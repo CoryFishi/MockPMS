@@ -28,7 +28,6 @@ export default function Home({
           favoriteFacilities={favoriteFacilities}
           setFavoriteFacilities={setFavoriteFacilities}
         />
-        <div className="flex-1 h-full bg-blue-400"></div>
       </div>
     </div>
   );
