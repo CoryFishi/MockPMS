@@ -1,0 +1,35 @@
+import { useState } from "react";
+import Navbar from "../components/Navbar";
+import Dashboard from "../components/Dashboard";
+
+export default function Home({
+  currentFacility,
+  setCurrentFacility,
+  savedFacilities,
+  setSavedFacilities,
+  favoriteFacilities,
+  setFavoriteFacilities,
+}) {
+  const [dashboardMenu, setDashboardMenu] = useState(true);
+
+  return (
+    <div className="h-screen w-screen flex flex-col overflow-x-hidden overflow-hidden font-roboto">
+      <Navbar
+        setDashboardMenu={setDashboardMenu}
+        dashboardMenu={dashboardMenu}
+      />
+      <div className="flex flex-1">
+        <Dashboard
+          dashboardMenu={dashboardMenu}
+          currentFacility={currentFacility}
+          setCurrentFacility={setCurrentFacility}
+          savedFacilities={savedFacilities}
+          setSavedFacilities={setSavedFacilities}
+          favoriteFacilities={favoriteFacilities}
+          setFavoriteFacilities={setFavoriteFacilities}
+        />
+        <div className="flex-1 h-full bg-blue-400"></div>
+      </div>
+    </div>
+  );
+}
