@@ -1,9 +1,9 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
-import CreateUnit from "./modals/CreateUnit";
 import CreateVisitorVisitor from "./modals/CreateVisitorVisitor";
 import EditVisitor from "./modals/EditVisitor";
+import { RiDoorLockFill } from "react-icons/ri";
 
 export default function VisitorPage({ currentFacility }) {
   const [visitors, setVisitors] = useState([]);
@@ -156,180 +156,226 @@ export default function VisitorPage({ currentFacility }) {
     });
   }, []);
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Filter facilities based on the search query
+  const filteredVisitors = visitors.filter(
+    (visitor) =>
+      (visitor.id?.toString() || "").includes(searchQuery) ||
+      (visitor.accessProfileName?.toLowerCase() || "").includes(
+        searchQuery.toLowerCase()
+      ) ||
+      (visitor.timeGroupName?.toLowerCase() || "").includes(
+        searchQuery.toLowerCase()
+      ) ||
+      (visitor.name?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+      (visitor.unitNumber?.toLowerCase() || "").includes(
+        searchQuery.toLowerCase()
+      ) ||
+      (visitor.mobilePhoneNumber?.toLowerCase() || "").includes(
+        searchQuery.toLowerCase()
+      ) ||
+      (visitor.email?.toLowerCase() || "").includes(
+        searchQuery.toLowerCase()
+      ) ||
+      (visitor.code?.toLowerCase() || "").includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="w-full h-full p-5 flex flex-col rounded-lg overflow-auto mb-14">
-      <div className="min-h-12 flex justify-center gap-32">
-        <div className="text-center">
-          <div className="font-bold text-2xl">{tenants || 0}</div>
-          Tenants
-        </div>
-        <div className="text-center">
-          <div className="font-bold text-2xl">{guests || 0}</div>
-          Guests
-        </div>
-        <div className="text-center">
-          <div className="font-bold text-2xl">{nonTenants || 0}</div>
-          Non-Tenants
-        </div>
-        <div className="text-center">
-          <div className="font-bold text-2xl">{visitors.length || 0}</div>
-          Total
+    <div className="overflow-auto mb-14">
+      <div className="flex h-12 bg-gray-200 items-center">
+        <div className="ml-5 flex items-center text-sm">
+          <RiDoorLockFill className="text-lg" />
+          &ensp; Visitors | {currentFacility.facilityInfo?.name}
         </div>
       </div>
-      <div className="m-1 mr-5 flex items-center justify-end">
-        <button
-          className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 ml-3"
-          onClick={() => setIsCreateVisitorModalOpen(true)}
-        >
-          Create Visitor
-        </button>
-      </div>
+      <div className="w-full h-full p-5 flex flex-col rounded-lg">
+        <div className="min-h-12 flex justify-center gap-32">
+          <div className="text-center">
+            <div className="font-bold text-2xl">{tenants || 0}</div>
+            Tenants
+          </div>
+          <div className="text-center">
+            <div className="font-bold text-2xl">{guests || 0}</div>
+            Guests
+          </div>
+          <div className="text-center">
+            <div className="font-bold text-2xl">{nonTenants || 0}</div>
+            Non-Tenants
+          </div>
+          <div className="text-center">
+            <div className="font-bold text-2xl">{visitors.length || 0}</div>
+            Total
+          </div>
+        </div>
+        <div className="mt-5 mb-2 flex items-center justify-end text-center">
+          <input
+            type="text"
+            placeholder="Search visitors..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border p-2 w-full"
+          />
+          <button
+            className="bg-green-500 text-white p-1 py-2 rounded hover:bg-green-600 ml-3 w-44"
+            onClick={() => setIsCreateVisitorModalOpen(true)}
+          >
+            Create Visitor
+          </button>
+        </div>
 
-      {/* Create Visitor Modal Popup */}
-      {isCreateVisitorModalOpen && (
-        <CreateVisitorVisitor
-          setIsCreateVisitorModalOpen={setIsCreateVisitorModalOpen}
-          currentFacility={currentFacility}
-          setVisitors={setVisitors}
-        />
-      )}
+        {/* Create Visitor Modal Popup */}
+        {isCreateVisitorModalOpen && (
+          <CreateVisitorVisitor
+            setIsCreateVisitorModalOpen={setIsCreateVisitorModalOpen}
+            currentFacility={currentFacility}
+            setVisitors={setVisitors}
+          />
+        )}
 
-      {/* Edit Visitor Modal Popup */}
-      {isEditVisitorModalOpen && (
-        <EditVisitor
-          setIsEditVisitorModalOpen={setIsEditVisitorModalOpen}
-          currentFacility={currentFacility}
-          setVisitors={setVisitors}
-          visitor={selectedVisitor}
-        />
-      )}
+        {/* Edit Visitor Modal Popup */}
+        {isEditVisitorModalOpen && (
+          <EditVisitor
+            setIsEditVisitorModalOpen={setIsEditVisitorModalOpen}
+            currentFacility={currentFacility}
+            setVisitors={setVisitors}
+            visitor={selectedVisitor}
+          />
+        )}
 
-      <table className="w-full table-auto border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="border border-gray-300 px-4 py-2 text-left">
-              Visitor Id
-            </th>
-            <th className="border border-gray-300 px-4 py-2 text-left">
-              Unit Number
-            </th>
-            <th className="border border-gray-300 px-4 py-2 text-left">Name</th>
-            <th className="border border-gray-300 px-4 py-2 text-left">Type</th>
-            <th className="border border-gray-300 px-4 py-2 text-left">
-              Access Profile
-            </th>
-            <th className="border border-gray-300 px-4 py-2 text-left">
-              Time Profile
-            </th>
-            <th className="border border-gray-300 px-4 py-2 text-left">
-              Gate Code
-            </th>
-            <th className="border border-gray-300 px-4 py-2 text-left">
-              Phone Number
-            </th>
-            <th className="border border-gray-300 px-4 py-2 text-left">
-              Email Address
-            </th>
-            <th className="border border-gray-300 px-4 py-2 text-left">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {visitors.map((visitor, index) => (
-            <tr key={index} className="hover:bg-gray-100">
-              <td className="border border-gray-300 px-4 py-2">{visitor.id}</td>
-              <td className="border border-gray-300 px-4 py-2">
-                {visitor.unitNumber}
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
-                {visitor.name}
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
-                {visitor.isTenant
-                  ? "Tenant"
-                  : visitor.isPortalVisitor
-                  ? "Non-Tenant"
-                  : !visitor.unitNumber
-                  ? "Non-Tenant Guest"
-                  : "Guest"}
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
-                {visitor.accessProfileName}
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
-                {visitor.timeGroupName}
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
-                {visitor.code}
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
-                {visitor.mobilePhoneNumber}
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
-                {visitor.email}
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
-                {visitor.isTenant === true ? (
-                  <>
-                    <button
-                      className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
-                      onClick={() =>
-                        setIsEditVisitorModalOpen(true) &
-                        setSelectedVisitor(visitor)
-                      }
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="bg-red-500 text-white px-2 py-1 rounded ml-2 hover:bg-red-600"
-                      onClick={() => moveOutVisitor(visitor)}
-                    >
-                      Move Out
-                    </button>
-                  </>
-                ) : visitor.isPortalVisitor === true ? (
-                  <>
-                    <button
-                      className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
-                      onClick={() =>
-                        setIsEditVisitorModalOpen(true) &
-                        setSelectedVisitor(visitor)
-                      }
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="bg-red-500 text-white px-2 py-1 rounded ml-2 hover:bg-red-600"
-                      onClick={() => deleteVisitor(visitor)}
-                    >
-                      Delete
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
-                      onClick={() =>
-                        setIsEditVisitorModalOpen(true) &
-                        setSelectedVisitor(visitor)
-                      }
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="bg-red-500 text-white px-2 py-1 rounded ml-2 hover:bg-red-600"
-                      onClick={() => deleteVisitor(visitor)}
-                    >
-                      Remove
-                    </button>
-                  </>
-                )}
-              </td>
+        <table className="w-full table-auto border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Visitor Id
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Unit Number
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Name
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Type
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Access Profile
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Time Profile
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Gate Code
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Phone Number
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Email Address
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Actions
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredVisitors.map((visitor, index) => (
+              <tr key={index} className="hover:bg-gray-100">
+                <td className="border border-gray-300 px-4 py-2">
+                  {visitor.id}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {visitor.unitNumber}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {visitor.name}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {visitor.isTenant
+                    ? "Tenant"
+                    : visitor.isPortalVisitor
+                    ? "Non-Tenant"
+                    : !visitor.unitNumber
+                    ? "Non-Tenant Guest"
+                    : "Guest"}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {visitor.accessProfileName}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {visitor.timeGroupName}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {visitor.code}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {visitor.mobilePhoneNumber}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {visitor.email}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {visitor.isTenant === true ? (
+                    <>
+                      <button
+                        className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                        onClick={() =>
+                          setIsEditVisitorModalOpen(true) &
+                          setSelectedVisitor(visitor)
+                        }
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="bg-red-500 text-white px-2 py-1 rounded ml-2 hover:bg-red-600"
+                        onClick={() => moveOutVisitor(visitor)}
+                      >
+                        Move Out
+                      </button>
+                    </>
+                  ) : visitor.isPortalVisitor === true ? (
+                    <>
+                      <button
+                        className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                        onClick={() =>
+                          setIsEditVisitorModalOpen(true) &
+                          setSelectedVisitor(visitor)
+                        }
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="bg-red-500 text-white px-2 py-1 rounded ml-2 hover:bg-red-600"
+                        onClick={() => deleteVisitor(visitor)}
+                      >
+                        Delete
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                        onClick={() =>
+                          setIsEditVisitorModalOpen(true) &
+                          setSelectedVisitor(visitor)
+                        }
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="bg-red-500 text-white px-2 py-1 rounded ml-2 hover:bg-red-600"
+                        onClick={() => deleteVisitor(visitor)}
+                      >
+                        Remove
+                      </button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
