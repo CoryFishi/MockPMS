@@ -13,7 +13,6 @@ export default function Dashboard({
   dashboardMenu,
   currentFacility,
   setCurrentFacility,
-  setSavedFacilities,
   savedFacilities,
   favoriteFacilities,
   setFavoriteFacilities,
@@ -135,7 +134,7 @@ export default function Dashboard({
           <div className="flex flex-col h-full w-1/6 bg-gray-800 text-white space-y-4 text-xl">
             {/* Header Side Bar */}
             <div>
-              <h3 className="text-center m-5 text-2xl">Not OPENTECH IoE</h3>
+              <h3 className="text-center m-5 text-2xl">OPENTECH IoE</h3>
             </div>
 
             {/* Current Facility Side Bar */}
