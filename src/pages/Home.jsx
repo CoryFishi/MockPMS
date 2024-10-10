@@ -23,7 +23,9 @@ export default function Home({
           dashboardMenu={dashboardMenu}
           currentFacility={currentFacility}
           setCurrentFacility={setCurrentFacility}
-          savedFacilities={savedFacilities}
+          savedFacilities={
+            Array.isArray(savedFacilities) ? savedFacilities : []
+          }
           setSavedFacilities={setSavedFacilities}
           favoriteFacilities={favoriteFacilities}
           setFavoriteFacilities={setFavoriteFacilities}

@@ -19,8 +19,10 @@ export default function Settings({
   const [clientSecret, setClientSecret] = useState("");
   const [environment, setEnvironment] = useState("-");
 
-  const [settingsSavedFacilities, setSettingsSavedFacilities] =
-    useState(savedFacilities);
+  const [settingsSavedFacilities, setSettingsSavedFacilities] = useState(
+    Array.isArray(savedFacilities) ? savedFacilities : []
+  );
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const submitNewFacility = () => {

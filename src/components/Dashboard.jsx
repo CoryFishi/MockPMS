@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import VisitorPage from "./VisitorPage";
@@ -13,7 +13,7 @@ export default function Dashboard({
   dashboardMenu,
   currentFacility,
   setCurrentFacility,
-  savedFacilities,
+  savedFacilities = [],
   favoriteFacilities,
   setFavoriteFacilities,
 }) {
@@ -22,13 +22,15 @@ export default function Dashboard({
     currentFacility: false,
   });
   const [openPage, setOpenPage] = useState(
-    localStorage.getItem("openPage") || "units"
+    localStorage.getItem("openPage") || "allFacilities"
   );
   const [currentFacilityName, setCurrentFacilityName] = useState(
-    localStorage.getItem("selectedFacilityName") || "Current Facility"
+    localStorage.getItem("selectedFacilityName") || "Select a Facility"
   );
   const existingLocalStorageFacility =
     JSON.parse(localStorage.getItem("currentFacility")) || {};
+
+  const navigate = useNavigate();
 
   const handleLogin = () => {
     var tokenStageKey = "";
@@ -113,6 +115,14 @@ export default function Dashboard({
     }));
   };
 
+  // Check if savedFacilities is empty and alert the user
+  useEffect(() => {
+    if (savedFacilities.length === 0) {
+      alert("Please authenticate a service, before proceeding...");
+      navigate("/settings");
+    }
+  }, [savedFacilities, navigate]);
+
   // Run handleLogin once when the component loads
   useEffect(() => {
     const initialize = async () => {
@@ -157,13 +167,19 @@ export default function Dashboard({
               {!openSections.currentFacility && (
                 <div className="ml-6 mt-4 space-y-2">
                   <Link
-                    onClick={() => setOpenPage("visitors")}
+                    onClick={() =>
+                      setOpenPage("visitors") &
+                      localStorage.setItem("openPage", "visitors")
+                    }
                     className="block hover:text-gray-300"
                   >
                     Visitors
                   </Link>
                   <Link
-                    onClick={() => setOpenPage("units")}
+                    onClick={() =>
+                      setOpenPage("units") &
+                      localStorage.setItem("openPage", "units")
+                    }
                     className="block hover:text-gray-300"
                   >
                     Units
@@ -188,13 +204,19 @@ export default function Dashboard({
               {!openSections.facilities && (
                 <div className="ml-6 mt-4 space-y-2">
                   <Link
-                    onClick={() => setOpenPage("allFacilities")}
+                    onClick={() =>
+                      setOpenPage("allFacilities") &
+                      localStorage.setItem("openPage", "allFacilities")
+                    }
                     className="block hover:text-gray-300"
                   >
                     All Facilities
                   </Link>
                   <Link
-                    onClick={() => setOpenPage("favorites")}
+                    onClick={() =>
+                      setOpenPage("favorites") &
+                      localStorage.setItem("openPage", "favorites")
+                    }
                     className="block hover:text-gray-300"
                   >
                     Favorites
