@@ -240,6 +240,7 @@ export default function Dashboard({
               savedFacilities={savedFacilities}
               favoriteFacilities={favoriteFacilities}
               setFavoriteFacilities={setFavoriteFacilities}
+              setOpenPage={setOpenPage}
             />
           )}
           {openPage === "favorites" && (
@@ -249,6 +250,7 @@ export default function Dashboard({
               savedFacilities={savedFacilities}
               favoriteFacilities={favoriteFacilities}
               setFavoriteFacilities={setFavoriteFacilities}
+              setOpenPage={setOpenPage}
             />
           )}
         </div>

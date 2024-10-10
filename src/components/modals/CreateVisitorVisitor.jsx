@@ -78,6 +78,7 @@ export default function CreateVisitorVisitor({
 
     axios(config)
       .then(function (response) {
+        console.log(response.data, currentFacility);
         setTimeProfiles(response.data);
       })
       .catch(function (error) {

@@ -5,13 +5,12 @@ import { GoStar, GoStarFill } from "react-icons/go";
 import qs from "qs";
 
 export default function AllFacilitiesPage({
-  currentFacility,
   setCurrentFacility,
   setCurrentFacilityName,
   savedFacilities,
-  setSavedFacilities,
   favoriteFacilities,
   setFavoriteFacilities,
+  setOpenPage,
 }) {
   const [facilities, setFacilities] = useState([]);
 
@@ -163,11 +162,12 @@ export default function AllFacilitiesPage({
   const handleSelect = async (facility) => {
     setCurrentFacility(facility);
     localStorage.setItem("currentFacility", JSON.stringify(facility));
-    toast.promise(handleSelectLogin(facility), {
+    await toast.promise(handleSelectLogin(facility), {
       loading: "Selecting facility...",
       success: <b>Facility selected!</b>,
       error: <b>Could not select facility.</b>,
     });
+    setOpenPage("units");
   };
 
   const addToFavorite = async (facility) => {
