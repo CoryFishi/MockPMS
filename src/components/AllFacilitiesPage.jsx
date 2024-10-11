@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
 import { GoStar, GoStarFill } from "react-icons/go";
 import qs from "qs";
-import { RiDoorLockFill } from "react-icons/ri";
+import { FaWarehouse } from "react-icons/fa6";
 
 export default function AllFacilitiesPage({
   currentFacility,
@@ -226,7 +226,7 @@ export default function AllFacilitiesPage({
     <div className="overflow-auto">
       <div className="flex h-12 bg-gray-200 items-center">
         <div className="ml-5 flex items-center text-sm">
-          <RiDoorLockFill className="text-lg" />
+          <FaWarehouse className="text-lg" />
           &ensp; All Facilities
         </div>
       </div>

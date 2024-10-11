@@ -238,16 +238,26 @@ export default function Settings({
             {settingsSavedFacilities.map((facility, index) => (
               <tr key={index} className="hover:bg-gray-100">
                 <td className="border border-gray-300 px-4 py-2">
-                  {facility.api}
+                  {facility.api
+                    ? "•".repeat(facility.api.length - 5) +
+                      facility.api.slice(-5)
+                    : ""}
                 </td>
+
                 <td className="border border-gray-300 px-4 py-2">
-                  {facility.apiSecret}
+                  {facility.apiSecret
+                    ? "•".repeat(facility.apiSecret.length - 5) +
+                      facility.apiSecret.slice(-5)
+                    : ""}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
                   {facility.client}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
-                  {facility.clientSecret}
+                  {facility.clientSecret
+                    ? "•".repeat(facility.clientSecret.length - 5) +
+                      facility.clientSecret.slice(-5)
+                    : ""}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
                   {facility.environment === ""
