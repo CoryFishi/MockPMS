@@ -5,11 +5,13 @@ import { GoStar, GoStarFill } from "react-icons/go";
 import qs from "qs";
 
 export default function FavoritesPage({
+  currentFacility,
   setCurrentFacility,
   setCurrentFacilityName,
   savedFacilities,
   favoriteFacilities,
   setFavoriteFacilities,
+  setOpenPage,
 }) {
   const [facilities, setFacilities] = useState([]);
 
@@ -73,11 +75,13 @@ export default function FavoritesPage({
   const handleSelect = async (facility) => {
     setCurrentFacility(facility);
     localStorage.setItem("currentFacility", JSON.stringify(facility));
-    toast.promise(handleSelectLogin(facility), {
+    await toast.promise(handleSelectLogin(facility), {
       loading: "Selecting facility...",
       success: <b>Facility selected!</b>,
       error: <b>Could not select facility.</b>,
     });
+    localStorage.setItem("openPage", "units");
+    setOpenPage("units");
   };
 
   const addToFavorite = async (facility) => {
@@ -114,76 +118,121 @@ export default function FavoritesPage({
     return favoriteFacilities.some((facility) => facility.id === facilityId);
   };
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Filter facilities based on the search query
+  const filteredFacilities = facilities.filter(
+    (facility) =>
+      (facility.id || "").toString().includes(searchQuery) ||
+      (facility.propertyNumber || "")
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      (facility.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (facility.environment || "")
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="w-full h-full p-5 flex flex-col rounded-lg overflow-auto mb-14">
-      <table className="w-full table-auto border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="border border-gray-300 px-4 py-2"></th>
-            <th className="border border-gray-300 px-4 py-2 text-left">
-              Environment
-            </th>
-            <th className="border border-gray-300 px-4 py-2 text-left">
-              Facility Id
-            </th>
-            <th className="border border-gray-300 px-4 py-2 text-left">
-              Facility Name
-            </th>
-            <th className="border border-gray-300 px-4 py-2 text-left">
-              Property Number
-            </th>
-            <th className="border border-gray-300 px-4 py-2 text-left">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {facilities.map((facility, index) => (
-            <tr key={index} className="hover:bg-gray-100">
-              <td
-                className="border border-gray-300 px-4 py-2 hover:cursor-pointer"
-                onClick={() => addToFavorite(facility)}
-              >
-                <div className="flex justify-center text-yellow-500">
-                  {isFacilityFavorite(facility.id) ? (
-                    <GoStarFill />
-                  ) : (
-                    <GoStar />
-                  )}
-                </div>
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
-                {facility.environment == "-dev"
-                  ? "Development"
-                  : facility.environment == ""
-                  ? "Production"
-                  : facility.environment == "-qa"
-                  ? "QA"
-                  : facility.environment == "cia-stg-1.aws."
-                  ? "Staging"
-                  : "N?A"}
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
-                {facility.id}
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
-                {facility.name}
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
-                {facility.propertyNumber}
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
-                <button
-                  className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
-                  onClick={() => handleSelect(facility)}
-                >
-                  Select
-                </button>
-              </td>
+    <div className="overflow-auto">
+      <div className="flex h-12 bg-gray-200 items-center">
+        <div className="ml-5 flex items-center text-sm">
+          <GoStarFill className="text-lg" />
+          &ensp; Favorites
+        </div>
+      </div>
+      <div className="w-full h-full p-5 flex flex-col rounded-lg pb-10">
+        <input
+          type="text"
+          placeholder="Search facilities..."
+          value={searchQuery}
+          onChange={(e) =>
+            setSearchQuery(e.target.value) & console.log(facilities)
+          }
+          className="border p-2 w-full mb-2"
+        />
+        <table className="w-full table-auto border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border border-gray-300 px-4 py-2"></th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Environment
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Facility Id
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Facility Name
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Property Number
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Actions
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredFacilities.map((facility, index) => (
+              <tr key={index} className="hover:bg-gray-100">
+                <td
+                  className="border border-gray-300 px-4 py-2 hover:cursor-pointer"
+                  onClick={() => addToFavorite(facility)}
+                >
+                  <div className="flex justify-center text-yellow-500">
+                    {isFacilityFavorite(facility.id) ? (
+                      <GoStarFill />
+                    ) : (
+                      <GoStar />
+                    )}
+                  </div>
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {facility.environment == "-dev"
+                    ? "Development"
+                    : facility.environment == ""
+                    ? "Production"
+                    : facility.environment == "-qa"
+                    ? "QA"
+                    : facility.environment == "cia-stg-1.aws."
+                    ? "Staging"
+                    : "N?A"}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {facility.id}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {facility.name}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {facility.propertyNumber}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {currentFacility.id == facility.id &&
+                  currentFacility.environment == facility.environment ? (
+                    <button
+                      className="bg-gray-200 text-white px-2 py-1 rounded hover:bg-gray-300"
+                      onClick={() =>
+                        localStorage.setItem("openPage", "units") &
+                        setOpenPage("units")
+                      }
+                    >
+                      Selected
+                    </button>
+                  ) : (
+                    <button
+                      className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                      onClick={() => handleSelect(facility)}
+                    >
+                      Select
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

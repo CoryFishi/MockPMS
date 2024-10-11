@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
 import CreateVisitorVisitor from "./modals/CreateVisitorVisitor";
 import EditVisitor from "./modals/EditVisitor";
-import { RiDoorLockFill } from "react-icons/ri";
+import { FaPerson } from "react-icons/fa6";
 
 export default function VisitorPage({ currentFacility, currentFacilityName }) {
   const [visitors, setVisitors] = useState([]);
@@ -182,10 +182,10 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
   );
 
   return (
-    <div className="overflow-auto mb-14">
+    <div className="overflow-auto h-full">
       <div className="flex h-12 bg-gray-200 items-center">
         <div className="ml-5 flex items-center text-sm">
-          <RiDoorLockFill className="text-lg" />
+          <FaPerson className="text-lg" />
           &ensp; Visitors | {currentFacilityName}
         </div>
       </div>

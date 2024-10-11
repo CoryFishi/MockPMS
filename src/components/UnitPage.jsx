@@ -5,7 +5,10 @@ import CreateUnit from "./modals/CreateUnit";
 import CreateVisitor from "./modals/CreateVisitorUnit";
 import { RiDoorLockFill } from "react-icons/ri";
 
-export default function UnitPage({ currentFacility, currentFacilityName }) {
+export default function UnitPage({
+  currentFacility,
+  currentFacilityName = { currentFacilityName },
+}) {
   const [units, setUnits] = useState([]);
   const [rented, setRented] = useState("");
   const [vacant, setVacant] = useState("");
@@ -368,7 +371,7 @@ export default function UnitPage({ currentFacility, currentFacilityName }) {
       unit.status.toLowerCase().includes(searchQuery.toLowerCase())
   );
   return (
-    <div className="overflow-auto mb-14">
+    <div className="overflow-auto">
       <div className="flex h-12 bg-gray-200 items-center">
         <div className="ml-5 flex items-center text-sm">
           <RiDoorLockFill className="text-lg" />
@@ -442,7 +445,7 @@ export default function UnitPage({ currentFacility, currentFacilityName }) {
           />
         )}
 
-        <table className="w-full table-auto border-collapse border border-gray-300">
+        <table className="w-full table-auto border-collapse border border-gray-300 pb-96">
           <thead>
             <tr className="bg-gray-200">
               <th className="border border-gray-300 px-4 py-2 text-left">

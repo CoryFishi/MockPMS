@@ -138,7 +138,7 @@ export default function Dashboard({
   }, []);
 
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex flex-col w-full h-screen overflow-auto">
       <div className="flex flex-row w-full h-full">
         {dashboardMenu === true && (
           <div className="flex flex-col h-full w-1/6 bg-gray-800 text-white space-y-4 text-xl">
@@ -226,7 +226,7 @@ export default function Dashboard({
             </div>
           </div>
         )}
-        <div className="w-full h-screen flex flex-col bg-background-50 overflow-hidden">
+        <div className="w-full flex flex-col bg-background-50 mb-14">
           {openPage === "visitors" && (
             <VisitorPage
               currentFacility={currentFacility}
@@ -241,6 +241,7 @@ export default function Dashboard({
           )}
           {openPage === "allFacilities" && (
             <AllFacilitiesPage
+              currentFacility={currentFacility}
               setCurrentFacility={setCurrentFacility}
               setCurrentFacilityName={setCurrentFacilityName}
               savedFacilities={savedFacilities}
@@ -251,6 +252,7 @@ export default function Dashboard({
           )}
           {openPage === "favorites" && (
             <FavoritesPage
+              currentFacility={currentFacility}
               setCurrentFacility={setCurrentFacility}
               setCurrentFacilityName={setCurrentFacilityName}
               savedFacilities={savedFacilities}

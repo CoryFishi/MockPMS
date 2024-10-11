@@ -66,12 +66,12 @@ export default function Settings({
         setSettingsSavedFacilities(updatedSettingsFacilities);
 
         // Clear the form inputs
-        setApi("");
-        setApiSecret("");
-        setClient("");
-        setClientSecret("");
-        setEnvironment("-");
-        setIsAuthenticated(false);
+        // setApi("");
+        // setApiSecret("");
+        // setClient("");
+        // setClientSecret("");
+        // setEnvironment("-");
+        // setIsAuthenticated(false);
 
         resolve("Facility added successfully!");
       } catch (error) {
@@ -205,180 +205,178 @@ export default function Settings({
   }, []);
 
   return (
-    <div className="h-screen w-screen flex flex-col overflow-x-hidden font-roboto overflow-hidden">
+    <div className="h-screen w-screen flex flex-col overflow-x-hidden overflow-hidden font-roboto">
       <Navbar />
-      <div className="flex flex-col min-h-screen bg-white overflow-hidden">
-        <div>
-          <table className="w-full table-auto border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  API Key
-                </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  API Secret
-                </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  Client
-                </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  Client Secret
-                </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  Environment
-                </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  Authenticated
-                </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {settingsSavedFacilities.map((facility, index) => (
-                <tr key={index} className="hover:bg-gray-100">
-                  <td className="border border-gray-300 px-4 py-2">
-                    {facility.api}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {facility.apiSecret}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {facility.client}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {facility.clientSecret}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {facility.environment === ""
-                      ? "Production"
-                      : facility.environment === "-dev"
-                      ? "Development"
-                      : facility.environment === "-qa"
-                      ? "QA"
-                      : facility.environment === "cia-stg-1.aws."
-                      ? "Staging"
-                      : facility.environment}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    <div className="flex justify-center text-lg">
-                      {facility.isAuthenticated ? (
-                        <FaCircleCheck className="text-green-500" />
-                      ) : (
-                        <MdOutlineError className="text-red-500" />
-                      )}
-                    </div>
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    <div className="text-center">
-                      <button
-                        className="m-1 px-4 py-1 bg-red-500 rounded-md hover:bg-red-600 text-white"
-                        onClick={() =>
-                          toast.promise(deleteFacility(index), {
-                            loading: "Deleting Credentials...",
-                            success: <b>Successfully deleted!</b>,
-                            error: <b>Failed deletion!</b>,
-                          })
-                        }
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              <tr className="hover:bg-gray-100">
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  <input
-                    type="text"
-                    className="w-64 border border-slate-100 shadow-md"
-                    value={api}
-                    onChange={(e) => setApi(e.target.value)}
-                  />
+      <div className="w-full h-full p-5 flex flex-col rounded-lg pb-5 overflow-y-auto">
+        <table className="w-full table-auto border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                API Key
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                API Secret
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Client
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Client Secret
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Environment
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Authenticated
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {settingsSavedFacilities.map((facility, index) => (
+              <tr key={index} className="hover:bg-gray-100">
+                <td className="border border-gray-300 px-4 py-2">
+                  {facility.api}
                 </td>
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  <input
-                    type="text"
-                    className="w-64 border border-slate-100 shadow-md"
-                    value={apiSecret}
-                    onChange={(e) => setApiSecret(e.target.value)}
-                  />
+                <td className="border border-gray-300 px-4 py-2">
+                  {facility.apiSecret}
                 </td>
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  <input
-                    type="text"
-                    className="w-64 border border-slate-100 shadow-md"
-                    value={client}
-                    onChange={(e) => setClient(e.target.value)}
-                  />
+                <td className="border border-gray-300 px-4 py-2">
+                  {facility.client}
                 </td>
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  <input
-                    type="text"
-                    className="w-64 border border-slate-100 shadow-md"
-                    value={clientSecret}
-                    onChange={(e) => setClientSecret(e.target.value)}
-                  />
+                <td className="border border-gray-300 px-4 py-2">
+                  {facility.clientSecret}
                 </td>
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  <select
-                    value={environment}
-                    onChange={(e) =>
-                      setEnvironment(e.target.value) &
-                      handleNewLogin(e.target.value)
-                    }
-                    className="w-64 p-0.5 shadow-md border border-slate-100"
-                  >
-                    <option value="-">--Select an Option--</option>
-                    <option value="">Production</option>
-                    <option value="-dev">Development</option>
-                    <option value="-qa">QA</option>
-                    <option value="cia-stg-1.aws.">Staging</option>
-                  </select>
+                <td className="border border-gray-300 px-4 py-2">
+                  {facility.environment === ""
+                    ? "Production"
+                    : facility.environment === "-dev"
+                    ? "Development"
+                    : facility.environment === "-qa"
+                    ? "QA"
+                    : facility.environment === "cia-stg-1.aws."
+                    ? "Staging"
+                    : facility.environment}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
                   <div className="flex justify-center text-lg">
-                    {isAuthenticated ? (
+                    {facility.isAuthenticated ? (
                       <FaCircleCheck className="text-green-500" />
                     ) : (
                       <MdOutlineError className="text-red-500" />
                     )}
                   </div>
                 </td>
-                <td className="border border-gray-300 px-4 py-2 text-center ">
-                  {isAuthenticated ? (
+                <td className="border border-gray-300 px-4 py-2">
+                  <div className="text-center">
                     <button
-                      className="m-1 px-4 py-1 bg-green-400 rounded-md hover:bg-green-500 text-white"
+                      className="m-1 px-4 py-1 bg-red-500 rounded-md hover:bg-red-600 text-white"
                       onClick={() =>
-                        toast.promise(submitNewFacility(), {
-                          loading: "Creating Credentials...",
-                          success: <b>Successfully created!</b>,
-                          error: <b>Failed to create!</b>,
+                        toast.promise(deleteFacility(index), {
+                          loading: "Deleting Credentials...",
+                          success: <b>Successfully deleted!</b>,
+                          error: <b>Failed deletion!</b>,
                         })
                       }
                     >
-                      Submit
+                      Delete
                     </button>
-                  ) : (
-                    <button
-                      className="m-1 px-4 py-1 bg-green-400 rounded-md hover:bg-green-500 text-white"
-                      onClick={() =>
-                        toast.promise(handleNewLogin(environment), {
-                          loading: "Authenticating Credentials...",
-                          success: <b>Successfully authenticated!</b>,
-                          error: <b>Failed to authenticate!</b>,
-                        })
-                      }
-                    >
-                      Authenticate
-                    </button>
-                  )}
+                  </div>
                 </td>
               </tr>
-            </tbody>
-          </table>
-        </div>
+            ))}
+            <tr className="hover:bg-gray-100">
+              <td className="border border-gray-300 px-4 py-2 text-center">
+                <input
+                  type="text"
+                  className="w-64 border border-slate-100 shadow-md"
+                  value={api}
+                  onChange={(e) => setApi(e.target.value)}
+                />
+              </td>
+              <td className="border border-gray-300 px-4 py-2 text-center">
+                <input
+                  type="text"
+                  className="w-64 border border-slate-100 shadow-md"
+                  value={apiSecret}
+                  onChange={(e) => setApiSecret(e.target.value)}
+                />
+              </td>
+              <td className="border border-gray-300 px-4 py-2 text-center">
+                <input
+                  type="text"
+                  className="w-64 border border-slate-100 shadow-md"
+                  value={client}
+                  onChange={(e) => setClient(e.target.value)}
+                />
+              </td>
+              <td className="border border-gray-300 px-4 py-2 text-center">
+                <input
+                  type="text"
+                  className="w-64 border border-slate-100 shadow-md"
+                  value={clientSecret}
+                  onChange={(e) => setClientSecret(e.target.value)}
+                />
+              </td>
+              <td className="border border-gray-300 px-4 py-2 text-center">
+                <select
+                  value={environment}
+                  onChange={(e) =>
+                    setEnvironment(e.target.value) &
+                    handleNewLogin(e.target.value)
+                  }
+                  className="w-64 p-0.5 shadow-md border border-slate-100"
+                >
+                  <option value="-">--Select an Option--</option>
+                  <option value="">Production</option>
+                  <option value="-dev">Development</option>
+                  <option value="-qa">QA</option>
+                  <option value="cia-stg-1.aws.">Staging</option>
+                </select>
+              </td>
+              <td className="border border-gray-300 px-4 py-2">
+                <div className="flex justify-center text-lg">
+                  {isAuthenticated ? (
+                    <FaCircleCheck className="text-green-500" />
+                  ) : (
+                    <MdOutlineError className="text-red-500" />
+                  )}
+                </div>
+              </td>
+              <td className="border border-gray-300 px-4 py-2 text-center ">
+                {isAuthenticated ? (
+                  <button
+                    className="m-1 px-4 py-1 bg-green-400 rounded-md hover:bg-green-500 text-white"
+                    onClick={() =>
+                      toast.promise(submitNewFacility(), {
+                        loading: "Creating Credentials...",
+                        success: <b>Successfully created!</b>,
+                        error: <b>Failed to create!</b>,
+                      })
+                    }
+                  >
+                    Submit
+                  </button>
+                ) : (
+                  <button
+                    className="m-1 px-4 py-1 bg-green-400 rounded-md hover:bg-green-500 text-white"
+                    onClick={() =>
+                      toast.promise(handleNewLogin(environment), {
+                        loading: "Authenticating Credentials...",
+                        success: <b>Successfully authenticated!</b>,
+                        error: <b>Failed to authenticate!</b>,
+                      })
+                    }
+                  >
+                    Authenticate
+                  </button>
+                )}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   );
