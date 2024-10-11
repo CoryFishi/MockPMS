@@ -5,7 +5,7 @@ import CreateUnit from "./modals/CreateUnit";
 import CreateVisitor from "./modals/CreateVisitorUnit";
 import { RiDoorLockFill } from "react-icons/ri";
 
-export default function UnitPage({ currentFacility }) {
+export default function UnitPage({ currentFacility, currentFacilityName }) {
   const [units, setUnits] = useState([]);
   const [rented, setRented] = useState("");
   const [vacant, setVacant] = useState("");
@@ -372,7 +372,7 @@ export default function UnitPage({ currentFacility }) {
       <div className="flex h-12 bg-gray-200 items-center">
         <div className="ml-5 flex items-center text-sm">
           <RiDoorLockFill className="text-lg" />
-          &ensp; Units | {currentFacility.facilityInfo?.name}
+          &ensp; Units | {currentFacilityName}
         </div>
       </div>
       <div className="w-full h-full p-5 flex flex-col rounded-lg">

@@ -155,11 +155,11 @@ export default function FavoritesPage({
               <td className="border border-gray-300 px-4 py-2">
                 {facility.environment == "-dev"
                   ? "Development"
-                  : ""
+                  : facility.environment == ""
                   ? "Production"
-                  : "-qa"
+                  : facility.environment == "-qa"
                   ? "QA"
-                  : "cia-stg-1.aws."
+                  : facility.environment == "cia-stg-1.aws."
                   ? "Staging"
                   : "N?A"}
               </td>

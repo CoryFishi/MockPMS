@@ -228,10 +228,16 @@ export default function Dashboard({
         )}
         <div className="w-full h-screen flex flex-col bg-background-50 overflow-hidden">
           {openPage === "visitors" && (
-            <VisitorPage currentFacility={currentFacility} />
+            <VisitorPage
+              currentFacility={currentFacility}
+              currentFacilityName={currentFacilityName}
+            />
           )}
           {openPage === "units" && (
-            <UnitPage currentFacility={currentFacility} />
+            <UnitPage
+              currentFacility={currentFacility}
+              currentFacilityName={currentFacilityName}
+            />
           )}
           {openPage === "allFacilities" && (
             <AllFacilitiesPage

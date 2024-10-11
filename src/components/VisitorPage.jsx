@@ -5,7 +5,7 @@ import CreateVisitorVisitor from "./modals/CreateVisitorVisitor";
 import EditVisitor from "./modals/EditVisitor";
 import { RiDoorLockFill } from "react-icons/ri";
 
-export default function VisitorPage({ currentFacility }) {
+export default function VisitorPage({ currentFacility, currentFacilityName }) {
   const [visitors, setVisitors] = useState([]);
   const [tenants, setTenants] = useState("");
   const [nonTenants, setNonTenants] = useState("");
@@ -186,7 +186,7 @@ export default function VisitorPage({ currentFacility }) {
       <div className="flex h-12 bg-gray-200 items-center">
         <div className="ml-5 flex items-center text-sm">
           <RiDoorLockFill className="text-lg" />
-          &ensp; Visitors | {currentFacility.facilityInfo?.name}
+          &ensp; Visitors | {currentFacilityName}
         </div>
       </div>
       <div className="w-full h-full p-5 flex flex-col rounded-lg">
