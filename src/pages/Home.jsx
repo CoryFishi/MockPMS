@@ -9,6 +9,8 @@ export default function Home({
   setSavedFacilities,
   favoriteFacilities,
   setFavoriteFacilities,
+  darkMode,
+  toggleDarkMode,
 }) {
   const [dashboardMenu, setDashboardMenu] = useState(true);
 
@@ -17,6 +19,8 @@ export default function Home({
       <Navbar
         setDashboardMenu={setDashboardMenu}
         dashboardMenu={dashboardMenu}
+        darkMode={darkMode}
+        toggleDarkMode={toggleDarkMode}
       />
       <div className="flex flex-1">
         <Dashboard

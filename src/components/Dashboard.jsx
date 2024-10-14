@@ -141,14 +141,20 @@ export default function Dashboard({
     <div className="flex flex-col w-full h-screen overflow-auto">
       <div className="flex flex-row w-full h-full">
         {dashboardMenu === true && (
-          <div className="flex flex-col h-full w-1/6 bg-gray-800 text-white space-y-4 text-xl">
+          <div className="flex flex-col h-full w-1/6 bg-navPrimary text-white text-xl dark:bg-darkNavPrimary border-r dark:border-border">
             {/* Header Side Bar */}
             <div>
               <h3 className="text-center m-5 text-2xl">OPENTECH IoE</h3>
             </div>
 
             {/* Current Facility Side Bar */}
-            <div className="pl-2 pr-2 pb-4">
+            <div
+              className={`pl-2 pr-2 pb-8 mt-8 ${
+                openPage === "visitors" || openPage === "units"
+                  ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
+                  : "dark:bg-darkNavPrimary"
+              }`}
+            >
               <div
                 className="flex justify-between items-center cursor-pointer mt-8"
                 onClick={() => toggleSection("currentFacility")}
@@ -189,7 +195,13 @@ export default function Dashboard({
             </div>
 
             {/* Facilities Side Bar */}
-            <div className="border-t border-b pl-2 pr-2 border-gray-500 pb-8">
+            <div
+              className={`border-t border-b pl-2 pr-2 border-gray-500 pb-8 ${
+                openPage === "allFacilities" || openPage === "favorites"
+                  ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
+                  : "dark:bg-darkNavPrimary"
+              }`}
+            >
               <div
                 className="flex justify-between items-center cursor-pointer mt-8"
                 onClick={() => toggleSection("facilities")}

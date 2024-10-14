@@ -7,10 +7,10 @@ import qs from "qs";
 import toast from "react-hot-toast";
 
 export default function Settings({
-  setCurrentFacility,
-  currentFacility,
   savedFacilities = [],
   setSavedFacilities,
+  darkMode,
+  toggleDarkMode,
 }) {
   // Create state for each input field
   const [api, setApi] = useState("");
@@ -205,61 +205,63 @@ export default function Settings({
   }, []);
 
   return (
-    <div className="h-screen w-screen flex flex-col overflow-x-hidden overflow-hidden font-roboto">
-      <Navbar />
+    <div className="dark:text-white dark:bg-darkPrimary h-screen w-screen flex flex-col overflow-x-hidden overflow-hidden font-roboto">
+      <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       <div className="w-full h-full p-5 flex flex-col rounded-lg pb-5 overflow-y-auto">
-        <table className="w-full table-auto border-collapse border border-gray-300">
+        <table className="w-full table-auto border-collapse border border-gray-300 dark:border-border">
           <thead>
-            <tr className="bg-gray-200">
-              <th className="border border-gray-300 px-4 py-2 text-left">
+            <tr className="bg-gray-200 dark:bg-darkNavSecondary">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 API Key
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 API Secret
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Client
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Client Secret
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Environment
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Authenticated
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Actions
               </th>
             </tr>
           </thead>
           <tbody>
             {settingsSavedFacilities.map((facility, index) => (
-              <tr key={index} className="hover:bg-gray-100">
-                <td className="border border-gray-300 px-4 py-2">
+              <tr
+                key={index}
+                className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
+              >
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {facility.api
                     ? "•".repeat(facility.api.length - 5) +
                       facility.api.slice(-5)
                     : ""}
                 </td>
-
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {facility.apiSecret
                     ? "•".repeat(facility.apiSecret.length - 5) +
                       facility.apiSecret.slice(-5)
                     : ""}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {facility.client}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {facility.clientSecret
                     ? "•".repeat(facility.clientSecret.length - 5) +
                       facility.clientSecret.slice(-5)
                     : ""}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {facility.environment === ""
                     ? "Production"
                     : facility.environment === "-dev"
@@ -270,7 +272,7 @@ export default function Settings({
                     ? "Staging"
                     : facility.environment}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   <div className="flex justify-center text-lg">
                     {facility.isAuthenticated ? (
                       <FaCircleCheck className="text-green-500" />
@@ -279,7 +281,7 @@ export default function Settings({
                     )}
                   </div>
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   <div className="text-center">
                     <button
                       className="m-1 px-4 py-1 bg-red-500 rounded-md hover:bg-red-600 text-white"
@@ -297,47 +299,47 @@ export default function Settings({
                 </td>
               </tr>
             ))}
-            <tr className="hover:bg-gray-100">
-              <td className="border border-gray-300 px-4 py-2 text-center">
+            <tr className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary">
+              <td className="text-black text-center border border-gray-300 dark:border-border px-4 py-2">
                 <input
                   type="text"
-                  className="w-64 border border-slate-100 shadow-md"
+                  className="w-64 border border-slate-100 shadow-md rounded"
                   value={api}
                   onChange={(e) => setApi(e.target.value)}
                 />
               </td>
-              <td className="border border-gray-300 px-4 py-2 text-center">
+              <td className="text-black text-center border border-gray-300 dark:border-border px-4 py-2">
                 <input
                   type="text"
-                  className="w-64 border border-slate-100 shadow-md"
+                  className="w-64 border border-slate-100 shadow-md rounded"
                   value={apiSecret}
                   onChange={(e) => setApiSecret(e.target.value)}
                 />
               </td>
-              <td className="border border-gray-300 px-4 py-2 text-center">
+              <td className="text-black text-center border border-gray-300 dark:border-border px-4 py-2">
                 <input
                   type="text"
-                  className="w-64 border border-slate-100 shadow-md"
+                  className="w-64 border border-slate-100 shadow-md rounded"
                   value={client}
                   onChange={(e) => setClient(e.target.value)}
                 />
               </td>
-              <td className="border border-gray-300 px-4 py-2 text-center">
+              <td className="text-black text-center border border-gray-300 dark:border-border px-4 py-2">
                 <input
                   type="text"
-                  className="w-64 border border-slate-100 shadow-md"
+                  className="w-64 border border-slate-100 shadow-md rounded"
                   value={clientSecret}
                   onChange={(e) => setClientSecret(e.target.value)}
                 />
               </td>
-              <td className="border border-gray-300 px-4 py-2 text-center">
+              <td className="text-black text-center border border-gray-300 dark:border-border px-4 py-2">
                 <select
                   value={environment}
                   onChange={(e) =>
                     setEnvironment(e.target.value) &
                     handleNewLogin(e.target.value)
                   }
-                  className="w-64 p-0.5 shadow-md border border-slate-100"
+                  className="w-64 p-0.5 shadow-md border border-slate-100 rounded"
                 >
                   <option value="-">--Select an Option--</option>
                   <option value="">Production</option>
@@ -346,7 +348,7 @@ export default function Settings({
                   <option value="cia-stg-1.aws.">Staging</option>
                 </select>
               </td>
-              <td className="border border-gray-300 px-4 py-2">
+              <td className="text-center border border-gray-300 dark:border-border px-4 py-2">
                 <div className="flex justify-center text-lg">
                   {isAuthenticated ? (
                     <FaCircleCheck className="text-green-500" />
@@ -355,7 +357,7 @@ export default function Settings({
                   )}
                 </div>
               </td>
-              <td className="border border-gray-300 px-4 py-2 text-center ">
+              <td className="text-center border border-gray-300 dark:border-border px-4 py-2">
                 {isAuthenticated ? (
                   <button
                     className="m-1 px-4 py-1 bg-green-400 rounded-md hover:bg-green-500 text-white"

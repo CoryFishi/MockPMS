@@ -223,8 +223,8 @@ export default function AllFacilitiesPage({
   );
 
   return (
-    <div className="overflow-auto">
-      <div className="flex h-12 bg-gray-200 items-center">
+    <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary">
+      <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <FaWarehouse className="text-lg" />
           &ensp; All Facilities
@@ -238,34 +238,37 @@ export default function AllFacilitiesPage({
           onChange={(e) =>
             setSearchQuery(e.target.value) & console.log(facilities)
           }
-          className="border p-2 w-full mb-2"
+          className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
         />
-        <table className="w-full table-auto border-collapse border border-gray-300">
+        <table className="w-full table-auto border-collapse border border-gray-300 pb-96 dark:border-border">
           <thead>
-            <tr className="bg-gray-200">
-              <th className="border border-gray-300 px-4 py-2"></th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+            <tr className="bg-gray-200 dark:bg-darkNavSecondary">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left"></th>
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Environment
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Facility Id
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Facility Name
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Property Number
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Actions
               </th>
             </tr>
           </thead>
           <tbody>
             {filteredFacilities.map((facility, index) => (
-              <tr key={index} className="hover:bg-gray-100">
+              <tr
+                key={index}
+                className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
+              >
                 <td
-                  className="border border-gray-300 px-4 py-2 hover:cursor-pointer"
+                  className="border border-gray-300 dark:border-border px-4 py-2"
                   onClick={() => addToFavorite(facility)}
                 >
                   <div className="flex justify-center text-yellow-500">
@@ -276,7 +279,7 @@ export default function AllFacilitiesPage({
                     )}
                   </div>
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {facility.environment == "-dev"
                     ? "Development"
                     : facility.environment == ""
@@ -287,20 +290,20 @@ export default function AllFacilitiesPage({
                     ? "Staging"
                     : "N?A"}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {facility.id}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {facility.name}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {facility.propertyNumber}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {currentFacility.id == facility.id &&
                   currentFacility.environment == facility.environment ? (
                     <button
-                      className="bg-gray-200 text-white px-2 py-1 rounded hover:bg-gray-300"
+                      className="font-bold bg-gray-200 text-white px-2 py-1 rounded hover:bg-gray-300"
                       onClick={() =>
                         localStorage.setItem("openPage", "units") &
                         setOpenPage("units")
@@ -310,7 +313,7 @@ export default function AllFacilitiesPage({
                     </button>
                   ) : (
                     <button
-                      className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                      className="font-bold bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
                       onClick={() => handleSelect(facility)}
                     >
                       Select

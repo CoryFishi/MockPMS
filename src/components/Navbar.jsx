@@ -1,38 +1,19 @@
-import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { RiMenuFold3Fill, RiMenuFold4Fill } from "react-icons/ri";
 
-export default function Navbar({ setDashboardMenu, dashboardMenu }) {
-  const [darkMode, setDarkMode] = useState(false);
-
-  // Check localStorage for dark mode preference on initial render
-  useEffect(() => {
-    const storedPreference = localStorage.getItem("darkMode");
-    if (storedPreference === "true") {
-      setDarkMode(true);
-      document.documentElement.classList.add("dark");
-    }
-  }, []);
-
-  // Toggle dark mode and save preference to localStorage
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    if (!darkMode) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("darkMode", "true");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("darkMode", "false");
-    }
-  };
-
+export default function Navbar({
+  setDashboardMenu,
+  dashboardMenu,
+  darkMode,
+  toggleDarkMode,
+}) {
   // Toggle dark mode and save preference to localStorage
   const toggleSideMenu = () => {
     setDashboardMenu((prev) => !prev);
   };
 
   return (
-    <nav className="bg-white dark:bg-black p-2 w-full border-slate-200 dark:border-gray-700 border-b">
+    <nav className="bg-white dark:bg-darkPrimary p-2 w-full border-slate-200 dark:border-gray-700 border-b">
       <div className="flex items-center justify-between text-black dark:text-white">
         <div className="flex">
           {(location.pathname === "/" && (

@@ -371,8 +371,8 @@ export default function UnitPage({
       unit.status.toLowerCase().includes(searchQuery.toLowerCase())
   );
   return (
-    <div className="overflow-auto">
-      <div className="flex h-12 bg-gray-200 items-center">
+    <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary">
+      <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <RiDoorLockFill className="text-lg" />
           &ensp; Units | {currentFacilityName}
@@ -403,7 +403,7 @@ export default function UnitPage({
             placeholder="Search units..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="border p-2 w-full"
+            className="border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
           />
           <h3 className="mr-2 w-36">Visitor Autofill</h3>
           <div
@@ -419,7 +419,7 @@ export default function UnitPage({
             ></div>
           </div>
           <button
-            className="bg-green-500 text-white p-1 py-2 rounded hover:bg-green-600 ml-3 w-44"
+            className="bg-green-500 text-white p-1 py-2 rounded hover:bg-green-600 ml-3 w-44 font-bold"
             onClick={() => setIsUnitModalOpen(true)}
           >
             Create Unit(s)
@@ -445,74 +445,79 @@ export default function UnitPage({
           />
         )}
 
-        <table className="w-full table-auto border-collapse border border-gray-300 pb-96">
+        <table className="w-full table-auto border-collapse border border-gray-300 pb-96 dark:border-border">
           <thead>
-            <tr className="bg-gray-200">
-              <th className="border border-gray-300 px-4 py-2 text-left">
+            <tr className="bg-gray-200 dark:bg-darkNavSecondary">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Unit Id
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Unit Number
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Status
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Facility ID
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Property Number
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Additional Prop 1
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Additional Prop 2
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Additional Prop 3
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Actions
               </th>
             </tr>
           </thead>
           <tbody>
             {filteredUnits.map((unit, index) => (
-              <tr key={index} className="hover:bg-gray-100">
-                <td className="border border-gray-300 px-4 py-2">{unit.id}</td>
-                <td className="border border-gray-300 px-4 py-2">
+              <tr
+                key={index}
+                className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
+              >
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                  {unit.id}
+                </td>
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {unit.unitNumber}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {unit.status}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {unit.facilityId}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {unit.propertyNumber}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {unit.additionalProp1}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {unit.additionalProp2}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {unit.additionalProp3}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {unit.status === "Rented" ? (
                     <>
                       <button
-                        className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+                        className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 font-bold"
                         onClick={() => turnDelinquent(unit)}
                       >
                         Turn Delinquent
                       </button>
                       <button
-                        className="bg-red-500 text-white px-2 py-1 rounded ml-2 hover:bg-red-600"
+                        className="bg-red-500 text-white px-2 py-1 rounded ml-2 hover:bg-red-600 font-bold"
                         onClick={() => moveOut(unit)}
                       >
                         Move Out
@@ -521,13 +526,13 @@ export default function UnitPage({
                   ) : unit.status === "Vacant" ? (
                     <>
                       <button
-                        className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                        className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 font-bold"
                         onClick={() => moveIn(unit) & setSelectedUnit(unit)}
                       >
                         Move In
                       </button>
                       <button
-                        className="bg-red-500 text-white px-2 py-1 rounded ml-2 hover:bg-red-600"
+                        className="bg-red-500 text-white px-2 py-1 rounded ml-2 hover:bg-red-600 font-bold"
                         onClick={() => deleteUnit(unit)}
                       >
                         Delete
@@ -536,13 +541,13 @@ export default function UnitPage({
                   ) : unit.status === "Delinquent" ? (
                     <>
                       <button
-                        className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                        className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 font-bold"
                         onClick={() => turnRented(unit)}
                       >
                         Turn Rented
                       </button>
                       <button
-                        className="bg-red-500 text-white px-2 py-1 rounded ml-2 hover:bg-red-600"
+                        className="bg-red-500 text-white px-2 py-1 rounded ml-2 hover:bg-red-600 font-bold"
                         onClick={() => moveOut(unit)}
                       >
                         Move Out
