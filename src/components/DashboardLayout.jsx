@@ -60,7 +60,6 @@ export default function DashboardLayout({
     axios(config)
       .then(function (response) {
         const tokenData = response.data;
-        console.log(response.data);
         localStorage.setItem(
           "currentFacility",
           JSON.stringify({

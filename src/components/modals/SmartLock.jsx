@@ -93,10 +93,7 @@ export default function SmartLock({
         <div className="pl-5 border-b-2 border-b-yellow-500 flex justify-between items-center">
           <div className="flex text-center items-center">
             <FaWarehouse />
-            <h2
-              className="ml-2 text-lg font-bold text-center items-center"
-              onClick={() => console.log(smartLocks)}
-            >
+            <h2 className="ml-2 text-lg font-bold text-center items-center">
               {facilityName}'s SmartLocks
             </h2>
           </div>

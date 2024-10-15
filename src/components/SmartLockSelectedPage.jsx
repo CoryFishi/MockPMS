@@ -87,9 +87,7 @@ export default function SmartLockSelectedPage({
           type="text"
           placeholder="Search facilities..."
           value={searchQuery}
-          onChange={(e) =>
-            setSearchQuery(e.target.value) & console.log(facilities)
-          }
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
         />
         <table className="w-full table-auto border-collapse border border-gray-300 pb-96 dark:border-border">

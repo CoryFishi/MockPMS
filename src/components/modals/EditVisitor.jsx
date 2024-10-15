@@ -143,7 +143,6 @@ export default function EditVisitor({
   useEffect(() => {
     handleTimeProfiles();
     handleAccessProfiles();
-    console.log(currentFacility);
   }, []);
 
   return (

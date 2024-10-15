@@ -195,7 +195,6 @@ export default function CreateVisitorVisitor({
       axios(config)
         .then(function (response) {
           const newVisitorData = [response.data.visitor];
-          console.log(newVisitorData);
           setVisitors((prevVisitors) => {
             const updatedVisitors = [...prevVisitors, ...newVisitorData];
             updatedVisitors.sort((a, b) => {
@@ -258,9 +257,7 @@ export default function CreateVisitorVisitor({
                 name="units"
                 id="units"
                 className="border border-gray-300 rounded px-3 py-2 w-full mb-2"
-                onChange={(e) =>
-                  setSelectedUnit(e.target.value) & console.log(e.target.value)
-                }
+                onChange={(e) => setSelectedUnit(e.target.value)}
                 required
               >
                 <option value="">Select a unit</option>

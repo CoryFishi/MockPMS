@@ -168,15 +168,21 @@ export default function SmartLockFacilityCard({ facility }) {
       } else {
         return;
       }
-      const locksSummaryData = await fetchSmartLockSummary();
-      if (locksSummaryData) {
-        setSmartlockSummary(locksSummaryData);
-      } else {
-        return;
-      }
       const accessPointsData = await fetchAccessPoints();
       if (accessPointsData) {
         setAccessPoints(accessPointsData);
+      }
+      const locksSummaryData = await fetchSmartLockSummary();
+      if (
+        locksSummaryData.error +
+          locksSummaryData.warning +
+          locksSummaryData.ok >
+        0
+      ) {
+        setSmartlockSummary(locksSummaryData);
+        console.log(facility.name);
+      } else {
+        return;
       }
       const smartlockData = await fetchSmartLock();
       if (smartlockData) {
@@ -199,69 +205,76 @@ export default function SmartLockFacilityCard({ facility }) {
       )}
       {edgeRouter && (
         <div className="break-inside-avoid bg-white shadow-lg rounded-lg p-5 mb-4 border dark:bg-darkSecondary text-black dark:text-white dark:border-border">
-          <h1 className="break-all w-full text-2xl">
+          <h1
+            className="break-all w-full text-2xl"
+            onClick={() => console.log(smartlockSummary)}
+          >
             {facility.name}'s Summary
           </h1>
-          {smartlockSummary && (
-            <>
-              <h2
-                className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg mt-2 hover:cursor-pointer"
-                onClick={() => openSmartLockModal()}
-              >
-                SmartLocks:
-              </h2>
-              <div className="grid grid-cols-3 grid-rows-2 gap-4 text-black dark:text-white">
-                <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
-                  onClick={() => openSmartLockModal("good")}
+          {smartlockSummary &&
+            smartlockSummary.errorCount +
+              smartlockSummary.okCount +
+              smartlockSummary.warningCount >
+              0 && (
+              <>
+                <h2
+                  className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg mt-2 hover:cursor-pointer"
+                  onClick={() => openSmartLockModal()}
                 >
-                  <h2 className="text-3xl font-bold">
-                    {smartlockSummary.okCount}
-                  </h2>
-                  <p className="text-sm">Good</p>
+                  SmartLocks:
+                </h2>
+                <div className="grid grid-cols-3 grid-rows-2 gap-4 text-black dark:text-white">
+                  <div
+                    className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                    onClick={() => openSmartLockModal("good")}
+                  >
+                    <h2 className="text-3xl font-bold">
+                      {smartlockSummary.okCount}
+                    </h2>
+                    <p className="text-sm">Good</p>
+                  </div>
+                  <div
+                    className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                    onClick={() => openSmartLockModal("warning")}
+                  >
+                    <h2 className="text-3xl font-bold">
+                      {smartlockSummary.warningCount}
+                    </h2>
+                    <p className="text-sm">Warning</p>
+                  </div>
+                  <div
+                    className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                    onClick={() => openSmartLockModal("error")}
+                  >
+                    <h2 className="text-3xl font-bold">
+                      {smartlockSummary.errorCount}
+                    </h2>
+                    <p className="text-sm">Error</p>
+                  </div>
+                  <div
+                    className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                    onClick={() => openSmartLockModal("lowestBattery")}
+                  >
+                    <h2 className="text-3xl font-bold">{lowestBattery}</h2>
+                    <p className="text-sm">Lowest Battery</p>
+                  </div>
+                  <div
+                    className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                    onClick={() => openSmartLockModal("lowestSignal")}
+                  >
+                    <h2 className="text-3xl font-bold">{lowestSignal}</h2>
+                    <p className="text-sm">Lowest Signal</p>
+                  </div>
+                  <div
+                    className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                    onClick={() => openSmartLockModal("offline")}
+                  >
+                    <h2 className="text-3xl font-bold">{offline}</h2>
+                    <p className="text-sm">Offline</p>
+                  </div>
                 </div>
-                <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
-                  onClick={() => openSmartLockModal("warning")}
-                >
-                  <h2 className="text-3xl font-bold">
-                    {smartlockSummary.warningCount}
-                  </h2>
-                  <p className="text-sm">Warning</p>
-                </div>
-                <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
-                  onClick={() => openSmartLockModal("error")}
-                >
-                  <h2 className="text-3xl font-bold">
-                    {smartlockSummary.errorCount}
-                  </h2>
-                  <p className="text-sm">Error</p>
-                </div>
-                <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
-                  onClick={() => openSmartLockModal("lowestBattery")}
-                >
-                  <h2 className="text-3xl font-bold">{lowestBattery}</h2>
-                  <p className="text-sm">Lowest Battery</p>
-                </div>
-                <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
-                  onClick={() => openSmartLockModal("lowestSignal")}
-                >
-                  <h2 className="text-3xl font-bold">{lowestSignal}</h2>
-                  <p className="text-sm">Lowest Signal</p>
-                </div>
-                <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
-                  onClick={() => openSmartLockModal("offline")}
-                >
-                  <h2 className="text-3xl font-bold">{offline}</h2>
-                  <p className="text-sm">Offline</p>
-                </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
 
           <h2 className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg mt-2 hover:cursor-pointer">
             OpenNet:
