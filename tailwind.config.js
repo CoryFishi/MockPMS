@@ -9,6 +9,7 @@ export default {
     extend: {
       colors: {
         darkPrimary: "#1A1C21",
+        darkSecondary: "#292c33",
         darkNavPrimary: "#121317",
         darkNavSecondary: "#292C33",
         navPrimary: "#10141f",

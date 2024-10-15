@@ -1,6 +1,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
+import SmartLock from "./modals/SmartLock";
 
 export default function SmartLockFacilityCard({ facility }) {
   const [smartlocks, setSmartlocks] = useState([]);
@@ -10,6 +11,16 @@ export default function SmartLockFacilityCard({ facility }) {
   const [smartlockSummary, setSmartlockSummary] = useState(null);
   const [edgeRouter, setEdgeRouter] = useState(null);
   const [accessPoints, setAccessPoints] = useState(null);
+  const [isSmartlockModalOpen, setIsSmartlockModalOpen] = useState(false);
+  const [smartlockModalOption, setSmartlockModalOption] = useState(null);
+
+  const openSmartLockModal = (option) => {
+    if (isSmartlockModalOpen) {
+      return;
+    }
+    setSmartlockModalOption(option);
+    setIsSmartlockModalOpen(true);
+  };
 
   const fetchSmartLockSummary = async () => {
     try {
@@ -128,7 +139,6 @@ export default function SmartLockFacilityCard({ facility }) {
       const lowestSignal =
         Math.round((lockWithLowestSignal.signalQuality / 255) * 100) + "%";
       setLowestSignal(lowestSignal);
-      console.log(lockWithLowestSignal, lowestSignal);
 
       // Find the lowest battery
       const lockWithLowestBattery = smartLocks.reduce((lowestLock, lock) => {
@@ -179,44 +189,73 @@ export default function SmartLockFacilityCard({ facility }) {
 
   return (
     <>
+      {isSmartlockModalOpen && (
+        <SmartLock
+          smartlockModalOption={smartlockModalOption}
+          smartLocks={smartlocks}
+          facilityName={facility.name}
+          setIsSmartlockModalOpen={setIsSmartlockModalOpen}
+        />
+      )}
       {edgeRouter && (
-        <div className="break-inside-avoid bg-white shadow-md rounded-lg p-5 mb-4">
-          <h1 className="break-all w-full text-3xl text-black">
+        <div className="break-inside-avoid bg-white shadow-lg rounded-lg p-5 mb-4 border dark:bg-darkSecondary text-black dark:text-white dark:border-border">
+          <h1 className="break-all w-full text-2xl">
             {facility.name}'s Summary
           </h1>
           {smartlockSummary && (
             <>
-              <h2 className="w-full border-b mb-2 border-blue-200 text-blue-500 text-lg mt-2">
+              <h2
+                className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg mt-2 hover:cursor-pointer"
+                onClick={() => openSmartLockModal()}
+              >
                 SmartLocks:
               </h2>
-              <div className="grid grid-cols-3 grid-rows-2 gap-4 text-black">
-                <div className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer">
+              <div className="grid grid-cols-3 grid-rows-2 gap-4 text-black dark:text-white">
+                <div
+                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  onClick={() => openSmartLockModal("good")}
+                >
                   <h2 className="text-3xl font-bold">
                     {smartlockSummary.okCount}
                   </h2>
                   <p className="text-sm">Good</p>
                 </div>
-                <div className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer">
+                <div
+                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  onClick={() => openSmartLockModal("warning")}
+                >
                   <h2 className="text-3xl font-bold">
                     {smartlockSummary.warningCount}
                   </h2>
                   <p className="text-sm">Warning</p>
                 </div>
-                <div className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer">
+                <div
+                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  onClick={() => openSmartLockModal("error")}
+                >
                   <h2 className="text-3xl font-bold">
                     {smartlockSummary.errorCount}
                   </h2>
                   <p className="text-sm">Error</p>
                 </div>
-                <div className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer">
+                <div
+                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  onClick={() => openSmartLockModal("lowestBattery")}
+                >
                   <h2 className="text-3xl font-bold">{lowestBattery}</h2>
                   <p className="text-sm">Lowest Battery</p>
                 </div>
-                <div className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer">
+                <div
+                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  onClick={() => openSmartLockModal("lowestSignal")}
+                >
                   <h2 className="text-3xl font-bold">{lowestSignal}</h2>
                   <p className="text-sm">Lowest Signal</p>
                 </div>
-                <div className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer">
+                <div
+                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  onClick={() => openSmartLockModal("offline")}
+                >
                   <h2 className="text-3xl font-bold">{offline}</h2>
                   <p className="text-sm">Offline</p>
                 </div>
@@ -224,20 +263,55 @@ export default function SmartLockFacilityCard({ facility }) {
             </>
           )}
 
-          <h2 className="w-full border-b mb-2 border-blue-200 text-blue-500 text-lg mt-2">
+          <h2 className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg mt-2 hover:cursor-pointer">
             OpenNet:
           </h2>
-          <div className="shadow-md rounded-lg p-2 flex items-center text-black">
-            <div className="w-14 h-14 bg-green-700 rounded-full"></div>
+          <div
+            className="shadow-md rounded-lg p-2 flex items-center text-black dark:text-white border"
+            title={
+              edgeRouter.isDevicePaired === false
+                ? "This device is not paired."
+                : edgeRouter.isDeviceOffline === true
+                ? "This device is offline."
+                : "This device is online and working."
+            }
+          >
+            <div
+              className={`w-14 h-14 rounded-full ${
+                edgeRouter.connectionStatus === "warning"
+                  ? "bg-yellow-500"
+                  : edgeRouter.connectionStatus === "error"
+                  ? "bg-red-500"
+                  : "bg-green-700"
+              }`}
+            ></div>
             <div className="ml-3">
               <h2 className="text-2xl">{edgeRouter?.name}</h2>
               <p className="text-sm">{edgeRouter?.lastReadDisplay}</p>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-2 text-black">
+          <div className="grid grid-cols-2 gap-2 text-black dark:text-white mt-2">
             {accessPoints?.map((accessPoint, index) => (
-              <div className="shadow-md rounded-lg p-2 flex items-center">
-                <div className="w-10 h-10 bg-green-700 rounded-full"></div>
+              <div
+                className="shadow-md rounded-lg p-2 flex items-center border"
+                key={index}
+                title={
+                  accessPoint.isDevicePaired === false
+                    ? "This device is not paired."
+                    : accessPoint.isDeviceOffline === true
+                    ? "This device is offline."
+                    : "This device is online and working."
+                }
+              >
+                <div
+                  className={`w-10 h-10 rounded-full ${
+                    accessPoint.isDevicePaired === false
+                      ? "bg-yellow-500"
+                      : accessPoint.isDeviceOffline === true
+                      ? "bg-red-500"
+                      : "bg-green-700"
+                  }`}
+                ></div>
                 <div className="ml-3">
                   <h2 className="text-xl">{accessPoint.name}</h2>
                   <p className="text-sm">{accessPoint.lastReadDisplay}</p>
