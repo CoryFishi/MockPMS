@@ -16,7 +16,8 @@ export default function Navbar({
     <nav className="bg-white dark:bg-darkPrimary p-2 w-full border-slate-200 dark:border-gray-700 border-b">
       <div className="flex items-center justify-between text-black dark:text-white">
         <div className="flex">
-          {(location.pathname === "/" && (
+          {(location.pathname === "/" ||
+            location.pathname === "/smartlock-dashboard") && (
             <button
               onClick={toggleSideMenu}
               className="flex items-center flex-shrink-0 mr-6 p-2"
@@ -27,7 +28,8 @@ export default function Navbar({
                 <RiMenuFold4Fill className="text-2xl ml-1 hover:cursor-pointer" />
               )}
             </button>
-          )) || <div className="mr-6 p-2 ml-7"></div>}
+          )}
+          <div className="mr-6 p-2 ml-7"></div>
         </div>
         <div className="flex items-center flex-shrink-0 mr-6 text-2xl font-medium">
           PMS
@@ -46,14 +48,26 @@ export default function Navbar({
             ></div>
           </div>
           <Link
+            to="/smartlock-dashboard"
+            className={`hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 rounded-md text-md font-medium ${
+              location.pathname === "/smartlock-dashboard" ? "underline" : ""
+            }`}
+          >
+            SmartLock
+          </Link>
+          <Link
             to="/"
-            className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 rounded-md text-md font-medium"
+            className={`hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 rounded-md text-md font-medium ${
+              location.pathname === "/" ? "underline" : ""
+            }`}
           >
             Dashboard
           </Link>
           <Link
-            to={`/settings`}
-            className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 rounded-md text-md font-medium"
+            to="/settings"
+            className={`hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 rounded-md text-md font-medium ${
+              location.pathname === "/settings" ? "underline" : ""
+            }`}
           >
             Settings
           </Link>

@@ -1,14 +1,14 @@
 import { useState } from "react";
 import Navbar from "../components/Navbar";
-import Dashboard from "../components/Dashboard";
+import SmartLockDashboardLayout from "../components/SmartLockDashboardLayout";
 
-export default function Home({
+export default function SmartLockDashboard({
   currentFacility,
   setCurrentFacility,
   savedFacilities,
   setSavedFacilities,
-  favoriteFacilities,
-  setFavoriteFacilities,
+  selectedFacilities,
+  setSelectedFacilities,
   darkMode,
   toggleDarkMode,
 }) {
@@ -23,7 +23,7 @@ export default function Home({
         toggleDarkMode={toggleDarkMode}
       />
       <div className="flex flex-1">
-        <Dashboard
+        <SmartLockDashboardLayout
           dashboardMenu={dashboardMenu}
           currentFacility={currentFacility}
           setCurrentFacility={setCurrentFacility}
@@ -31,8 +31,8 @@ export default function Home({
             Array.isArray(savedFacilities) ? savedFacilities : []
           }
           setSavedFacilities={setSavedFacilities}
-          favoriteFacilities={favoriteFacilities}
-          setFavoriteFacilities={setFavoriteFacilities}
+          selectedFacilities={selectedFacilities}
+          setSelectedFacilities={setSelectedFacilities}
         />
       </div>
     </div>

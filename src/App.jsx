@@ -1,8 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import { useState, useEffect } from "react";
+import SmartLockDashboard from "./pages/SmartLockDashboard";
 
 function App() {
   const [currentFacility, setCurrentFacility] = useState(
@@ -13,6 +14,9 @@ function App() {
   );
   const [favoriteFacilities, setFavoriteFacilities] = useState(
     JSON.parse(localStorage.getItem("favoriteFacilities")) || []
+  );
+  const [selectedFacilities, setSelectedFacilities] = useState(
+    JSON.parse(localStorage.getItem("selectedFacilities")) || []
   );
 
   const [darkMode, setDarkMode] = useState(false);
@@ -45,13 +49,26 @@ function App() {
         <Route
           path="/"
           element={
-            <Home
+            <Dashboard
               currentFacility={currentFacility}
               setCurrentFacility={setCurrentFacility}
               savedFacilities={savedFacilities}
               setSavedFacilities={setSavedFacilities}
               favoriteFacilities={favoriteFacilities}
               setFavoriteFacilities={setFavoriteFacilities}
+              darkMode={darkMode}
+              toggleDarkMode={toggleDarkMode}
+            />
+          }
+        />
+        <Route
+          path="/smartlock-dashboard"
+          element={
+            <SmartLockDashboard
+              savedFacilities={savedFacilities}
+              setSavedFacilities={setSavedFacilities}
+              selectedFacilities={selectedFacilities}
+              setSelectedFacilities={setSelectedFacilities}
               darkMode={darkMode}
               toggleDarkMode={toggleDarkMode}
             />

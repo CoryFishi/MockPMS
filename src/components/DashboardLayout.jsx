@@ -9,7 +9,7 @@ import FavoritesPage from "./FavoritesPage";
 import axios from "axios";
 import qs from "qs";
 
-export default function Dashboard({
+export default function DashboardLayout({
   dashboardMenu,
   currentFacility,
   setCurrentFacility,
@@ -59,6 +59,8 @@ export default function Dashboard({
 
     axios(config)
       .then(function (response) {
+        const tokenData = response.data;
+        console.log(response.data);
         localStorage.setItem(
           "currentFacility",
           JSON.stringify({
@@ -71,6 +73,10 @@ export default function Dashboard({
           bearer: response.data,
         }));
         setCurrentFacilityName(currentFacility.name);
+
+        setTimeout(() => {
+          handleLogin();
+        }, (tokenData.expires_in - 60) * 1000);
       })
       .catch(function (error) {
         console.error("Error during login:", error);

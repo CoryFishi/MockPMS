@@ -66,12 +66,12 @@ export default function Settings({
         setSettingsSavedFacilities(updatedSettingsFacilities);
 
         // Clear the form inputs
-        // setApi("");
-        // setApiSecret("");
-        // setClient("");
-        // setClientSecret("");
-        // setEnvironment("-");
-        // setIsAuthenticated(false);
+        setApi("");
+        setApiSecret("");
+        setClient("");
+        setClientSecret("");
+        setEnvironment("-");
+        setIsAuthenticated(false);
 
         resolve("Facility added successfully!");
       } catch (error) {
