@@ -9,6 +9,7 @@ export default function SmartLockDashboardView({
   setSelectedFacilities,
 }) {
   const [facilitiesWithBearers, setFacilitiesWithBearers] = useState([]);
+  const [filteredFacilities, setFilteredFacilities] = useState([]);
 
   // Function to get a bearer token for each facility
   const fetchBearerToken = async (facility) => {
@@ -56,23 +57,63 @@ export default function SmartLockDashboardView({
         })
       );
       setFacilitiesWithBearers(updatedFacilities);
+      setFilteredFacilities(updatedFacilities);
     };
 
     fetchFacilitiesWithBearers();
   }, [selectedFacilities]);
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const search = () => {
+    setFilteredFacilities([]);
+    setTimeout(
+      () =>
+        setFilteredFacilities(
+          facilitiesWithBearers.filter(
+            (facility) =>
+              (facility.id || "").toString().includes(searchQuery) ||
+              (facility.propertyNumber || "")
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
+              (facility.name || "")
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
+              (facility.environment || "")
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase())
+          )
+        ),
+      500
+    );
+  };
+
   return (
-    <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary">
+    <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary text-center">
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <FaLock className="text-lg" />
           &ensp; SmartLock Dashboard
         </div>
       </div>
-      <p className="text-sm dark:text-white">{Date()}</p>
-
-      <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 p-5 pt-1">
-        {facilitiesWithBearers.map((facility, index) => (
+      <p className="text-sm dark:text-white text-left">{Date()}</p>
+      <div className="mt-5 mb-2 flex items-center justify-end text-center mx-5">
+        <input
+          type="text"
+          placeholder="Search facilities..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
+        />
+        <button
+          className="bg-green-500 text-white p-1 py-2 rounded hover:bg-green-600 ml-3 w-44 font-bold"
+          onClick={() => search()}
+        >
+          Search
+        </button>
+      </div>
+      <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 p-5 pt-1 text-left">
+        {filteredFacilities.map((facility, index) => (
           <div key={index}>
             <SmartLockFacilityCard facility={facility} />
           </div>

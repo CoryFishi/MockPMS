@@ -1,6 +1,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useState, useEffect } from "react";
+import { IoIosCreate } from "react-icons/io";
 
 export default function CreateVisitorVisitor({
   setIsCreateVisitorModalOpen,
@@ -229,9 +230,16 @@ export default function CreateVisitorVisitor({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-5 rounded shadow-lg w-96">
-        <h2 className="text-lg font-bold mb-4">Creating New Visitor</h2>
-        <form onSubmit={handleCreateVisitor}>
+      <div className="bg-white rounded shadow-lg w-96">
+        <div className="pl-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
+          <div className="flex text-center items-center">
+            <IoIosCreate />
+            <h2 className="ml-2 text-lg font-bold text-center items-center">
+              Creating New Visitor
+            </h2>
+          </div>
+        </div>
+        <form onSubmit={handleCreateVisitor} className="px-5 py-2">
           <label className="block">Visitor Type</label>
           <select
             name="types"

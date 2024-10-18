@@ -1,6 +1,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useState } from "react";
+import { IoIosCreate } from "react-icons/io";
 
 export default function CreateUnit({
   setIsUnitModalOpen,
@@ -76,32 +77,41 @@ export default function CreateUnit({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-5 rounded shadow-lg">
-        <h2 className="text-lg font-bold mb-4">Create a New Unit</h2>
-        <label className="block mb-2">Unit Number</label>
-        <input
-          type="text"
-          className="border border-gray-300 rounded px-3 py-2 w-full"
-          value={newUnitNumber}
-          onChange={(e) => setNewUnitNumber(e.target.value)}
-          placeholder="Enter unit number"
-        />{" "}
-        <p className="text-wrap text-xs text-red-400">
-          Multiple Units can be created by sperating each unit by a comma
-        </p>
-        <div className="mt-4 flex justify-end">
-          <button
-            className="bg-gray-300 px-4 py-2 rounded mr-2"
-            onClick={() => setIsUnitModalOpen(false)}
-          >
-            Cancel
-          </button>
-          <button
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-            onClick={handleCreateUnit}
-          >
-            Submit
-          </button>
+      <div className="bg-white rounded shadow-lg">
+        <div className="pl-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
+          <div className="flex text-center items-center">
+            <IoIosCreate />
+            <h2 className="ml-2 text-lg font-bold text-center items-center">
+              Create Unit(s)
+            </h2>
+          </div>
+        </div>
+        <div className="px-5 py-3">
+          <label className="block mb-2">Unit Number</label>
+          <input
+            type="text"
+            className="border border-gray-300 rounded px-3 py-2 w-full"
+            value={newUnitNumber}
+            onChange={(e) => setNewUnitNumber(e.target.value)}
+            placeholder="Enter unit number"
+          />{" "}
+          <p className="text-wrap text-xs text-red-400 mt-1">
+            Multiple Units can be created by sperating each unit by a comma
+          </p>
+          <div className="mt-4 flex justify-end">
+            <button
+              className="bg-gray-300 px-4 py-2 rounded mr-2"
+              onClick={() => setIsUnitModalOpen(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              onClick={handleCreateUnit}
+            >
+              Submit
+            </button>
+          </div>
         </div>
       </div>
     </div>

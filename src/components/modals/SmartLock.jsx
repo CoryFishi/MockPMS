@@ -1,7 +1,26 @@
-import axios from "axios";
-import toast from "react-hot-toast";
 import React, { useState, useEffect } from "react";
 import { FaWarehouse } from "react-icons/fa6";
+import {
+  MdBattery20,
+  MdBattery60,
+  MdBattery80,
+  MdBatteryFull,
+  MdBattery0Bar,
+} from "react-icons/md";
+
+import {
+  RiSignalWifi1Fill,
+  RiSignalWifi2Fill,
+  RiSignalWifi3Fill,
+  RiSignalWifiFill,
+  RiErrorWarningFill,
+} from "react-icons/ri";
+
+import { FaLock, FaLockOpen, FaCheckCircle } from "react-icons/fa";
+
+import { BsShieldLockFill } from "react-icons/bs";
+
+import { IoIosWarning } from "react-icons/io";
 
 export default function SmartLock({
   smartlockModalOption,
@@ -70,6 +89,9 @@ export default function SmartLock({
         (smartlock.unitName || "")
           .toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
+        (smartlock.overallStatus || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
         (smartlock.deviceType || "")
           .toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
@@ -90,7 +112,7 @@ export default function SmartLock({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
       <div className="bg-white rounded shadow-lg text-black relative max-h-[95vh] w-full max-w-[95vw] dark:text-white dark:bg-darkPrimary">
-        <div className="pl-5 border-b-2 border-b-yellow-500 flex justify-between items-center">
+        <div className="pl-5 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">
             <FaWarehouse />
             <h2 className="ml-2 text-lg font-bold text-center items-center">
@@ -99,10 +121,10 @@ export default function SmartLock({
           </div>
 
           <button
-            className="right-1 text-black hover:bg-red-500 text-2xl my-2 mr-3 px-2 rounded-full dark:text-white dark:hover:bg-red-500"
+            className="right-0 text-gray-600 bg-gray-100 hover:bg-gray-300 dark:text-white dark:hover:bg-red-500 h-full px-5 rounded-tr"
             onClick={() => setIsSmartlockModalOpen(false)}
           >
-            &times;
+            x
           </button>
         </div>
         <div className="p-5">
@@ -275,7 +297,7 @@ export default function SmartLock({
                       )
                     }
                   >
-                    Lock Status Message
+                    Lock Status Message(s)
                   </th>
                   <th
                     className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
@@ -310,21 +332,124 @@ export default function SmartLock({
                     <td className="border border-gray-300 dark:border-border px-4 py-2">
                       {smartlock.deviceType}
                     </td>
-                    <td className="border border-gray-300 dark:border-border px-4 py-2">
-                      {Math.round((smartlock.signalQuality / 255) * 100)}%
+                    <td className="border border-gray-300 dark:border-border px-4 py-2 text-center">
+                      {smartlock.signalQuality < 60 ? (
+                        <div className="inline-flex items-center gap-1">
+                          <RiSignalWifi1Fill className="text-red-500" />
+                          {Math.round((smartlock.signalQuality / 255) * 100)}%
+                        </div>
+                      ) : smartlock.signalQuality < 160 ? (
+                        <div className="inline-flex items-center gap-1">
+                          <RiSignalWifi2Fill className="text-yellow-500" />
+                          {Math.round((smartlock.signalQuality / 255) * 100)}%
+                        </div>
+                      ) : smartlock.signalQuality < 230 ? (
+                        <div className="inline-flex items-center gap-1">
+                          <RiSignalWifi3Fill className="text-green-300" />
+                          {Math.round((smartlock.signalQuality / 255) * 100)}%
+                        </div>
+                      ) : (
+                        <div className="inline-flex items-center gap-1">
+                          <RiSignalWifiFill className="text-green-500" />
+                          {Math.round((smartlock.signalQuality / 255) * 100)}%
+                        </div>
+                      )}
                     </td>
-                    <td className="border border-gray-300 dark:border-border px-4 py-2">
-                      {smartlock.batteryLevel}%
+                    <td className="border border-gray-300 dark:border-border px-4 py-2 text-center">
+                      {smartlock.batteryLevel < 20 ? (
+                        <div className="inline-flex items-center gap-1">
+                          <MdBattery0Bar className="text-red-500" />
+                          {smartlock.batteryLevel}%
+                        </div>
+                      ) : smartlock.batteryLevel < 50 ? (
+                        <div className="inline-flex items-center gap-1">
+                          <MdBattery20 className="text-yellow-500" />
+                          {smartlock.batteryLevel}%
+                        </div>
+                      ) : smartlock.batteryLevel < 75 ? (
+                        <div className="inline-flex items-center gap-1">
+                          <MdBattery60 className="text-yellow-500" />
+                          {smartlock.batteryLevel}%
+                        </div>
+                      ) : smartlock.batteryLevel < 99 ? (
+                        <div className="inline-flex items-center gap-1">
+                          <MdBattery80 className="text-green-300" />
+                          {smartlock.batteryLevel}%
+                        </div>
+                      ) : (
+                        <div className="inline-flex items-center gap-1">
+                          <MdBatteryFull className="text-green-500" />
+                          {smartlock.batteryLevel}%
+                        </div>
+                      )}
                     </td>
+
                     <td className="border border-gray-300 dark:border-border px-4 py-2">
-                      {smartlock.lockState}
+                      {smartlock.lockState === "Locked" ? (
+                        <div className="inline-flex items-center gap-2">
+                          <FaLock />
+                          {smartlock.lockState}
+                        </div>
+                      ) : smartlock.lockState === "Unlocked" ||
+                        smartlock.lockState === "UnlockedLocal" ? (
+                        <div className="inline-flex items-center gap-2">
+                          <FaLockOpen />
+                          {smartlock.lockState}
+                        </div>
+                      ) : (
+                        <div className="inline-flex items-center gap-2">
+                          <BsShieldLockFill className="text-red-500" />
+                          {smartlock.lockState}
+                        </div>
+                      )}
                     </td>
                     <td className="border border-gray-300 dark:border-border px-4 py-2">
                       {smartlock.unitStatus}
                     </td>
                     <td className="border border-gray-300 dark:border-border px-4 py-2">
-                      {smartlock.statusMessages}
+                      {smartlock.statusMessages[0] != "" ? (
+                        smartlock.overallStatus === "error" ? (
+                          <div className="inline-flex items-center gap-2">
+                            <RiErrorWarningFill className="text-red-500 text-2xl" />
+                            <div>
+                              {smartlock.statusMessages.map(
+                                (message, index) => (
+                                  <div key={index}>{message}</div>
+                                )
+                              )}
+                            </div>
+                          </div>
+                        ) : smartlock.overallStatus === "warning" ? (
+                          <div className="inline-flex items-center gap-2">
+                            <IoIosWarning className="text-yellow-500 text-2xl" />
+                            <div>
+                              {smartlock.statusMessages.map(
+                                (message, index) => (
+                                  <div key={index}>{message}</div>
+                                )
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="inline-flex items-center gap-2">
+                            <FaCheckCircle className="text-green-500" />
+                            <div>
+                              {smartlock.statusMessages.map(
+                                (message, index) => (
+                                  <div key={index}>{message}</div>
+                                )
+                              )}
+                            </div>
+                          </div>
+                        )
+                      ) : (
+                        <div className="inline-flex items-center gap-2">
+                          <FaCheckCircle className="text-green-500 text-xl" />{" "}
+                          SmartLock is online
+                        </div>
+                      )}
                     </td>
+
                     <td className="border border-gray-300 dark:border-border px-4 py-2">
                       {smartlock.lastUpdateTimestampDisplay}
                     </td>

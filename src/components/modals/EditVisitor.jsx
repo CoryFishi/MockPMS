@@ -1,6 +1,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useState, useEffect } from "react";
+import { MdEdit } from "react-icons/md";
 
 export default function EditVisitor({
   setIsEditVisitorModalOpen,
@@ -147,9 +148,17 @@ export default function EditVisitor({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-5 rounded shadow-lg w-96">
-        <h2 className="text-lg font-bold mb-4">Editing Visitor {visitor.id}</h2>
-        <form onSubmit={handleEditVisitor}>
+      <div className="bg-white rounded shadow-lg w-96">
+        <div className="pl-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
+          <div className="flex text-center items-center">
+            <MdEdit />
+            <h2 className="ml-2 text-lg font-bold text-center items-center">
+              Editing Visitor {visitor.id}
+            </h2>
+          </div>
+        </div>
+
+        <form onSubmit={handleEditVisitor} className="px-5 py-3">
           <label className="block">First Name</label>
           <input
             type="text"
@@ -234,7 +243,6 @@ export default function EditVisitor({
             }
             required
           >
-            <option value="">Select an time profile</option>
             {timeProfiles && timeProfiles.length > 0 ? (
               timeProfiles.map((profile) => (
                 <option key={profile.id} value={profile.id}>
@@ -259,7 +267,6 @@ export default function EditVisitor({
             }
             required
           >
-            <option value="">Select an access profile</option>
             {accessProfiles && accessProfiles.length > 0 ? (
               accessProfiles.map((profile) => (
                 <option key={profile.id} value={profile.id}>

@@ -246,7 +246,7 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
         <table className="w-full table-auto border-collapse border border-gray-300 pb-96 dark:border-border">
           <thead>
             <tr className="bg-gray-200 dark:bg-darkNavSecondary">
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden md:table-cell">
                 Visitor Id
               </th>
               <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
@@ -258,19 +258,19 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
               <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Type
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden sm:table-cell">
                 Access Profile
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden sm:table-cell">
                 Time Profile
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell">
                 Gate Code
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell">
                 Phone Number
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden xl:table-cell">
                 Email Address
               </th>
               <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
@@ -284,7 +284,7 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
                 key={index}
                 className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
               >
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden md:table-cell">
                   {visitor.id}
                 </td>
                 <td className="border border-gray-300 dark:border-border px-4 py-2">
@@ -302,19 +302,19 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
                     ? "Non-Tenant Guest"
                     : "Guest"}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
                   {visitor.accessProfileName}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
                   {visitor.timeGroupName}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
                   {visitor.code}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
                   {visitor.mobilePhoneNumber}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden xl:table-cell">
                   {visitor.email}
                 </td>
                 <td className="border border-gray-300 dark:border-border px-4 py-2">

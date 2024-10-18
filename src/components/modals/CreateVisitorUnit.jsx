@@ -1,6 +1,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useState, useEffect } from "react";
+import { IoIosCreate } from "react-icons/io";
 
 export default function CreateVisitorUnit({
   setIsCreateVisitorModalOpen,
@@ -156,11 +157,16 @@ export default function CreateVisitorUnit({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-5 rounded shadow-lg w-96">
-        <h2 className="text-lg font-bold mb-4">
-          Renting Unit {unit.unitNumber}
-        </h2>
-        <form onSubmit={handleCreateVisitor}>
+      <div className="bg-white rounded shadow-lg w-96">
+        <div className="pl-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
+          <div className="flex text-center items-center">
+            <IoIosCreate />
+            <h2 className="ml-2 text-lg font-bold text-center items-center">
+              Renting Unit {unit.unitNumber}
+            </h2>
+          </div>
+        </div>
+        <form onSubmit={handleCreateVisitor} className="px-5 py-3">
           <label className="block">First Name</label>
           <input
             type="text"
@@ -280,7 +286,7 @@ export default function CreateVisitorUnit({
 
           <div className="mt-4 flex justify-end">
             <button
-              className="bg-gray-300 px-4 py-2 rounded mr-2"
+              className="bg-gray-300 px-4 py-2 rounded mr-2 hover:bg-gray-400"
               onClick={() => setIsCreateVisitorModalOpen(false)}
             >
               Cancel

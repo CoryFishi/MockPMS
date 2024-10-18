@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import CreateUnit from "./modals/CreateUnit";
 import CreateVisitor from "./modals/CreateVisitorUnit";
 import { RiDoorLockFill } from "react-icons/ri";
+import EditVisitor from "./modals/EditVisitor";
 
 export default function UnitPage({
   currentFacility,
@@ -20,6 +21,8 @@ export default function UnitPage({
   const [selectedUnit, setSelectedUnit] = useState("");
   const [timeProfiles, setTimeProfiles] = useState({});
   const [accessProfiles, setAccessProfiles] = useState({});
+  const [isEditVisitorModalOpen, setIsEditVisitorModalOpen] = useState(false);
+  const [selectedVisitor, setSelectedVisitor] = useState({});
 
   const handleTimeProfiles = async () => {
     var tokenStageKey = "";
@@ -138,18 +141,19 @@ export default function UnitPage({
         timeGroupId: timeProfiles[0].id,
         accessProfileId: accessProfiles[0].id,
         unitId: unit.id,
-        accessCode: "123456",
+        accessCode:
+          Math.floor(Math.random() * (999999999 - 100000 + 1)) + 100000,
         lastName: "Tenant",
         firstName: "Temporary",
         email: "automations@temp.com",
-        mobilePhoneNumber: "6236666666",
+        mobilePhoneNumber: "9996666999",
         isTenant: true,
         extendedData: {
           additionalProp1: null,
           additionalProp2: null,
           additionalProp3: null,
         },
-        suppressCommands: true,
+        suppressCommands: false,
       };
 
       const config = {
@@ -370,6 +374,43 @@ export default function UnitPage({
       unit.id.toString().includes(searchQuery) ||
       unit.status.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const editTenant = async (unit) => {
+    if (unit.status === "Vacant") return;
+    const handleVisitorFetch = async () => {
+      var tokenStageKey = "";
+      var tokenEnvKey = "";
+      if (currentFacility.environment === "cia-stg-1.aws.") {
+        tokenStageKey = "cia-stg-1.aws.";
+      } else {
+        tokenEnvKey = currentFacility.environment;
+      }
+      const config = {
+        method: "get",
+        url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/units/${unit.id}/visitors`,
+        headers: {
+          Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+          accept: "application/json",
+          "api-version": "2.0",
+          "Content-Type": "application/json-patch+json",
+        },
+        data: "",
+      };
+      return axios(config)
+        .then(function (response) {
+          return response.data[0];
+        })
+        .catch(function (error) {
+          throw error;
+        });
+    };
+
+    const visitor = await handleVisitorFetch();
+    console.log(visitor);
+    setSelectedVisitor(visitor);
+    setIsEditVisitorModalOpen(true);
+  };
+
   return (
     <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary">
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
@@ -445,6 +486,14 @@ export default function UnitPage({
           />
         )}
 
+        {isEditVisitorModalOpen && (
+          <EditVisitor
+            setIsEditVisitorModalOpen={setIsEditVisitorModalOpen}
+            currentFacility={currentFacility}
+            visitor={selectedVisitor}
+          />
+        )}
+
         <table className="w-full table-auto border-collapse border border-gray-300 pb-96 dark:border-border">
           <thead>
             <tr className="bg-gray-200 dark:bg-darkNavSecondary">
@@ -457,19 +506,19 @@ export default function UnitPage({
               <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
                 Status
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden sm:table-cell">
                 Facility ID
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden md:table-cell">
                 Property Number
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden md:table-cell">
                 Additional Prop 1
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell">
                 Additional Prop 2
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell">
                 Additional Prop 3
               </th>
               <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
@@ -483,8 +532,20 @@ export default function UnitPage({
                 key={index}
                 className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
               >
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
-                  {unit.id}
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  onClick={() => editTenant(unit)}
+                >
+                  {unit.status === "Rented" || unit.status === "Delinquent" ? (
+                    <p
+                      className="text-blue-500  hover:cursor-pointer"
+                      title="edit tenant"
+                    >
+                      {unit.id}
+                    </p>
+                  ) : (
+                    unit.id
+                  )}
                 </td>
                 <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {unit.unitNumber}
@@ -492,21 +553,22 @@ export default function UnitPage({
                 <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {unit.status}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
                   {unit.facilityId}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden md:table-cell">
                   {unit.propertyNumber}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden md:table-cell">
                   {unit.additionalProp1}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
                   {unit.additionalProp2}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
                   {unit.additionalProp3}
                 </td>
+
                 <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {unit.status === "Rented" ? (
                     <>
