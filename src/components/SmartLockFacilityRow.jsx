@@ -2,8 +2,29 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
 import SmartLock from "./modals/SmartLock";
+import {
+  MdBattery20,
+  MdBattery60,
+  MdBattery80,
+  MdBatteryFull,
+  MdBattery0Bar,
+} from "react-icons/md";
 
-export default function SmartLockFacilityCard({ facility }) {
+import {
+  RiSignalWifi1Fill,
+  RiSignalWifi2Fill,
+  RiSignalWifi3Fill,
+  RiSignalWifiFill,
+  RiErrorWarningFill,
+} from "react-icons/ri";
+
+import { FaLock, FaLockOpen, FaCheckCircle } from "react-icons/fa";
+
+import { BsShieldLockFill } from "react-icons/bs";
+
+import { IoIosWarning } from "react-icons/io";
+
+export default function SmartLockFacilityRow({ facility, index }) {
   const [smartlocks, setSmartlocks] = useState([]);
   const [lowestSignal, setLowestSignal] = useState([]);
   const [offline, setOffline] = useState([]);
@@ -192,7 +213,91 @@ export default function SmartLockFacilityCard({ facility }) {
   }, []);
 
   return (
-    <>
+    <tr className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary relative">
+      <td className="border border-gray-300 dark:border-border px-4 py-2 ">
+        {facility.name}
+      </td>
+      <td
+        className="border border-gray-300 dark:border-border px-4 py-2"
+        title={edgeRouter?.connectionStatusMessage}
+      >
+        <div className="inline-flex items-center gap-1">
+          {edgeRouter?.isDeviceOffline ? (
+            <IoIosWarning className="text-red-500 mr-2" />
+          ) : (
+            <FaCheckCircle className="text-green-500 mr-2" />
+          )}
+          {edgeRouter?.name}
+        </div>
+      </td>
+      <td
+        className="border border-gray-300 dark:border-border px-4 py-2"
+        title={
+          Array.isArray(accessPoints)
+            ? accessPoints
+                .filter((ap) => ap.isDeviceOffline === false)
+                .map((ap) => ap.name)
+                .join(", ")
+            : ""
+        }
+      >
+        {Array.isArray(accessPoints)
+          ? accessPoints.filter((ap) => ap.isDeviceOffline === false).length
+          : 0}
+      </td>
+
+      <td
+        className="border border-gray-300 dark:border-border px-4 py-2"
+        title={
+          Array.isArray(accessPoints)
+            ? accessPoints
+                .filter((ap) => ap.isDeviceOffline === true)
+                .map((ap) => ap.name)
+                .join(", ")
+            : ""
+        }
+      >
+        {Array.isArray(accessPoints)
+          ? accessPoints.filter((ap) => ap.isDeviceOffline === true).length
+          : 0}
+      </td>
+
+      <td
+        className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+        onClick={() => openSmartLockModal("good")}
+      >
+        {smartlockSummary?.okCount}
+      </td>
+      <td
+        className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+        onClick={() => openSmartLockModal("warning")}
+      >
+        {smartlockSummary?.warningCount}
+      </td>
+      <td
+        className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+        onClick={() => openSmartLockModal("error")}
+      >
+        {smartlockSummary?.errorCount}
+      </td>
+      <td
+        className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+        onClick={() => openSmartLockModal("offline")}
+      >
+        {offline}
+      </td>
+      <td
+        className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+        onClick={() => openSmartLockModal("lowestSignal")}
+      >
+        {lowestSignal}
+      </td>
+      <td
+        className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+        onClick={() => openSmartLockModal("lowestBattery")}
+      >
+        {lowestBattery}
+      </td>
       {isSmartlockModalOpen && (
         <SmartLock
           smartlockModalOption={smartlockModalOption}
@@ -201,145 +306,6 @@ export default function SmartLockFacilityCard({ facility }) {
           setIsSmartlockModalOpen={setIsSmartlockModalOpen}
         />
       )}
-      {edgeRouter && (
-        <div className="break-inside-avoid bg-white shadow-lg rounded-lg p-5 mb-4 border dark:bg-darkSecondary text-black dark:text-white dark:border-border">
-          <h1
-            className="break-all w-full text-2xl"
-            onClick={() => console.log(smartlockSummary)}
-          >
-            {facility.name}'s Summary
-          </h1>
-          {smartlockSummary && (
-            <>
-              <h2
-                className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg mt-2 hover:cursor-pointer"
-                onClick={() => openSmartLockModal()}
-              >
-                SmartLocks:
-              </h2>
-              <div className="grid grid-cols-3 grid-rows-2 gap-4 text-black dark:text-white">
-                <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
-                  onClick={() => openSmartLockModal("good")}
-                >
-                  <h2 className="text-3xl font-bold">
-                    {smartlockSummary.okCount}
-                  </h2>
-                  <p className="text-sm">Good</p>
-                </div>
-                <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
-                  onClick={() => openSmartLockModal("warning")}
-                >
-                  <h2 className="text-3xl font-bold">
-                    {smartlockSummary.warningCount}
-                  </h2>
-                  <p className="text-sm">Warning</p>
-                </div>
-                <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
-                  onClick={() => openSmartLockModal("error")}
-                >
-                  <h2 className="text-3xl font-bold">
-                    {smartlockSummary.errorCount}
-                  </h2>
-                  <p className="text-sm">Error</p>
-                </div>
-                <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
-                  onClick={() => openSmartLockModal("lowestBattery")}
-                >
-                  <h2 className="text-3xl font-bold">{lowestBattery}</h2>
-                  <p className="text-sm">Lowest Battery</p>
-                </div>
-                <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
-                  onClick={() => openSmartLockModal("lowestSignal")}
-                >
-                  <h2 className="text-3xl font-bold">{lowestSignal}</h2>
-                  <p className="text-sm">Lowest Signal</p>
-                </div>
-                <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
-                  onClick={() => openSmartLockModal("offline")}
-                >
-                  <h2 className="text-3xl font-bold">{offline}</h2>
-                  <p className="text-sm">Offline</p>
-                </div>
-              </div>
-            </>
-          )}
-
-          <h2 className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg mt-2 hover:cursor-pointer">
-            OpenNet:
-          </h2>
-          <div
-            className="shadow-md rounded-lg p-2 flex items-center text-black dark:text-white border"
-            title={edgeRouter.connectionStatusMessage}
-          >
-            <div
-              className={`w-14 h-14 rounded-full ${
-                edgeRouter.connectionStatus === "warning"
-                  ? "bg-yellow-500"
-                  : edgeRouter.connectionStatus === "error"
-                  ? "bg-red-500"
-                  : "bg-green-700"
-              }`}
-            ></div>
-            <div className="ml-3">
-              <h2 className="text-2xl">{edgeRouter?.name}</h2>
-              <p className="text-sm">
-                {new Date(edgeRouter.eventLastReceivedOn).toLocaleString(
-                  "en-US",
-                  {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                    hour12: true,
-                  }
-                )}
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-black dark:text-white mt-2">
-            {accessPoints?.map((accessPoint, index) => (
-              <div
-                className="shadow-md rounded-lg p-2 flex items-center border"
-                key={index}
-                title={accessPoint.connectionStatusMessage}
-              >
-                <div
-                  className={`w-10 h-10 rounded-full ${
-                    accessPoint.isDevicePaired === false
-                      ? "bg-yellow-500"
-                      : accessPoint.isDeviceOffline === true
-                      ? "bg-red-500"
-                      : "bg-green-700"
-                  }`}
-                ></div>
-                <div className="ml-3">
-                  <h2 className="text-xl">{accessPoint.name}</h2>
-                  <p className="text-sm">
-                    {new Date(accessPoint.lastUpdateTimestamp).toLocaleString(
-                      "en-US",
-                      {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                        hour12: true,
-                      }
-                    )}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </>
+    </tr>
   );
 }

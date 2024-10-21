@@ -31,6 +31,7 @@ export default function SmartLock({
   const [filteredSmartLocks, setFilteredSmartLocks] = useState(smartLocks);
   const [option, setOption] = useState(smartlockModalOption);
   const [searchQuery, setSearchQuery] = useState("");
+  const [hoveredRow, setHoveredRow] = useState(null);
 
   useEffect(() => {
     var sortedSmartLocks = [...smartLocks].sort((a, b) => {
@@ -110,8 +111,8 @@ export default function SmartLock({
   }, [smartLocks, option, searchQuery]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white rounded shadow-lg text-black relative max-h-[95vh] w-full max-w-[95vw] dark:text-white dark:bg-darkPrimary">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-white rounded shadow-lg text-black relative h-[90vh] w-full max-w-[95vw] dark:text-white dark:bg-darkPrimary">
         <div className="pl-5 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">
             <FaWarehouse />
@@ -121,7 +122,7 @@ export default function SmartLock({
           </div>
 
           <button
-            className="right-0 text-gray-600 bg-gray-100 hover:bg-gray-300 dark:text-white dark:hover:bg-red-500 h-full px-5 rounded-tr"
+            className="right-0 text-gray-600 bg-gray-100 hover:bg-gray-300 dark:text-white dark:hover:bg-red-500 h-full px-5 rounded-tr dark:bg-gray-800"
             onClick={() => setIsSmartlockModalOpen(false)}
           >
             x
@@ -320,11 +321,40 @@ export default function SmartLock({
               <tbody>
                 {filteredSmartLocks.map((smartlock, index) => (
                   <tr
+                    className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary relative hover:cursor-pointer"
+                    onClick={() => setHoveredRow(index)}
+                    onMouseLeave={() => setHoveredRow(null)}
                     key={index}
-                    className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
                   >
                     <td className="border border-gray-300 dark:border-border px-4 py-2">
                       {smartlock.name}
+                      {hoveredRow === index && (
+                        <div className="absolute bg-gray-700 dark:bg-slate-700 text-white p-2 rounded shadow-lg z-10 top-1 left-2/4 transform -translate-x-1/2 text-left w-4/5">
+                          <div className="grid grid-cols-4 gap-1 overflow-hidden">
+                            {Object.entries(smartlock).map(
+                              ([key, value], index) => (
+                                <div key={index} className="break-words">
+                                  <span className="font-bold text-yellow-500 ">
+                                    {key}:
+                                  </span>
+                                  <br />
+                                  <span className="whitespace-normal break-words">
+                                    {value === null
+                                      ? "null"
+                                      : value === ""
+                                      ? "null"
+                                      : value === true
+                                      ? "true"
+                                      : value === false
+                                      ? "false"
+                                      : value}
+                                  </span>
+                                </div>
+                              )
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </td>
                     <td className="border border-gray-300 dark:border-border px-4 py-2">
                       {smartlock.unitName}
@@ -332,7 +362,10 @@ export default function SmartLock({
                     <td className="border border-gray-300 dark:border-border px-4 py-2">
                       {smartlock.deviceType}
                     </td>
-                    <td className="border border-gray-300 dark:border-border px-4 py-2 text-center">
+                    <td
+                      className="border border-gray-300 dark:border-border px-4 py-2 text-center"
+                      title={smartlock.signalQualityDisplay}
+                    >
                       {smartlock.signalQuality < 60 ? (
                         <div className="inline-flex items-center gap-1">
                           <RiSignalWifi1Fill className="text-red-500" />
@@ -355,7 +388,10 @@ export default function SmartLock({
                         </div>
                       )}
                     </td>
-                    <td className="border border-gray-300 dark:border-border px-4 py-2 text-center">
+                    <td
+                      className="border border-gray-300 dark:border-border px-4 py-2 text-center"
+                      title={smartlock.lastBatteryChangeTimestampDisplay}
+                    >
                       {smartlock.batteryLevel < 20 ? (
                         <div className="inline-flex items-center gap-1">
                           <MdBattery0Bar className="text-red-500" />
@@ -406,7 +442,10 @@ export default function SmartLock({
                     <td className="border border-gray-300 dark:border-border px-4 py-2">
                       {smartlock.unitStatus}
                     </td>
-                    <td className="border border-gray-300 dark:border-border px-4 py-2">
+                    <td
+                      className="border border-gray-300 dark:border-border px-4 py-2"
+                      title={smartlock.lastEventTimestampDisplay}
+                    >
                       {smartlock.statusMessages[0] != "" ? (
                         smartlock.overallStatus === "error" ? (
                           <div className="inline-flex items-center gap-2">

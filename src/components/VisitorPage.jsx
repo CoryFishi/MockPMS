@@ -189,6 +189,8 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
           &ensp; Visitors | {currentFacilityName}
         </div>
       </div>
+      <p className="text-sm dark:text-white text-left">{Date()}</p>
+
       <div className="w-full h-full p-5 flex flex-col rounded-lg">
         <div className="min-h-12 flex justify-center gap-32">
           <div className="text-center">

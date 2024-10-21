@@ -94,7 +94,7 @@ export default function CreateUnit({
             value={newUnitNumber}
             onChange={(e) => setNewUnitNumber(e.target.value)}
             placeholder="Enter unit number"
-          />{" "}
+          />
           <p className="text-wrap text-xs text-red-400 mt-1">
             Multiple Units can be created by sperating each unit by a comma
           </p>

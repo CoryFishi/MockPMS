@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
 import { FaLock } from "react-icons/fa";
 import SmartLockFacilityCard from "./SmartLockFacilityCard";
+import SmartLockFacilityRow from "./SmartLockFacilityRow";
 
 export default function SmartLockDashboardView({
   selectedFacilities,
@@ -10,6 +11,9 @@ export default function SmartLockDashboardView({
 }) {
   const [facilitiesWithBearers, setFacilitiesWithBearers] = useState([]);
   const [filteredFacilities, setFilteredFacilities] = useState([]);
+  const [listView, setListView] = useState(
+    JSON.parse(localStorage.getItem("smartlockListView")) || false
+  );
 
   // Function to get a bearer token for each facility
   const fetchBearerToken = async (facility) => {
@@ -46,6 +50,11 @@ export default function SmartLockDashboardView({
       toast.error(`Failed to fetch token for ${facility.name}`);
       return null;
     }
+  };
+
+  const toggleListView = () => {
+    setListView(!listView);
+    localStorage.setItem("smartlockListView", !listView);
   };
 
   useEffect(() => {
@@ -111,14 +120,86 @@ export default function SmartLockDashboardView({
         >
           Search
         </button>
+        <button
+          className="bg-slate-300 text-white p-1 py-2 rounded hover:bg-slate-400 ml-3 w-44 font-bold"
+          onClick={() => toggleListView()}
+        >
+          {listView ? "Card View" : "List View"}
+        </button>
       </div>
-      <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 p-5 pt-1 text-left">
-        {filteredFacilities.map((facility, index) => (
-          <div key={index}>
-            <SmartLockFacilityCard facility={facility} />
-          </div>
-        ))}
-      </div>
+
+      {listView ? (
+        <div className="w-full px-5">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-200 dark:bg-darkNavSecondary">
+                <th className="border border-gray-300 dark:border-border px-4 py-2"></th>
+                <th
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  colSpan="3"
+                >
+                  OpenNet
+                </th>
+                <th
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  colSpan="6"
+                >
+                  SmartLock
+                </th>
+              </tr>
+              <tr className="bg-gray-200 dark:bg-darkNavSecondary">
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Facility
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Edge Router
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Online APs
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Offline APs
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Okay
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Warning
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Error
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Offline
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Lowest Signal Quality
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Lowest Battery Level
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredFacilities.map((facility, index) => (
+                <SmartLockFacilityRow
+                  key={index}
+                  facility={facility}
+                  index={index}
+                />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 p-5 pt-1 text-left">
+          {filteredFacilities.map((facility, index) => (
+            <div key={index}>
+              <SmartLockFacilityCard facility={facility} />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
