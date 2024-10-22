@@ -2,29 +2,16 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
 import SmartLock from "./modals/SmartLock";
-import {
-  MdBattery20,
-  MdBattery60,
-  MdBattery80,
-  MdBatteryFull,
-  MdBattery0Bar,
-} from "react-icons/md";
 
-import {
-  RiSignalWifi1Fill,
-  RiSignalWifi2Fill,
-  RiSignalWifi3Fill,
-  RiSignalWifiFill,
-  RiErrorWarningFill,
-} from "react-icons/ri";
-
-import { FaLock, FaLockOpen, FaCheckCircle } from "react-icons/fa";
-
-import { BsShieldLockFill } from "react-icons/bs";
+import { FaCheckCircle } from "react-icons/fa";
 
 import { IoIosWarning } from "react-icons/io";
 
-export default function SmartLockFacilityRow({ facility, index }) {
+export default function SmartLockFacilityRow({
+  setFacilitiesInfo,
+  facility,
+  index,
+}) {
   const [smartlocks, setSmartlocks] = useState([]);
   const [lowestSignal, setLowestSignal] = useState([]);
   const [offline, setOffline] = useState([]);
@@ -34,6 +21,46 @@ export default function SmartLockFacilityRow({ facility, index }) {
   const [accessPoints, setAccessPoints] = useState(null);
   const [isSmartlockModalOpen, setIsSmartlockModalOpen] = useState(false);
   const [smartlockModalOption, setSmartlockModalOption] = useState(null);
+
+  useEffect(() => {
+    const facilityData = {
+      name: facility.name,
+      lowestSignal: lowestSignal,
+      offlineCount: offline,
+      lowestBattery: lowestBattery,
+      errorCount: smartlockSummary?.errorCount,
+      okCount: smartlockSummary?.okCount,
+      warningCount: smartlockSummary?.warningCount,
+      edgeRouterStatus: edgeRouter?.isDeviceOffline,
+      offlineAccessPointsCount: Array.isArray(accessPoints)
+        ? accessPoints.filter((ap) => ap.isDeviceOffline === true).length
+        : 0,
+      onlineAccessPointsCount: Array.isArray(accessPoints)
+        ? accessPoints.filter((ap) => ap.isDeviceOffline === false).length
+        : 0,
+    };
+
+    setFacilitiesInfo((prev) => {
+      const existingIndex = prev.findIndex((f) => f.name === facility.name);
+
+      if (existingIndex !== -1) {
+        const updatedFacilities = [...prev];
+        updatedFacilities[existingIndex] = facilityData;
+        return updatedFacilities;
+      } else {
+        return [...prev, facilityData];
+      }
+    });
+  }, [
+    facility,
+    smartlocks,
+    lowestSignal,
+    offline,
+    lowestBattery,
+    smartlockSummary,
+    edgeRouter,
+    accessPoints,
+  ]);
 
   const openSmartLockModal = (option) => {
     if (isSmartlockModalOpen) {
@@ -153,17 +180,22 @@ export default function SmartLockFacilityRow({ facility, index }) {
 
       // Find the lowest signalQuality
       const lockWithLowestSignal = smartLocks.reduce((lowestLock, lock) => {
-        return lock.signalQuality < lowestLock.signalQuality
+        return lock.signalQuality < lowestLock.signalQuality &&
+          !lock.isDeviceOffline
           ? lock
           : lowestLock;
       }, smartLocks[0]);
+
       const lowestSignal =
         Math.round((lockWithLowestSignal.signalQuality / 255) * 100) + "%";
       setLowestSignal(lowestSignal);
 
       // Find the lowest battery
       const lockWithLowestBattery = smartLocks.reduce((lowestLock, lock) => {
-        return lock.batteryLevel < lowestLock.batteryLevel ? lock : lowestLock;
+        return lock.batteryLevel < lowestLock.batteryLevel &&
+          !lock.isDeviceOffline
+          ? lock
+          : lowestLock;
       }, smartLocks[0]);
       const lowestBattery = lockWithLowestBattery.batteryLevel + "%";
       setLowestBattery(lowestBattery);

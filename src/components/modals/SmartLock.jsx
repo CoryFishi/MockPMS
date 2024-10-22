@@ -57,7 +57,9 @@ export default function SmartLock({
         break;
       case "lowestSignal":
         const lowestSignalStrength = sortedSmartLocks.reduce((lowest, lock) => {
-          return lock.signalQuality < lowest ? lock.signalQuality : lowest;
+          return lock.signalQuality < lowest && !lock.isDeviceOffline
+            ? lock.signalQuality
+            : lowest;
         }, sortedSmartLocks[0].signalQuality);
 
         sortedSmartLocks = sortedSmartLocks.filter(
@@ -66,7 +68,9 @@ export default function SmartLock({
         break;
       case "lowestBattery":
         const lowestBatteryLevel = sortedSmartLocks.reduce((lowest, lock) => {
-          return lock.batteryLevel < lowest ? lock.batteryLevel : lowest;
+          return lock.batteryLevel < lowest && !lock.isDeviceOffline
+            ? lock.batteryLevel
+            : lowest;
         }, sortedSmartLocks[0].batteryLevel);
 
         sortedSmartLocks = sortedSmartLocks.filter(

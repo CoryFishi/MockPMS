@@ -14,6 +14,88 @@ export default function SmartLockDashboardView({
   const [listView, setListView] = useState(
     JSON.parse(localStorage.getItem("smartlockListView")) || false
   );
+  const [facilitiesInfo, setFacilitiesInfo] = useState([]);
+
+  const [edgeRouterOfflineCount, setEdgeRouterOfflineCount] = useState([]);
+  const [edgeRouterOnlineCount, setEdgeRouterOnlineCount] = useState([]);
+  const [accessPointsOnlineCount, setAccessPointsOnlineCount] = useState([]);
+  const [accessPointsOfflineCount, setAccessPointsOfflineCount] = useState([]);
+  const [smartlockOkayCount, setSmartlockOkayCount] = useState([]);
+  const [smartlockWarningCount, setSmartlockWarningCount] = useState([]);
+  const [smartlockErrorCount, setSmartlockErrorCount] = useState([]);
+  const [smartlockOfflineCount, setSmartlockOfflineCount] = useState([]);
+  const [smartlockLowestSignal, setSmartlockLowestSignal] = useState([]);
+  const [smartlockLowestBattery, setSmartlockLowestBattery] = useState([]);
+  const [totalSmartlocks, setTotalSmartlocks] = useState(0);
+  const [totalAccessPoints, setTotalAccessPoints] = useState(0);
+  const [totalEdgeRouters, setTotalEdgeRouters] = useState(0);
+
+  useEffect(() => {
+    const updateAggregatedCounts = (facilitiesInfo) => {
+      const aggregatedData = facilitiesInfo.reduce(
+        (totals, facility) => {
+          totals.totalSmartlocks +=
+            facility.okCount +
+            facility.warningCount +
+            facility.errorCount +
+            facility.offlineCount;
+          totals.totalEdgeRouters += facility.edgeRouterStatus ? 1 : 1;
+          totals.totalAccessPoints +=
+            facility.onlineAccessPointsCount +
+            facility.offlineAccessPointsCount;
+          totals.edgeRouterOfflineCount += facility.edgeRouterStatus ? 1 : 0;
+          totals.edgeRouterOnlineCount += facility.edgeRouterStatus ? 0 : 1;
+          totals.accessPointsOnlineCount += facility.onlineAccessPointsCount;
+          totals.accessPointsOfflineCount += facility.offlineAccessPointsCount;
+          totals.smartlockOkayCount += facility.okCount || 0;
+          totals.smartlockWarningCount += facility.warningCount || 0;
+          totals.smartlockErrorCount += facility.errorCount || 0;
+          totals.smartlockOfflineCount += facility.offlineCount || 0;
+          totals.smartlockLowestSignal =
+            Math.min(
+              parseInt(totals.smartlockLowestSignal),
+              parseInt(facility.lowestSignal)
+            ) + "%";
+          totals.smartlockLowestBattery =
+            Math.min(
+              parseInt(totals.smartlockLowestBattery),
+              parseInt(facility.lowestBattery)
+            ) + "%";
+
+          return totals;
+        },
+        {
+          totalAccessPoints: 0,
+          totalEdgeRouters: 0,
+          totalSmartlocks: 0,
+          edgeRouterOfflineCount: 0,
+          edgeRouterOnlineCount: 0,
+          accessPointsOnlineCount: 0,
+          accessPointsOfflineCount: 0,
+          smartlockOkayCount: 0,
+          smartlockWarningCount: 0,
+          smartlockErrorCount: 0,
+          smartlockOfflineCount: 0,
+          smartlockLowestSignal: "100%",
+          smartlockLowestBattery: "100%",
+        }
+      );
+      setTotalAccessPoints(aggregatedData.totalAccessPoints);
+      setTotalEdgeRouters(aggregatedData.totalEdgeRouters);
+      setTotalSmartlocks(aggregatedData.totalSmartlocks);
+      setEdgeRouterOfflineCount(aggregatedData.edgeRouterOfflineCount);
+      setEdgeRouterOnlineCount(aggregatedData.edgeRouterOnlineCount);
+      setAccessPointsOnlineCount(aggregatedData.accessPointsOnlineCount);
+      setAccessPointsOfflineCount(aggregatedData.accessPointsOfflineCount);
+      setSmartlockOkayCount(aggregatedData.smartlockOkayCount);
+      setSmartlockWarningCount(aggregatedData.smartlockWarningCount);
+      setSmartlockErrorCount(aggregatedData.smartlockErrorCount);
+      setSmartlockOfflineCount(aggregatedData.smartlockOfflineCount);
+      setSmartlockLowestSignal(aggregatedData.smartlockLowestSignal);
+      setSmartlockLowestBattery(aggregatedData.smartlockLowestBattery);
+    };
+    updateAggregatedCounts(facilitiesInfo);
+  }, [facilitiesInfo]);
 
   // Function to get a bearer token for each facility
   const fetchBearerToken = async (facility) => {
@@ -183,11 +265,103 @@ export default function SmartLockDashboardView({
             <tbody>
               {filteredFacilities.map((facility, index) => (
                 <SmartLockFacilityRow
+                  setFacilitiesInfo={setFacilitiesInfo}
                   key={index}
                   facility={facility}
                   index={index}
                 />
               ))}
+              <tr className="bg-slate-50 dark:bg-darkSecondary">
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2 font-bold"
+                  title={totalSmartlocks}
+                >
+                  Totals:
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title={
+                    Math.round(
+                      (edgeRouterOnlineCount / totalEdgeRouters) * 100
+                    ) + "% Online"
+                  }
+                >
+                  {edgeRouterOnlineCount} Online <br />{" "}
+                  {edgeRouterOfflineCount > 0
+                    ? edgeRouterOfflineCount + " Offline"
+                    : ""}
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title={
+                    Math.round(
+                      (accessPointsOnlineCount / totalAccessPoints) * 100
+                    ) + "% Online"
+                  }
+                >
+                  {accessPointsOnlineCount}
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title={
+                    Math.round(
+                      (accessPointsOfflineCount / totalAccessPoints) * 100
+                    ) + "% Offline"
+                  }
+                >
+                  {accessPointsOfflineCount}
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title={
+                    Math.round((smartlockOkayCount / totalSmartlocks) * 100) +
+                    "% Okay Status"
+                  }
+                >
+                  {smartlockOkayCount}
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title={
+                    Math.round(
+                      (smartlockWarningCount / totalSmartlocks) * 100
+                    ) + "% Warning Status"
+                  }
+                >
+                  {smartlockWarningCount}
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title={
+                    Math.round((smartlockErrorCount / totalSmartlocks) * 100) +
+                    "% Error Status"
+                  }
+                >
+                  {smartlockErrorCount}
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title={
+                    Math.round(
+                      (smartlockOfflineCount / totalSmartlocks) * 100
+                    ) + "% Offline"
+                  }
+                >
+                  {smartlockOfflineCount}
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title="Lowest Signal"
+                >
+                  {smartlockLowestSignal}
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title="Lowest Battery"
+                >
+                  {smartlockLowestBattery}
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>

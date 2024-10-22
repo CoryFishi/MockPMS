@@ -132,7 +132,8 @@ export default function SmartLockFacilityCard({ facility }) {
 
       // Find the lowest signalQuality
       const lockWithLowestSignal = smartLocks.reduce((lowestLock, lock) => {
-        return lock.signalQuality < lowestLock.signalQuality
+        return lock.signalQuality < lowestLock.signalQuality &&
+          !lock.isDeviceOffline
           ? lock
           : lowestLock;
       }, smartLocks[0]);
@@ -142,7 +143,10 @@ export default function SmartLockFacilityCard({ facility }) {
 
       // Find the lowest battery
       const lockWithLowestBattery = smartLocks.reduce((lowestLock, lock) => {
-        return lock.batteryLevel < lowestLock.batteryLevel ? lock : lowestLock;
+        return lock.batteryLevel < lowestLock.batteryLevel &&
+          !lock.isDeviceOffline
+          ? lock
+          : lowestLock;
       }, smartLocks[0]);
       const lowestBattery = lockWithLowestBattery.batteryLevel + "%";
       setLowestBattery(lowestBattery);
