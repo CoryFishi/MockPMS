@@ -23,14 +23,21 @@ export default function SmartLockFacilityRow({
   const [smartlockModalOption, setSmartlockModalOption] = useState(null);
 
   useEffect(() => {
+    console.log(smartlockSummary?.errorCount);
     const facilityData = {
       name: facility.name,
-      lowestSignal: lowestSignal,
-      offlineCount: offline,
-      lowestBattery: lowestBattery,
-      errorCount: smartlockSummary?.errorCount,
-      okCount: smartlockSummary?.okCount,
-      warningCount: smartlockSummary?.warningCount,
+      lowestSignal:
+        lowestSignal && Object.keys(lowestSignal).length > 0
+          ? lowestSignal
+          : "100%",
+      offlineCount: offline > 0 ? offline : 0,
+      lowestBattery:
+        lowestBattery && Object.keys(lowestBattery).length > 0
+          ? lowestBattery
+          : "100%",
+      errorCount: smartlockSummary?.errorCount || 0,
+      okCount: smartlockSummary?.okCount || 0,
+      warningCount: smartlockSummary?.warningCount || 0,
       edgeRouterStatus: edgeRouter?.isDeviceOffline,
       offlineAccessPointsCount: Array.isArray(accessPoints)
         ? accessPoints.filter((ap) => ap.isDeviceOffline === true).length
