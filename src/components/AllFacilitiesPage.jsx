@@ -238,23 +238,23 @@ export default function AllFacilitiesPage({
           onChange={(e) => setSearchQuery(e.target.value)}
           className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
         />
-        <table className="w-full table-auto border-collapse border border-gray-300 pb-96 dark:border-border">
+        <table className="w-full table-auto border-collapse border-gray-300 pb-96">
           <thead>
             <tr className="bg-gray-200 dark:bg-darkNavSecondary">
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left"></th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"></th>
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Environment
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Facility Id
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Facility Name
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Property Number
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Actions
               </th>
             </tr>
@@ -266,7 +266,7 @@ export default function AllFacilitiesPage({
                 className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
               >
                 <td
-                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  className="border-y border-gray-300 dark:border-border px-4 py-2"
                   onClick={() => addToFavorite(facility)}
                 >
                   <div className="flex justify-center text-yellow-500">
@@ -277,7 +277,7 @@ export default function AllFacilitiesPage({
                     )}
                   </div>
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {facility.environment == "-dev"
                     ? "Development"
                     : facility.environment == ""
@@ -288,16 +288,16 @@ export default function AllFacilitiesPage({
                     ? "Staging"
                     : "N?A"}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {facility.id}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {facility.name}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {facility.propertyNumber}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {currentFacility.id == facility.id &&
                   currentFacility.environment == facility.environment ? (
                     <button

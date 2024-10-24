@@ -13,7 +13,7 @@ export default function Navbar({
   };
 
   return (
-    <nav className="bg-white dark:bg-darkPrimary p-2 w-full border-slate-200 dark:border-gray-700 border-b">
+    <nav className="bg-white dark:bg-darkPrimary p-2 w-full border-slate-200 dark:border-gray-700 border-b select-none">
       <div className="flex items-center justify-between text-black dark:text-white">
         <div className="flex">
           {(location.pathname === "/" ||
@@ -42,7 +42,7 @@ export default function Navbar({
             }`}
           >
             <div
-              className={`bg-white w-3 h-3 rounded-full shadow-md transform transition-transform ${
+              className={`bg-white w-3 h-3 rounded-full shadow-md transform transition-transform duration-500 ease-out ${
                 darkMode ? "translate-x-2" : ""
               }`}
             ></div>

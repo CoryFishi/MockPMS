@@ -21,9 +21,10 @@ export default function SmartLockFacilityRow({
   const [accessPoints, setAccessPoints] = useState(null);
   const [isSmartlockModalOpen, setIsSmartlockModalOpen] = useState(false);
   const [smartlockModalOption, setSmartlockModalOption] = useState(null);
+  const [lowestSignalSmartlock, setLowestSignalSmartlock] = useState([]);
+  const [lowestBatterySmartlock, setLowestBatterySmartlock] = useState([]);
 
   useEffect(() => {
-    console.log(smartlockSummary?.errorCount);
     const facilityData = {
       name: facility.name,
       lowestSignal:
@@ -196,6 +197,7 @@ export default function SmartLockFacilityRow({
       const lowestSignal =
         Math.round((lockWithLowestSignal.signalQuality / 255) * 100) + "%";
       setLowestSignal(lowestSignal);
+      setLowestSignalSmartlock(lockWithLowestSignal);
 
       // Find the lowest battery
       const lockWithLowestBattery = smartLocks.reduce((lowestLock, lock) => {
@@ -206,6 +208,7 @@ export default function SmartLockFacilityRow({
       }, smartLocks[0]);
       const lowestBattery = lockWithLowestBattery.batteryLevel + "%";
       setLowestBattery(lowestBattery);
+      setLowestBatterySmartlock(lockWithLowestBattery);
 
       const offlineDeviceCount = smartLocks.filter(
         (lock) => lock.isDeviceOffline === true
@@ -273,10 +276,15 @@ export default function SmartLockFacilityRow({
         className="border border-gray-300 dark:border-border px-4 py-2"
         title={
           Array.isArray(accessPoints)
-            ? accessPoints
+            ? `${accessPoints
                 .filter((ap) => ap.isDeviceOffline === false)
                 .map((ap) => ap.name)
-                .join(", ")
+                .join(", ")}\n${Math.round(
+                (accessPoints.filter((ap) => ap.isDeviceOffline === false)
+                  .length /
+                  accessPoints.length) *
+                  100
+              )}% Online`
             : ""
         }
       >
@@ -289,10 +297,15 @@ export default function SmartLockFacilityRow({
         className="border border-gray-300 dark:border-border px-4 py-2"
         title={
           Array.isArray(accessPoints)
-            ? accessPoints
+            ? `${accessPoints
                 .filter((ap) => ap.isDeviceOffline === true)
                 .map((ap) => ap.name)
-                .join(", ")
+                .join(", ")}\n${Math.round(
+                (accessPoints.filter((ap) => ap.isDeviceOffline === true)
+                  .length /
+                  accessPoints.length) *
+                  100
+              )}% Offline`
             : ""
         }
       >
@@ -304,36 +317,82 @@ export default function SmartLockFacilityRow({
       <td
         className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
         onClick={() => openSmartLockModal("good")}
+        title={
+          Math.round(
+            (smartlockSummary?.okCount /
+              (smartlockSummary?.okCount +
+                smartlockSummary?.warningCount +
+                smartlockSummary?.errorCount)) *
+              100
+          ) +
+          "%" +
+          " Okay Status"
+        }
       >
         {smartlockSummary?.okCount}
       </td>
       <td
         className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
         onClick={() => openSmartLockModal("warning")}
+        title={
+          Math.round(
+            (smartlockSummary?.warningCount /
+              (smartlockSummary?.okCount +
+                smartlockSummary?.warningCount +
+                smartlockSummary?.errorCount)) *
+              100
+          ) +
+          "%" +
+          " Warning Status"
+        }
       >
         {smartlockSummary?.warningCount}
       </td>
       <td
         className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
         onClick={() => openSmartLockModal("error")}
+        title={
+          Math.round(
+            (smartlockSummary?.errorCount /
+              (smartlockSummary?.okCount +
+                smartlockSummary?.warningCount +
+                smartlockSummary?.errorCount)) *
+              100
+          ) +
+          "%" +
+          " Error Status"
+        }
       >
         {smartlockSummary?.errorCount}
       </td>
       <td
         className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
         onClick={() => openSmartLockModal("offline")}
+        title={
+          Math.round(
+            (offline /
+              (smartlockSummary?.okCount +
+                smartlockSummary?.warningCount +
+                smartlockSummary?.errorCount)) *
+              100
+          ) +
+          "%" +
+          " Offline"
+        }
       >
         {offline}
       </td>
       <td
         className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
         onClick={() => openSmartLockModal("lowestSignal")}
+        title={"SmartLock " + lowestSignalSmartlock.name}
       >
         {lowestSignal}
       </td>
       <td
         className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
         onClick={() => openSmartLockModal("lowestBattery")}
+        title={"SmartLock " + lowestBatterySmartlock.name}
       >
         {lowestBattery}
       </td>

@@ -116,7 +116,7 @@ export default function SmartLock({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white rounded shadow-lg text-black relative h-[90vh] w-full max-w-[95vw] dark:text-white dark:bg-darkPrimary">
+      <div className="bg-white rounded shadow-lg text-black relative max-h-[95vh] w-full max-w-[95vw] dark:text-white dark:bg-darkPrimary">
         <div className="pl-5 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">
             <FaWarehouse />
@@ -132,7 +132,7 @@ export default function SmartLock({
             x
           </button>
         </div>
-        <div className="p-5">
+        <div className="pt-5 px-5">
           {option && (
             <p
               className="text-right text-blue-500 pr-10 hover:cursor-pointer hover:text-blue-900"
@@ -148,7 +148,7 @@ export default function SmartLock({
             onChange={(e) => setSearchQuery(e.target.value)}
             className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
           />
-          <div className="max-h-[75vh] overflow-y-auto text-center">
+          <div className="max-h-[73vh] overflow-y-auto text-center">
             <table className="w-full table-auto border-collapse border border-gray-300 dark:border-border">
               <thead>
                 <tr className="bg-gray-200 dark:bg-darkNavSecondary sticky top-[-1px] z-10">
@@ -501,6 +501,9 @@ export default function SmartLock({
               </tbody>
             </table>
           </div>
+          <p className="p-1">
+            {filteredSmartLocks.length} of {smartLocks.length}
+          </p>
         </div>
       </div>
     </div>

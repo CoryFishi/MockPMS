@@ -23,6 +23,7 @@ export default function UnitPage({
   const [accessProfiles, setAccessProfiles] = useState({});
   const [isEditVisitorModalOpen, setIsEditVisitorModalOpen] = useState(false);
   const [selectedVisitor, setSelectedVisitor] = useState({});
+  const [filteredUnits, setFilteredUnits] = useState(units);
 
   const handleTimeProfiles = async () => {
     var tokenStageKey = "";
@@ -364,16 +365,17 @@ export default function UnitPage({
     handleAccessProfiles();
     handleTimeProfiles();
   }, []);
+  useEffect(() => {
+    const filteredUnits = units.filter(
+      (unit) =>
+        unit.unitNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        unit.id.toString().includes(searchQuery) ||
+        unit.status.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredUnits(filteredUnits);
+  }, [units]);
 
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Filter facilities based on the search query
-  const filteredUnits = units.filter(
-    (unit) =>
-      unit.unitNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      unit.id.toString().includes(searchQuery) ||
-      unit.status.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const editTenant = async (unit) => {
     if (unit.status === "Vacant") return;
@@ -450,19 +452,19 @@ export default function UnitPage({
           />
           <h3 className="mr-2 w-36">Visitor Autofill</h3>
           <div
-            className={`w-7 h-4 flex items-center rounded-full p-1 cursor-pointer ${
+            className={`w-8 h-4 flex items-center rounded-full p-1 cursor-pointer ${
               visitorAutofill ? "bg-blue-600" : "bg-gray-300"
             }`}
             onClick={() => setVisitorAutofill(!visitorAutofill)}
           >
             <div
-              className={`bg-white w-3 h-3 rounded-full shadow-md transform transition-transform ${
+              className={`bg-white w-3 h-3 rounded-full shadow-md transform transition-transform duration-500 ease-out ${
                 visitorAutofill ? "translate-x-2" : ""
               }`}
             ></div>
           </div>
           <button
-            className="bg-green-500 text-white p-1 py-2 rounded hover:bg-green-600 ml-3 w-44 font-bold"
+            className="bg-green-500 text-white p-1 py-2 rounded hover:bg-green-600 hover:scale-105 ml-3 w-44 font-bold transition duration-300 ease-in-out transform"
             onClick={() => setIsUnitModalOpen(true)}
           >
             Create Unit(s)
@@ -496,34 +498,73 @@ export default function UnitPage({
           />
         )}
 
-        <table className="w-full table-auto border-collapse border border-gray-300 pb-96 dark:border-border">
+        <table className="w-full table-auto border-collapse border-gray-300 pb-96 dark:border-border">
           <thead>
             <tr className="bg-gray-200 dark:bg-darkNavSecondary">
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() =>
+                  setFilteredUnits(
+                    [...filteredUnits].sort((a, b) => {
+                      if (a.id < b.id) return -1;
+                      if (a.id > b.id) return 1;
+                      return 0;
+                    })
+                  )
+                }
+              >
                 Unit Id
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() =>
+                  setFilteredUnits(
+                    [...filteredUnits].sort((a, b) => {
+                      if (
+                        a.unitNumber.toLowerCase() < b.unitNumber.toLowerCase()
+                      )
+                        return -1;
+                      if (
+                        a.unitNumber.toLowerCase() > b.unitNumber.toLowerCase()
+                      )
+                        return 1;
+                      return 0;
+                    })
+                  )
+                }
+              >
                 Unit Number
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() =>
+                  setFilteredUnits(
+                    [...filteredUnits].sort((a, b) => {
+                      if (a.status < b.status) return -1;
+                      if (a.status > b.status) return 1;
+                      return 0;
+                    })
+                  )
+                }
+              >
                 Status
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden sm:table-cell">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden sm:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Facility ID
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden md:table-cell">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden md:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Property Number
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden md:table-cell">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden md:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Additional Prop 1
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Additional Prop 2
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Additional Prop 3
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Actions
               </th>
             </tr>
@@ -535,7 +576,7 @@ export default function UnitPage({
                 className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
               >
                 <td
-                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  className="border-y border-gray-300 dark:border-border px-4 py-2"
                   onClick={() => editTenant(unit)}
                 >
                   {unit.status === "Rented" || unit.status === "Delinquent" ? (
@@ -549,29 +590,29 @@ export default function UnitPage({
                     unit.id
                   )}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {unit.unitNumber}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {unit.status}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
                   {unit.facilityId}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden md:table-cell">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden md:table-cell">
                   {unit.propertyNumber}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden md:table-cell">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden md:table-cell">
                   {unit.additionalProp1}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
                   {unit.additionalProp2}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
                   {unit.additionalProp3}
                 </td>
 
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {unit.status === "Rented" ? (
                     <>
                       <button

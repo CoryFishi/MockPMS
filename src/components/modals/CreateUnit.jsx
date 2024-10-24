@@ -77,7 +77,7 @@ export default function CreateUnit({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white rounded shadow-lg">
+      <div className="bg-white rounded shadow-lg dark:bg-darkPrimary">
         <div className="pl-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">
             <IoIosCreate />
@@ -87,10 +87,10 @@ export default function CreateUnit({
           </div>
         </div>
         <div className="px-5 py-3">
-          <label className="block mb-2">Unit Number</label>
+          <label className="block mb-2">Unit Number(s)</label>
           <input
             type="text"
-            className="border border-gray-300 rounded px-3 py-2 w-full"
+            className="border border-gray-300 rounded px-3 py-2 w-full dark:bg-darkSecondary dark:border-border"
             value={newUnitNumber}
             onChange={(e) => setNewUnitNumber(e.target.value)}
             placeholder="Enter unit number"
@@ -100,13 +100,13 @@ export default function CreateUnit({
           </p>
           <div className="mt-4 flex justify-end">
             <button
-              className="bg-gray-300 px-4 py-2 rounded mr-2"
+              className="bg-gray-400 px-4 py-2 rounded mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
               onClick={() => setIsUnitModalOpen(false)}
             >
               Cancel
             </button>
             <button
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
               onClick={handleCreateUnit}
             >
               Submit

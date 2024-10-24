@@ -14,6 +14,7 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
     useState(false);
   const [selectedVisitor, setSelectedVisitor] = useState("");
   const [isEditVisitorModalOpen, setIsEditVisitorModalOpen] = useState("");
+  const [filteredVisitors, setFilteredVisitors] = useState(visitors);
 
   const handleVisitors = async () => {
     var tokenStageKey = "";
@@ -158,28 +159,33 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Filter facilities based on the search query
-  const filteredVisitors = visitors.filter(
-    (visitor) =>
-      (visitor.id?.toString() || "").includes(searchQuery) ||
-      (visitor.accessProfileName?.toLowerCase() || "").includes(
-        searchQuery.toLowerCase()
-      ) ||
-      (visitor.timeGroupName?.toLowerCase() || "").includes(
-        searchQuery.toLowerCase()
-      ) ||
-      (visitor.name?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
-      (visitor.unitNumber?.toLowerCase() || "").includes(
-        searchQuery.toLowerCase()
-      ) ||
-      (visitor.mobilePhoneNumber?.toLowerCase() || "").includes(
-        searchQuery.toLowerCase()
-      ) ||
-      (visitor.email?.toLowerCase() || "").includes(
-        searchQuery.toLowerCase()
-      ) ||
-      (visitor.code?.toLowerCase() || "").includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    // Filter facilities based on the search query
+    const filteredVisitors = visitors.filter(
+      (visitor) =>
+        (visitor.id?.toString() || "").includes(searchQuery) ||
+        (visitor.accessProfileName?.toLowerCase() || "").includes(
+          searchQuery.toLowerCase()
+        ) ||
+        (visitor.timeGroupName?.toLowerCase() || "").includes(
+          searchQuery.toLowerCase()
+        ) ||
+        (visitor.name?.toLowerCase() || "").includes(
+          searchQuery.toLowerCase()
+        ) ||
+        (visitor.unitNumber?.toLowerCase() || "").includes(
+          searchQuery.toLowerCase()
+        ) ||
+        (visitor.mobilePhoneNumber?.toLowerCase() || "").includes(
+          searchQuery.toLowerCase()
+        ) ||
+        (visitor.email?.toLowerCase() || "").includes(
+          searchQuery.toLowerCase()
+        ) ||
+        (visitor.code?.toLowerCase() || "").includes(searchQuery.toLowerCase())
+    );
+    setFilteredVisitors(filteredVisitors);
+  }, [visitors]);
 
   return (
     <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary">
@@ -219,7 +225,7 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
             className="border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
           />
           <button
-            className="font-bold bg-green-500 text-white p-1 py-2 rounded hover:bg-green-600 ml-3 w-44"
+            className="bg-green-500 text-white p-1 py-2 rounded hover:bg-green-600 hover:scale-105 ml-3 w-44 font-bold transition duration-300 ease-in-out transform"
             onClick={() => setIsCreateVisitorModalOpen(true)}
           >
             Create Visitor
@@ -245,37 +251,146 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
           />
         )}
 
-        <table className="w-full table-auto border-collapse border border-gray-300 pb-96 dark:border-border">
+        <table className="w-full table-auto border-collapse border-gray-300 pb-96 dark:border-border">
           <thead>
             <tr className="bg-gray-200 dark:bg-darkNavSecondary">
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden md:table-cell">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() =>
+                  setFilteredVisitors(
+                    [...filteredVisitors].sort((a, b) => {
+                      if (a.id < b.id) return -1;
+                      if (a.id > b.id) return 1;
+                      return 0;
+                    })
+                  )
+                }
+              >
                 Visitor Id
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() =>
+                  setFilteredVisitors(
+                    [...filteredVisitors].sort((a, b) => {
+                      const unitA = (a.unitNumber || "").toLowerCase();
+                      const unitB = (b.unitNumber || "").toLowerCase();
+
+                      if (unitA < unitB) return -1;
+                      if (unitA > unitB) return 1;
+                      return 0;
+                    })
+                  )
+                }
+              >
                 Unit Number
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() =>
+                  setFilteredVisitors(
+                    [...filteredVisitors].sort((a, b) => {
+                      if (a.name.toLowerCase() < b.name.toLowerCase())
+                        return -1;
+                      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+                      return 0;
+                    })
+                  )
+                }
+              >
                 Name
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() =>
+                  setFilteredVisitors(
+                    [...filteredVisitors].sort((a, b) => {
+                      if (a.isTenant < b.isTenant) return -1;
+                      if (a.isTenant > b.isTenant) return 1;
+                      return 0;
+                    })
+                  )
+                }
+              >
                 Type
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden sm:table-cell">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden sm:table-cell hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() =>
+                  setFilteredVisitors(
+                    [...filteredVisitors].sort((a, b) => {
+                      if (a.accessProfileName < b.accessProfileName) return -1;
+                      if (a.accessProfileName > b.accessProfileName) return 1;
+                      return 0;
+                    })
+                  )
+                }
+              >
                 Access Profile
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden sm:table-cell">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden sm:table-cell hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() =>
+                  setFilteredVisitors(
+                    [...filteredVisitors].sort((a, b) => {
+                      if (a.timeGroupName < b.timeGroupName) return -1;
+                      if (a.timeGroupName > b.timeGroupName) return 1;
+                      return 0;
+                    })
+                  )
+                }
+              >
                 Time Profile
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() =>
+                  setFilteredVisitors(
+                    [...filteredVisitors].sort((a, b) => {
+                      if (a.code < b.code) return -1;
+                      if (a.code > b.code) return 1;
+                      return 0;
+                    })
+                  )
+                }
+              >
                 Gate Code
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() =>
+                  setFilteredVisitors(
+                    [...filteredVisitors].sort((a, b) => {
+                      const phoneA = (a.mobilePhoneNumber || "").toLowerCase();
+                      const phoneB = (b.mobilePhoneNumber || "").toLowerCase();
+
+                      if (phoneA < phoneB) return -1;
+                      if (phoneA > phoneB) return 1;
+                      return 0;
+                    })
+                  )
+                }
+              >
                 Phone Number
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden xl:table-cell">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden xl:table-cell hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() =>
+                  setFilteredVisitors(
+                    [...filteredVisitors].sort((a, b) => {
+                      const emailA = (a.email || "").toLowerCase();
+                      const emailB = (b.email || "").toLowerCase();
+
+                      if (emailA < emailB) return -1;
+                      if (emailA > emailB) return 1;
+                      return 0;
+                    })
+                  )
+                }
+              >
                 Email Address
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Actions
               </th>
             </tr>
@@ -286,16 +401,16 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
                 key={index}
                 className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
               >
-                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden md:table-cell">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden md:table-cell">
                   {visitor.id}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {visitor.unitNumber}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {visitor.name}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {visitor.isTenant
                     ? "Tenant"
                     : visitor.isPortalVisitor
@@ -304,22 +419,22 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
                     ? "Non-Tenant Guest"
                     : "Guest"}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
                   {visitor.accessProfileName}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
                   {visitor.timeGroupName}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
                   {visitor.code}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
                   {visitor.mobilePhoneNumber}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2 hidden xl:table-cell">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden xl:table-cell">
                   {visitor.email}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {visitor.isTenant === true ? (
                     <>
                       <button

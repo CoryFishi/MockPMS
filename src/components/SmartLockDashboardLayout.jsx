@@ -43,7 +43,7 @@ export default function SmartLockDashboardLayout({
     <div className="flex flex-col w-full h-screen overflow-auto">
       <div className="flex flex-row w-full h-full">
         {dashboardMenu === true && (
-          <div className="flex flex-col h-full w-1/6 bg-navPrimary text-white text-xl dark:bg-darkNavPrimary border-r dark:border-border">
+          <div className="flex flex-col h-full w-1/6 bg-navPrimary text-white text-xl dark:bg-darkNavPrimary border-r dark:border-border select-none">
             {/* Header Side Bar */}
             <div>
               <h3 className="text-center m-5 text-2xl">OPENTECH IoE</h3>
@@ -54,7 +54,7 @@ export default function SmartLockDashboardLayout({
               className={`pl-2 pr-2 pb-8 mt-8 ${
                 openPage === "dashboard" || openPage === "units"
                   ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
-                  : "dark:bg-darkNavPrimary"
+                  : ""
               }`}
             >
               <div
@@ -73,13 +73,13 @@ export default function SmartLockDashboardLayout({
               </div>
 
               {!openSections.currentFacility && (
-                <div className="ml-6 mt-4 space-y-2">
+                <div className="mx-4 mt-4 space-y-2">
                   <Link
                     onClick={() =>
                       setOpenPage("dashboard") &
                       localStorage.setItem("openPage2", "dashboard")
                     }
-                    className="block hover:text-gray-300"
+                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                   >
                     SmartLock
                   </Link>
@@ -92,7 +92,7 @@ export default function SmartLockDashboardLayout({
               className={`border-t border-b pl-2 pr-2 border-gray-500 pb-8 ${
                 openPage === "allFacilities" || openPage === "selected"
                   ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
-                  : "dark:bg-darkNavPrimary"
+                  : ""
               }`}
             >
               <div
@@ -107,13 +107,13 @@ export default function SmartLockDashboardLayout({
               </div>
 
               {!openSections.facilities && (
-                <div className="ml-6 mt-4 space-y-2">
+                <div className="mx-4 mt-4 space-y-2">
                   <Link
                     onClick={() =>
                       setOpenPage("allFacilities") &
                       localStorage.setItem("openPage2", "allFacilities")
                     }
-                    className="block hover:text-gray-300"
+                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                   >
                     All Facilities
                   </Link>
@@ -122,7 +122,7 @@ export default function SmartLockDashboardLayout({
                       setOpenPage("selected") &
                       localStorage.setItem("openPage2", "selected")
                     }
-                    className="block hover:text-gray-300"
+                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                   >
                     Selected Facilities
                   </Link>

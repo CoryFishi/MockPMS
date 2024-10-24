@@ -146,7 +146,7 @@ export default function DashboardLayout({
     <div className="flex flex-col w-full h-screen overflow-auto">
       <div className="flex flex-row w-full h-full">
         {dashboardMenu === true && (
-          <div className="flex flex-col h-full w-1/6 bg-navPrimary text-white text-xl dark:bg-darkNavPrimary border-r dark:border-border">
+          <div className="flex flex-col h-full w-1/6 bg-navPrimary text-white text-xl dark:bg-darkNavPrimary border-r dark:border-border select-none">
             {/* Header Side Bar */}
             <div>
               <h3 className="text-center m-5 text-2xl">OPENTECH IoE</h3>
@@ -176,13 +176,13 @@ export default function DashboardLayout({
               </div>
 
               {!openSections.currentFacility && (
-                <div className="ml-6 mt-4 space-y-2">
+                <div className="mx-4 mt-4 space-y-2">
                   <Link
                     onClick={() =>
                       setOpenPage("visitors") &
                       localStorage.setItem("openPage", "visitors")
                     }
-                    className="block hover:text-gray-300"
+                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                   >
                     Visitors
                   </Link>
@@ -191,7 +191,7 @@ export default function DashboardLayout({
                       setOpenPage("units") &
                       localStorage.setItem("openPage", "units")
                     }
-                    className="block hover:text-gray-300"
+                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                   >
                     Units
                   </Link>
@@ -219,13 +219,13 @@ export default function DashboardLayout({
               </div>
 
               {!openSections.facilities && (
-                <div className="ml-6 mt-4 space-y-2">
+                <div className="mx-4 mt-4 space-y-2">
                   <Link
                     onClick={() =>
                       setOpenPage("allFacilities") &
                       localStorage.setItem("openPage", "allFacilities")
                     }
-                    className="block hover:text-gray-300"
+                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                   >
                     All Facilities
                   </Link>
@@ -234,7 +234,7 @@ export default function DashboardLayout({
                       setOpenPage("favorites") &
                       localStorage.setItem("openPage", "favorites")
                     }
-                    className="block hover:text-gray-300"
+                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                   >
                     Favorites
                   </Link>

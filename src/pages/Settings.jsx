@@ -123,7 +123,7 @@ export default function Settings({
       });
   };
 
-  const handleNewLogin = (env) => {
+  const handleNewLogin = async (env) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (env === "cia-stg-1.aws.") {
