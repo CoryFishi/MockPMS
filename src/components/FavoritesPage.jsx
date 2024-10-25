@@ -14,6 +14,7 @@ export default function FavoritesPage({
   setOpenPage,
 }) {
   const [facilities, setFacilities] = useState([]);
+  const [sortDirection, setSortDirection] = useState("asc");
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredFacilities, setFilteredFacilities] =
     useState(favoriteFacilities);
@@ -160,44 +161,56 @@ export default function FavoritesPage({
               <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"></th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+
                   setFilteredFacilities(
                     [...filteredFacilities].sort((a, b) => {
-                      if (a.environment < b.environment) return -1;
-                      if (a.environment > b.environment) return 1;
+                      if (a.environment < b.environment)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.environment > b.environment)
+                        return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
                 Environment
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out min-w-28"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+
                   setFilteredFacilities(
                     [...filteredFacilities].sort((a, b) => {
-                      if (a.id < b.id) return -1;
-                      if (a.id > b.id) return 1;
+                      if (a.id < b.id) return newDirection === "asc" ? -1 : 1;
+                      if (a.id > b.id) return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
                 Facility Id
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+
                   setFilteredFacilities(
                     [...filteredFacilities].sort((a, b) => {
                       if (a.name.toLowerCase() < b.name.toLowerCase())
-                        return -1;
-                      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.name.toLowerCase() > b.name.toLowerCase())
+                        return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
                 Facility Name
               </th>
@@ -206,15 +219,20 @@ export default function FavoritesPage({
                 onClick={() =>
                   setFilteredFacilities(
                     [...filteredFacilities].sort((a, b) => {
-                      const propA = a.propertyNumber
+                      const newDirection =
+                        sortDirection === "asc" ? "desc" : "asc";
+                      setSortDirection(newDirection);
+                      const propertyNumberA = a.propertyNumber
                         ? a.propertyNumber.toLowerCase()
                         : "";
-                      const propB = b.propertyNumber
+                      const propertyNumberB = b.propertyNumber
                         ? b.propertyNumber.toLowerCase()
                         : "";
 
-                      if (propA < propB) return -1;
-                      if (propA > propB) return 1;
+                      if (propertyNumberA < propertyNumberB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (propertyNumberA > propertyNumberB)
+                        return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
                   )

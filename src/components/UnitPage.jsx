@@ -24,6 +24,7 @@ export default function UnitPage({
   const [isEditVisitorModalOpen, setIsEditVisitorModalOpen] = useState(false);
   const [selectedVisitor, setSelectedVisitor] = useState({});
   const [filteredUnits, setFilteredUnits] = useState(units);
+  const [sortDirection, setSortDirection] = useState("asc");
 
   const handleTimeProfiles = async () => {
     var tokenStageKey = "";
@@ -356,22 +357,12 @@ export default function UnitPage({
   };
 
   // Run handleUnits once when the component loads
-  useEffect(async () => {
-    try {
-      await toast.promise(handleUnits(), {
-        loading: "Loading units...",
-        success: <b>Units loaded successfully!</b>,
-        error: <b>Could not load units.</b>,
-      });
-    } catch (error) {
-      setTimeout(async () => {
-        await toast.promise(handleUnits(), {
-          loading: "Loading units...",
-          success: <b>Units loaded successfully!</b>,
-          error: <b>Could not load units.</b>,
-        });
-      }, 5000);
-    }
+  useEffect(() => {
+    toast.promise(handleUnits(), {
+      loading: "Loading units...",
+      success: <b>Units loaded successfully!</b>,
+      error: <b>Could not load units.</b>,
+    });
 
     handleAccessProfiles();
     handleTimeProfiles();
@@ -514,65 +505,172 @@ export default function UnitPage({
             <tr className="bg-gray-200 dark:bg-darkNavSecondary">
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
                   setFilteredUnits(
                     [...filteredUnits].sort((a, b) => {
-                      if (a.id < b.id) return -1;
-                      if (a.id > b.id) return 1;
+                      if (a.id < b.id) return newDirection === "asc" ? -1 : 1;
+                      if (a.id > b.id) return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
                 Unit Id
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
                   setFilteredUnits(
                     [...filteredUnits].sort((a, b) => {
                       if (
                         a.unitNumber.toLowerCase() < b.unitNumber.toLowerCase()
                       )
-                        return -1;
+                        return newDirection === "asc" ? -1 : 1;
                       if (
                         a.unitNumber.toLowerCase() > b.unitNumber.toLowerCase()
                       )
-                        return 1;
+                        return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
                 Unit Number
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
                   setFilteredUnits(
                     [...filteredUnits].sort((a, b) => {
-                      if (a.status < b.status) return -1;
-                      if (a.status > b.status) return 1;
+                      if (a.status < b.status)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.status > b.status)
+                        return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
                 Status
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden sm:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hidden sm:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setFilteredUnits(
+                    [...filteredUnits].sort((a, b) => {
+                      if (a.facilityId < b.facilityId)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.facilityId > b.facilityId)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Facility ID
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden md:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hidden md:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setFilteredUnits(
+                    [...filteredUnits].sort((a, b) => {
+                      const propertyNumberA = (
+                        a.propertyNumber || ""
+                      ).toLowerCase();
+                      const propertyNumberB = (
+                        b.propertyNumber || ""
+                      ).toLowerCase();
+                      if (propertyNumberA < propertyNumberB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (propertyNumberA > propertyNumberB)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Property Number
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden md:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hidden md:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setFilteredUnits(
+                    [...filteredUnits].sort((a, b) => {
+                      const extendedDataA = (
+                        a.extendedData?.additionalProp1 || ""
+                      ).toLowerCase();
+                      const extendedDataB = (
+                        b.extendedData?.additionalProp1 || ""
+                      ).toLowerCase();
+                      if (extendedDataA < extendedDataB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (extendedDataA > extendedDataB)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Additional Prop 1
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hidden lg:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setFilteredUnits(
+                    [...filteredUnits].sort((a, b) => {
+                      const extendedDataA = (
+                        a.extendedData?.additionalProp2 || ""
+                      ).toLowerCase();
+                      const extendedDataB = (
+                        b.extendedData?.additionalProp2 || ""
+                      ).toLowerCase();
+                      if (extendedDataA < extendedDataB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (extendedDataA > extendedDataB)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Additional Prop 2
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hidden lg:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setFilteredUnits(
+                    [...filteredUnits].sort((a, b) => {
+                      const extendedDataA = (
+                        a.extendedData?.additionalProp3 || ""
+                      ).toLowerCase();
+                      const extendedDataB = (
+                        b.extendedData?.additionalProp3 || ""
+                      ).toLowerCase();
+                      if (extendedDataA < extendedDataB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (extendedDataA > extendedDataB)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Additional Prop 3
               </th>
               <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">

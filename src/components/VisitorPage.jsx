@@ -15,6 +15,7 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
   const [selectedVisitor, setSelectedVisitor] = useState("");
   const [isEditVisitorModalOpen, setIsEditVisitorModalOpen] = useState("");
   const [filteredVisitors, setFilteredVisitors] = useState(visitors);
+  const [sortDirection, setSortDirection] = useState("asc");
 
   const handleVisitors = async () => {
     var tokenStageKey = "";
@@ -149,22 +150,12 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
   };
 
   // Run handleUnits once when the component loads
-  useEffect(async () => {
-    try {
-      await toast.promise(handleVisitors(), {
-        loading: "Loading visitors...",
-        success: <b>Visitors loaded successfully!</b>,
-        error: <b>Could not load visitors.</b>,
-      });
-    } catch (error) {
-      setTimeout(async () => {
-        await toast.promise(handleVisitors(), {
-          loading: "Loading visitors...",
-          success: <b>Visitors loaded successfully!</b>,
-          error: <b>Could not load visitors.</b>,
-        });
-      }, 5000);
-    }
+  useEffect(() => {
+    toast.promise(handleVisitors(), {
+      loading: "Loading visitors...",
+      success: <b>Visitors loaded successfully!</b>,
+      error: <b>Could not load visitors.</b>,
+    });
   }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -266,137 +257,178 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
             <tr className="bg-gray-200 dark:bg-darkNavSecondary">
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
-                      if (a.id < b.id) return -1;
-                      if (a.id > b.id) return 1;
+                      if (a.id < b.id) return newDirection === "asc" ? -1 : 1;
+                      if (a.id > b.id) return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
                 Visitor Id
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
                       const unitA = (a.unitNumber || "").toLowerCase();
                       const unitB = (b.unitNumber || "").toLowerCase();
 
-                      if (unitA < unitB) return -1;
-                      if (unitA > unitB) return 1;
+                      if (unitA < unitB) return newDirection === "asc" ? -1 : 1;
+                      if (unitA > unitB) return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
                 Unit Number
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
                       if (a.name.toLowerCase() < b.name.toLowerCase())
-                        return -1;
-                      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.name.toLowerCase() > b.name.toLowerCase())
+                        return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
                 Name
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
-                      if (a.isTenant < b.isTenant) return -1;
-                      if (a.isTenant > b.isTenant) return 1;
+                      if (a.isTenant < b.isTenant)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.isTenant > b.isTenant)
+                        return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
-                Type
+                Visitor Type
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden sm:table-cell hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
-                      if (a.accessProfileName < b.accessProfileName) return -1;
-                      if (a.accessProfileName > b.accessProfileName) return 1;
+                      if (a.accessProfileName < b.accessProfileName)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.accessProfileName > b.accessProfileName)
+                        return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
                 Access Profile
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden sm:table-cell hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
-                      if (a.timeGroupName < b.timeGroupName) return -1;
-                      if (a.timeGroupName > b.timeGroupName) return 1;
+                      if (a.timeGroupName < b.timeGroupName)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.timeGroupName > b.timeGroupName)
+                        return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
                 Time Profile
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
-                      if (a.code < b.code) return -1;
-                      if (a.code > b.code) return 1;
+                      if (a.code < b.code)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.code > b.code)
+                        return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
                 Gate Code
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
                       const phoneA = (a.mobilePhoneNumber || "").toLowerCase();
                       const phoneB = (b.mobilePhoneNumber || "").toLowerCase();
 
-                      if (phoneA < phoneB) return -1;
-                      if (phoneA > phoneB) return 1;
+                      if (phoneA < phoneB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (phoneA > phoneB)
+                        return newDirection === "asc" ? 1 : -1;
+
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
                 Phone Number
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden xl:table-cell hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
                       const emailA = (a.email || "").toLowerCase();
                       const emailB = (b.email || "").toLowerCase();
 
-                      if (emailA < emailB) return -1;
-                      if (emailA > emailB) return 1;
+                      if (emailA < emailB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (emailA > emailB)
+                        return newDirection === "asc" ? 1 : -1;
+
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
                 Email Address
               </th>

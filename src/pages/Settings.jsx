@@ -18,12 +18,11 @@ export default function Settings({
   const [client, setClient] = useState("");
   const [clientSecret, setClientSecret] = useState("");
   const [environment, setEnvironment] = useState("-");
-
   const [settingsSavedFacilities, setSettingsSavedFacilities] = useState(
     Array.isArray(savedFacilities) ? savedFacilities : []
   );
-
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [sortDirection, setSortDirection] = useState("asc");
 
   const submitNewFacility = () => {
     return new Promise((resolve, reject) => {
@@ -208,28 +207,106 @@ export default function Settings({
     <div className="dark:text-white dark:bg-darkPrimary h-screen w-screen flex flex-col overflow-x-hidden overflow-hidden font-roboto">
       <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       <div className="w-full h-full p-5 flex flex-col rounded-lg pb-5 overflow-y-auto">
-        <table className="w-full table-auto border-collapse border border-gray-300 dark:border-border">
+        <table className="w-full table-auto border-collapse">
           <thead>
             <tr className="bg-gray-200 dark:bg-darkNavSecondary">
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+
+                  setSettingsSavedFacilities(
+                    [...settingsSavedFacilities].sort((a, b) => {
+                      if (a.api < b.api) return newDirection === "asc" ? -1 : 1;
+                      if (a.api > b.api) return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 API Key
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+
+                  setSettingsSavedFacilities(
+                    [...settingsSavedFacilities].sort((a, b) => {
+                      if (a.apiSecret < b.apiSecret)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.apiSecret > b.apiSecret)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 API Secret
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+
+                  setSettingsSavedFacilities(
+                    [...settingsSavedFacilities].sort((a, b) => {
+                      if (a.client < b.client)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.client > b.client)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Client
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+
+                  setSettingsSavedFacilities(
+                    [...settingsSavedFacilities].sort((a, b) => {
+                      if (a.clientSecret < b.clientSecret)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.clientSecret > b.clientSecret)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Client Secret
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+
+                  setSettingsSavedFacilities(
+                    [...settingsSavedFacilities].sort((a, b) => {
+                      if (a.environment < b.environment)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.environment > b.environment)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Environment
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Authenticated
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Actions
               </th>
             </tr>
@@ -240,28 +317,28 @@ export default function Settings({
                 key={index}
                 className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
               >
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {facility.api
                     ? "•".repeat(facility.api.length - 5) +
                       facility.api.slice(-5)
                     : ""}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {facility.apiSecret
                     ? "•".repeat(facility.apiSecret.length - 5) +
                       facility.apiSecret.slice(-5)
                     : ""}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {facility.client}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {facility.clientSecret
                     ? "•".repeat(facility.clientSecret.length - 5) +
                       facility.clientSecret.slice(-5)
                     : ""}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {facility.environment === ""
                     ? "Production"
                     : facility.environment === "-dev"
@@ -272,7 +349,7 @@ export default function Settings({
                     ? "Staging"
                     : facility.environment}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   <div className="flex justify-center text-lg">
                     {facility.isAuthenticated ? (
                       <FaCircleCheck className="text-green-500" />
@@ -281,7 +358,7 @@ export default function Settings({
                     )}
                   </div>
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   <div className="text-center">
                     <button
                       className="m-1 px-4 py-1 bg-red-500 rounded-md hover:bg-red-600 text-white"
@@ -300,7 +377,7 @@ export default function Settings({
               </tr>
             ))}
             <tr className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary">
-              <td className="text-black text-center border border-gray-300 dark:border-border px-4 py-2">
+              <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
                 <input
                   type="text"
                   className="border border-slate-100 shadow-md rounded"
@@ -308,7 +385,7 @@ export default function Settings({
                   onChange={(e) => setApi(e.target.value)}
                 />
               </td>
-              <td className="text-black text-center border border-gray-300 dark:border-border px-4 py-2">
+              <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
                 <input
                   type="text"
                   className="border border-slate-100 shadow-md rounded"
@@ -316,7 +393,7 @@ export default function Settings({
                   onChange={(e) => setApiSecret(e.target.value)}
                 />
               </td>
-              <td className="text-black text-center border border-gray-300 dark:border-border px-4 py-2">
+              <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
                 <input
                   type="text"
                   className="border border-slate-100 shadow-md rounded"
@@ -324,7 +401,7 @@ export default function Settings({
                   onChange={(e) => setClient(e.target.value)}
                 />
               </td>
-              <td className="text-black text-center border border-gray-300 dark:border-border px-4 py-2">
+              <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
                 <input
                   type="text"
                   className="border border-slate-100 shadow-md rounded"
@@ -332,14 +409,14 @@ export default function Settings({
                   onChange={(e) => setClientSecret(e.target.value)}
                 />
               </td>
-              <td className="text-black text-center border border-gray-300 dark:border-border px-4 py-2">
+              <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
                 <select
                   value={environment}
                   onChange={(e) =>
                     setEnvironment(e.target.value) &
                     handleNewLogin(e.target.value)
                   }
-                  className="p-0.5 shadow-md border border-slate-100 rounded"
+                  className="p-0.5 shadow-md border-y border-slate-100 rounded"
                 >
                   <option value="-">--Select an Option--</option>
                   <option value="">Production</option>
@@ -348,7 +425,7 @@ export default function Settings({
                   <option value="cia-stg-1.aws.">Staging</option>
                 </select>
               </td>
-              <td className="text-center border border-gray-300 dark:border-border px-4 py-2">
+              <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
                 <div className="flex justify-center text-lg">
                   {isAuthenticated ? (
                     <FaCircleCheck className="text-green-500" />
@@ -357,7 +434,7 @@ export default function Settings({
                   )}
                 </div>
               </td>
-              <td className="text-center border border-gray-300 dark:border-border px-4 py-2">
+              <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
                 {isAuthenticated ? (
                   <button
                     className="m-1 px-4 py-1 bg-green-400 rounded-md hover:bg-green-500 text-white"
