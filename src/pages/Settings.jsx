@@ -303,7 +303,7 @@ export default function Settings({
               <td className="text-black text-center border border-gray-300 dark:border-border px-4 py-2">
                 <input
                   type="text"
-                  className="w-64 border border-slate-100 shadow-md rounded"
+                  className="border border-slate-100 shadow-md rounded"
                   value={api}
                   onChange={(e) => setApi(e.target.value)}
                 />
@@ -311,7 +311,7 @@ export default function Settings({
               <td className="text-black text-center border border-gray-300 dark:border-border px-4 py-2">
                 <input
                   type="text"
-                  className="w-64 border border-slate-100 shadow-md rounded"
+                  className="border border-slate-100 shadow-md rounded"
                   value={apiSecret}
                   onChange={(e) => setApiSecret(e.target.value)}
                 />
@@ -319,7 +319,7 @@ export default function Settings({
               <td className="text-black text-center border border-gray-300 dark:border-border px-4 py-2">
                 <input
                   type="text"
-                  className="w-64 border border-slate-100 shadow-md rounded"
+                  className="border border-slate-100 shadow-md rounded"
                   value={client}
                   onChange={(e) => setClient(e.target.value)}
                 />
@@ -327,7 +327,7 @@ export default function Settings({
               <td className="text-black text-center border border-gray-300 dark:border-border px-4 py-2">
                 <input
                   type="text"
-                  className="w-64 border border-slate-100 shadow-md rounded"
+                  className="border border-slate-100 shadow-md rounded"
                   value={clientSecret}
                   onChange={(e) => setClientSecret(e.target.value)}
                 />
@@ -339,7 +339,7 @@ export default function Settings({
                     setEnvironment(e.target.value) &
                     handleNewLogin(e.target.value)
                   }
-                  className="w-64 p-0.5 shadow-md border border-slate-100 rounded"
+                  className="p-0.5 shadow-md border border-slate-100 rounded"
                 >
                   <option value="-">--Select an Option--</option>
                   <option value="">Production</option>

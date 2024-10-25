@@ -149,12 +149,22 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
   };
 
   // Run handleUnits once when the component loads
-  useEffect(() => {
-    toast.promise(handleVisitors(), {
-      loading: "Loading visitors...",
-      success: <b>Visitors loaded successfully!</b>,
-      error: <b>Could not load visitors.</b>,
-    });
+  useEffect(async () => {
+    try {
+      await toast.promise(handleVisitors(), {
+        loading: "Loading visitors...",
+        success: <b>Visitors loaded successfully!</b>,
+        error: <b>Could not load visitors.</b>,
+      });
+    } catch (error) {
+      setTimeout(async () => {
+        await toast.promise(handleVisitors(), {
+          loading: "Loading visitors...",
+          success: <b>Visitors loaded successfully!</b>,
+          error: <b>Could not load visitors.</b>,
+        });
+      }, 5000);
+    }
   }, []);
 
   const [searchQuery, setSearchQuery] = useState("");

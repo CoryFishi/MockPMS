@@ -274,7 +274,7 @@ export default function SmartLockDashboardView({
               <tr className="bg-slate-50 dark:bg-darkSecondary">
                 <td
                   className="border border-gray-300 dark:border-border px-4 py-2 font-bold"
-                  title={totalSmartlocks}
+                  title={totalSmartlocks + " SmartLocks"}
                 >
                   Totals:
                 </td>

@@ -15,6 +15,7 @@ export default function AllFacilitiesPage({
   setOpenPage,
 }) {
   const [facilities, setFacilities] = useState([]);
+  const [filteredFacilities, setFilteredFacilities] = useState(savedFacilities);
 
   const handleLogin = async (facility) => {
     var tokenStageKey = "";
@@ -209,18 +210,22 @@ export default function AllFacilitiesPage({
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Filter facilities based on the search query
-  const filteredFacilities = facilities.filter(
-    (facility) =>
-      (facility.id || "").toString().includes(searchQuery) ||
-      (facility.propertyNumber || "")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      (facility.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (facility.environment || "")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    const filtered = facilities.filter(
+      (facility) =>
+        (facility.id || "").toString().includes(searchQuery) ||
+        (facility.propertyNumber || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (facility.name || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (facility.environment || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())
+    );
+    setFilteredFacilities(filtered);
+  }, [facilities, searchQuery]);
 
   return (
     <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary">
@@ -239,19 +244,71 @@ export default function AllFacilitiesPage({
           className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
         />
         <table className="w-full table-auto border-collapse border-gray-300 pb-96">
-          <thead>
+          <thead className="sticky top-[-1px] z-10">
             <tr className="bg-gray-200 dark:bg-darkNavSecondary">
               <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"></th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() =>
+                  setFilteredFacilities(
+                    [...filteredFacilities].sort((a, b) => {
+                      if (a.environment < b.environment) return -1;
+                      if (a.environment > b.environment) return 1;
+                      return 0;
+                    })
+                  )
+                }
+              >
                 Environment
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out min-w-28"
+                onClick={() =>
+                  setFilteredFacilities(
+                    [...filteredFacilities].sort((a, b) => {
+                      if (a.id < b.id) return -1;
+                      if (a.id > b.id) return 1;
+                      return 0;
+                    })
+                  )
+                }
+              >
                 Facility Id
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() =>
+                  setFilteredFacilities(
+                    [...filteredFacilities].sort((a, b) => {
+                      if (a.name.toLowerCase() < b.name.toLowerCase())
+                        return -1;
+                      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+                      return 0;
+                    })
+                  )
+                }
+              >
                 Facility Name
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() =>
+                  setFilteredFacilities(
+                    [...filteredFacilities].sort((a, b) => {
+                      const propA = a.propertyNumber
+                        ? a.propertyNumber.toLowerCase()
+                        : "";
+                      const propB = b.propertyNumber
+                        ? b.propertyNumber.toLowerCase()
+                        : "";
+
+                      if (propA < propB) return -1;
+                      if (propA > propB) return 1;
+                      return 0;
+                    })
+                  )
+                }
+              >
                 Property Number
               </th>
               <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
@@ -266,18 +323,21 @@ export default function AllFacilitiesPage({
                 className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
               >
                 <td
-                  className="border-y border-gray-300 dark:border-border px-4 py-2"
+                  className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
                   onClick={() => addToFavorite(facility)}
                 >
                   <div className="flex justify-center text-yellow-500">
                     {isFacilityFavorite(facility.id) ? (
                       <GoStarFill />
                     ) : (
-                      <GoStar />
+                      <GoStar className="text-slate-400" />
                     )}
                   </div>
                 </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td
+                  className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                  onClick={() => addToFavorite(facility)}
+                >
                   {facility.environment == "-dev"
                     ? "Development"
                     : facility.environment == ""
@@ -288,20 +348,29 @@ export default function AllFacilitiesPage({
                     ? "Staging"
                     : "N?A"}
                 </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td
+                  className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                  onClick={() => addToFavorite(facility)}
+                >
                   {facility.id}
                 </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td
+                  className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                  onClick={() => addToFavorite(facility)}
+                >
                   {facility.name}
                 </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td
+                  className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                  onClick={() => addToFavorite(facility)}
+                >
                   {facility.propertyNumber}
                 </td>
                 <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {currentFacility.id == facility.id &&
                   currentFacility.environment == facility.environment ? (
                     <button
-                      className="font-bold bg-gray-200 text-white px-2 py-1 rounded hover:bg-gray-300"
+                      className="font-bold bg-gray-200 text-white px-2 py-1 rounded hover:bg-gray-300 select-none"
                       onClick={() =>
                         localStorage.setItem("openPage", "units") &
                         setOpenPage("units")
@@ -311,7 +380,7 @@ export default function AllFacilitiesPage({
                     </button>
                   ) : (
                     <button
-                      className="font-bold bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                      className="font-bold bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 select-none"
                       onClick={() => handleSelect(facility)}
                     >
                       Select

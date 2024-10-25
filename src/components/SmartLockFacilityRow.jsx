@@ -256,7 +256,10 @@ export default function SmartLockFacilityRow({
 
   return (
     <tr className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary relative">
-      <td className="border border-gray-300 dark:border-border px-4 py-2 ">
+      <td
+        className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+        onClick={() => openSmartLockModal("")}
+      >
         {facility.name}
       </td>
       <td

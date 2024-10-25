@@ -356,12 +356,23 @@ export default function UnitPage({
   };
 
   // Run handleUnits once when the component loads
-  useEffect(() => {
-    toast.promise(handleUnits(), {
-      loading: "Loading units...",
-      success: <b>Units loaded successfully!</b>,
-      error: <b>Could not load units.</b>,
-    });
+  useEffect(async () => {
+    try {
+      await toast.promise(handleUnits(), {
+        loading: "Loading units...",
+        success: <b>Units loaded successfully!</b>,
+        error: <b>Could not load units.</b>,
+      });
+    } catch (error) {
+      setTimeout(async () => {
+        await toast.promise(handleUnits(), {
+          loading: "Loading units...",
+          success: <b>Units loaded successfully!</b>,
+          error: <b>Could not load units.</b>,
+        });
+      }, 5000);
+    }
+
     handleAccessProfiles();
     handleTimeProfiles();
   }, []);
@@ -464,7 +475,7 @@ export default function UnitPage({
             ></div>
           </div>
           <button
-            className="bg-green-500 text-white p-1 py-2 rounded hover:bg-green-600 hover:scale-105 ml-3 w-44 font-bold transition duration-300 ease-in-out transform"
+            className="bg-green-500 text-white p-1 py-2 rounded hover:bg-green-600 hover:scale-105 ml-3 w-44 font-bold transition duration-300 ease-in-out transform select-none"
             onClick={() => setIsUnitModalOpen(true)}
           >
             Create Unit(s)
@@ -612,7 +623,7 @@ export default function UnitPage({
                   {unit.additionalProp3}
                 </td>
 
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2 select-none">
                   {unit.status === "Rented" ? (
                     <>
                       <button

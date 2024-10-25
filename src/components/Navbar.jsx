@@ -16,11 +16,10 @@ export default function Navbar({
     <nav className="bg-white dark:bg-darkPrimary p-2 w-full border-slate-200 dark:border-gray-700 border-b select-none">
       <div className="flex items-center justify-between text-black dark:text-white">
         <div className="flex">
-          {(location.pathname === "/" ||
-            location.pathname === "/smartlock-dashboard") && (
+          {location.pathname !== "/settings" && (
             <button
               onClick={toggleSideMenu}
-              className="flex items-center flex-shrink-0 mr-6 p-2"
+              className="flex items-center flex-shrink-0 p-2"
             >
               {(dashboardMenu === true && (
                 <RiMenuFold3Fill className="text-2xl ml-1 hover:cursor-pointer" />
@@ -29,9 +28,8 @@ export default function Navbar({
               )}
             </button>
           )}
-          <div className="mr-6 p-2 ml-7"></div>
         </div>
-        <div className="flex items-center flex-shrink-0 mr-6 text-2xl font-medium">
+        <div className="flex items-center flex-shrink-0 text-2xl font-medium lg:">
           PMS
         </div>
         <div className="flex space-x-4 items-center mr-5">
