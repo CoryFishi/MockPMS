@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { FaLock } from "react-icons/fa";
 import SmartLockFacilityCard from "./SmartLockFacilityCard";
 import SmartLockFacilityRow from "./SmartLockFacilityRow";
+import SmartLockExport from "./SmartLockExport";
 
 export default function SmartLockDashboardView({
   selectedFacilities,
@@ -209,7 +210,6 @@ export default function SmartLockDashboardView({
           {listView ? "Card View" : "List View"}
         </button>
       </div>
-
       {listView ? (
         <div className="w-full px-5">
           <table className="w-full">
@@ -374,6 +374,9 @@ export default function SmartLockDashboardView({
           ))}
         </div>
       )}
+      <div className="float-right px-5">
+        <SmartLockExport facilitiesInfo={facilitiesInfo} />
+      </div>
     </div>
   );
 }

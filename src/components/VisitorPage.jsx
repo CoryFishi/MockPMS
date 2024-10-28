@@ -16,6 +16,7 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
   const [isEditVisitorModalOpen, setIsEditVisitorModalOpen] = useState("");
   const [filteredVisitors, setFilteredVisitors] = useState(visitors);
   const [sortDirection, setSortDirection] = useState("asc");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleVisitors = async () => {
     var tokenStageKey = "";
@@ -157,8 +158,6 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
       error: <b>Could not load visitors.</b>,
     });
   }, []);
-
-  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     // Filter facilities based on the search query

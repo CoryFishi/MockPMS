@@ -18,10 +18,9 @@ export default function CreateVisitorUnit({
     timeProfile: "",
     accessProfile: "",
   });
-
   const [timeProfiles, setTimeProfiles] = useState({});
   const [accessProfiles, setAccessProfiles] = useState({});
-
+  // API call handler to get time profiles
   const handleTimeProfiles = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
@@ -49,6 +48,7 @@ export default function CreateVisitorUnit({
         console.log(error);
       });
   };
+  // API call handler to get access profiles
   const handleAccessProfiles = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
@@ -76,7 +76,7 @@ export default function CreateVisitorUnit({
         console.log(error);
       });
   };
-
+  // API call handler to create the new visitor
   const handleCreateVisitor = (e) => {
     e.preventDefault();
     if (!newVisitor.timeProfile) {
@@ -150,14 +150,18 @@ export default function CreateVisitorUnit({
     setNewVisitor("");
   };
 
+  // On load get dependencies
   useEffect(() => {
     handleTimeProfiles();
     handleAccessProfiles();
   }, []);
 
   return (
+    // Background Filter
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      {/* Modal Container */}
       <div className="bg-white rounded shadow-lg w-96 dark:bg-darkPrimary">
+        {/* Header Container */}
         <div className="pl-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">
             <IoIosCreate />
@@ -166,6 +170,7 @@ export default function CreateVisitorUnit({
             </h2>
           </div>
         </div>
+        {/* Content Container */}
         <form onSubmit={handleCreateVisitor} className="px-5 py-3">
           <label className="block">First Name</label>
           <input

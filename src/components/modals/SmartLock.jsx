@@ -148,7 +148,7 @@ export default function SmartLock({
             onChange={(e) => setSearchQuery(e.target.value)}
             className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
           />
-          <div className="max-h-[73vh] overflow-y-auto text-center">
+          <div className="h-[73vh] overflow-y-auto text-center">
             <table className="w-full table-auto border-collapse border border-gray-300 dark:border-border">
               <thead>
                 <tr className="bg-gray-200 dark:bg-darkNavSecondary sticky top-[-1px] z-10">
