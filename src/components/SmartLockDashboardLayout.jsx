@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
-import axios from "axios";
-import qs from "qs";
 import SmartLockAllFacilitiesPage from "./SmartLockAllFacilitiesPage";
 import SmartLockSelectedPage from "./SmartLockSelectedPage";
 import SmartLockDashboardView from "./SmartLockDashboardView";
@@ -143,7 +141,6 @@ export default function SmartLockDashboardLayout({
               savedFacilities={savedFacilities}
               selectedFacilities={selectedFacilities}
               setSelectedFacilities={setSelectedFacilities}
-              setOpenPage={setOpenPage}
             />
           )}
           {openPage === "selected" && (
@@ -151,7 +148,6 @@ export default function SmartLockDashboardLayout({
               savedFacilities={savedFacilities}
               selectedFacilities={selectedFacilities}
               setSelectedFacilities={setSelectedFacilities}
-              setOpenPage={setOpenPage}
             />
           )}
         </div>

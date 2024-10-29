@@ -8,16 +8,15 @@ export default function FavoritesPage({
   currentFacility,
   setCurrentFacility,
   setCurrentFacilityName,
-  savedFacilities,
   favoriteFacilities,
   setFavoriteFacilities,
-  setOpenPage,
 }) {
   const [facilities, setFacilities] = useState([]);
   const [sortDirection, setSortDirection] = useState("asc");
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredFacilities, setFilteredFacilities] =
     useState(favoriteFacilities);
+  const [sortedColumn, setSortedColumn] = useState(null);
 
   const handleSelectLogin = async (facility) => {
     var tokenStageKey = "";
@@ -66,16 +65,6 @@ export default function FavoritesPage({
       });
   };
 
-  const handleFacilities = async (saved) => {
-    // Run the toast notification for each facility
-    try {
-      setFacilities(favoriteFacilities);
-      toast.success(<b>Favorites loaded successfully!</b>);
-    } catch {
-      alert("It broke");
-    }
-  };
-
   const handleSelect = async (facility) => {
     setCurrentFacility(facility);
     localStorage.setItem("currentFacility", JSON.stringify(facility));
@@ -114,13 +103,26 @@ export default function FavoritesPage({
     }
   };
 
-  useEffect(() => {
-    handleFacilities(savedFacilities);
-  }, []);
-
   const isFacilityFavorite = (facilityId) => {
     return favoriteFacilities.some((facility) => facility.id === facilityId);
   };
+
+  useEffect(() => {
+    const sortedFacilities = favoriteFacilities.sort((a, b) => {
+      if (a.environment < b.environment) return -1;
+      if (a.environment > b.environment) return 1;
+      if (a.id < b.id) return -1;
+      if (a.id > b.id) return 1;
+      return 0;
+    });
+    setSortedColumn("Facility Id");
+    try {
+      setFacilities(sortedFacilities);
+      toast.success(<b>Favorites loaded successfully!</b>);
+    } catch {
+      alert("It broke");
+    }
+  }, []);
 
   useEffect(() => {
     const filtered = facilities.filter(
@@ -156,7 +158,7 @@ export default function FavoritesPage({
           className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
         />
         <table className="w-full table-auto border-collapse pb-96">
-          <thead className="sticky top-[-1px] z-10">
+          <thead className="sticky top-[-1px] z-10 select-none">
             <tr className="bg-gray-200 dark:bg-darkNavSecondary">
               <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"></th>
               <th
@@ -164,7 +166,7 @@ export default function FavoritesPage({
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
-
+                  setSortedColumn("Environment");
                   setFilteredFacilities(
                     [...filteredFacilities].sort((a, b) => {
                       if (a.environment < b.environment)
@@ -177,13 +179,18 @@ export default function FavoritesPage({
                 }}
               >
                 Environment
+                {sortedColumn === "Environment" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out min-w-28"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
-
+                  setSortedColumn("Facility Id");
                   setFilteredFacilities(
                     [...filteredFacilities].sort((a, b) => {
                       if (a.id < b.id) return newDirection === "asc" ? -1 : 1;
@@ -194,13 +201,18 @@ export default function FavoritesPage({
                 }}
               >
                 Facility Id
+                {sortedColumn === "Facility Id" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
-
+                  setSortedColumn("Facility Name");
                   setFilteredFacilities(
                     [...filteredFacilities].sort((a, b) => {
                       if (a.name.toLowerCase() < b.name.toLowerCase())
@@ -213,6 +225,11 @@ export default function FavoritesPage({
                 }}
               >
                 Facility Name
+                {sortedColumn === "Facility Name" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
@@ -222,6 +239,7 @@ export default function FavoritesPage({
                       const newDirection =
                         sortDirection === "asc" ? "desc" : "asc";
                       setSortDirection(newDirection);
+                      setSortedColumn("Property Number");
                       const propertyNumberA = a.propertyNumber
                         ? a.propertyNumber.toLowerCase()
                         : "";
@@ -239,6 +257,11 @@ export default function FavoritesPage({
                 }
               >
                 Property Number
+                {sortedColumn === "Property Number" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Actions

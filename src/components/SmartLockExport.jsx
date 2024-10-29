@@ -1,6 +1,5 @@
-import React from "react";
-
 export default function SmartLockExport({ facilitiesInfo }) {
+  // Export function
   const exportTable = () => {
     // Convert the data to CSV format
     const headers = [
@@ -15,9 +14,9 @@ export default function SmartLockExport({ facilitiesInfo }) {
       "Lowest Battery SmartLock",
       "Lowest Signal SmartLock",
     ];
-
+    // Create rows
     const csvRows = [
-      headers.join(","), // Add headers
+      headers.join(","), // Add headers to rows
       ...facilitiesInfo.map((facility) =>
         [
           facility.name,
@@ -49,6 +48,7 @@ export default function SmartLockExport({ facilitiesInfo }) {
   };
 
   return (
+    // Export Button
     <p
       className="text-black dark:text-white p-1 py-2 rounded font-bold hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer mr-5"
       onClick={exportTable}

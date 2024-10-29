@@ -17,6 +17,7 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
   const [filteredVisitors, setFilteredVisitors] = useState(visitors);
   const [sortDirection, setSortDirection] = useState("asc");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortedColumn, setSortedColumn] = useState(null);
 
   const handleVisitors = async () => {
     var tokenStageKey = "";
@@ -44,6 +45,7 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
           if (a.unitNumber > b.unitNumber) return 1;
           return 0;
         });
+        setSortedColumn("Unit Number");
 
         const tenantCount = sortedVisitors.filter(
           (visitor) => visitor.isTenant === true
@@ -252,14 +254,14 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
         )}
 
         <table className="w-full table-auto border-collapse border-gray-300 pb-96 dark:border-border">
-          <thead>
+          <thead className="select-none">
             <tr className="bg-gray-200 dark:bg-darkNavSecondary">
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
-
+                  setSortedColumn("Visitor Id");
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
                       if (a.id < b.id) return newDirection === "asc" ? -1 : 1;
@@ -270,12 +272,18 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
                 }}
               >
                 Visitor Id
+                {sortedColumn === "Visitor Id" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
+                  setSortedColumn("Unit Number");
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
                       const unitA = (a.unitNumber || "").toLowerCase();
@@ -289,13 +297,18 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
                 }}
               >
                 Unit Number
+                {sortedColumn === "Unit Number" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
-
+                  setSortedColumn("Name");
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
                       if (a.name.toLowerCase() < b.name.toLowerCase())
@@ -308,13 +321,18 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
                 }}
               >
                 Name
+                {sortedColumn === "Name" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
-
+                  setSortedColumn("Visitor Type");
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
                       if (a.isTenant < b.isTenant)
@@ -327,13 +345,18 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
                 }}
               >
                 Visitor Type
+                {sortedColumn === "Visitor Type" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden sm:table-cell hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
-
+                  setSortedColumn("Access Profile");
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
                       if (a.accessProfileName < b.accessProfileName)
@@ -346,13 +369,18 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
                 }}
               >
                 Access Profile
+                {sortedColumn === "Access Profile" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden sm:table-cell hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
-
+                  setSortedColumn("Time Profile");
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
                       if (a.timeGroupName < b.timeGroupName)
@@ -365,13 +393,18 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
                 }}
               >
                 Time Profile
+                {sortedColumn === "Time Profile" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
-
+                  setSortedColumn("Gate Code");
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
                       if (a.code < b.code)
@@ -384,13 +417,18 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
                 }}
               >
                 Gate Code
+                {sortedColumn === "Gate Code" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden lg:table-cell hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
-
+                  setSortedColumn("Phone Number");
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
                       const phoneA = (a.mobilePhoneNumber || "").toLowerCase();
@@ -407,13 +445,18 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
                 }}
               >
                 Phone Number
+                {sortedColumn === "Phone Number" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hidden xl:table-cell hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
-
+                  setSortedColumn("Email Address");
                   setFilteredVisitors(
                     [...filteredVisitors].sort((a, b) => {
                       const emailA = (a.email || "").toLowerCase();
@@ -430,6 +473,11 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
                 }}
               >
                 Email Address
+                {sortedColumn === "Email Address" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Actions

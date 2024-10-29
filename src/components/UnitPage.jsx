@@ -25,6 +25,7 @@ export default function UnitPage({
   const [selectedVisitor, setSelectedVisitor] = useState({});
   const [filteredUnits, setFilteredUnits] = useState(units);
   const [sortDirection, setSortDirection] = useState("asc");
+  const [sortedColumn, setSortedColumn] = useState(null);
 
   const handleTimeProfiles = async () => {
     var tokenStageKey = "";
@@ -107,6 +108,7 @@ export default function UnitPage({
           if (a.unitNumber > b.unitNumber) return 1;
           return 0;
         });
+        setSortedColumn("Unit Number");
 
         const rentedCount = sortedUnits.filter(
           (unit) => unit.status === "Rented"
@@ -501,13 +503,15 @@ export default function UnitPage({
         )}
 
         <table className="w-full table-auto border-collapse border-gray-300 pb-96 dark:border-border">
-          <thead>
+          <thead className="select-none">
             <tr className="bg-gray-200 dark:bg-darkNavSecondary">
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
+                  setSortedColumn("Unit Id");
+
                   setFilteredUnits(
                     [...filteredUnits].sort((a, b) => {
                       if (a.id < b.id) return newDirection === "asc" ? -1 : 1;
@@ -518,12 +522,18 @@ export default function UnitPage({
                 }}
               >
                 Unit Id
+                {sortedColumn === "Unit Id" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
+                  setSortedColumn("Unit Number");
                   setFilteredUnits(
                     [...filteredUnits].sort((a, b) => {
                       if (
@@ -540,12 +550,19 @@ export default function UnitPage({
                 }}
               >
                 Unit Number
+                {sortedColumn === "Unit Number" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
+                  setSortedColumn("Status");
+
                   setFilteredUnits(
                     [...filteredUnits].sort((a, b) => {
                       if (a.status < b.status)
@@ -558,12 +575,18 @@ export default function UnitPage({
                 }}
               >
                 Status
+                {sortedColumn === "Status" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hidden sm:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
+                  setSortedColumn("Facility ID");
                   setFilteredUnits(
                     [...filteredUnits].sort((a, b) => {
                       if (a.facilityId < b.facilityId)
@@ -576,12 +599,18 @@ export default function UnitPage({
                 }}
               >
                 Facility ID
+                {sortedColumn === "Facility ID" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hidden md:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
+                  setSortedColumn("Property Number");
                   setFilteredUnits(
                     [...filteredUnits].sort((a, b) => {
                       const propertyNumberA = (
@@ -600,12 +629,18 @@ export default function UnitPage({
                 }}
               >
                 Property Number
+                {sortedColumn === "Property Number" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hidden md:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
+                  setSortedColumn("Additional Prop 1");
                   setFilteredUnits(
                     [...filteredUnits].sort((a, b) => {
                       const extendedDataA = (
@@ -624,12 +659,18 @@ export default function UnitPage({
                 }}
               >
                 Additional Prop 1
+                {sortedColumn === "Additional Prop 1" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hidden lg:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
+                  setSortedColumn("Additional Prop 2");
                   setFilteredUnits(
                     [...filteredUnits].sort((a, b) => {
                       const extendedDataA = (
@@ -648,12 +689,18 @@ export default function UnitPage({
                 }}
               >
                 Additional Prop 2
+                {sortedColumn === "Additional Prop 2" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hidden lg:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
+                  setSortedColumn("Additional Prop 3");
                   setFilteredUnits(
                     [...filteredUnits].sort((a, b) => {
                       const extendedDataA = (
@@ -672,6 +719,11 @@ export default function UnitPage({
                 }}
               >
                 Additional Prop 3
+                {sortedColumn === "Additional Prop 3" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Actions

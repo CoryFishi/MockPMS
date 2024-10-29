@@ -16,7 +16,6 @@ export default function SmartLockDashboardView({
     JSON.parse(localStorage.getItem("smartlockListView")) || false
   );
   const [facilitiesInfo, setFacilitiesInfo] = useState([]);
-
   const [edgeRouterOfflineCount, setEdgeRouterOfflineCount] = useState([]);
   const [edgeRouterOnlineCount, setEdgeRouterOnlineCount] = useState([]);
   const [accessPointsOnlineCount, setAccessPointsOnlineCount] = useState([]);
@@ -30,7 +29,76 @@ export default function SmartLockDashboardView({
   const [totalSmartlocks, setTotalSmartlocks] = useState(0);
   const [totalAccessPoints, setTotalAccessPoints] = useState(0);
   const [totalEdgeRouters, setTotalEdgeRouters] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
 
+  // Search via search bar and button
+  const search = () => {
+    setFilteredFacilities([]);
+    setTimeout(
+      () =>
+        setFilteredFacilities(
+          facilitiesWithBearers.filter(
+            (facility) =>
+              (facility.id || "").toString().includes(searchQuery) ||
+              (facility.propertyNumber || "")
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
+              (facility.name || "")
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
+              (facility.environment || "")
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase())
+          )
+        ),
+      500
+    );
+  };
+
+  // Function to get a bearer token for each facility
+  const fetchBearerToken = async (facility) => {
+    try {
+      var tokenStageKey = "";
+      var tokenEnvKey = "";
+      if (facility.environment === "cia-stg-1.aws.") {
+        tokenStageKey = "cia-stg-1.aws.";
+      } else {
+        tokenEnvKey = facility.environment;
+      }
+      const data = {
+        grant_type: "password",
+        username: facility.api,
+        password: facility.apiSecret,
+        client_id: facility.client,
+        client_secret: facility.clientSecret,
+      };
+
+      const response = await axios.post(
+        `https://auth.${tokenStageKey}insomniaccia${tokenEnvKey}.com/auth/token`,
+        data,
+        {
+          headers: {
+            accept: "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+
+      return response.data.access_token;
+    } catch (error) {
+      console.error(`Error fetching token for ${facility.name}:`, error);
+      toast.error(`Failed to fetch token for ${facility.name}`);
+      return null;
+    }
+  };
+
+  // Toggle view - list or card
+  const toggleListView = () => {
+    setListView(!listView);
+    localStorage.setItem("smartlockListView", !listView);
+  };
+
+  // Add totals together from each facility
   useEffect(() => {
     const updateAggregatedCounts = (facilitiesInfo) => {
       const aggregatedData = facilitiesInfo.reduce(
@@ -98,48 +166,7 @@ export default function SmartLockDashboardView({
     updateAggregatedCounts(facilitiesInfo);
   }, [facilitiesInfo]);
 
-  // Function to get a bearer token for each facility
-  const fetchBearerToken = async (facility) => {
-    try {
-      var tokenStageKey = "";
-      var tokenEnvKey = "";
-      if (facility.environment === "cia-stg-1.aws.") {
-        tokenStageKey = "cia-stg-1.aws.";
-      } else {
-        tokenEnvKey = facility.environment;
-      }
-      const data = {
-        grant_type: "password",
-        username: facility.api,
-        password: facility.apiSecret,
-        client_id: facility.client,
-        client_secret: facility.clientSecret,
-      };
-
-      const response = await axios.post(
-        `https://auth.${tokenStageKey}insomniaccia${tokenEnvKey}.com/auth/token`,
-        data,
-        {
-          headers: {
-            accept: "application/json",
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      );
-
-      return response.data.access_token;
-    } catch (error) {
-      console.error(`Error fetching token for ${facility.name}:`, error);
-      toast.error(`Failed to fetch token for ${facility.name}`);
-      return null;
-    }
-  };
-
-  const toggleListView = () => {
-    setListView(!listView);
-    localStorage.setItem("smartlockListView", !listView);
-  };
-
+  // Get bearer tokens prior to creating rows/cards
   useEffect(() => {
     const fetchFacilitiesWithBearers = async () => {
       const updatedFacilities = await Promise.all(
@@ -152,44 +179,29 @@ export default function SmartLockDashboardView({
       setFilteredFacilities(updatedFacilities);
     };
 
+    // Initial fetch
     fetchFacilitiesWithBearers();
+
+    // Set up interval for every 2 minutes
+    const interval = setInterval(fetchFacilitiesWithBearers, 2 * 60 * 1000);
+
+    // Clear interval on component unmount
+    return () => clearInterval(interval);
   }, [selectedFacilities]);
-
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const search = () => {
-    setFilteredFacilities([]);
-    setTimeout(
-      () =>
-        setFilteredFacilities(
-          facilitiesWithBearers.filter(
-            (facility) =>
-              (facility.id || "").toString().includes(searchQuery) ||
-              (facility.propertyNumber || "")
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-              (facility.name || "")
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-              (facility.environment || "")
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase())
-          )
-        ),
-      500
-    );
-  };
 
   return (
     <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary text-center">
+      {/* tab title */}
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <FaLock className="text-lg" />
           &ensp; SmartLock Dashboard
         </div>
       </div>
+      {/* Last update date/time */}
       <p className="text-sm dark:text-white text-left">{Date()}</p>
       <div className="mt-5 mb-2 flex items-center justify-end text-center mx-5">
+        {/* Search Bar */}
         <input
           type="text"
           placeholder="Search facilities..."
@@ -197,12 +209,14 @@ export default function SmartLockDashboardView({
           onChange={(e) => setSearchQuery(e.target.value)}
           className="border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
         />
+        {/* Search Button */}
         <button
           className="bg-green-500 text-white p-1 py-2 rounded hover:bg-green-600 ml-3 w-44 font-bold"
           onClick={() => search()}
         >
           Search
         </button>
+        {/* Toggle view button */}
         <button
           className="bg-slate-300 text-white p-1 py-2 rounded hover:bg-slate-400 ml-3 w-44 font-bold"
           onClick={() => toggleListView()}
@@ -210,6 +224,7 @@ export default function SmartLockDashboardView({
           {listView ? "Card View" : "List View"}
         </button>
       </div>
+      {/* List view */}
       {listView ? (
         <div className="w-full px-5">
           <table className="w-full">
@@ -366,6 +381,7 @@ export default function SmartLockDashboardView({
           </table>
         </div>
       ) : (
+        // Card View
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 p-5 pt-1 text-left">
           {filteredFacilities.map((facility, index) => (
             <div key={index}>
@@ -374,6 +390,7 @@ export default function SmartLockDashboardView({
           ))}
         </div>
       )}
+      {/* Export Button */}
       <div className="float-right px-5">
         <SmartLockExport facilitiesInfo={facilitiesInfo} />
       </div>

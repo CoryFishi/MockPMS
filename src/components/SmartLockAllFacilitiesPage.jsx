@@ -12,12 +12,13 @@ export default function SmartLockAllFacilitiesPage({
   savedFacilities,
   selectedFacilities,
   setSelectedFacilities,
-  setOpenPage,
 }) {
   const [facilities, setFacilities] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredFacilities, setFilteredFacilities] =
     useState(selectedFacilities);
+  const [sortedColumn, setSortedColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState("asc");
 
   const handleLogin = async (facility) => {
     var tokenStageKey = "";
@@ -98,6 +99,7 @@ export default function SmartLockAllFacilitiesPage({
               return 0;
             });
           });
+          setSortedColumn("Facility Id");
 
           return response;
         })
@@ -143,13 +145,13 @@ export default function SmartLockAllFacilitiesPage({
     }
   };
 
-  useEffect(() => {
-    handleFacilities(savedFacilities);
-  }, []);
-
   const isFacilitySelected = (facilityId) => {
     return selectedFacilities.some((facility) => facility.id === facilityId);
   };
+
+  useEffect(() => {
+    handleFacilities(savedFacilities);
+  }, []);
 
   useEffect(() => {
     const filtered = facilities.filter(
@@ -185,72 +187,110 @@ export default function SmartLockAllFacilitiesPage({
           className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
         />
         <table className="w-full table-auto border-collapse border-gray-300 pb-96">
-          <thead className="sticky top-[-1px] z-10">
+          <thead className="sticky top-[-1px] z-10 select-none">
             <tr className="bg-gray-200 dark:bg-darkNavSecondary">
               <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"></th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Environment");
                   setFilteredFacilities(
                     [...filteredFacilities].sort((a, b) => {
-                      if (a.environment < b.environment) return -1;
-                      if (a.environment > b.environment) return 1;
+                      if (a.environment < b.environment)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.environment > b.environment)
+                        return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
                 Environment
+                {sortedColumn === "Environment" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Facility Id");
                   setFilteredFacilities(
                     [...filteredFacilities].sort((a, b) => {
-                      if (a.id < b.id) return -1;
-                      if (a.id > b.id) return 1;
+                      if (a.id < b.id) return newDirection === "asc" ? -1 : 1;
+                      if (a.id > b.id) return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
                 Facility Id
+                {sortedColumn === "Facility Id" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Facility Name");
                   setFilteredFacilities(
                     [...filteredFacilities].sort((a, b) => {
                       if (a.name.toLowerCase() < b.name.toLowerCase())
-                        return -1;
-                      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.name.toLowerCase() > b.name.toLowerCase())
+                        return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
-                  )
-                }
+                  );
+                }}
               >
                 Facility Name
+                {sortedColumn === "Facility Name" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th
                 className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() =>
                   setFilteredFacilities(
                     [...filteredFacilities].sort((a, b) => {
-                      const propA = a.propertyNumber
+                      const newDirection =
+                        sortDirection === "asc" ? "desc" : "asc";
+                      setSortDirection(newDirection);
+                      setSortedColumn("Property Number");
+                      const propertyNumberA = a.propertyNumber
                         ? a.propertyNumber.toLowerCase()
                         : "";
-                      const propB = b.propertyNumber
+                      const propertyNumberB = b.propertyNumber
                         ? b.propertyNumber.toLowerCase()
                         : "";
 
-                      if (propA < propB) return -1;
-                      if (propA > propB) return 1;
+                      if (propertyNumberA < propertyNumberB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (propertyNumberA > propertyNumberB)
+                        return newDirection === "asc" ? 1 : -1;
                       return 0;
                     })
                   )
                 }
               >
                 Property Number
+                {sortedColumn === "Property Number" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
             </tr>
           </thead>
