@@ -108,22 +108,22 @@ export default function EditVisitor({
       axios(config)
         .then(function (response) {
           const newVisitorData = response.data;
-          setVisitors((prevVisitors) => {
-            const updatedVisitors = prevVisitors.map((visitor) => {
-              if (visitor.id === newVisitorData.id) {
-                return { ...visitor, ...newVisitorData };
-              }
-              return visitor;
-            });
+          if (typeof setVisitors === "function") {
+            setVisitors((prevVisitors) => {
+              const updatedVisitors = prevVisitors.map((visitor) => {
+                if (visitor.id === newVisitorData.id) {
+                  return { ...visitor, ...newVisitorData };
+                }
+                return visitor;
+              });
 
-            updatedVisitors.sort((a, b) => {
-              if (a.unitNumber < b.unitNumber) return -1;
-              if (a.unitNumber > b.unitNumber) return 1;
-              return 0;
+              return updatedVisitors.sort((a, b) => {
+                if (a.unitNumber < b.unitNumber) return -1;
+                if (a.unitNumber > b.unitNumber) return 1;
+                return 0;
+              });
             });
-
-            return updatedVisitors;
-          });
+          }
         })
 
         .catch(function (error) {
@@ -144,10 +144,11 @@ export default function EditVisitor({
   useEffect(() => {
     handleTimeProfiles();
     handleAccessProfiles();
+    console.log(typeof setVisitors); // Should log "function"
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white rounded shadow-lg w-96 dark:bg-darkPrimary">
         <div className="pl-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">

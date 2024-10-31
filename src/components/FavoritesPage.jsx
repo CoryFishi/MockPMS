@@ -3,6 +3,12 @@ import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
 import { GoStar, GoStarFill } from "react-icons/go";
 import qs from "qs";
+import {
+  BiChevronLeft,
+  BiChevronRight,
+  BiChevronsLeft,
+  BiChevronsRight,
+} from "react-icons/bi";
 
 export default function FavoritesPage({
   currentFacility,
@@ -10,6 +16,7 @@ export default function FavoritesPage({
   setCurrentFacilityName,
   favoriteFacilities,
   setFavoriteFacilities,
+  setOpenPage,
 }) {
   const [facilities, setFacilities] = useState([]);
   const [sortDirection, setSortDirection] = useState("asc");
@@ -17,6 +24,8 @@ export default function FavoritesPage({
   const [filteredFacilities, setFilteredFacilities] =
     useState(favoriteFacilities);
   const [sortedColumn, setSortedColumn] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
 
   const handleSelectLogin = async (facility) => {
     var tokenStageKey = "";
@@ -141,8 +150,11 @@ export default function FavoritesPage({
     setFilteredFacilities(filtered);
   }, [facilities, searchQuery]);
 
+  // Pagination logic
+  const pageCount = Math.ceil(filteredFacilities.length / rowsPerPage);
+
   return (
-    <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary">
+    <div className="overflow-auto dark:text-white dark:bg-darkPrimary mb-14">
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <GoStarFill className="text-lg" />
@@ -150,13 +162,15 @@ export default function FavoritesPage({
         </div>
       </div>
       <div className="w-full h-full p-5 flex flex-col rounded-lg pb-10">
-        <input
-          type="text"
-          placeholder="Search facilities..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
-        />
+        <div className="mt-5 mb-2 flex items-center justify-end text-center">
+          <input
+            type="text"
+            placeholder="Search facilities..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
+          />
+        </div>
         <table className="w-full table-auto border-collapse pb-96">
           <thead className="sticky top-[-1px] z-10 select-none">
             <tr className="bg-gray-200 dark:bg-darkNavSecondary">
@@ -269,80 +283,143 @@ export default function FavoritesPage({
             </tr>
           </thead>
           <tbody>
-            {filteredFacilities.map((facility, index) => (
-              <tr
-                key={index}
-                className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
-              >
-                <td
-                  className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
-                  onClick={() => addToFavorite(facility)}
+            {filteredFacilities
+              .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+              .map((facility, index) => (
+                <tr
+                  key={index}
+                  className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
                 >
-                  <div className="flex justify-center text-yellow-500">
-                    {isFacilityFavorite(facility.id) ? (
-                      <GoStarFill />
+                  <td
+                    className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                    onClick={() => addToFavorite(facility)}
+                  >
+                    <div className="flex justify-center text-yellow-500">
+                      {isFacilityFavorite(facility.id) ? (
+                        <GoStarFill />
+                      ) : (
+                        <GoStar className="text-slate-400" />
+                      )}
+                    </div>
+                  </td>
+                  <td
+                    className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                    onClick={() => addToFavorite(facility)}
+                  >
+                    {facility.environment == "-dev"
+                      ? "Development"
+                      : facility.environment == ""
+                      ? "Production"
+                      : facility.environment == "-qa"
+                      ? "QA"
+                      : facility.environment == "cia-stg-1.aws."
+                      ? "Staging"
+                      : "N?A"}
+                  </td>
+                  <td
+                    className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                    onClick={() => addToFavorite(facility)}
+                  >
+                    {facility.id}
+                  </td>
+                  <td
+                    className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                    onClick={() => addToFavorite(facility)}
+                  >
+                    {facility.name}
+                  </td>
+                  <td
+                    className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                    onClick={() => addToFavorite(facility)}
+                  >
+                    {facility.propertyNumber}
+                  </td>
+                  <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                    {currentFacility.id == facility.id &&
+                    currentFacility.environment == facility.environment ? (
+                      <button
+                        className="font-bold bg-gray-200 text-white px-2 py-1 rounded hover:bg-gray-300 select-none"
+                        onClick={() =>
+                          localStorage.setItem("openPage", "units") &
+                          setOpenPage("units")
+                        }
+                      >
+                        Selected
+                      </button>
                     ) : (
-                      <GoStar className="text-slate-400" />
+                      <button
+                        className="font-bold bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 select-none"
+                        onClick={() => handleSelect(facility)}
+                      >
+                        Select
+                      </button>
                     )}
-                  </div>
-                </td>
-                <td
-                  className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
-                  onClick={() => addToFavorite(facility)}
-                >
-                  {facility.environment == "-dev"
-                    ? "Development"
-                    : facility.environment == ""
-                    ? "Production"
-                    : facility.environment == "-qa"
-                    ? "QA"
-                    : facility.environment == "cia-stg-1.aws."
-                    ? "Staging"
-                    : "N?A"}
-                </td>
-                <td
-                  className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
-                  onClick={() => addToFavorite(facility)}
-                >
-                  {facility.id}
-                </td>
-                <td
-                  className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
-                  onClick={() => addToFavorite(facility)}
-                >
-                  {facility.name}
-                </td>
-                <td
-                  className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
-                  onClick={() => addToFavorite(facility)}
-                >
-                  {facility.propertyNumber}
-                </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                  {currentFacility.id == facility.id &&
-                  currentFacility.environment == facility.environment ? (
-                    <button
-                      className="font-bold bg-gray-200 text-white px-2 py-1 rounded hover:bg-gray-300 select-none"
-                      onClick={() =>
-                        localStorage.setItem("openPage", "units") &
-                        setOpenPage("units")
-                      }
-                    >
-                      Selected
-                    </button>
-                  ) : (
-                    <button
-                      className="font-bold bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 select-none"
-                      onClick={() => handleSelect(facility)}
-                    >
-                      Select
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
+
+        {/* Modal footer/pagination */}
+        <div className="flex justify-between items-center px-2 py-5 mx-1">
+          <div className="flex gap-3">
+            <div>
+              <select
+                className="border rounded ml-2"
+                id="rowsPerPage"
+                value={rowsPerPage}
+                onChange={(e) => {
+                  setRowsPerPage(Number(e.target.value));
+                  setCurrentPage(1); // Reset to first page on rows per page change
+                }}
+              >
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={100}>100</option>
+              </select>
+            </div>
+            <p className="text-sm">
+              {currentPage === 1 ? 1 : (currentPage - 1) * rowsPerPage + 1} -{" "}
+              {currentPage * rowsPerPage > filteredFacilities.length
+                ? filteredFacilities.length
+                : currentPage * rowsPerPage}{" "}
+              of {filteredFacilities.length}
+            </p>
+          </div>
+          <div className="gap-2 flex">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(1)}
+              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
+            >
+              <BiChevronsLeft />
+            </button>
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => prev - 1)}
+              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
+            >
+              <BiChevronLeft />
+            </button>
+            <p>
+              {currentPage} of {pageCount}
+            </p>
+            <button
+              disabled={currentPage === pageCount}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
+            >
+              <BiChevronRight />
+            </button>
+            <button
+              disabled={currentPage === pageCount}
+              onClick={() => setCurrentPage(pageCount)}
+              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
+            >
+              <BiChevronsRight />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -143,7 +143,7 @@ export default function DashboardLayout({
   }, []);
 
   return (
-    <div className="flex flex-col w-full h-screen overflow-auto">
+    <div className="flex flex-col w-full h-screen overflow-hidden">
       <div className="flex flex-row w-full h-full">
         {dashboardMenu === true && (
           <div className="flex flex-col h-full w-1/6 bg-navPrimary text-white text-xl dark:bg-darkNavPrimary border-r dark:border-border select-none">
@@ -243,7 +243,7 @@ export default function DashboardLayout({
             </div>
           </div>
         )}
-        <div className="w-full flex flex-col bg-background-50 mb-14">
+        <div className="w-full flex flex-col bg-background-50 h-full">
           {openPage === "visitors" && (
             <VisitorPage
               currentFacility={currentFacility}

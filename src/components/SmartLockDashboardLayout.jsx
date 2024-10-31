@@ -39,7 +39,7 @@ export default function SmartLockDashboardLayout({
 
   return (
     <div className="flex flex-col w-full h-screen overflow-auto">
-      <div className="flex flex-row w-full h-full">
+      <div className="flex flex-row w-full h-full  flex-shrink-0">
         {dashboardMenu === true && (
           <div className="flex flex-col h-full w-1/6 bg-navPrimary text-white text-xl dark:bg-darkNavPrimary border-r dark:border-border select-none">
             {/* Header Side Bar */}
@@ -129,7 +129,7 @@ export default function SmartLockDashboardLayout({
             </div>
           </div>
         )}
-        <div className="w-full flex flex-col bg-background-50 mb-14">
+        <div className="w-full flex flex-col bg-background-50 h-full">
           {openPage === "dashboard" && (
             <SmartLockDashboardView
               selectedFacilities={selectedFacilities}

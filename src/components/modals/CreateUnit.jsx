@@ -86,7 +86,7 @@ export default function CreateUnit({
 
   return (
     // Background Filter
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       {/* Modal Container */}
       <div className="bg-white rounded shadow-lg dark:bg-darkPrimary">
         {/* Header Container */}
