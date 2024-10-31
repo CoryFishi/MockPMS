@@ -243,7 +243,7 @@ export default function DashboardLayout({
             </div>
           </div>
         )}
-        <div className="w-full flex flex-col bg-background-50 h-full">
+        <div className="w-full flex flex-col bg-background-50 dark:bg-darkPrimary h-full">
           {openPage === "visitors" && (
             <VisitorPage
               currentFacility={currentFacility}
