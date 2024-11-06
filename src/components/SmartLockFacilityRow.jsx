@@ -39,7 +39,7 @@ export default function SmartLockFacilityRow({
       errorCount: smartlockSummary?.errorCount || 0,
       okCount: smartlockSummary?.okCount || 0,
       warningCount: smartlockSummary?.warningCount || 0,
-      edgeRouterStatus: edgeRouter?.isDeviceOffline,
+      edgeRouterStatus: edgeRouter?.connectionStatus,
       offlineAccessPointsCount: Array.isArray(accessPoints)
         ? accessPoints.filter((ap) => ap.isDeviceOffline === true).length
         : 0,
@@ -265,10 +265,13 @@ export default function SmartLockFacilityRow({
       <td
         className="border border-gray-300 dark:border-border px-4 py-2"
         title={edgeRouter?.connectionStatusMessage}
+        onClick={() => console.log(edgeRouter)}
       >
         <div className="inline-flex items-center gap-1">
-          {edgeRouter?.isDeviceOffline ? (
+          {edgeRouter?.connectionStatus === "error" ? (
             <IoIosWarning className="text-red-500 mr-2" />
+          ) : edgeRouter?.connectionStatus === "warning" ? (
+            <IoIosWarning className="text-yellow-500 mr-2" />
           ) : (
             <FaCheckCircle className="text-green-500 mr-2" />
           )}

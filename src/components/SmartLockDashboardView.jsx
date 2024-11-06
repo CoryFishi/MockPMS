@@ -18,6 +18,7 @@ export default function SmartLockDashboardView({
   const [facilitiesInfo, setFacilitiesInfo] = useState([]);
   const [edgeRouterOfflineCount, setEdgeRouterOfflineCount] = useState([]);
   const [edgeRouterOnlineCount, setEdgeRouterOnlineCount] = useState([]);
+  const [edgeRouterWarningCount, setEdgeRouterWarningCount] = useState([]);
   const [accessPointsOnlineCount, setAccessPointsOnlineCount] = useState([]);
   const [accessPointsOfflineCount, setAccessPointsOfflineCount] = useState([]);
   const [smartlockOkayCount, setSmartlockOkayCount] = useState([]);
@@ -112,8 +113,12 @@ export default function SmartLockDashboardView({
           totals.totalAccessPoints +=
             facility.onlineAccessPointsCount +
             facility.offlineAccessPointsCount;
-          totals.edgeRouterOfflineCount += facility.edgeRouterStatus ? 1 : 0;
-          totals.edgeRouterOnlineCount += facility.edgeRouterStatus ? 0 : 1;
+          totals.edgeRouterOfflineCount +=
+            facility.edgeRouterStatus === "error" ? 1 : 0;
+          totals.edgeRouterOnlineCount +=
+            facility.edgeRouterStatus === "ok" ? 1 : 0;
+          totals.edgeRouterWarningCount +=
+            facility.edgeRouterStatus === "warning" ? 1 : 0;
           totals.accessPointsOnlineCount += facility.onlineAccessPointsCount;
           totals.accessPointsOfflineCount += facility.offlineAccessPointsCount;
           totals.smartlockOkayCount += facility.okCount || 0;
@@ -139,6 +144,7 @@ export default function SmartLockDashboardView({
           totalSmartlocks: 0,
           edgeRouterOfflineCount: 0,
           edgeRouterOnlineCount: 0,
+          edgeRouterWarningCount: 0,
           accessPointsOnlineCount: 0,
           accessPointsOfflineCount: 0,
           smartlockOkayCount: 0,
@@ -153,6 +159,7 @@ export default function SmartLockDashboardView({
       setTotalEdgeRouters(aggregatedData.totalEdgeRouters);
       setTotalSmartlocks(aggregatedData.totalSmartlocks);
       setEdgeRouterOfflineCount(aggregatedData.edgeRouterOfflineCount);
+      setEdgeRouterWarningCount(aggregatedData.edgeRouterWarningCount);
       setEdgeRouterOnlineCount(aggregatedData.edgeRouterOnlineCount);
       setAccessPointsOnlineCount(aggregatedData.accessPointsOnlineCount);
       setAccessPointsOfflineCount(aggregatedData.accessPointsOfflineCount);
@@ -301,9 +308,13 @@ export default function SmartLockDashboardView({
                     ) + "% Online"
                   }
                 >
-                  {edgeRouterOnlineCount} Online <br />{" "}
+                  {edgeRouterOnlineCount} Online <br />
                   {edgeRouterOfflineCount > 0
                     ? edgeRouterOfflineCount + " Offline"
+                    : ""}
+                  <br />
+                  {edgeRouterWarningCount > 0
+                    ? edgeRouterWarningCount + " Warning"
                     : ""}
                 </td>
                 <td
