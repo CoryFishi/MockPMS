@@ -6,6 +6,7 @@ import axios from "axios";
 import qs from "qs";
 import toast from "react-hot-toast";
 import { CiExport, CiImport } from "react-icons/ci";
+import packageJson from "../../package.json";
 
 export default function Settings({
   savedFacilities = [],
@@ -24,7 +25,7 @@ export default function Settings({
   );
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [sortDirection, setSortDirection] = useState("asc");
-  const [version, setVersion] = useState("v2.1.2");
+  const [version, setVersion] = useState(packageJson.version);
   const fileInputRef = useRef(null);
 
   const submitNewFacility = () => {
@@ -628,7 +629,7 @@ export default function Settings({
               </tr>
             </tbody>
           </table>
-          <div className="text-right bottom-0">{version}</div>
+          <div className="text-right bottom-0">v{version}</div>
         </div>
       </div>
     </div>

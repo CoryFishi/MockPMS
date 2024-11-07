@@ -305,7 +305,16 @@ export default function SmartLockDashboardView({
                   title={
                     Math.round(
                       (edgeRouterOnlineCount / totalEdgeRouters) * 100
-                    ) + "% Online"
+                    ) +
+                    "% Online \n" +
+                    Math.round(
+                      (edgeRouterOfflineCount / totalEdgeRouters) * 100
+                    ) +
+                    "% Offline \n" +
+                    Math.round(
+                      (edgeRouterWarningCount / totalEdgeRouters) * 100
+                    ) +
+                    "% Warning"
                   }
                 >
                   {edgeRouterOnlineCount} Online <br />
