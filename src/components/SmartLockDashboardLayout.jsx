@@ -5,6 +5,7 @@ import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import SmartLockAllFacilitiesPage from "./SmartLockAllFacilitiesPage";
 import SmartLockSelectedPage from "./SmartLockSelectedPage";
 import SmartLockDashboardView from "./SmartLockDashboardView";
+import SmartLockReports from "./SmartLockReports";
 
 export default function SmartLockDashboardLayout({
   dashboardMenu,
@@ -72,7 +73,7 @@ export default function SmartLockDashboardLayout({
 
               {!openSections.currentFacility && (
                 <div className="mx-4 mt-4 space-y-2">
-                  <Link
+                  <button
                     onClick={() =>
                       setOpenPage("dashboard") &
                       localStorage.setItem("openPage2", "dashboard")
@@ -80,7 +81,16 @@ export default function SmartLockDashboardLayout({
                     className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                   >
                     SmartLock
-                  </Link>
+                  </button>
+                  <button
+                    onClick={() =>
+                      setOpenPage("reports") &
+                      localStorage.setItem("openPage2", "reports")
+                    }
+                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                  >
+                    Reports
+                  </button>
                 </div>
               )}
             </div>
@@ -106,7 +116,7 @@ export default function SmartLockDashboardLayout({
 
               {!openSections.facilities && (
                 <div className="mx-4 mt-4 space-y-2">
-                  <Link
+                  <button
                     onClick={() =>
                       setOpenPage("allFacilities") &
                       localStorage.setItem("openPage2", "allFacilities")
@@ -114,16 +124,16 @@ export default function SmartLockDashboardLayout({
                     className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                   >
                     All Facilities
-                  </Link>
-                  <Link
+                  </button>
+                  <button
                     onClick={() =>
                       setOpenPage("selected") &
                       localStorage.setItem("openPage2", "selected")
                     }
-                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary text-left"
                   >
                     Selected Facilities
-                  </Link>
+                  </button>
                 </div>
               )}
             </div>
@@ -135,6 +145,9 @@ export default function SmartLockDashboardLayout({
               selectedFacilities={selectedFacilities}
               setSelectedFacilities={setSelectedFacilities}
             />
+          )}
+          {openPage === "reports" && (
+            <SmartLockReports selectedFacilities={selectedFacilities} />
           )}
           {openPage === "allFacilities" && (
             <SmartLockAllFacilitiesPage

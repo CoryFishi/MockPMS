@@ -41,6 +41,8 @@ export default function SmartLock({
   const [hoveredRow, setHoveredRow] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
 
   useEffect(() => {
     setSortedColumn("Name");
@@ -125,9 +127,6 @@ export default function SmartLock({
     setCurrentPage(1);
   }, [smartLocks, option, searchQuery]);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
-
   // Pagination logic
   const pageCount = Math.ceil(filteredSmartLocks.length / rowsPerPage);
 
@@ -170,7 +169,7 @@ export default function SmartLock({
               <thead className="select-none">
                 <tr className="bg-gray-200 dark:bg-darkNavSecondary sticky top-[-1px] z-10">
                   <th
-                    className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                    className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                     onClick={() => {
                       const newDirection =
                         sortDirection === "asc" ? "desc" : "asc";
