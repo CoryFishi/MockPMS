@@ -9,23 +9,47 @@ import {
   BiChevronsLeft,
   BiChevronsRight,
 } from "react-icons/bi";
+import { useAuth } from "../context/AuthProvider";
+import { supabase } from "../supabaseClient";
 
-export default function FavoritesPage({
-  currentFacility,
-  setCurrentFacility,
-  setCurrentFacilityName,
-  favoriteFacilities,
-  setFavoriteFacilities,
-  setOpenPage,
-}) {
+export default function FavoritesPage({ setCurrentFacilityName, setOpenPage }) {
   const [facilities, setFacilities] = useState([]);
   const [sortDirection, setSortDirection] = useState("asc");
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredFacilities, setFilteredFacilities] =
-    useState(favoriteFacilities);
+  const [filteredFacilities, setFilteredFacilities] = useState([]);
   const [sortedColumn, setSortedColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [favoriteTokensLoaded, setFavoriteTokensLoaded] = useState(false);
+  const {
+    user,
+    tokens,
+    isPulled,
+    favoriteTokens,
+    setFavoriteTokens,
+    selectedTokens,
+    currentFacility,
+    setCurrentFacility,
+    isLoading,
+  } = useAuth();
+  // Pagination logic
+  const pageCount = Math.ceil(filteredFacilities.length / rowsPerPage);
+
+  const handleCurrentFacilityUpdate = async (updatedInfo) => {
+    const { data, error } = await supabase.from("user_data").upsert(
+      {
+        user_id: user.id,
+        current_facility: updatedInfo,
+      },
+      { onConflict: "user_id" }
+    );
+
+    if (error) {
+      console.error("Error saving credentials:", error.message);
+    } else {
+      setCurrentFacility(updatedInfo);
+    }
+  };
 
   const handleSelectLogin = async (facility) => {
     var tokenStageKey = "";
@@ -54,17 +78,13 @@ export default function FavoritesPage({
 
     return axios(config)
       .then(function (response) {
-        localStorage.setItem(
-          "currentFacility",
-          JSON.stringify({
-            ...facility,
-            bearer: response.data,
-          })
-        );
-        setCurrentFacility((prevState) => ({
-          ...prevState,
-          bearer: response.data,
-        }));
+        const tokenData = response.data;
+        const updatedFacility = {
+          ...facility,
+          token: tokenData,
+        };
+        handleCurrentFacilityUpdate(updatedFacility);
+
         setCurrentFacilityName(facility.name);
         return response;
       })
@@ -75,8 +95,7 @@ export default function FavoritesPage({
   };
 
   const handleSelect = async (facility) => {
-    setCurrentFacility(facility);
-    localStorage.setItem("currentFacility", JSON.stringify(facility));
+    await handleCurrentFacilityUpdate(facility);
     await toast.promise(handleSelectLogin(facility), {
       loading: "Selecting facility...",
       success: <b>Facility selected!</b>,
@@ -88,36 +107,73 @@ export default function FavoritesPage({
 
   const addToFavorite = async (facility) => {
     const isFavorite = isFacilityFavorite(facility.id);
-    if (isFavorite) {
-      setFavoriteFacilities((prevFavoriteFacilities) => {
-        const updatedFavorites = prevFavoriteFacilities.filter(
-          (favFacility) => favFacility.id !== facility.id
-        );
+    handleFavoriteFacilitiesUpdate(facility, isFavorite);
+  };
 
-        localStorage.setItem(
-          "favoriteFacilities",
-          JSON.stringify(updatedFavorites)
-        );
-        return updatedFavorites;
-      });
+  const handleFavoriteFacilitiesUpdate = async (newFacility, isFavorite) => {
+    // Fetch existing favorite tokens for the user
+    const { data: currentData, error: fetchError } = await supabase
+      .from("user_data")
+      .select("favorite_tokens")
+      .eq("user_id", user.id)
+      .single();
+
+    if (fetchError) {
+      console.error("Error fetching favorite tokens:", fetchError.message);
+      toast.error("Failed to retrieve favorite credentials.");
+      return;
+    }
+    if (isFavorite) {
+      // Filter out the token to remove
+      const updatedTokens = (currentData?.favorite_tokens || []).filter(
+        (token) => token.id !== newFacility.id
+      );
+
+      // Upsert the updated tokens array back to the database
+      const { data, error } = await supabase.from("user_data").upsert(
+        {
+          user_id: user.id,
+          favorite_tokens: updatedTokens,
+        },
+        { onConflict: "user_id" }
+      );
+
+      if (error) {
+        console.error("Error removing favorite token:", error.message);
+      } else {
+        setFavoriteTokens(updatedTokens);
+      }
     } else {
-      setFavoriteFacilities((prevFavoriteFacilities) => {
-        const updatedFavorites = [...prevFavoriteFacilities, facility];
-        localStorage.setItem(
-          "favoriteFacilities",
-          JSON.stringify(updatedFavorites)
-        );
-        return updatedFavorites;
-      });
+      // Filter in the token to remove
+      const updatedTokens = [
+        ...(currentData?.favorite_tokens || []),
+        newFacility,
+      ];
+      const { data, error } = await supabase.from("user_data").upsert(
+        {
+          user_id: user.id,
+          favorite_tokens: updatedTokens,
+        },
+        { onConflict: "user_id" }
+      );
+
+      if (error) {
+        console.error("Error saving favorite tokens:", error.message);
+      } else {
+        setFavoriteTokens(updatedTokens);
+      }
     }
   };
 
   const isFacilityFavorite = (facilityId) => {
-    return favoriteFacilities.some((facility) => facility.id === facilityId);
+    return favoriteTokens.some((facility) => facility.id === facilityId);
   };
 
   useEffect(() => {
-    const sortedFacilities = favoriteFacilities.sort((a, b) => {
+    if (favoriteTokens.length < 1) return;
+    if (favoriteTokensLoaded) return;
+    setFavoriteTokensLoaded(true);
+    const sortedFacilities = favoriteTokens.sort((a, b) => {
       if (a.environment < b.environment) return -1;
       if (a.environment > b.environment) return 1;
       if (a.id < b.id) return -1;
@@ -131,7 +187,7 @@ export default function FavoritesPage({
     } catch {
       alert("It broke");
     }
-  }, []);
+  }, [favoriteTokens]);
 
   useEffect(() => {
     const filtered = facilities.filter(
@@ -150,9 +206,6 @@ export default function FavoritesPage({
     setFilteredFacilities(filtered);
   }, [facilities, searchQuery]);
 
-  // Pagination logic
-  const pageCount = Math.ceil(filteredFacilities.length / rowsPerPage);
-
   return (
     <div className="overflow-auto dark:text-white dark:bg-darkPrimary mb-14">
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
@@ -162,7 +215,7 @@ export default function FavoritesPage({
         </div>
       </div>
       <div className="w-full h-full p-5 flex flex-col rounded-lg pb-10">
-        <div className="mt-5 mb-2 flex items-center justify-end text-center">
+        <div className=" mb-2 flex items-center justify-end text-center">
           <input
             type="text"
             placeholder="Search facilities..."

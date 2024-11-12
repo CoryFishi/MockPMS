@@ -528,6 +528,9 @@ export default function SmartLock({
                       </td>
                       <td className="border border-gray-300 dark:border-border px-4 py-2">
                         {smartlock.unitStatus}
+                        {smartlock.visitorName
+                          ? " - " + smartlock.visitorName
+                          : ""}
                       </td>
                       <td
                         className="border border-gray-300 dark:border-border px-4 py-2"

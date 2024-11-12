@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import SmartLockAllFacilitiesPage from "./SmartLockAllFacilitiesPage";
@@ -7,21 +6,16 @@ import SmartLockSelectedPage from "./SmartLockSelectedPage";
 import SmartLockDashboardView from "./SmartLockDashboardView";
 import SmartLockReports from "./SmartLockReports";
 
-export default function SmartLockDashboardLayout({
-  dashboardMenu,
-  selectedFacilities,
-  setSelectedFacilities,
-  savedFacilities = [],
-}) {
+export default function SmartLockDashboardLayout({ dashboardMenu }) {
+  // Drop down variables for the left navigation menu
   const [openSections, setOpenSections] = useState({
     facilities: false,
     currentFacility: false,
   });
+  // Open page state holder
   const [openPage, setOpenPage] = useState(
     localStorage.getItem("openPage2") || "allFacilities"
   );
-
-  const navigate = useNavigate();
 
   const toggleSection = (section) => {
     setOpenSections((prev) => ({
@@ -29,14 +23,6 @@ export default function SmartLockDashboardLayout({
       [section]: !prev[section],
     }));
   };
-
-  // Check if savedFacilities is empty and alert the user
-  useEffect(() => {
-    if (savedFacilities.length === 0) {
-      alert("Please authenticate a service, before proceeding...");
-      navigate("/settings");
-    }
-  }, [savedFacilities, navigate]);
 
   return (
     <div className="flex flex-col w-full h-screen overflow-auto">
@@ -51,7 +37,7 @@ export default function SmartLockDashboardLayout({
             {/* Current Facility Side Bar */}
             <div
               className={`pl-2 pr-2 pb-8 mt-8 ${
-                openPage === "dashboard" || openPage === "units"
+                openPage === "dashboard" || openPage === "reports"
                   ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
                   : ""
               }`}
@@ -78,7 +64,7 @@ export default function SmartLockDashboardLayout({
                       setOpenPage("dashboard") &
                       localStorage.setItem("openPage2", "dashboard")
                     }
-                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left"
                   >
                     SmartLock
                   </button>
@@ -87,7 +73,7 @@ export default function SmartLockDashboardLayout({
                       setOpenPage("reports") &
                       localStorage.setItem("openPage2", "reports")
                     }
-                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left"
                   >
                     Reports
                   </button>
@@ -121,7 +107,7 @@ export default function SmartLockDashboardLayout({
                       setOpenPage("allFacilities") &
                       localStorage.setItem("openPage2", "allFacilities")
                     }
-                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left"
                   >
                     All Facilities
                   </button>
@@ -130,7 +116,7 @@ export default function SmartLockDashboardLayout({
                       setOpenPage("selected") &
                       localStorage.setItem("openPage2", "selected")
                     }
-                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary text-left"
+                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary text-left w-full"
                   >
                     Selected Facilities
                   </button>
@@ -140,29 +126,10 @@ export default function SmartLockDashboardLayout({
           </div>
         )}
         <div className="w-full flex flex-col bg-background-50 h-full">
-          {openPage === "dashboard" && (
-            <SmartLockDashboardView
-              selectedFacilities={selectedFacilities}
-              setSelectedFacilities={setSelectedFacilities}
-            />
-          )}
-          {openPage === "reports" && (
-            <SmartLockReports selectedFacilities={selectedFacilities} />
-          )}
-          {openPage === "allFacilities" && (
-            <SmartLockAllFacilitiesPage
-              savedFacilities={savedFacilities}
-              selectedFacilities={selectedFacilities}
-              setSelectedFacilities={setSelectedFacilities}
-            />
-          )}
-          {openPage === "selected" && (
-            <SmartLockSelectedPage
-              savedFacilities={savedFacilities}
-              selectedFacilities={selectedFacilities}
-              setSelectedFacilities={setSelectedFacilities}
-            />
-          )}
+          {openPage === "dashboard" && <SmartLockDashboardView />}
+          {openPage === "reports" && <SmartLockReports />}
+          {openPage === "allFacilities" && <SmartLockAllFacilitiesPage />}
+          {openPage === "selected" && <SmartLockSelectedPage />}
         </div>
       </div>
     </div>

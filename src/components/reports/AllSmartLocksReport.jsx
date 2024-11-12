@@ -25,7 +25,10 @@ import {
   BiChevronsRight,
 } from "react-icons/bi";
 
-export default function AllSmartLocksReport({ selectedFacilities }) {
+export default function AllSmartLocksReport({
+  selectedFacilities,
+  searchQuery,
+}) {
   const [filteredSmartLocks, setFilteredSmartLocks] = useState([]);
   const [smartlocks, setSmartlocks] = useState([]);
   const [hoveredRow, setHoveredRow] = useState(null);
@@ -33,7 +36,6 @@ export default function AllSmartLocksReport({ selectedFacilities }) {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [sortDirection, setSortDirection] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchSmartLock = async (facility) => {
     try {
@@ -104,6 +106,9 @@ export default function AllSmartLocksReport({ selectedFacilities }) {
 
     const filteredSmartLocks = sortedSmartLocks.filter(
       (smartlock) =>
+        (smartlock.facilityName || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
         (smartlock.name || "")
           .toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
@@ -514,6 +519,7 @@ export default function AllSmartLocksReport({ selectedFacilities }) {
                 </td>
                 <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {smartlock.unitStatus}
+                  {smartlock.visitorName ? " - " + smartlock.visitorName : ""}
                 </td>
                 <td
                   className="border border-gray-300 dark:border-border px-4 py-2"

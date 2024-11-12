@@ -2,10 +2,11 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useState, useEffect } from "react";
 import { IoIosCreate } from "react-icons/io";
+import { useAuth } from "../../context/AuthProvider";
+import { supabase } from "../../supabaseClient";
 
 export default function CreateVisitorVisitor({
   setIsCreateVisitorModalOpen,
-  currentFacility,
   setVisitors,
 }) {
   const [newVisitor, setNewVisitor] = useState({
@@ -23,6 +24,17 @@ export default function CreateVisitorVisitor({
   const [accessProfiles, setAccessProfiles] = useState({});
   const [units, setUnits] = useState({});
   const [selectedUnit, setSelectedUnit] = useState({});
+  const {
+    user,
+    tokens,
+    isPulled,
+    favoriteTokens,
+    setFavoriteTokens,
+    selectedTokens,
+    currentFacility,
+    setCurrentFacility,
+    isLoading,
+  } = useAuth();
 
   const handleUnits = async () => {
     var tokenStageKey = "";
@@ -37,7 +49,7 @@ export default function CreateVisitorVisitor({
       method: "get",
       url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/units`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+        Authorization: "Bearer " + currentFacility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
       },
@@ -71,7 +83,7 @@ export default function CreateVisitorVisitor({
       method: "get",
       url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/timegroups`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+        Authorization: "Bearer " + currentFacility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
       },
@@ -99,7 +111,7 @@ export default function CreateVisitorVisitor({
       method: "get",
       url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/accessprofiles`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+        Authorization: "Bearer " + currentFacility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
       },
@@ -113,7 +125,6 @@ export default function CreateVisitorVisitor({
         console.log(error);
       });
   };
-
   const handleCreateVisitor = (e) => {
     e.preventDefault();
     var tokenStageKey = "";
@@ -185,7 +196,7 @@ export default function CreateVisitorVisitor({
       method: "post",
       url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/visitors`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+        Authorization: "Bearer " + currentFacility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
         "Content-Type": "application/json-patch+json",

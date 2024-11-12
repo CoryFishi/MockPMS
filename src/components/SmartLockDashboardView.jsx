@@ -5,11 +5,9 @@ import { FaLock } from "react-icons/fa";
 import SmartLockFacilityCard from "./SmartLockFacilityCard";
 import SmartLockFacilityRow from "./SmartLockFacilityRow";
 import SmartLockExport from "./SmartLockExport";
+import { useAuth } from "../context/AuthProvider";
 
-export default function SmartLockDashboardView({
-  selectedFacilities,
-  setSelectedFacilities,
-}) {
+export default function SmartLockDashboardView({}) {
   const [facilitiesWithBearers, setFacilitiesWithBearers] = useState([]);
   const [filteredFacilities, setFilteredFacilities] = useState([]);
   const [listView, setListView] = useState(
@@ -31,6 +29,18 @@ export default function SmartLockDashboardView({
   const [totalAccessPoints, setTotalAccessPoints] = useState(0);
   const [totalEdgeRouters, setTotalEdgeRouters] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const {
+    user,
+    tokens,
+    isPulled,
+    favoriteTokens,
+    setFavoriteTokens,
+    selectedTokens,
+    setSelectedTokens,
+    currentFacility,
+    setCurrentFacility,
+    isLoading,
+  } = useAuth();
 
   // Search via search bar and button
   const search = () => {
@@ -177,7 +187,7 @@ export default function SmartLockDashboardView({
   useEffect(() => {
     const fetchFacilitiesWithBearers = async () => {
       const updatedFacilities = await Promise.all(
-        selectedFacilities.map(async (facility) => {
+        selectedTokens.map(async (facility) => {
           const bearer = await fetchBearerToken(facility);
           return { ...facility, bearer };
         })
@@ -194,7 +204,7 @@ export default function SmartLockDashboardView({
 
     // Clear interval on component unmount
     return () => clearInterval(interval);
-  }, [selectedFacilities]);
+  }, [selectedTokens]);
 
   return (
     <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary text-center">

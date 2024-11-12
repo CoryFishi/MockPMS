@@ -7,11 +7,7 @@ import { FaCheckCircle } from "react-icons/fa";
 
 import { IoIosWarning } from "react-icons/io";
 
-export default function SmartLockFacilityRow({
-  setFacilitiesInfo,
-  facility,
-  index,
-}) {
+export default function SmartLockFacilityRow({ setFacilitiesInfo, facility }) {
   const [smartlocks, setSmartlocks] = useState([]);
   const [lowestSignal, setLowestSignal] = useState([]);
   const [offline, setOffline] = useState([]);
@@ -69,7 +65,6 @@ export default function SmartLockFacilityRow({
     edgeRouter,
     accessPoints,
   ]);
-
   const openSmartLockModal = (option) => {
     if (isSmartlockModalOpen) {
       return;
@@ -77,7 +72,6 @@ export default function SmartLockFacilityRow({
     setSmartlockModalOption(option);
     setIsSmartlockModalOpen(true);
   };
-
   const fetchSmartLockSummary = async () => {
     try {
       var tokenStageKey = "";
@@ -105,7 +99,6 @@ export default function SmartLockFacilityRow({
       return null;
     }
   };
-
   const fetchEdgeRouter = async () => {
     try {
       var tokenStageKey = "";
@@ -133,7 +126,6 @@ export default function SmartLockFacilityRow({
       return null;
     }
   };
-
   const fetchAccessPoints = async () => {
     try {
       var tokenStageKey = "";
@@ -163,7 +155,6 @@ export default function SmartLockFacilityRow({
       return null;
     }
   };
-
   const fetchSmartLock = async () => {
     try {
       var tokenStageKey = "";
@@ -222,7 +213,6 @@ export default function SmartLockFacilityRow({
       return null;
     }
   };
-
   useEffect(() => {
     const fetchData = async () => {
       const edgeRouterData = await fetchEdgeRouter();

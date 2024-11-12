@@ -1,7 +1,6 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
-import { FaCheckCircle } from "react-icons/fa";
 import {
   BiChevronLeft,
   BiChevronRight,
@@ -9,20 +8,22 @@ import {
   BiChevronsRight,
 } from "react-icons/bi";
 
-export default function AllEdgeRoutersReport({
+export default function AllSmartLocksEventsReport({
   selectedFacilities,
   searchQuery,
 }) {
-  const [filteredEdgeRouters, setFilteredEdgeRouters] = useState([]);
-  const [edgeRouters, setEdgeRouters] = useState([]);
+  const [filteredSmartLockEvents, setFilteredSmartLockEvents] = useState([]);
+  const [smartlockEvents, setSmartlockEvents] = useState([]);
   const [hoveredRow, setHoveredRow] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [sortDirection, setSortDirection] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
 
-  const fetchEdgeRouters = async (facility) => {
+  const fetchSmartLockEvents = async (facility) => {
     try {
+      const currentTime = Math.floor(Date.now() / 1000);
+      const oneWeekAgo = currentTime - 7 * 24 * 60 * 60;
       var tokenStageKey = "";
       var tokenEnvKey = "";
       if (facility.environment === "cia-stg-1.aws.") {
@@ -32,45 +33,41 @@ export default function AllEdgeRoutersReport({
       }
 
       const response = await axios.get(
-        `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${facility.id}/edgerouterstatus`,
+        `https://accessevent.${tokenStageKey}insomniaccia${tokenEnvKey}.com/combinedevents/facilities/${facility.id}?uq=&vq=&etq=1&etq=2&etq=3&etq=4&etq=5&etq=6&etq=7&etq=8&etq=9&etq=10&etq=11&etq=12&etq=13&etq=14&etq=15&etq=16&etq=17&etq=18&etq=19&etq=20&etq=21&etq=22&etq=23&etq=24&etq=25&minDate=${oneWeekAgo}&maxDate=${currentTime}&hideMetadata=true`,
         {
           headers: {
             Authorization: "Bearer " + facility.bearer,
             accept: "application/json",
-            "api-version": "2.0",
+            "api-version": "3.0",
           },
         }
       );
-      const edgeRouters = response.data;
-      return edgeRouters;
+      const smartLockEvents = response.data;
+      console.log(smartLockEvents);
+      return smartLockEvents;
     } catch (error) {
-      console.error(`Error fetching Edge Routers for: ${facility.name}`, error);
-      toast.error(`${facility.name} does not have Edge Routers`);
+      console.error(`Error fetching Events for: ${facility.name}`, error);
+      toast.error(`${facility.name} does not have Events`);
       return null;
     }
   };
 
   const fetchDataForSelectedFacilities = async () => {
-    setEdgeRouters([]); // Clear existing data
+    setSmartlockEvents([]); // Clear existing data
     const fetchPromises = selectedFacilities.map(async (facility) => {
-      const facilityName = facility.name;
-      const edgeRoutersData = await fetchEdgeRouters(facility);
-
-      // Add facilityName to the edgeRoutersData array
-      edgeRoutersData.facilityName = facilityName;
-
-      return edgeRoutersData;
+      const smartlockData = await fetchSmartLockEvents(facility);
+      return smartlockData;
     });
 
-    const allEdgeRouterData = await Promise.all(fetchPromises);
+    const allSmartlockData = await Promise.all(fetchPromises);
 
-    // Flatten the array and update state with all Edge Routers
-    const flattenedData = allEdgeRouterData.flat();
-    setEdgeRouters(flattenedData);
+    // Flatten the array and update state with all smartlocks
+    const flattenedData = allSmartlockData.flat();
+    setSmartlockEvents(flattenedData);
   };
 
   // Pagination logic
-  const pageCount = Math.ceil(filteredEdgeRouters.length / rowsPerPage);
+  const pageCount = Math.ceil(filteredSmartLockEvents.length / rowsPerPage);
 
   useEffect(() => {
     fetchDataForSelectedFacilities();
@@ -78,31 +75,41 @@ export default function AllEdgeRoutersReport({
 
   useEffect(() => {
     setSortedColumn("Facility");
-    var sortedEdgeRouters = [...edgeRouters].sort((a, b) => {
-      if (a.facilityName.toLowerCase() < b.facilityName.toLowerCase())
-        return -1;
-      if (a.facilityName.toLowerCase() > b.facilityName.toLowerCase()) return 1;
+    var sortedSmartLockEvents = [...smartlockEvents].sort((a, b) => {
+      if (a.createdOn < b.createdOn) return -1;
+      if (a.facilityName > b.createdOn) return 1;
       return 0;
     });
 
-    const filteredEdgeRouters = sortedEdgeRouters.filter(
-      (edgeRouter) =>
-        (edgeRouter.name || "")
+    const filteredSmartLockEvents = sortedSmartLockEvents.filter(
+      (event) =>
+        (event.facilityName || "")
           .toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
-        (edgeRouter.facilityName || "")
+        (event.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (event.unitName || "")
           .toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
-        (edgeRouter.overallStatus || "")
+        (event.overallStatus || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (event.deviceType || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        String(event.batteryLevel || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        String(Math.round((event.signalQuality / 255) * 100) || "")
           .toLowerCase()
           .includes(searchQuery.toLowerCase())
     );
-    setFilteredEdgeRouters(filteredEdgeRouters);
+    setFilteredSmartLockEvents(filteredSmartLockEvents);
     setCurrentPage(1);
-  }, [edgeRouters, searchQuery]);
+  }, [smartlockEvents, searchQuery]);
 
   return (
     <div className="w-full px-2">
+      <p className="text-left text-sm">Last 7 days</p>
       <table className="w-full table-auto border-collapse border border-gray-300 dark:border-border">
         <thead className="select-none">
           <tr className="bg-gray-200 dark:bg-darkNavSecondary sticky top-[-1px] z-10">
@@ -112,8 +119,8 @@ export default function AllEdgeRoutersReport({
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
                 setSortedColumn("Facility");
-                setFilteredEdgeRouters(
-                  [...filteredEdgeRouters].sort((a, b) => {
+                setFilteredSmartLockEvents(
+                  [...filteredSmartLockEvents].sort((a, b) => {
                     if (
                       a.facilityName.toLowerCase() <
                       b.facilityName.toLowerCase()
@@ -142,8 +149,8 @@ export default function AllEdgeRoutersReport({
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
                 setSortedColumn("Name");
-                setFilteredEdgeRouters(
-                  [...filteredEdgeRouters].sort((a, b) => {
+                setFilteredSmartLockEvents(
+                  [...filteredSmartLockEvents].sort((a, b) => {
                     if (a.name.toLowerCase() < b.name.toLowerCase())
                       return newDirection === "asc" ? -1 : 1;
                     if (a.name.toLowerCase() > b.name.toLowerCase())
@@ -153,7 +160,7 @@ export default function AllEdgeRoutersReport({
                 );
               }}
             >
-              Name
+              Device Name
               {sortedColumn === "Name" && (
                 <span className="ml-2">
                   {sortDirection === "asc" ? "▲" : "▼"}
@@ -165,26 +172,20 @@ export default function AllEdgeRoutersReport({
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
-                setSortedColumn("Connection Status");
-                setFilteredEdgeRouters(
-                  [...filteredEdgeRouters].sort((a, b) => {
-                    if (
-                      a.connectionStatus.toLowerCase() <
-                      b.connectionStatus.toLowerCase()
-                    )
+                setSortedColumn("Unit");
+                setFilteredSmartLockEvents(
+                  [...filteredSmartLockEvents].sort((a, b) => {
+                    if (a.unitName.toLowerCase() < b.unitName.toLowerCase())
                       return newDirection === "asc" ? -1 : 1;
-                    if (
-                      a.connectionStatus.toLowerCase() >
-                      b.connectionStatus.toLowerCase()
-                    )
+                    if (a.unitName.toLowerCase() > b.unitName.toLowerCase())
                       return newDirection === "asc" ? 1 : -1;
                     return 0;
                   })
                 );
               }}
             >
-              Connection Status
-              {sortedColumn === "Connection Status" && (
+              Event Category
+              {sortedColumn === "Unit" && (
                 <span className="ml-2">
                   {sortDirection === "asc" ? "▲" : "▼"}
                 </span>
@@ -195,20 +196,21 @@ export default function AllEdgeRoutersReport({
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
-                setSortedColumn("Event Status");
-                setFilteredEdgeRouters(
-                  [...filteredEdgeRouters].sort((a, b) => {
-                    if (a.eventStatusMessage < b.eventStatusMessage)
+                setSortedColumn("Device Type");
+
+                setFilteredSmartLockEvents(
+                  [...filteredSmartLockEvents].sort((a, b) => {
+                    if (a.deviceType < b.deviceType)
                       return newDirection === "asc" ? -1 : 1;
-                    if (a.eventStatusMessage > b.eventStatusMessage)
+                    if (a.deviceType > b.deviceType)
                       return newDirection === "asc" ? 1 : -1;
                     return 0;
                   })
                 );
               }}
             >
-              Event Status
-              {sortedColumn === "Event Status" && (
+              Event Type
+              {sortedColumn === "Device Type" && (
                 <span className="ml-2">
                   {sortDirection === "asc" ? "▲" : "▼"}
                 </span>
@@ -219,24 +221,20 @@ export default function AllEdgeRoutersReport({
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
-                setSortedColumn("Provisioning");
-                setFilteredEdgeRouters(
-                  [...filteredEdgeRouters].sort((a, b) => {
-                    if (
-                      a.isLockProvisioningEnabled < b.isLockProvisioningEnabled
-                    )
+                setSortedColumn("Signal Quality");
+                setFilteredSmartLockEvents(
+                  [...filteredSmartLockEvents].sort((a, b) => {
+                    if (a.signalQuality < b.signalQuality)
                       return newDirection === "asc" ? -1 : 1;
-                    if (
-                      a.isLockProvisioningEnabled > b.isLockProvisioningEnabled
-                    )
+                    if (a.signalQuality > b.signalQuality)
                       return newDirection === "asc" ? 1 : -1;
                     return 0;
                   })
                 );
               }}
             >
-              Provisioning Enabled
-              {sortedColumn === "Provisioning" && (
+              Signal Quality
+              {sortedColumn === "Signal Quality" && (
                 <span className="ml-2">
                   {sortDirection === "asc" ? "▲" : "▼"}
                 </span>
@@ -247,44 +245,20 @@ export default function AllEdgeRoutersReport({
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
-                setSortedColumn("Status");
-                setFilteredEdgeRouters(
-                  [...filteredEdgeRouters].sort((a, b) => {
-                    if (a.isDeviceOffline < b.isDeviceOffline)
+                setSortedColumn("Last Update");
+                setFilteredSmartLockEvents(
+                  [...filteredSmartLockEvents].sort((a, b) => {
+                    if (a.lastUpdateTimestamp < b.lastUpdateTimestamp)
                       return newDirection === "asc" ? -1 : 1;
-                    if (a.isDeviceOffline > b.isDeviceOffline)
+                    if (a.lastUpdateTimestamp > b.lastUpdateTimestamp)
                       return newDirection === "asc" ? 1 : -1;
                     return 0;
                   })
                 );
               }}
             >
-              Status
-              {sortedColumn === "Status" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-            <th
-              className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Last Communication On");
-                setFilteredEdgeRouters(
-                  [...filteredEdgeRouters].sort((a, b) => {
-                    if (a.lastCommunicationOn < b.lastCommunicationOn)
-                      return newDirection === "asc" ? -1 : 1;
-                    if (a.lastCommunicationOn > b.lastCommunicationOn)
-                      return newDirection === "asc" ? 1 : -1;
-                    return 0;
-                  })
-                );
-              }}
-            >
-              Last Communicated On
-              {sortedColumn === "Last Communication On" && (
+              Created On
+              {sortedColumn === "Last Update" && (
                 <span className="ml-2">
                   {sortDirection === "asc" ? "▲" : "▼"}
                 </span>
@@ -293,9 +267,9 @@ export default function AllEdgeRoutersReport({
           </tr>
         </thead>
         <tbody>
-          {filteredEdgeRouters
+          {filteredSmartLockEvents
             .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-            .map((edgeRouter, index) => (
+            .map((smartlock, index) => (
               <tr
                 key={index}
                 className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary relative"
@@ -303,42 +277,49 @@ export default function AllEdgeRoutersReport({
                 onMouseLeave={() => setHoveredRow(null)}
               >
                 <td className="border border-gray-300 dark:border-border px-4 py-2">
-                  {edgeRouter.facilityName}
+                  {smartlock.facilityName}
+                  {hoveredRow === index && (
+                    <div className="absolute bg-gray-700 dark:bg-slate-700 text-white p-2 rounded shadow-lg z-10 top-1 left-2/4 transform -translate-x-1/2 text-left w-4/5">
+                      <div className="grid grid-cols-4 gap-1 overflow-hidden">
+                        {Object.entries(smartlock).map(
+                          ([key, value], index) => (
+                            <div key={index} className="break-words">
+                              <span className="font-bold text-yellow-500">
+                                {key}:
+                              </span>
+                              <br />
+                              <span className="whitespace-normal break-words">
+                                {value === null
+                                  ? "null"
+                                  : value === ""
+                                  ? "null"
+                                  : value === true
+                                  ? "true"
+                                  : value === false
+                                  ? "false"
+                                  : value}
+                              </span>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </td>
                 <td className="border border-gray-300 dark:border-border px-4 py-2">
-                  {edgeRouter.name}
+                  {smartlock.deviceName}
                 </td>
                 <td className="border border-gray-300 dark:border-border px-4 py-2">
-                  <div className="inline-flex items-center gap-2">
-                    {edgeRouter.connectionStatus === "ok" ? (
-                      <FaCheckCircle className="text-green-500" />
-                    ) : (
-                      ""
-                    )}
-                    <div>{edgeRouter.connectionStatusMessage}</div>
-                  </div>
+                  {smartlock.eventCategory}
                 </td>
                 <td className="border border-gray-300 dark:border-border px-4 py-2">
-                  <div className="inline-flex items-center gap-2">
-                    {edgeRouter.eventStatusMessage === "ok" ? (
-                      <FaCheckCircle className="text-green-500" />
-                    ) : (
-                      ""
-                    )}
-                    <div>{edgeRouter.eventStatusMessage}</div>
-                  </div>
+                  {smartlock.eventType}
                 </td>
                 <td className="border border-gray-300 dark:border-border px-4 py-2">
-                  {edgeRouter.isAccessPointProvisioningEnabled ||
-                  edgeRouter.isLockProvisioningEnabled
-                    ? "True"
-                    : "False"}
+                  {smartlock.eventDetails}
                 </td>
                 <td className="border border-gray-300 dark:border-border px-4 py-2">
-                  {!edgeRouter.isDeviceOffline ? "Online" : "Offline"}
-                </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
-                  {edgeRouter.lastCommunicationOn}
+                  {smartlock.createdOn}
                 </td>
               </tr>
             ))}
@@ -364,10 +345,10 @@ export default function AllEdgeRoutersReport({
           </div>
           <p className="text-sm">
             {currentPage === 1 ? 1 : (currentPage - 1) * rowsPerPage + 1} -{" "}
-            {currentPage * rowsPerPage > filteredEdgeRouters.length
-              ? filteredEdgeRouters.length
+            {currentPage * rowsPerPage > filteredSmartLockEvents.length
+              ? filteredSmartLockEvents.length
               : currentPage * rowsPerPage}{" "}
-            of {filteredEdgeRouters.length}
+            of {filteredSmartLockEvents.length}
           </p>
         </div>
         <div className="gap-2 flex">

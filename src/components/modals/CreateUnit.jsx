@@ -2,14 +2,23 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useState } from "react";
 import { IoIosCreate } from "react-icons/io";
+import { useAuth } from "../../context/AuthProvider";
+import { supabase } from "../../supabaseClient";
 
-export default function CreateUnit({
-  setIsUnitModalOpen,
-  currentFacility,
-  setUnits,
-}) {
+export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
   // Store the unit number to be created
   const [newUnitNumber, setNewUnitNumber] = useState("");
+  const {
+    user,
+    tokens,
+    isPulled,
+    favoriteTokens,
+    setFavoriteTokens,
+    selectedTokens,
+    currentFacility,
+    setCurrentFacility,
+    isLoading,
+  } = useAuth();
 
   // API call handler to create the new unit
   const handleCreateUnit = async () => {
@@ -46,7 +55,7 @@ export default function CreateUnit({
         method: "post",
         url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/units`,
         headers: {
-          Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+          Authorization: "Bearer " + currentFacility?.token?.access_token,
           accept: "application/json",
           "api-version": "2.0",
           "Content-Type": "application/json",

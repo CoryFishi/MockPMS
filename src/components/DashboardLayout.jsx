@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import VisitorPage from "./VisitorPage";
@@ -8,15 +8,12 @@ import AllFacilitiesPage from "./AllFacilitiesPage";
 import FavoritesPage from "./FavoritesPage";
 import axios from "axios";
 import qs from "qs";
+import { useAuth } from "../context/AuthProvider";
+import { supabase } from "../supabaseClient";
 
-export default function DashboardLayout({
-  dashboardMenu,
-  currentFacility,
-  setCurrentFacility,
-  savedFacilities = [],
-  favoriteFacilities,
-  setFavoriteFacilities,
-}) {
+export default function DashboardLayout({ dashboardMenu }) {
+  const { user, currentFacility, setCurrentFacility } = useAuth();
+  const [isNameGrabbed, setIsNameGrabbed] = useState(false);
   const [openSections, setOpenSections] = useState({
     facilities: false,
     currentFacility: false,
@@ -24,15 +21,34 @@ export default function DashboardLayout({
   const [openPage, setOpenPage] = useState(
     localStorage.getItem("openPage") || "allFacilities"
   );
-  const [currentFacilityName, setCurrentFacilityName] = useState(
-    localStorage.getItem("selectedFacilityName") || "Select a Facility"
-  );
-  const existingLocalStorageFacility =
-    JSON.parse(localStorage.getItem("currentFacility")) || {};
+  const [currentFacilityName, setCurrentFacilityName] =
+    useState("Select a Facility");
 
-  const navigate = useNavigate();
+  const handleCurrentFacilityUpdate = async (updatedInfo) => {
+    const { data, error } = await supabase.from("user_data").upsert(
+      {
+        user_id: user.id,
+        current_facility: updatedInfo,
+      },
+      { onConflict: "user_id" }
+    );
 
-  const handleLogin = () => {
+    if (error) {
+      console.error("Error saving credentials:", error.message);
+    } else {
+      setCurrentFacility(updatedInfo);
+      setIsNameGrabbed(true);
+    }
+  };
+
+  const handleFacilityHandles = async () => {
+    await handleLogin();
+    await handleFacilityInfo();
+  };
+
+  const handleLogin = async () => {
+    if (Object.keys(currentFacility).length === 0) return;
+
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "cia-stg-1.aws.") {
@@ -60,18 +76,12 @@ export default function DashboardLayout({
     axios(config)
       .then(function (response) {
         const tokenData = response.data;
-        localStorage.setItem(
-          "currentFacility",
-          JSON.stringify({
-            ...existingLocalStorageFacility,
-            bearer: response.data,
-          })
-        );
-        setCurrentFacility((prevState) => ({
-          ...prevState,
-          bearer: response.data,
-        }));
-        setCurrentFacilityName(currentFacility.name);
+        let facility = currentFacility;
+        const updatedFacility = {
+          ...facility,
+          token: tokenData,
+        };
+        handleCurrentFacilityUpdate(updatedFacility);
 
         setTimeout(() => {
           handleLogin();
@@ -82,7 +92,8 @@ export default function DashboardLayout({
       });
   };
 
-  const handleFacilityInfo = () => {
+  const handleFacilityInfo = async () => {
+    if (Object.keys(currentFacility).length === 0) return;
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "cia-stg-1.aws.") {
@@ -95,17 +106,20 @@ export default function DashboardLayout({
       url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}`,
       headers: {
         accept: "application/json",
-        Authorization: "Bearer " + currentFacility.bearer.access_token,
+        Authorization: "Bearer " + currentFacility.token.access_token,
         "api-version": "2.0",
       },
     };
 
     axios(config)
       .then(function (response) {
-        setCurrentFacility((prevState) => ({
-          ...prevState,
-          facilityInfo: response.data,
-        }));
+        const facilityInfo = response.data;
+        let facility = currentFacility;
+        const updatedFacility = {
+          ...facility,
+          facilityInfo,
+        };
+        handleCurrentFacilityUpdate(updatedFacility);
         setCurrentFacilityName(response.data.name);
       })
       .catch(function (error) {
@@ -120,27 +134,12 @@ export default function DashboardLayout({
     }));
   };
 
-  // Check if savedFacilities is empty and alert the user
-  useEffect(() => {
-    if (savedFacilities.length === 0) {
-      alert("Please authenticate a service, before proceeding...");
-      navigate("/settings");
-    }
-  }, [savedFacilities, navigate]);
-
   // Run handleLogin once when the component loads
   useEffect(() => {
-    const initialize = async () => {
-      try {
-        await handleLogin();
-        await handleFacilityInfo();
-      } catch (error) {
-        console.error("Error during initialization:", error);
-      }
-    };
-
-    initialize();
-  }, []);
+    if (!isNameGrabbed) {
+      handleFacilityHandles();
+    }
+  }, [currentFacility]);
 
   return (
     <div className="flex flex-col w-full h-screen overflow-hidden">
@@ -245,36 +244,20 @@ export default function DashboardLayout({
         )}
         <div className="w-full flex flex-col bg-background-50 dark:bg-darkPrimary h-full">
           {openPage === "visitors" && (
-            <VisitorPage
-              currentFacility={currentFacility}
-              currentFacilityName={currentFacilityName}
-            />
+            <VisitorPage currentFacilityName={currentFacilityName} />
           )}
           {openPage === "units" && (
-            <UnitPage
-              currentFacility={currentFacility}
-              currentFacilityName={currentFacilityName}
-            />
+            <UnitPage currentFacilityName={currentFacilityName} />
           )}
           {openPage === "allFacilities" && (
             <AllFacilitiesPage
-              currentFacility={currentFacility}
-              setCurrentFacility={setCurrentFacility}
               setCurrentFacilityName={setCurrentFacilityName}
-              savedFacilities={savedFacilities}
-              favoriteFacilities={favoriteFacilities}
-              setFavoriteFacilities={setFavoriteFacilities}
               setOpenPage={setOpenPage}
             />
           )}
           {openPage === "favorites" && (
             <FavoritesPage
-              currentFacility={currentFacility}
-              setCurrentFacility={setCurrentFacility}
               setCurrentFacilityName={setCurrentFacilityName}
-              savedFacilities={savedFacilities}
-              favoriteFacilities={favoriteFacilities}
-              setFavoriteFacilities={setFavoriteFacilities}
               setOpenPage={setOpenPage}
             />
           )}

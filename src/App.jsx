@@ -4,21 +4,10 @@ import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import { useState, useEffect } from "react";
 import SmartLockDashboard from "./pages/SmartLockDashboard";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 function App() {
-  const [currentFacility, setCurrentFacility] = useState(
-    JSON.parse(localStorage.getItem("currentFacility")) || {}
-  );
-  const [savedFacilities, setSavedFacilities] = useState(
-    JSON.parse(localStorage.getItem("savedFacilities")) || {}
-  );
-  const [favoriteFacilities, setFavoriteFacilities] = useState(
-    JSON.parse(localStorage.getItem("favoriteFacilities")) || []
-  );
-  const [selectedFacilities, setSelectedFacilities] = useState(
-    JSON.parse(localStorage.getItem("selectedFacilities")) || []
-  );
-
   const [darkMode, setDarkMode] = useState(false);
 
   // Check localStorage for dark mode preference on initial render
@@ -49,26 +38,13 @@ function App() {
         <Route
           path="/"
           element={
-            <Dashboard
-              currentFacility={currentFacility}
-              setCurrentFacility={setCurrentFacility}
-              savedFacilities={savedFacilities}
-              setSavedFacilities={setSavedFacilities}
-              favoriteFacilities={favoriteFacilities}
-              setFavoriteFacilities={setFavoriteFacilities}
-              darkMode={darkMode}
-              toggleDarkMode={toggleDarkMode}
-            />
+            <Dashboard darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           }
         />
         <Route
-          path="/smartlock-dashboard"
+          path="/smartlock"
           element={
             <SmartLockDashboard
-              savedFacilities={savedFacilities}
-              setSavedFacilities={setSavedFacilities}
-              selectedFacilities={selectedFacilities}
-              setSelectedFacilities={setSelectedFacilities}
               darkMode={darkMode}
               toggleDarkMode={toggleDarkMode}
             />
@@ -77,14 +53,25 @@ function App() {
         <Route
           path="/settings"
           element={
-            <Settings
-              currentFacility={currentFacility}
-              setCurrentFacility={setCurrentFacility}
-              savedFacilities={savedFacilities}
-              setSavedFacilities={setSavedFacilities}
-              darkMode={darkMode}
-              toggleDarkMode={toggleDarkMode}
-            />
+            <Settings darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <Login darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <Register darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+          }
+        />
+        <Route
+          path="/*"
+          element={
+            <Login darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           }
         />
       </Routes>

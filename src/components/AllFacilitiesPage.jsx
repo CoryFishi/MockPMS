@@ -10,23 +10,100 @@ import {
   BiChevronsLeft,
   BiChevronsRight,
 } from "react-icons/bi";
+import { useAuth } from "../context/AuthProvider";
+import { supabase } from "../supabaseClient";
 
 export default function AllFacilitiesPage({
-  currentFacility,
-  setCurrentFacility,
-  setCurrentFacilityName,
-  savedFacilities,
-  favoriteFacilities,
-  setFavoriteFacilities,
   setOpenPage,
+  setCurrentFacilityName,
 }) {
+  const {
+    user,
+    tokens,
+    isPulled,
+    favoriteTokens,
+    setFavoriteTokens,
+    currentFacility,
+    setCurrentFacility,
+  } = useAuth();
   const [facilities, setFacilities] = useState([]);
-  const [filteredFacilities, setFilteredFacilities] = useState(savedFacilities);
+  const [filteredFacilities, setFilteredFacilities] = useState([]);
   const [sortDirection, setSortDirection] = useState("asc");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortedColumn, setSortedColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+
+  const handleCurrentFacilityUpdate = async (updatedInfo) => {
+    const { data, error } = await supabase.from("user_data").upsert(
+      {
+        user_id: user.id,
+        current_facility: updatedInfo,
+      },
+      { onConflict: "user_id" }
+    );
+
+    if (error) {
+      console.error("Error saving credentials:", error.message);
+    } else {
+      setCurrentFacility(updatedInfo);
+    }
+  };
+
+  const handleFavoriteFacilitiesUpdate = async (newFacility, isFavorite) => {
+    // Fetch existing favorite tokens for the user
+    const { data: currentData, error: fetchError } = await supabase
+      .from("user_data")
+      .select("favorite_tokens")
+      .eq("user_id", user.id)
+      .single();
+
+    if (fetchError) {
+      console.error("Error fetching favorite tokens:", fetchError.message);
+      toast.error("Failed to retrieve favorite credentials.");
+      return;
+    }
+    if (isFavorite) {
+      // Filter out the token to remove
+      const updatedTokens = (currentData?.favorite_tokens || []).filter(
+        (token) => token.id !== newFacility.id
+      );
+
+      // Upsert the updated tokens array back to the database
+      const { data, error } = await supabase.from("user_data").upsert(
+        {
+          user_id: user.id,
+          favorite_tokens: updatedTokens,
+        },
+        { onConflict: "user_id" }
+      );
+
+      if (error) {
+        console.error("Error removing favorite token:", error.message);
+      } else {
+        setFavoriteTokens(updatedTokens);
+      }
+    } else {
+      // Filter in the token to remove
+      const updatedTokens = [
+        ...(currentData?.favorite_tokens || []),
+        newFacility,
+      ];
+      const { data, error } = await supabase.from("user_data").upsert(
+        {
+          user_id: user.id,
+          favorite_tokens: updatedTokens,
+        },
+        { onConflict: "user_id" }
+      );
+
+      if (error) {
+        console.error("Error saving favorite tokens:", error.message);
+      } else {
+        setFavoriteTokens(updatedTokens);
+      }
+    }
+  };
 
   const handleLogin = async (facility) => {
     var tokenStageKey = "";
@@ -92,17 +169,13 @@ export default function AllFacilitiesPage({
 
     return axios(config)
       .then(function (response) {
-        localStorage.setItem(
-          "currentFacility",
-          JSON.stringify({
-            ...facility,
-            bearer: response.data,
-          })
-        );
-        setCurrentFacility((prevState) => ({
-          ...prevState,
-          bearer: response.data,
-        }));
+        const tokenData = response.data;
+        const updatedFacility = {
+          ...facility,
+          token: tokenData,
+        };
+        handleCurrentFacilityUpdate(updatedFacility);
+
         setCurrentFacilityName(facility.name);
         return response;
       })
@@ -113,6 +186,8 @@ export default function AllFacilitiesPage({
   };
 
   const handleFacilities = async (saved) => {
+    setFilteredFacilities([]);
+    setFacilities([]);
     const handleAccount = async (facility) => {
       const bearer = await handleLogin(facility);
       var tokenStageKey = "";
@@ -163,20 +238,19 @@ export default function AllFacilitiesPage({
           throw error;
         });
     };
-    for (let i = 0; i < saved.length; i++) {
-      const facility = saved[i];
-      // Run the toast notification for each facility
-      toast.promise(handleAccount(facility), {
-        loading: "Loading facilities...",
-        success: <b>Facilities loaded successfully!</b>,
-        error: <b>Could not load facilities.</b>,
-      });
+    try {
+      for (let i = 0; i < saved.length; i++) {
+        const facility = saved[i];
+        handleAccount(facility);
+      }
+      toast.success(<b>Facilities Loaded Successfully!</b>);
+    } catch (error) {
+      toast.error("Facilities Failed to Load!");
     }
   };
 
   const handleSelect = async (facility) => {
-    setCurrentFacility(facility);
-    localStorage.setItem("currentFacility", JSON.stringify(facility));
+    await handleCurrentFacilityUpdate(facility);
     await toast.promise(handleSelectLogin(facility), {
       loading: "Selecting facility...",
       success: <b>Facility selected!</b>,
@@ -188,36 +262,19 @@ export default function AllFacilitiesPage({
 
   const addToFavorite = async (facility) => {
     const isFavorite = isFacilityFavorite(facility.id);
-    if (isFavorite) {
-      setFavoriteFacilities((prevFavoriteFacilities) => {
-        const updatedFavorites = prevFavoriteFacilities.filter(
-          (favFacility) => favFacility.id !== facility.id
-        );
-
-        localStorage.setItem(
-          "favoriteFacilities",
-          JSON.stringify(updatedFavorites)
-        );
-        return updatedFavorites;
-      });
-    } else {
-      setFavoriteFacilities((prevFavoriteFacilities) => {
-        const updatedFavorites = [...prevFavoriteFacilities, facility];
-        localStorage.setItem(
-          "favoriteFacilities",
-          JSON.stringify(updatedFavorites)
-        );
-        return updatedFavorites;
-      });
-    }
+    handleFavoriteFacilitiesUpdate(facility, isFavorite);
   };
 
   useEffect(() => {
-    handleFacilities(savedFacilities);
-  }, []);
+    if (isPulled) {
+      handleFacilities(tokens);
+    }
+  }, [tokens]);
 
   const isFacilityFavorite = (facilityId) => {
-    return favoriteFacilities.some((facility) => facility.id === facilityId);
+    return (favoriteTokens || []).some(
+      (facility) => facility.id === facilityId
+    );
   };
 
   useEffect(() => {
@@ -258,7 +315,6 @@ export default function AllFacilitiesPage({
             className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
           />
         </div>
-
         <div>
           <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
             <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">

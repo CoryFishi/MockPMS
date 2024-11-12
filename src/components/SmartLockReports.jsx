@@ -5,8 +5,10 @@ import { FaLock } from "react-icons/fa";
 import AllSmartLocksReport from "./reports/AllSmartLocksReport";
 import AllEdgeRoutersReport from "./reports/AllEdgeRoutersReport";
 import AllAccessPointsReport from "./reports/AllAccessPointsReport";
+import { useAuth } from "../context/AuthProvider";
+import AllSmartLocksEventsReport from "./reports/AllSmartLockEventsReport";
 
-export default function SmartLockReports({ selectedFacilities }) {
+export default function SmartLockReports({}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [newSelectedFacilities, setNewSelectedFacilities] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -15,6 +17,7 @@ export default function SmartLockReports({ selectedFacilities }) {
   const [selectedReport, setSelectedReport] = useState("");
   const [openPage, setOpenPage] = useState("AllSmartLocksReport");
   const [reportSearch, setReportSearch] = useState(false);
+  const { selectedTokens } = useAuth();
 
   // Function to select all selected facilities
   const selectAllFacilities = () => {
@@ -79,7 +82,7 @@ export default function SmartLockReports({ selectedFacilities }) {
   useEffect(() => {
     const fetchFacilitiesWithBearers = async () => {
       const updatedFacilities = await Promise.all(
-        selectedFacilities.map(async (facility) => {
+        selectedTokens.map(async (facility) => {
           const bearer = await fetchBearerToken(facility);
           return { ...facility, bearer };
         })
@@ -96,7 +99,7 @@ export default function SmartLockReports({ selectedFacilities }) {
 
     // Clear interval on component unmount
     return () => clearInterval(interval);
-  }, [selectedFacilities]);
+  }, [selectedTokens]);
   // Set all facilities as selected by default
   useEffect(() => {
     const initialSelection = facilitiesWithBearers.map((facility) => facility);
@@ -126,11 +129,20 @@ export default function SmartLockReports({ selectedFacilities }) {
           name="report"
           id="report"
           className="ml-2 w-96 border rounded dark:bg-darkNavSecondary dark:border-border text-black dark:text-white p-[10.5px]"
-          onChange={(e) => setOpenPage(e.target.value)}
+          onChange={(e) => setOpenPage(e.target.value) & setReportSearch(false)}
         >
           <option value="AllSmartLocksReport">All SmartLocks</option>
           <option value="AllEdgeRoutersReport">All EdgeRouters</option>
           <option value="AllAccessPointsReport">All AccessPoints</option>
+          <option value="AllSmartLockEventsReport">SmartLock Events</option>
+          <option value="ApplicationEventsReport">Option #5 - TBD</option>
+          <option value="AllSmartLocksReport">Option #6 - TBD</option>
+          <option value="AllSmartLocksReport">Option #7 - TBD</option>
+          <option value="AllSmartLocksReport">Option #8 - TBD</option>
+          <option value="AllSmartLocksReport">Option #9 - TBD</option>
+          <option value="AllSmartLocksReport">Option #10 - TBD</option>
+          <option value="AllSmartLocksReport">Option #11 - TBD</option>
+          <option value="AllSmartLocksReport">Option #12 - TBD</option>
         </select>
         <div className="ml-2 relative inline-block w-96">
           <button
@@ -180,13 +192,28 @@ export default function SmartLockReports({ selectedFacilities }) {
         </button>
       </div>
       {openPage === "AllSmartLocksReport" && reportSearch === true && (
-        <AllSmartLocksReport selectedFacilities={newSelectedFacilities} />
+        <AllSmartLocksReport
+          selectedFacilities={newSelectedFacilities}
+          searchQuery={searchQuery}
+        />
       )}
-      {openPage === "AllEdgeRoutersReport" && (
-        <AllEdgeRoutersReport selectedFacilities={newSelectedFacilities} />
+      {openPage === "AllEdgeRoutersReport" && reportSearch === true && (
+        <AllEdgeRoutersReport
+          selectedFacilities={newSelectedFacilities}
+          searchQuery={searchQuery}
+        />
       )}
-      {openPage === "AllAccessPointsReport" && (
-        <AllAccessPointsReport selectedFacilities={newSelectedFacilities} />
+      {openPage === "AllAccessPointsReport" && reportSearch === true && (
+        <AllAccessPointsReport
+          selectedFacilities={newSelectedFacilities}
+          searchQuery={searchQuery}
+        />
+      )}
+      {openPage === "AllSmartLockEventsReport" && reportSearch === true && (
+        <AllSmartLocksEventsReport
+          selectedFacilities={newSelectedFacilities}
+          searchQuery={searchQuery}
+        />
       )}
     </div>
   );

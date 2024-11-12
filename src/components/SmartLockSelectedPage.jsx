@@ -10,54 +10,101 @@ import {
   BiChevronsLeft,
   BiChevronsRight,
 } from "react-icons/bi";
+import { useAuth } from "../context/AuthProvider";
+import { supabase } from "../supabaseClient";
 
-export default function SmartLockSelectedPage({
-  savedFacilities,
-  selectedFacilities,
-  setSelectedFacilities,
-  setOpenPage,
-}) {
+export default function SmartLockSelectedPage({}) {
   const [facilities, setFacilities] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredFacilities, setFilteredFacilities] =
-    useState(selectedFacilities);
+  const [filteredFacilities, setFilteredFacilities] = useState([]);
   const [sortedColumn, setSortedColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [selectedTokensLoaded, setSelectedTokensLoaded] = useState(false);
 
-  const addToSelected = async (facility) => {
-    const isSelected = isFacilitySelected(facility.id);
+  const {
+    user,
+    tokens,
+    isPulled,
+    favoriteTokens,
+    setFavoriteTokens,
+    selectedTokens,
+    setSelectedTokens,
+    currentFacility,
+    setCurrentFacility,
+    isLoading,
+  } = useAuth();
+
+  const handleSelectedFacilitiesUpdate = async (newFacility, isSelected) => {
+    // Fetch existing favorite tokens for the user
+    const { data: currentData, error: fetchError } = await supabase
+      .from("user_data")
+      .select("selected_tokens")
+      .eq("user_id", user.id)
+      .single();
+
+    if (fetchError) {
+      console.error("Error fetching favorite tokens:", fetchError.message);
+      toast.error("Failed to retrieve favorite credentials.");
+      return;
+    }
     if (isSelected) {
-      setSelectedFacilities((prevFavoriteFacilities) => {
-        const updatedFavorites = prevFavoriteFacilities.filter(
-          (favFacility) => favFacility.id !== facility.id
-        );
+      // Filter out the token to remove
+      const updatedTokens = (currentData?.selected_tokens || []).filter(
+        (token) => token.id !== newFacility.id
+      );
 
-        localStorage.setItem(
-          "selectedFacilities",
-          JSON.stringify(updatedFavorites)
-        );
-        return updatedFavorites;
-      });
+      // Upsert the updated tokens array back to the database
+      const { data, error } = await supabase.from("user_data").upsert(
+        {
+          user_id: user.id,
+          selected_tokens: updatedTokens,
+        },
+        { onConflict: "user_id" }
+      );
+
+      if (error) {
+        console.error("Error removing favorite token:", error.message);
+      } else {
+        setSelectedTokens(updatedTokens);
+      }
     } else {
-      setSelectedFacilities((prevFavoriteFacilities) => {
-        const updatedFavorites = [...prevFavoriteFacilities, facility];
-        localStorage.setItem(
-          "selectedFacilities",
-          JSON.stringify(updatedFavorites)
-        );
-        return updatedFavorites;
-      });
+      // Filter in the token to remove
+      const updatedTokens = [
+        ...(currentData?.selected_tokens || []),
+        newFacility,
+      ];
+      const { data, error } = await supabase.from("user_data").upsert(
+        {
+          user_id: user.id,
+          selected_tokens: updatedTokens,
+        },
+        { onConflict: "user_id" }
+      );
+
+      if (error) {
+        console.error("Error saving favorite tokens:", error.message);
+      } else {
+        setSelectedTokens(updatedTokens);
+      }
     }
   };
 
+  const addToSelected = async (facility) => {
+    const isSelected = isFacilitySelected(facility.id);
+    handleSelectedFacilitiesUpdate(facility, isSelected);
+  };
+
   const isFacilitySelected = (facilityId) => {
-    return selectedFacilities.some((facility) => facility.id === facilityId);
+    return selectedTokens.some((facility) => facility.id === facilityId);
   };
 
   useEffect(() => {
-    const sortedFacilities = selectedFacilities.sort((a, b) => {
+    if (selectedTokens.length < 1) return;
+    if (selectedTokensLoaded) return;
+    setSelectedTokensLoaded(true);
+    const sortedFacilities = selectedTokens.sort((a, b) => {
       if (a.environment < b.environment) return -1;
       if (a.environment > b.environment) return 1;
       if (a.id < b.id) return -1;
@@ -68,11 +115,11 @@ export default function SmartLockSelectedPage({
 
     try {
       setFacilities(sortedFacilities);
-      toast.success(<b>Favorites loaded successfully!</b>);
+      toast.success(<b>Selected facilites loaded successfully!</b>);
     } catch {
       alert("It broke");
     }
-  }, []);
+  }, [selectedTokens]);
 
   useEffect(() => {
     const filtered = facilities.filter(

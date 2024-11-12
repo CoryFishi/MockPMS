@@ -2,10 +2,11 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useState, useEffect } from "react";
 import { MdEdit } from "react-icons/md";
+import { useAuth } from "../../context/AuthProvider";
+import { supabase } from "../../supabaseClient";
 
 export default function EditVisitor({
   setIsEditVisitorModalOpen,
-  currentFacility,
   setVisitors,
   visitor,
 }) {
@@ -16,6 +17,7 @@ export default function EditVisitor({
   });
   const [timeProfiles, setTimeProfiles] = useState({});
   const [accessProfiles, setAccessProfiles] = useState({});
+  const { currentFacility } = useAuth();
 
   const handleTimeProfiles = async () => {
     var tokenStageKey = "";
@@ -30,7 +32,7 @@ export default function EditVisitor({
       method: "get",
       url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/timegroups`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+        Authorization: "Bearer " + currentFacility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
       },
@@ -57,7 +59,7 @@ export default function EditVisitor({
       method: "get",
       url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/accessprofiles`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+        Authorization: "Bearer " + currentFacility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
       },
@@ -97,7 +99,7 @@ export default function EditVisitor({
       method: "post",
       url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/visitors/${visitor.id}/update`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+        Authorization: "Bearer " + currentFacility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
         "Content-Type": "application/json-patch+json",
@@ -144,7 +146,6 @@ export default function EditVisitor({
   useEffect(() => {
     handleTimeProfiles();
     handleAccessProfiles();
-    console.log(typeof setVisitors); // Should log "function"
   }, []);
 
   return (

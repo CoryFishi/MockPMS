@@ -11,16 +11,19 @@ import {
   BiChevronsLeft,
   BiChevronsRight,
 } from "react-icons/bi";
+import { useAuth } from "../context/AuthProvider";
+import { supabase } from "../supabaseClient";
 
 export default function UnitPage({
-  currentFacility,
   currentFacilityName = { currentFacilityName },
 }) {
   const [units, setUnits] = useState([]);
   const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
   const [isCreateVisitorModalOpen, setIsCreateVisitorModalOpen] =
     useState(false);
-  const [visitorAutofill, setVisitorAutofill] = useState(false);
+  const [visitorAutofill, setVisitorAutofill] = useState(
+    localStorage.getItem("visitorAutofill") === "true"
+  );
   const [selectedUnit, setSelectedUnit] = useState("");
   const [timeProfiles, setTimeProfiles] = useState({});
   const [accessProfiles, setAccessProfiles] = useState({});
@@ -32,6 +35,18 @@ export default function UnitPage({
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [unitsPulled, setUnitsPulled] = useState(false);
+  const {
+    user,
+    tokens,
+    isPulled,
+    favoriteTokens,
+    setFavoriteTokens,
+    selectedTokens,
+    currentFacility,
+    setCurrentFacility,
+    isLoading,
+  } = useAuth();
 
   const rentedCount = filteredUnits.filter(
     (unit) => unit.status === "Rented"
@@ -56,7 +71,7 @@ export default function UnitPage({
       method: "get",
       url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/timegroups`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+        Authorization: "Bearer " + currentFacility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
       },
@@ -83,7 +98,7 @@ export default function UnitPage({
       method: "get",
       url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/accessprofiles`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+        Authorization: "Bearer " + currentFacility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
       },
@@ -110,7 +125,7 @@ export default function UnitPage({
       method: "get",
       url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/units`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+        Authorization: "Bearer " + currentFacility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
       },
@@ -125,7 +140,7 @@ export default function UnitPage({
         });
         setSortedColumn("Unit Number");
         setUnits(sortedUnits);
-
+        setUnitsPulled(true);
         return response;
       })
       .catch(function (error) {
@@ -165,7 +180,7 @@ export default function UnitPage({
         url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/visitors`,
 
         headers: {
-          Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+          Authorization: "Bearer " + currentFacility?.token?.access_token,
           accept: "application/json",
           "api-version": "2.0",
           "Content-Type": "application/json-patch+json",
@@ -210,7 +225,7 @@ export default function UnitPage({
         method: "post",
         url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/units/${unit.id}/enable?suppressCommands=true`,
         headers: {
-          Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+          Authorization: "Bearer " + currentFacility?.token?.access_token,
           accept: "application/json",
           "api-version": "2.0",
           "Content-Type": "application/json-patch+json",
@@ -250,7 +265,7 @@ export default function UnitPage({
         method: "post",
         url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/units/${unit.id}/vacate?suppressCommands=true`,
         headers: {
-          Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+          Authorization: "Bearer " + currentFacility?.token?.access_token,
           accept: "application/json",
           "api-version": "2.0",
           "Content-Type": "application/json-patch+json",
@@ -290,7 +305,7 @@ export default function UnitPage({
         method: "post",
         url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/units/${unit.id}/disable?suppressCommands=true`,
         headers: {
-          Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+          Authorization: "Bearer " + currentFacility?.token?.access_token,
           accept: "application/json",
           "api-version": "2.0",
           "Content-Type": "application/json-patch+json",
@@ -330,7 +345,7 @@ export default function UnitPage({
         method: "post",
         url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/units/${unit.id}/delete/vacant?suppressCommands=true`,
         headers: {
-          Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+          Authorization: "Bearer " + currentFacility?.token?.access_token,
           accept: "application/json",
           "api-version": "2.0",
           "Content-Type": "application/json-patch+json",
@@ -369,7 +384,7 @@ export default function UnitPage({
         method: "get",
         url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/units/${unit.id}/visitors`,
         headers: {
-          Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+          Authorization: "Bearer " + currentFacility?.token?.access_token,
           accept: "application/json",
           "api-version": "2.0",
           "Content-Type": "application/json-patch+json",
@@ -389,18 +404,26 @@ export default function UnitPage({
     setSelectedVisitor(visitor);
     setIsEditVisitorModalOpen(true);
   };
+  const handleVisitorAutofill = (isFill) => {
+    setVisitorAutofill(!isFill);
+    localStorage.setItem("visitorAutofill", !isFill);
+  };
 
   // Run handleUnits once when the component loads
   useEffect(() => {
+    //Return if no token is found
+    if (!currentFacility.token) return;
+    // Return if units have already been pulled
+    if (unitsPulled) return;
     toast.promise(handleUnits(), {
       loading: "Loading units...",
       success: <b>Units loaded successfully!</b>,
       error: <b>Could not load units.</b>,
     });
-
     handleAccessProfiles();
     handleTimeProfiles();
-  }, []);
+  }, [currentFacility]);
+
   useEffect(() => {
     const filteredUnits = units.filter(
       (unit) =>
@@ -458,7 +481,7 @@ export default function UnitPage({
             className={`w-8 h-4 flex items-center rounded-full p-1 cursor-pointer ${
               visitorAutofill ? "bg-blue-600" : "bg-gray-300"
             }`}
-            onClick={() => setVisitorAutofill(!visitorAutofill)}
+            onClick={() => handleVisitorAutofill(visitorAutofill)}
           >
             <div
               className={`bg-white w-3 h-3 rounded-full shadow-md transform transition-transform duration-500 ease-out ${

@@ -2,10 +2,11 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useState, useEffect } from "react";
 import { IoIosCreate } from "react-icons/io";
+import { useAuth } from "../../context/AuthProvider";
+import { supabase } from "../../supabaseClient";
 
 export default function CreateVisitorUnit({
   setIsCreateVisitorModalOpen,
-  currentFacility,
   setUnits,
   unit,
 }) {
@@ -18,6 +19,17 @@ export default function CreateVisitorUnit({
     timeProfile: "",
     accessProfile: "",
   });
+  const {
+    user,
+    tokens,
+    isPulled,
+    favoriteTokens,
+    setFavoriteTokens,
+    selectedTokens,
+    currentFacility,
+    setCurrentFacility,
+    isLoading,
+  } = useAuth();
   const [timeProfiles, setTimeProfiles] = useState({});
   const [accessProfiles, setAccessProfiles] = useState({});
   // API call handler to get time profiles
@@ -34,7 +46,7 @@ export default function CreateVisitorUnit({
       method: "get",
       url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/timegroups`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+        Authorization: "Bearer " + currentFacility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
       },
@@ -62,7 +74,7 @@ export default function CreateVisitorUnit({
       method: "get",
       url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/accessprofiles`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+        Authorization: "Bearer " + currentFacility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
       },
@@ -114,7 +126,7 @@ export default function CreateVisitorUnit({
       method: "post",
       url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/visitors`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+        Authorization: "Bearer " + currentFacility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
         "Content-Type": "application/json-patch+json",

@@ -10,8 +10,10 @@ import {
   BiChevronsLeft,
   BiChevronsRight,
 } from "react-icons/bi";
+import { useAuth } from "../context/AuthProvider";
+import { supabase } from "../supabaseClient";
 
-export default function VisitorPage({ currentFacility, currentFacilityName }) {
+export default function VisitorPage({ currentFacilityName }) {
   const [visitors, setVisitors] = useState([]);
   const [tenants, setTenants] = useState("");
   const [nonTenants, setNonTenants] = useState("");
@@ -26,6 +28,18 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
   const [sortedColumn, setSortedColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [visitorsPulled, setVisitorsPulled] = useState(false);
+  const {
+    user,
+    tokens,
+    isPulled,
+    favoriteTokens,
+    setFavoriteTokens,
+    selectedTokens,
+    currentFacility,
+    setCurrentFacility,
+    isLoading,
+  } = useAuth();
 
   const tenantCount = filteredVisitors.filter(
     (visitor) => visitor.isTenant === true
@@ -50,7 +64,7 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
       method: "get",
       url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/visitors`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+        Authorization: "Bearer " + currentFacility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
       },
@@ -65,7 +79,7 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
         });
         setSortedColumn("Unit Number");
         setVisitors(sortedVisitors);
-
+        setVisitorsPulled(true);
         return response;
       })
       .catch(function (error) {
@@ -88,7 +102,7 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
         url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/units/${visitor.unitId}/vacate?suppressCommands=true`,
 
         headers: {
-          Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+          Authorization: "Bearer " + currentFacility?.token?.access_token,
           accept: "application/json",
           "api-version": "2.0",
           "Content-Type": "application/json-patch+json",
@@ -129,7 +143,7 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
         url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/visitors/${visitor.id}/remove?suppressCommands=false`,
 
         headers: {
-          Authorization: "Bearer " + currentFacility?.bearer?.access_token,
+          Authorization: "Bearer " + currentFacility?.token?.access_token,
           accept: "application/json",
           "api-version": "2.0",
           "Content-Type": "application/json-patch+json",
@@ -148,21 +162,26 @@ export default function VisitorPage({ currentFacility, currentFacilityName }) {
           throw error;
         });
     };
+    console.log(visitor);
     toast.promise(handleDelete(), {
       loading: "Deleting Unit " + visitor.unitNumber + "...",
-      success: <b>{visitor.unitNumber} successfully deleted!</b>,
-      error: <b>{visitor.unitNumber} failed deletion!</b>,
+      success: <b>{visitor.id} successfully deleted!</b>,
+      error: <b>{visitor.id} failed deletion!</b>,
     });
   };
 
   // Run handleUnits once when the component loads
   useEffect(() => {
+    //Return if no token is found
+    if (!currentFacility.token) return;
+    // Return if visitors have already been pulled
+    if (visitorsPulled) return;
     toast.promise(handleVisitors(), {
       loading: "Loading visitors...",
       success: <b>Visitors loaded successfully!</b>,
       error: <b>Could not load visitors.</b>,
     });
-  }, []);
+  }, [currentFacility]);
 
   useEffect(() => {
     // Filter facilities based on the search query
