@@ -4,8 +4,9 @@ import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 import { useState } from "react";
 import { MdExpandLess, MdExpandMore, MdOutlineWbSunny } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+
 import { FaMoon } from "react-icons/fa";
-import { BiDownArrow } from "react-icons/bi";
 
 export default function Navbar({
   setDashboardMenu,
@@ -26,6 +27,7 @@ export default function Navbar({
     setUser,
   } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -36,6 +38,7 @@ export default function Navbar({
       setCurrentFacility({});
       setFavoriteTokens([]);
       setSelectedTokens([]);
+      navigate("/login");
     }
   };
   const showSideToggle =

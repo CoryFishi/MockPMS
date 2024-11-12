@@ -11,20 +11,13 @@ import { useAuth } from "../context/AuthProvider";
 import NotFound from "../components/NotFound";
 import { supabase } from "../supabaseClient";
 
-export default function Settings({
-  savedFacilities = [],
-  setSavedFacilities,
-  darkMode,
-  toggleDarkMode,
-}) {
+export default function Settings({ darkMode, toggleDarkMode }) {
   const [api, setApi] = useState("");
   const [apiSecret, setApiSecret] = useState("");
   const [client, setClient] = useState("");
   const [clientSecret, setClientSecret] = useState("");
   const [environment, setEnvironment] = useState("-");
-  const [settingsSavedFacilities, setSettingsSavedFacilities] = useState(
-    Array.isArray(savedFacilities) ? savedFacilities : []
-  );
+  const [settingsSavedFacilities, setSettingsSavedFacilities] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [sortDirection, setSortDirection] = useState("asc");
   const [version, setVersion] = useState(packageJson.version);
@@ -383,18 +376,6 @@ export default function Settings({
   const triggerFileInput = () => {
     fileInputRef.current.click();
   };
-  useEffect(() => {
-    const storedFacilities = JSON.parse(
-      localStorage.getItem("savedFacilities")
-    );
-    if (Array.isArray(storedFacilities)) {
-      setTokens(storedFacilities);
-      setSettingsSavedFacilities(storedFacilities);
-    } else {
-      setSavedFacilities([]);
-      setSettingsSavedFacilities([]);
-    }
-  }, [setSavedFacilities]);
 
   // Run login for all saved facilities when settingsSavedFacilities changes
   useEffect(() => {
@@ -402,7 +383,7 @@ export default function Settings({
       return;
     }
     handleFetchTokens();
-    settingsSavedFacilities.forEach((facility, index) => {
+    tokens.forEach((facility, index) => {
       handleOldLogin(facility, index);
     });
   }, [user]);
