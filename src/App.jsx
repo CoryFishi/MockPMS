@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import SmartLockDashboard from "./pages/SmartLockDashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Admin from "./pages/Admin";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -66,6 +67,12 @@ function App() {
           path="/register"
           element={
             <Register darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <Admin darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           }
         />
         <Route

@@ -12,7 +12,7 @@ import {
 import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 
-export default function FavoritesPage({ setCurrentFacilityName, setOpenPage }) {
+export default function FavoritesPage() {
   const [facilities, setFacilities] = useState([]);
   const [sortDirection, setSortDirection] = useState("asc");
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,15 +23,13 @@ export default function FavoritesPage({ setCurrentFacilityName, setOpenPage }) {
   const [favoriteTokensLoaded, setFavoriteTokensLoaded] = useState(false);
   const {
     user,
-    tokens,
-    isPulled,
     favoriteTokens,
     setFavoriteTokens,
-    selectedTokens,
     currentFacility,
     setCurrentFacility,
-    isLoading,
   } = useAuth();
+  const [noFacilities, setNoFacilities] = useState(false);
+
   // Pagination logic
   const pageCount = Math.ceil(filteredFacilities.length / rowsPerPage);
 
@@ -124,6 +122,7 @@ export default function FavoritesPage({ setCurrentFacilityName, setOpenPage }) {
       return;
     }
     if (isFavorite) {
+      setNoFacilities(false);
       // Filter out the token to remove
       const updatedTokens = (currentData?.favorite_tokens || []).filter(
         (token) => token.id !== newFacility.id
@@ -170,9 +169,15 @@ export default function FavoritesPage({ setCurrentFacilityName, setOpenPage }) {
   };
 
   useEffect(() => {
-    if (favoriteTokens.length < 1) return;
+    if (favoriteTokens.length < 1) {
+      if (facilities.length < 1) {
+        setNoFacilities(true);
+      }
+      return;
+    }
     if (favoriteTokensLoaded) return;
     setFavoriteTokensLoaded(true);
+    setNoFacilities(false);
     const sortedFacilities = favoriteTokens.sort((a, b) => {
       if (a.environment < b.environment) return -1;
       if (a.environment > b.environment) return 1;
@@ -412,7 +417,11 @@ export default function FavoritesPage({ setCurrentFacilityName, setOpenPage }) {
               ))}
           </tbody>
         </table>
-
+        {noFacilities && (
+          <div className="w-full text-center mt-5 text-red-500">
+            No Facilities Currently Favorited...
+          </div>
+        )}
         {/* Modal footer/pagination */}
         <div className="flex justify-between items-center px-2 py-5 mx-1">
           <div className="flex gap-3">

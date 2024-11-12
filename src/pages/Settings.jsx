@@ -10,6 +10,7 @@ import packageJson from "../../package.json";
 import { useAuth } from "../context/AuthProvider";
 import NotFound from "../components/NotFound";
 import { supabase } from "../supabaseClient";
+import { useNavigate } from "react-router-dom";
 
 export default function Settings({ darkMode, toggleDarkMode }) {
   const [api, setApi] = useState("");
@@ -23,6 +24,8 @@ export default function Settings({ darkMode, toggleDarkMode }) {
   const [version, setVersion] = useState(packageJson.version);
   const fileInputRef = useRef(null);
   const { user, tokens, setTokens } = useAuth();
+  const [newPassword, setNewPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleFetchTokens = async () => {
     try {
@@ -142,9 +145,31 @@ export default function Settings({ darkMode, toggleDarkMode }) {
     }
   };
 
-  //
-  //
-  //
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error logging out:", error.message);
+    } else {
+      navigate("/login");
+      setTokens([]);
+      setCurrentFacility({});
+      setFavoriteTokens([]);
+      setSelectedTokens([]);
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Password changed successfully!");
+      setNewPassword("");
+    }
+  };
 
   const handleOldLogin = (facility, index) => {
     var tokenStageKey = "";
@@ -222,26 +247,6 @@ export default function Settings({ darkMode, toggleDarkMode }) {
         console.error(error.message);
         throw error;
       });
-  };
-  // Delete facility handler
-  const deleteFacility = (index) => {
-    return new Promise((resolve, reject) => {
-      try {
-        const updatedFacilities = settingsSavedFacilities.filter(
-          (_, i) => i !== index
-        );
-
-        setSavedFacilities(updatedFacilities);
-        setSettingsSavedFacilities(updatedFacilities);
-        localStorage.setItem(
-          "savedFacilities",
-          JSON.stringify(updatedFacilities)
-        );
-        resolve(true); // Resolve the promise if successful
-      } catch (error) {
-        reject(error); // Reject the promise if there is an error
-      }
-    });
   };
   const exportFacilities = () => {
     const userResponse = confirm("Are you sure you want to export the tokens?");
@@ -394,29 +399,56 @@ export default function Settings({ darkMode, toggleDarkMode }) {
         <div>
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           <div className="w-full h-full px-5 flex flex-col rounded-lg overflow-y-auto">
-            <div className="text-right mt-2">
-              <button
-                className="text-black dark:text-white p-3 hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer mr-5"
-                title="Export Tokens"
-                onClick={() => exportFacilities()}
-              >
-                <CiExport className="text-2xl" />
-              </button>
-              <button
-                className="text-black dark:text-white p-3 hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer mr-5"
-                title="Import Tokens"
-                onClick={triggerFileInput}
-              >
-                <CiImport className="text-2xl" />
-              </button>
-              {/* Hidden File Input */}
-              <input
-                type="file"
-                accept=".csv"
-                ref={fileInputRef}
-                onChange={handleFileUpload}
-                style={{ display: "none" }}
-              />
+            <div className="flex justify-between mt-2">
+              <div className="flex justify-center items-center text-center h-full">
+                <div className="flex items-center justify-center text-center max-w-5xl space-x-2">
+                  <input
+                    type="password"
+                    placeholder="New Password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="text-black h-11 rounded "
+                  />
+                  <button
+                    className="bg-gray-100 dark:bg-darkSecondary m-1 rounded text-black dark:text-white p-3 hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer"
+                    onClick={() => handlePasswordChange()}
+                  >
+                    Change Password
+                  </button>
+                </div>
+                <button
+                  className="ml-2 bg-gray-100 dark:bg-darkSecondary m-1  rounded text-black dark:text-white p-3 hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer"
+                  onClick={() => handleLogout()}
+                >
+                  Logout
+                </button>
+              </div>
+              <div>
+                <button
+                  className="bg-gray-100 dark:bg-darkSecondary m-1 rounded text-black dark:text-white p-3 hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer"
+                  title="DISABLED - Export Tokens"
+                  onClick={() => exportFacilities()}
+                  disabled
+                >
+                  <CiExport className="text-2xl" />
+                </button>
+                <button
+                  className="bg-gray-100 dark:bg-darkSecondary m-1 rounded text-black dark:text-white p-3 hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer"
+                  title="DISABLED - Import Tokens"
+                  onClick={triggerFileInput}
+                  disabled
+                >
+                  <CiImport className="text-2xl" />
+                </button>
+                {/* Hidden File Input */}
+                <input
+                  type="file"
+                  accept=".csv"
+                  ref={fileInputRef}
+                  onChange={handleFileUpload}
+                  style={{ display: "none" }}
+                />
+              </div>
             </div>
 
             <div className="mt-3 h-full">

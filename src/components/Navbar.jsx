@@ -5,7 +5,6 @@ import { supabase } from "../supabaseClient";
 import { useState } from "react";
 import { MdExpandLess, MdExpandMore, MdOutlineWbSunny } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-
 import { FaMoon } from "react-icons/fa";
 
 export default function Navbar({
@@ -24,7 +23,7 @@ export default function Navbar({
     setCurrentFacility,
     setFavoriteTokens,
     setSelectedTokens,
-    setUser,
+    role,
   } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -41,6 +40,7 @@ export default function Navbar({
       navigate("/login");
     }
   };
+
   const showSideToggle =
     location.pathname === "/" || location.pathname === "/smartlock-dashboard";
 
@@ -103,7 +103,18 @@ export default function Navbar({
               Property Manager
             </Link>
           )}
-
+          {user && role === "admin" && (
+            <Link
+              to="/admin"
+              className={`hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium ${
+                location.pathname === "/admin"
+                  ? "border-b-2 border-yellow-400"
+                  : ""
+              }`}
+            >
+              Admin
+            </Link>
+          )}
           {user ? (
             <div>
               <h2

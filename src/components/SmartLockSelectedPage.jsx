@@ -13,7 +13,7 @@ import {
 import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 
-export default function SmartLockSelectedPage({}) {
+export default function SmartLockSelectedPage() {
   const [facilities, setFacilities] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredFacilities, setFilteredFacilities] = useState([]);
@@ -22,19 +22,9 @@ export default function SmartLockSelectedPage({}) {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [selectedTokensLoaded, setSelectedTokensLoaded] = useState(false);
+  const [noFacilities, setNoFacilities] = useState(false);
 
-  const {
-    user,
-    tokens,
-    isPulled,
-    favoriteTokens,
-    setFavoriteTokens,
-    selectedTokens,
-    setSelectedTokens,
-    currentFacility,
-    setCurrentFacility,
-    isLoading,
-  } = useAuth();
+  const { user, selectedTokens, setSelectedTokens } = useAuth();
 
   const handleSelectedFacilitiesUpdate = async (newFacility, isSelected) => {
     // Fetch existing favorite tokens for the user
@@ -51,6 +41,7 @@ export default function SmartLockSelectedPage({}) {
     }
     if (isSelected) {
       // Filter out the token to remove
+      setNoFacilities(false);
       const updatedTokens = (currentData?.selected_tokens || []).filter(
         (token) => token.id !== newFacility.id
       );
@@ -71,6 +62,7 @@ export default function SmartLockSelectedPage({}) {
       }
     } else {
       // Filter in the token to remove
+      setNoFacilities(false);
       const updatedTokens = [
         ...(currentData?.selected_tokens || []),
         newFacility,
@@ -101,9 +93,15 @@ export default function SmartLockSelectedPage({}) {
   };
 
   useEffect(() => {
-    if (selectedTokens.length < 1) return;
+    if (selectedTokens.length < 1) {
+      if (facilities.length < 1) {
+        setNoFacilities(true);
+      }
+      return;
+    }
     if (selectedTokensLoaded) return;
     setSelectedTokensLoaded(true);
+    setNoFacilities(false);
     const sortedFacilities = selectedTokens.sort((a, b) => {
       if (a.environment < b.environment) return -1;
       if (a.environment > b.environment) return 1;
@@ -112,7 +110,6 @@ export default function SmartLockSelectedPage({}) {
       return 0;
     });
     setSortedColumn("Facility Id");
-
     try {
       setFacilities(sortedFacilities);
       toast.success(<b>Selected facilites loaded successfully!</b>);
@@ -316,6 +313,11 @@ export default function SmartLockSelectedPage({}) {
                 ))}
             </tbody>
           </table>
+          {noFacilities && (
+            <div className="w-full text-center mt-5 text-red-500">
+              No Facilities Currently Selected...
+            </div>
+          )}
         </div>
         {/* Modal footer/pagination */}
         <div className="flex justify-between items-center px-2 py-5 mx-1">

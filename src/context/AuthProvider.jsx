@@ -1,7 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from "react";
 import { supabase } from "../supabaseClient";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 import { IoWarning } from "react-icons/io5";
 
 const AuthContext = createContext();
@@ -14,24 +13,37 @@ export const AuthProvider = ({ children }) => {
   const [currentFacility, setCurrentFacility] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [isPulled, setIsPulled] = useState(false);
+  const [role, setRole] = useState("");
 
-  // Get all saved Tokens
-  const getUserTokens = async () => {
+  // Get the current facility selection
+  const getUserData = async () => {
     if (!user) throw new Error("User not signed in");
 
     const { data, error } = await supabase
       .from("user_data")
-      .select("tokens")
+      .select("*") // Selects all columns in the row
       .eq("user_id", user.id)
       .single();
 
     if (error) {
-      console.error("Error fetching tokens:", error);
+      if (error.code === "PGRST116") {
+        setCurrentFacility({});
+        setSelectedTokens([]);
+        setFavoriteTokens([]);
+        setTokens([]);
+        setRole("");
+        return;
+      }
+      console.error("Error fetching user data:", error);
       return null;
     }
+    setCurrentFacility(data?.current_facility || {});
+    setSelectedTokens(data?.selected_tokens || []);
+    setFavoriteTokens(data?.favorite_tokens || []);
     setTokens(data?.tokens || []);
-
-    if (data?.tokens < 1 && user) {
+    setRole(data?.role || "");
+    console.log(data);
+    if (data?.tokens < 1 && window.location.pathname !== "/settings") {
       toast.custom(
         (t) => (
           <div className="max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5">
@@ -74,57 +86,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Get all favorited tokens
-  const getUserFavoriteTokens = async () => {
-    if (!user) throw new Error("User not signed in");
-
-    const { data, error } = await supabase
-      .from("user_data")
-      .select("favorite_tokens")
-      .eq("user_id", user.id)
-      .single();
-
-    if (error) {
-      console.error("Error fetching tokens:", error);
-      return null;
-    }
-    setFavoriteTokens(data?.favorite_tokens || []);
-  };
-
-  // Get all selected tokens
-  const getUserSelectedTokens = async () => {
-    if (!user) throw new Error("User not signed in");
-
-    const { data, error } = await supabase
-      .from("user_data")
-      .select("selected_tokens")
-      .eq("user_id", user.id)
-      .single();
-
-    if (error) {
-      console.error("Error fetching tokens:", error);
-      return null;
-    }
-    setSelectedTokens(data?.selected_tokens || []);
-  };
-
-  // Get the current facility selection
-  const GetUserCurrentFacility = async () => {
-    if (!user) throw new Error("User not signed in");
-
-    const { data, error } = await supabase
-      .from("user_data")
-      .select("current_facility")
-      .eq("user_id", user.id)
-      .single();
-
-    if (error) {
-      console.error("Error fetching tokens:", error);
-      return null;
-    }
-    setCurrentFacility(data?.current_facility || {});
-  };
-
   useEffect(() => {
     const fetchSession = async () => {
       const { data: sessionData } = await supabase.auth.getSession();
@@ -150,10 +111,7 @@ export const AuthProvider = ({ children }) => {
     if (user && !isPulled) {
       // Call all gets
       setIsPulled(true);
-      getUserTokens();
-      getUserFavoriteTokens();
-      getUserSelectedTokens();
-      GetUserCurrentFacility();
+      getUserData();
     }
   }, [user]);
 
@@ -162,6 +120,7 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         setUser,
+        role,
         isPulled,
         setIsPulled,
         tokens,

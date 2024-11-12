@@ -33,6 +33,7 @@ export default function AllFacilitiesPage({
   const [sortedColumn, setSortedColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [noFacilities, setNoFacilities] = useState(false);
 
   const handleCurrentFacilityUpdate = async (updatedInfo) => {
     const { data, error } = await supabase.from("user_data").upsert(
@@ -230,7 +231,7 @@ export default function AllFacilitiesPage({
             });
           });
           setSortedColumn("Facility Id");
-
+          if (response.data.length > 0) setNoFacilities(false);
           return response;
         })
         .catch(function (error) {
@@ -243,7 +244,11 @@ export default function AllFacilitiesPage({
         const facility = saved[i];
         handleAccount(facility);
       }
-      toast.success(<b>Facilities Loaded Successfully!</b>);
+      if (saved.length > 0) {
+        toast.success(<b>Facilities Loaded Successfully!</b>);
+      } else {
+        setNoFacilities(true);
+      }
     } catch (error) {
       toast.error("Facilities Failed to Load!");
     }
@@ -510,6 +515,11 @@ export default function AllFacilitiesPage({
                 ))}
             </tbody>
           </table>
+          {noFacilities && (
+            <div className="w-full text-center mt-5 text-red-500">
+              No Authorized Facilities To Choose From...
+            </div>
+          )}
         </div>
         {/* Modal footer/pagination */}
         <div className="flex justify-between items-center px-2 py-5 mx-1">

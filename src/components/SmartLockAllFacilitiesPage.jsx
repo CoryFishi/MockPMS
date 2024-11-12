@@ -24,17 +24,8 @@ export default function SmartLockAllFacilitiesPage({}) {
   const [sortDirection, setSortDirection] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
-  const {
-    user,
-    tokens,
-    isPulled,
-    favoriteTokens,
-    selectedTokens,
-    setSelectedTokens,
-    currentFacility,
-    setCurrentFacility,
-    isLoading,
-  } = useAuth();
+  const [noFacilities, setNoFacilities] = useState(false);
+  const { user, tokens, selectedTokens, setSelectedTokens } = useAuth();
 
   const handleLogin = async (facility) => {
     var tokenStageKey = "";
@@ -116,6 +107,7 @@ export default function SmartLockAllFacilitiesPage({}) {
             });
           });
           setSortedColumn("Facility Id");
+          if (response.data.length > 0) setNoFacilities(false);
 
           return response;
         })
@@ -124,14 +116,18 @@ export default function SmartLockAllFacilitiesPage({}) {
           throw error;
         });
     };
-    for (let i = 0; i < saved.length; i++) {
-      const facility = saved[i];
-      // Run the toast notification for each facility
-      toast.promise(handleAccount(facility), {
-        loading: "Loading facilities...",
-        success: <b>Facilities loaded successfully!</b>,
-        error: <b>Could not load facilities.</b>,
-      });
+    try {
+      for (let i = 0; i < saved.length; i++) {
+        const facility = saved[i];
+        handleAccount(facility);
+      }
+      if (saved.length > 0) {
+        toast.success(<b>Facilities Loaded Successfully!</b>);
+      } else {
+        setNoFacilities(true);
+      }
+    } catch (error) {
+      toast.error("Facilities Failed to Load!");
     }
   };
 
@@ -400,6 +396,11 @@ export default function SmartLockAllFacilitiesPage({}) {
                 ))}
             </tbody>
           </table>
+          {noFacilities && (
+            <div className="w-full text-center mt-5 text-red-500">
+              No Authorized Facilities To Choose From...
+            </div>
+          )}
         </div>
         {/* Modal footer/pagination */}
         <div className="flex justify-between items-center px-2 py-5 mx-1">
