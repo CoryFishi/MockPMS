@@ -1,12 +1,13 @@
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Dashboard from "./pages/Dashboard";
-import Settings from "./pages/Settings";
+import AuthenticationSettings from "./pages/AuthenticationSettings";
 import { useState, useEffect } from "react";
 import SmartLockDashboard from "./pages/SmartLockDashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Admin from "./pages/Admin";
+import UserSettings from "./pages/UserSettings";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -52,9 +53,18 @@ function App() {
           }
         />
         <Route
-          path="/settings"
+          path="/authentication-settings"
           element={
-            <Settings darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <AuthenticationSettings
+              darkMode={darkMode}
+              toggleDarkMode={toggleDarkMode}
+            />
+          }
+        />
+        <Route
+          path="/user-settings"
+          element={
+            <UserSettings darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           }
         />
         <Route

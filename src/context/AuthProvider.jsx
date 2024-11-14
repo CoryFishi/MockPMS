@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
 
     const { data, error } = await supabase
       .from("user_data")
-      .select("*") // Selects all columns in the row
+      .select("*")
       .eq("user_id", user.id)
       .single();
 
@@ -42,7 +42,6 @@ export const AuthProvider = ({ children }) => {
     setFavoriteTokens(data?.favorite_tokens || []);
     setTokens(data?.tokens || []);
     setRole(data?.role || "");
-    console.log(data);
     if (data?.tokens < 1 && window.location.pathname !== "/settings") {
       toast.custom(
         (t) => (

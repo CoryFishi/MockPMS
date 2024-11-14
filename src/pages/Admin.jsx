@@ -8,6 +8,7 @@ export default function Admin({ darkMode, toggleDarkMode }) {
   const [dashboardMenu, setDashboardMenu] = useState(true);
   const [userData, setUserData] = useState([]);
   const { user } = useAuth();
+
   const getUserData = async () => {
     if (!user) return;
 
