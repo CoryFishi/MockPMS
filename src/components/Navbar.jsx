@@ -47,8 +47,8 @@ export default function Navbar({
     location.pathname === "/" || location.pathname === "/smartlock-dashboard";
 
   return (
-    <nav className="bg-white dark:bg-darkPrimary p-2 w-full border-slate-200 dark:border-gray-700 border-b select-none">
-      <div className="flex items-center justify-between text-black dark:text-white">
+    <nav className="bg-white dark:bg-darkPrimary p-2 w-full border-slate-200 dark:border-gray-700 border-b select-none relative">
+      <div className="flex items-center justify-between text-black dark:text-white relative">
         <div className="flex">
           {showSideToggle && (
             <button
@@ -63,16 +63,20 @@ export default function Navbar({
             </button>
           )}
         </div>
-        <div className="flex items-center flex-shrink-0 text-2xl font-medium lg:">
+
+        {/* Centered PMS */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 text-2xl font-medium">
           PMS
         </div>
+
         <div className="flex space-x-4 items-center mr-5">
+          {/* Rest of your navigation */}
           <div
             onClick={toggleDarkMode}
             className={`w-8 h-4 flex items-center rounded-full p-1 cursor-pointer bg-gray-300 dark:bg-gray-600`}
           >
             <div
-              className={`bg-white shadow-md shadow-gray-300 dark:shadow-sm dark:shadow-gray-600 dark:bg-darkSecondary w-4 h-4 rounded-full transform transition-transform duration-500 ease-out flex items-center justify-center x- ${
+              className={`bg-white shadow-md shadow-gray-300 dark:shadow-sm dark:shadow-gray-600 dark:bg-darkSecondary w-4 h-4 rounded-full transform transition-transform duration-500 ease-out flex items-center justify-center ${
                 darkMode ? "translate-x-2" : ""
               }`}
             >

@@ -19,7 +19,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
   const { user, role } = useAuth();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [eventsPulled, setEventsPulled] = useState(false);
   const pageCount = Math.ceil(filteredEvents.length / rowsPerPage);
@@ -164,9 +164,9 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                 </div>
               </div>
             </div>
-            <div className="w-full mt-5">
+            <div className="w-full mt-2">
               <h1 className="text-2xl text-center">User Events</h1>
-              <table className="w-full table-auto border-collapse border-gray-300 dark:border-border my-2">
+              <table className="w-full table-auto border-collapse border-gray-300 dark:border-border mt-1">
                 <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary w-full">
                   <tr className="bg-gray-200 dark:bg-darkNavSecondary w-full">
                     <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
@@ -214,7 +214,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                 <p className="text-center">No events found.</p>
               )}
               {/* Modal footer/pagination */}
-              <div className="flex justify-between items-center px-2 py-5 mx-1">
+              <div className="flex justify-between items-center px-2 py-4 mx-1">
                 <div className="flex gap-3">
                   <div>
                     <select

@@ -164,7 +164,13 @@ export default function DashboardLayout({ dashboardMenu }) {
                 onClick={() => toggleSection("currentFacility")}
               >
                 <div className="flex items-center space-x-2">
-                  <BsBuildingFill />
+                  <BsBuildingFill
+                    className={`${
+                      openPage === "visitors" || openPage === "units"
+                        ? "text-yellow-500"
+                        : ""
+                    }`}
+                  />
                   <span className="pl-2">{currentFacilityName}</span>
                 </div>
                 {openSections.currentFacility ? (
@@ -211,7 +217,13 @@ export default function DashboardLayout({ dashboardMenu }) {
                 onClick={() => toggleSection("facilities")}
               >
                 <div className="flex items-center space-x-2">
-                  <BsFillBuildingsFill />
+                  <BsFillBuildingsFill
+                    className={`${
+                      openPage === "allFacilities" || openPage === "favorites"
+                        ? "text-yellow-500"
+                        : ""
+                    }`}
+                  />
                   <span>Other Options</span>
                 </div>
                 {openSections.facilities ? <MdExpandLess /> : <MdExpandMore />}

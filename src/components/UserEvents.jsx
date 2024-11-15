@@ -60,106 +60,108 @@ export default function UserEvents() {
         </div>
       </div>
       <p className="text-sm dark:text-white text-left">{Date()}</p>
-      <table className="w-full table-auto border-collapse border-gray-300 dark:border-border my-2">
-        <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary w-full">
-          <tr className="bg-gray-200 dark:bg-darkNavSecondary w-full">
-            <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-              Created On
-            </th>
-            <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-              Event
-            </th>
-            <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-              Description
-            </th>
-            <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-              Completed
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredEvents
-            .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-            .map((event, index) => (
-              <tr
-                key={index}
-                className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
+      <div className="w-full px-5 py-2">
+        <table className="w-full table-auto border-collapse border-gray-300 dark:border-border my-2">
+          <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary w-full">
+            <tr className="bg-gray-200 dark:bg-darkNavSecondary w-full">
+              <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                Created On
+              </th>
+              <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                Event
+              </th>
+              <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                Description
+              </th>
+              <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                Completed
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredEvents
+              .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+              .map((event, index) => (
+                <tr
+                  key={index}
+                  className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
+                >
+                  <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                    {event.created_at}
+                  </td>
+                  <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                    {event.event_name}
+                  </td>
+                  <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
+                    {event.event_description}
+                  </td>
+                  <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
+                    {event.completed ? "true" : "false"}
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+        {events.length < 1 && <p className="text-center">No events found.</p>}
+        {/* Modal footer/pagination */}
+        <div className="flex justify-between items-center px-2 py-5 mx-1">
+          <div className="flex gap-3">
+            <div>
+              <select
+                className="border rounded ml-2 dark:bg-darkSecondary dark:border-border"
+                id="rowsPerPage"
+                value={rowsPerPage}
+                onChange={(e) => {
+                  setRowsPerPage(Number(e.target.value));
+                  setCurrentPage(1); // Reset to first page on rows per page change
+                }}
               >
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                  {event.created_at}
-                </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                  {event.event_name}
-                </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
-                  {event.event_description}
-                </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
-                  {event.completed ? "true" : "false"}
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-      {events.length < 1 && <p className="text-center">No events found.</p>}
-      {/* Modal footer/pagination */}
-      <div className="flex justify-between items-center px-2 py-5 mx-1">
-        <div className="flex gap-3">
-          <div>
-            <select
-              className="border rounded ml-2 dark:bg-darkSecondary dark:border-border"
-              id="rowsPerPage"
-              value={rowsPerPage}
-              onChange={(e) => {
-                setRowsPerPage(Number(e.target.value));
-                setCurrentPage(1); // Reset to first page on rows per page change
-              }}
-            >
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={100}>100</option>
-            </select>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={100}>100</option>
+              </select>
+            </div>
+            <p className="text-sm">
+              {currentPage === 1 ? 1 : (currentPage - 1) * rowsPerPage + 1} -{" "}
+              {currentPage * rowsPerPage > filteredEvents.length
+                ? filteredEvents.length
+                : currentPage * rowsPerPage}{" "}
+              of {filteredEvents.length}
+            </p>
           </div>
-          <p className="text-sm">
-            {currentPage === 1 ? 1 : (currentPage - 1) * rowsPerPage + 1} -{" "}
-            {currentPage * rowsPerPage > filteredEvents.length
-              ? filteredEvents.length
-              : currentPage * rowsPerPage}{" "}
-            of {filteredEvents.length}
-          </p>
-        </div>
-        <div className="gap-2 flex">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(1)}
-            className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-          >
-            <BiChevronsLeft />
-          </button>
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => prev - 1)}
-            className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-          >
-            <BiChevronLeft />
-          </button>
-          <p>
-            {currentPage} of {pageCount}
-          </p>
-          <button
-            disabled={currentPage === pageCount}
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-          >
-            <BiChevronRight />
-          </button>
-          <button
-            disabled={currentPage === pageCount}
-            onClick={() => setCurrentPage(pageCount)}
-            className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-          >
-            <BiChevronsRight />
-          </button>
+          <div className="gap-2 flex">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(1)}
+              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
+            >
+              <BiChevronsLeft />
+            </button>
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => prev - 1)}
+              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
+            >
+              <BiChevronLeft />
+            </button>
+            <p>
+              {currentPage} of {pageCount}
+            </p>
+            <button
+              disabled={currentPage === pageCount}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
+            >
+              <BiChevronRight />
+            </button>
+            <button
+              disabled={currentPage === pageCount}
+              onClick={() => setCurrentPage(pageCount)}
+              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
+            >
+              <BiChevronsRight />
+            </button>
+          </div>
         </div>
       </div>
     </div>

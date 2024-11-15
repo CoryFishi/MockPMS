@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
-import { useAuth } from "../context/AuthProvider";
 import Users from "./UsersPage";
 import UserEvents from "./UserEvents";
 
@@ -45,17 +44,19 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                 onClick={() => toggleSection("userAdmin")}
               >
                 <div className="flex items-center space-x-2">
-                  <BsBuildingFill />
+                  <BsBuildingFill
+                    className={`${
+                      openPage === "users" || openPage === "userEvents"
+                        ? "text-yellow-500"
+                        : ""
+                    }`}
+                  />
                   <span className="pl-2">User Administrastion</span>
                 </div>
-                {openSections.currentFacility ? (
-                  <MdExpandLess />
-                ) : (
-                  <MdExpandMore />
-                )}
+                {openSections.userAdmin ? <MdExpandLess /> : <MdExpandMore />}
               </div>
 
-              {!openSections.currentFacility && (
+              {!openSections.userAdmin && (
                 <div className="mx-4 mt-4 space-y-2">
                   <Link
                     onClick={() =>

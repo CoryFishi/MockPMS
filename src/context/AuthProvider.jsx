@@ -42,7 +42,13 @@ export const AuthProvider = ({ children }) => {
     setFavoriteTokens(data?.favorite_tokens || []);
     setTokens(data?.tokens || []);
     setRole(data?.role || "");
-    if (data?.tokens < 1 && window.location.pathname !== "/settings") {
+    if (
+      data?.tokens < 1 &&
+      data?.favorite_tokens < 1 &&
+      data?.current_facility &&
+      data?.selected_tokens < 1 &&
+      window.location.pathname !== "/authentication-settings"
+    ) {
       toast.custom(
         (t) => (
           <div className="max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5">
@@ -52,7 +58,7 @@ export const AuthProvider = ({ children }) => {
                 onClick={() => {
                   toast.dismiss(t.id);
                   window.location.href =
-                    "https://propertymanager-dev.netlify.app/settings";
+                    "https://propertymanager.netlify.app/authentication-settings";
                 }}
               >
                 <div className="flex-shrink-0 flex items-center justify-center">

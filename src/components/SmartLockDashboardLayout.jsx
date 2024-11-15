@@ -47,7 +47,13 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                 onClick={() => toggleSection("currentFacility")}
               >
                 <div className="flex items-center space-x-2">
-                  <BsBuildingFill />
+                  <BsBuildingFill
+                    className={`${
+                      openPage === "dashboard" || openPage === "reports"
+                        ? "text-yellow-500"
+                        : ""
+                    }`}
+                  />
                   <span className="pl-2">Dashboard</span>
                 </div>
                 {openSections.currentFacility ? (
@@ -94,7 +100,13 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                 onClick={() => toggleSection("facilities")}
               >
                 <div className="flex items-center space-x-2">
-                  <BsFillBuildingsFill />
+                  <BsFillBuildingsFill
+                    className={`${
+                      openPage === "allFacilities" || openPage === "selected"
+                        ? "text-yellow-500"
+                        : ""
+                    }`}
+                  />
                   <span>Other Options</span>
                 </div>
                 {openSections.facilities ? <MdExpandLess /> : <MdExpandMore />}
