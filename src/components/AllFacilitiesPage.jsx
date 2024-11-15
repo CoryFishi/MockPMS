@@ -40,6 +40,7 @@ export default function AllFacilitiesPage({
       {
         user_id: user.id,
         current_facility: updatedInfo,
+        last_update_at: new Date().toISOString(),
       },
       { onConflict: "user_id" }
     );
@@ -75,6 +76,7 @@ export default function AllFacilitiesPage({
         {
           user_id: user.id,
           favorite_tokens: updatedTokens,
+          last_update_at: new Date().toISOString(),
         },
         { onConflict: "user_id" }
       );
@@ -94,6 +96,7 @@ export default function AllFacilitiesPage({
         {
           user_id: user.id,
           favorite_tokens: updatedTokens,
+          last_update_at: new Date().toISOString(),
         },
         { onConflict: "user_id" }
       );

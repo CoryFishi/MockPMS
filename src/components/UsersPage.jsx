@@ -54,16 +54,25 @@ export default function Users() {
         <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary w-full">
           <tr className="bg-gray-200 dark:bg-darkNavSecondary w-full">
             <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-              Created On
+              User Id
             </th>
             <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-              Email
+              Tokens
+            </th>
+            <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              Favorites
+            </th>
+            <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              Selected
+            </th>
+            <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              Current Facility
             </th>
             <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
               Role
             </th>
             <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-              Last Sign In
+              Created On
             </th>
             <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
               Actions
@@ -79,19 +88,31 @@ export default function Users() {
                 className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
               >
                 <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                  {user.created_at}
+                  {user.user_id}
                 </td>
                 <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                  {user.email}
+                  {user.tokens.length}
+                </td>
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                  {user.favorite_tokens.length}
+                </td>
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                  {user.selected_tokens.length}
+                </td>
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                  {user.current_facility.name || "n/a"}
                 </td>
                 <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
                   {user.role}
                 </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
-                  {user.last_sign_in_at}
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                  {user.created_at}
                 </td>
                 <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
-                  <button className="dark:bg-darkSecondary border rounded dark:border-border p-2 hover:dark:bg-darkPrimary">
+                  <button
+                    className="dark:bg-darkSecondary border rounded dark:border-border p-2 hover:dark:bg-darkPrimary"
+                    onClick={() => alert("Not done")}
+                  >
                     Actions
                   </button>
                 </td>
