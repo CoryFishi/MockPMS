@@ -20,7 +20,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [sortDirection, setSortDirection] = useState("asc");
   const fileInputRef = useRef(null);
-  const { user, tokens, setTokens } = useAuth();
+  const { user, tokens, setTokens, role } = useAuth();
 
   async function addEvent(eventName, eventDescription, completed) {
     const { data, error } = await supabase.from("user_events").insert([
@@ -644,10 +644,18 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                         className="p-0.5 shadow-md border-y border-slate-100 rounded"
                       >
                         <option value="-">--Select an Option--</option>
-                        <option value="">Production</option>
+                        {(role === "admin" ||
+                          role === "qa" ||
+                          role === "dev") && (
+                          <option value="">Production</option>
+                        )}
                         <option value="-dev">Development</option>
                         <option value="-qa">QA</option>
-                        <option value="cia-stg-1.aws.">Staging</option>
+                        {(role === "admin" ||
+                          role === "qa" ||
+                          role === "dev") && (
+                          <option value="cia-stg-1.aws.">Staging</option>
+                        )}
                       </select>
                     </td>
                     <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">

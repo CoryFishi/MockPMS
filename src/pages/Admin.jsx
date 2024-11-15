@@ -6,11 +6,11 @@ import AdminDashboardLayout from "../components/AdminDashboardLayout";
 
 export default function Admin({ darkMode, toggleDarkMode }) {
   const [dashboardMenu, setDashboardMenu] = useState(true);
-  const { user } = useAuth();
+  const { user, role } = useAuth();
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-x-hidden overflow-hidden font-roboto">
-      {user ? (
+      {user && role === "admin" ? (
         <div className="h-screen">
           <Navbar
             setDashboardMenu={setDashboardMenu}
