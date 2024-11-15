@@ -9,7 +9,6 @@ import { CiExport, CiImport } from "react-icons/ci";
 import { useAuth } from "../context/AuthProvider";
 import NotFound from "../components/NotFound";
 import { supabase } from "../supabaseClient";
-import { useNavigate } from "react-router-dom";
 
 export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
   const [api, setApi] = useState("");
@@ -22,8 +21,22 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
   const [sortDirection, setSortDirection] = useState("asc");
   const fileInputRef = useRef(null);
   const { user, tokens, setTokens } = useAuth();
-  const navigate = useNavigate();
 
+  async function addEvent(eventName, eventDescription, completed) {
+    const { data, error } = await supabase.from("user_events").insert([
+      {
+        event_name: eventName,
+        event_description: eventDescription,
+        completed: completed,
+      },
+    ]);
+
+    if (error) {
+      console.error("Error inserting event:", error);
+    } else {
+      console.log("Inserted event:", data);
+    }
+  }
   const handleFetchTokens = async () => {
     try {
       // Now fetch the tokens after the delay
@@ -43,7 +56,6 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       console.error("Error fetching tokens:", error);
     }
   };
-
   const fetchTokens = async () => {
     if (!user) {
       return;
@@ -69,7 +81,6 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       return updatedTokens;
     }
   };
-
   const submitCredentials = async () => {
     let updatedTokens = (await fetchTokens()) || [];
     // Add the new set of credentials to the array
@@ -91,17 +102,26 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     );
 
     if (error) {
+      await addEvent(
+        "Create Authentication",
+        `${user.email} created an authentication connection`,
+        false
+      );
       console.error("Error saving credentials:", error.message);
     } else {
+      await addEvent(
+        "Create Authentication",
+        `${user.email} created an authentication connection`,
+        true
+      );
       setApi("");
       setApiSecret("");
       setClient("");
       setClientSecret("");
-
+      setIsAuthenticated(false);
       handleFetchTokens();
     }
   };
-
   const removeToken = async (apiToRemove) => {
     if (!user) {
       toast.error("User not authenticated.");
@@ -136,12 +156,21 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     );
 
     if (error) {
+      await addEvent(
+        "Delete Authentication",
+        `${user.email} deleted an authentication connection`,
+        false
+      );
       console.error("Error removing token:", error.message);
     } else {
-      handleFetchTokens();
+      await addEvent(
+        "Delete Authentication",
+        `${user.email} deleted an authentication connection`,
+        true
+      );
+      await handleFetchTokens();
     }
   };
-
   const handleOldLogin = (facility, index) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";

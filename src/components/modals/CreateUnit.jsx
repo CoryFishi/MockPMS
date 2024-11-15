@@ -8,17 +8,24 @@ import { supabase } from "../../supabaseClient";
 export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
   // Store the unit number to be created
   const [newUnitNumber, setNewUnitNumber] = useState("");
-  const {
-    user,
-    tokens,
-    isPulled,
-    favoriteTokens,
-    setFavoriteTokens,
-    selectedTokens,
-    currentFacility,
-    setCurrentFacility,
-    isLoading,
-  } = useAuth();
+  const { user, currentFacility } = useAuth();
+
+  // Event handler
+  async function addEvent(eventName, eventDescription, completed) {
+    const { data, error } = await supabase.from("user_events").insert([
+      {
+        event_name: eventName,
+        event_description: eventDescription,
+        completed: completed,
+      },
+    ]);
+
+    if (error) {
+      console.error("Error inserting event:", error);
+    } else {
+      console.log("Inserted event:", data);
+    }
+  }
 
   // API call handler to create the new unit
   const handleCreateUnit = async () => {
@@ -40,7 +47,7 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
       .split(",")
       .map((unit) => unit.trim());
     // Send API call for each unit in unitsNumberArray
-    unitNumbersArray.map((unitNumber) => {
+    unitNumbersArray.map(async (unitNumber) => {
       const data = {
         unitNumber: unitNumber,
         extendedData: {
@@ -63,30 +70,43 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
         data: data,
       };
       // Toast w/ promise
-      toast.promise(
-        axios(config)
-          .then(function (response) {
-            // Sucessful response, add new unit to unit array
-            setUnits((prevUnits) => {
-              const updatedUnits = [...prevUnits, response.data];
-              // Sort unit array by unitNumber before returning
-              return updatedUnits.sort((a, b) => {
-                if (a.unitNumber < b.unitNumber) return -1;
-                if (a.unitNumber > b.unitNumber) return 1;
-                return 0;
+      try {
+        toast.promise(
+          axios(config)
+            .then(function (response) {
+              // Sucessful response, add new unit to unit array
+              setUnits((prevUnits) => {
+                const updatedUnits = [...prevUnits, response.data];
+                // Sort unit array by unitNumber before returning
+                return updatedUnits.sort((a, b) => {
+                  if (a.unitNumber < b.unitNumber) return -1;
+                  if (a.unitNumber > b.unitNumber) return 1;
+                  return 0;
+                });
               });
-            });
-          })
-          // Error handling
-          .catch(function (error) {
-            throw error;
-          }),
-        {
-          loading: `Creating unit ${unitNumber}...`,
-          success: <b>Unit {unitNumber} created successfully!</b>,
-          error: <b>Failed to create unit {unitNumber}.</b>,
-        }
-      );
+            })
+            // Error handling
+            .catch(function (error) {
+              throw error;
+            }),
+          {
+            loading: `Creating unit ${unitNumber}...`,
+            success: <b>Unit {unitNumber} created successfully!</b>,
+            error: <b>Failed to create unit {unitNumber}.</b>,
+          }
+        );
+        await addEvent(
+          "Create Unit",
+          `${user.email} created unit ${unitNumber} at ${currentFacility.name}, facility id ${currentFacility.id}`,
+          true
+        );
+      } catch (error) {
+        await addEvent(
+          "Create Unit",
+          `${user.email} created unit ${unitNumber} at ${currentFacility.name}, facility id ${currentFacility.id}`,
+          false
+        );
+      }
     });
     // Close modal and clear input after submitting
     setIsUnitModalOpen(false);

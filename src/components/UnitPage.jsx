@@ -36,18 +36,7 @@ export default function UnitPage({
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [unitsPulled, setUnitsPulled] = useState(false);
-  const {
-    user,
-    tokens,
-    isPulled,
-    favoriteTokens,
-    setFavoriteTokens,
-    selectedTokens,
-    currentFacility,
-    setCurrentFacility,
-    isLoading,
-  } = useAuth();
-
+  const { currentFacility, user } = useAuth();
   const rentedCount = filteredUnits.filter(
     (unit) => unit.status === "Rented"
   ).length;
@@ -58,6 +47,21 @@ export default function UnitPage({
     (unit) => unit.status === "Vacant"
   ).length;
 
+  async function addEvent(eventName, eventDescription, completed) {
+    const { data, error } = await supabase.from("user_events").insert([
+      {
+        event_name: eventName,
+        event_description: eventDescription,
+        completed: completed,
+      },
+    ]);
+
+    if (error) {
+      console.error("Error inserting event:", error);
+    } else {
+      console.log("Inserted event:", data);
+    }
+  }
   const handleTimeProfiles = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
@@ -147,7 +151,7 @@ export default function UnitPage({
         throw error;
       });
   };
-  const moveIn = (unit) => {
+  const moveIn = async (unit) => {
     const handleRent = async () => {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -203,16 +207,29 @@ export default function UnitPage({
     };
 
     if (visitorAutofill) {
-      toast.promise(handleRent(), {
-        loading: "Renting Unit " + unit.unitNumber + "...",
-        success: <b>{unit.unitNumber} successfully rented!</b>,
-        error: <b>{unit.unitNumber} failed rental!</b>,
-      });
+      try {
+        await toast.promise(handleRent(), {
+          loading: "Renting Unit " + unit.unitNumber + "...",
+          success: <b>{unit.unitNumber} successfully rented!</b>,
+          error: <b>{unit.unitNumber} failed rental!</b>,
+        });
+        await addEvent(
+          "Add Tenant",
+          `${user.email} rented ${unit.unitNumber} at ${currentFacilityName}, facility id ${currentFacility.id}`,
+          true
+        );
+      } catch (error) {
+        await addEvent(
+          "Add Tenant",
+          `${user.email} rented ${unit.unitNumber} at ${currentFacilityName}, facility id ${currentFacility.id}`,
+          false
+        );
+      }
     } else {
       setIsCreateVisitorModalOpen(true);
     }
   };
-  const turnRented = (unit) => {
+  const turnRented = async (unit) => {
     const handleRentalStatus = async () => {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -245,13 +262,26 @@ export default function UnitPage({
           throw error;
         });
     };
-    toast.promise(handleRentalStatus(), {
-      loading: "Changing " + unit.unitNumber + "to rented...",
-      success: <b>{unit.unitNumber} successfully changed to rented!</b>,
-      error: <b>{unit.unitNumber} failed status change!</b>,
-    });
+    try {
+      toast.promise(handleRentalStatus(), {
+        loading: "Changing " + unit.unitNumber + "to rented...",
+        success: <b>{unit.unitNumber} successfully changed to rented!</b>,
+        error: <b>{unit.unitNumber} failed status change!</b>,
+      });
+      await addEvent(
+        "Update Unit To Rented",
+        `${user.email} set ${unit.unitNumber} as rented at ${currentFacilityName}, facility id ${currentFacility.id}`,
+        true
+      );
+    } catch (error) {
+      await addEvent(
+        "Update Unit To Rented",
+        `${user.email} set ${unit.unitNumber} as rented at ${currentFacilityName}, facility id ${currentFacility.id}`,
+        false
+      );
+    }
   };
-  const moveOut = (unit) => {
+  const moveOut = async (unit) => {
     const handleMoveOut = async () => {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -286,13 +316,26 @@ export default function UnitPage({
           throw error;
         });
     };
-    toast.promise(handleMoveOut(), {
-      loading: "Removing tenant from unit " + unit.unitNumber + "...",
-      success: <b>{unit.unitNumber} successfully vacated!</b>,
-      error: <b>{unit.unitNumber} failed rental!</b>,
-    });
+    try {
+      await toast.promise(handleMoveOut(), {
+        loading: "Removing tenant from unit " + unit.unitNumber + "...",
+        success: <b>{unit.unitNumber} successfully vacated!</b>,
+        error: <b>{unit.unitNumber} failed rental!</b>,
+      });
+      await addEvent(
+        "Remove Tenant",
+        `${user.email} moved out ${unit.unitNumber} at ${currentFacilityName}, facility id ${currentFacility.id}`,
+        true
+      );
+    } catch (error) {
+      await addEvent(
+        "Remove Tenant",
+        `${user.email} moved out ${unit.unitNumber} at ${currentFacilityName}, facility id ${currentFacility.id}`,
+        false
+      );
+    }
   };
-  const turnDelinquent = (unit) => {
+  const turnDelinquent = async (unit) => {
     const handleRentalStatus = async () => {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -325,13 +368,26 @@ export default function UnitPage({
           throw error;
         });
     };
-    toast.promise(handleRentalStatus(), {
-      loading: "Changing " + unit.unitNumber + "to delinquent...",
-      success: <b>{unit.unitNumber} successfully changed to delinquent!</b>,
-      error: <b>{unit.unitNumber} failed status change!</b>,
-    });
+    try {
+      toast.promise(handleRentalStatus(), {
+        loading: "Changing " + unit.unitNumber + "to delinquent...",
+        success: <b>{unit.unitNumber} successfully changed to delinquent!</b>,
+        error: <b>{unit.unitNumber} failed status change!</b>,
+      });
+      await addEvent(
+        "Update Unit To Delinquent",
+        `${user.email} set ${unit.unitNumber} as delinquent at ${currentFacilityName}, facility id ${currentFacility.id}`,
+        true
+      );
+    } catch (error) {
+      await addEvent(
+        "Update Unit To Delinquent",
+        `${user.email} set ${unit.unitNumber} as delinquent at ${currentFacilityName}, facility id ${currentFacility.id}`,
+        false
+      );
+    }
   };
-  const deleteUnit = (unit) => {
+  const deleteUnit = async (unit) => {
     const handleDelete = async () => {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -364,11 +420,24 @@ export default function UnitPage({
           throw error;
         });
     };
-    toast.promise(handleDelete(), {
-      loading: "Deleting Unit " + unit.unitNumber + "...",
-      success: <b>{unit.unitNumber} successfully deleted!</b>,
-      error: <b>{unit.unitNumber} failed deletion!</b>,
-    });
+    try {
+      toast.promise(handleDelete(), {
+        loading: "Deleting Unit " + unit.unitNumber + "...",
+        success: <b>{unit.unitNumber} successfully deleted!</b>,
+        error: <b>{unit.unitNumber} failed deletion!</b>,
+      });
+      await addEvent(
+        "Delete Unit",
+        `${user.email} deleted ${unit.unitNumber} at ${currentFacilityName}, facility id ${currentFacility.id}`,
+        true
+      );
+    } catch (error) {
+      await addEvent(
+        "Delete Unit",
+        `${user.email} deleted ${unit.unitNumber} at ${currentFacilityName}, facility id ${currentFacility.id}`,
+        false
+      );
+    }
   };
   const editTenant = async (unit) => {
     if (unit.status === "Vacant") return;

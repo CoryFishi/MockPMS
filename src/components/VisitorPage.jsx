@@ -11,13 +11,9 @@ import {
   BiChevronsRight,
 } from "react-icons/bi";
 import { useAuth } from "../context/AuthProvider";
-import { supabase } from "../supabaseClient";
 
 export default function VisitorPage({ currentFacilityName }) {
   const [visitors, setVisitors] = useState([]);
-  const [tenants, setTenants] = useState("");
-  const [nonTenants, setNonTenants] = useState("");
-  const [guests, setGuests] = useState("");
   const [isCreateVisitorModalOpen, setIsCreateVisitorModalOpen] =
     useState(false);
   const [selectedVisitor, setSelectedVisitor] = useState("");
@@ -29,17 +25,7 @@ export default function VisitorPage({ currentFacilityName }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [visitorsPulled, setVisitorsPulled] = useState(false);
-  const {
-    user,
-    tokens,
-    isPulled,
-    favoriteTokens,
-    setFavoriteTokens,
-    selectedTokens,
-    currentFacility,
-    setCurrentFacility,
-    isLoading,
-  } = useAuth();
+  const { currentFacility } = useAuth();
 
   const tenantCount = filteredVisitors.filter(
     (visitor) => visitor.isTenant === true
@@ -86,7 +72,6 @@ export default function VisitorPage({ currentFacilityName }) {
         throw error;
       });
   };
-
   const moveOutVisitor = (visitor) => {
     const handleDelete = async () => {
       var tokenStageKey = "";
@@ -127,7 +112,6 @@ export default function VisitorPage({ currentFacilityName }) {
       error: <b>{visitor.unitNumber} failed move out!</b>,
     });
   };
-
   const deleteVisitor = (visitor) => {
     const handleDelete = async () => {
       var tokenStageKey = "";
