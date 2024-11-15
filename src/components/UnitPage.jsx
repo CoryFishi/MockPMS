@@ -58,8 +58,6 @@ export default function UnitPage({
 
     if (error) {
       console.error("Error inserting event:", error);
-    } else {
-      console.log("Inserted event:", data);
     }
   }
   const handleTimeProfiles = async () => {

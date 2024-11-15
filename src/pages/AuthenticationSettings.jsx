@@ -33,8 +33,6 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
 
     if (error) {
       console.error("Error inserting event:", error);
-    } else {
-      console.log("Inserted event:", data);
     }
   }
   const handleFetchTokens = async () => {
