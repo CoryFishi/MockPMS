@@ -38,6 +38,7 @@ export default function FavoritesPage() {
       {
         user_id: user.id,
         current_facility: updatedInfo,
+        last_update_at: new Date().toISOString(),
       },
       { onConflict: "user_id" }
     );

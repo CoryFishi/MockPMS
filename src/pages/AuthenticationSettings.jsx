@@ -97,6 +97,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       {
         user_id: user.id,
         tokens: updatedTokens,
+        last_update_at: new Date().toISOString(),
       },
       { onConflict: "user_id" }
     );
@@ -151,6 +152,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       {
         user_id: user.id,
         tokens: updatedTokens,
+        last_update_at: new Date().toISOString(),
       },
       { onConflict: "user_id" }
     );

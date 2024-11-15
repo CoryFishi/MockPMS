@@ -155,6 +155,7 @@ export default function SmartLockAllFacilitiesPage({}) {
         {
           user_id: user.id,
           selected_tokens: updatedTokens,
+          last_update_at: new Date().toISOString(),
         },
         { onConflict: "user_id" }
       );
@@ -174,6 +175,7 @@ export default function SmartLockAllFacilitiesPage({}) {
         {
           user_id: user.id,
           selected_tokens: updatedTokens,
+          last_update_at: new Date().toISOString(),
         },
         { onConflict: "user_id" }
       );
