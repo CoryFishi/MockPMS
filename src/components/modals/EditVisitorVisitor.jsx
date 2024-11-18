@@ -71,7 +71,6 @@ export default function EditVisitor({
         console.log(error);
       });
   };
-
   const handleEditVisitor = (e) => {
     e.preventDefault();
     var tokenStageKey = "";
@@ -144,7 +143,6 @@ export default function EditVisitor({
   useEffect(() => {
     handleTimeProfiles();
     handleAccessProfiles();
-    console.log(typeof setVisitors); // Should log "function"
   }, []);
 
   return (

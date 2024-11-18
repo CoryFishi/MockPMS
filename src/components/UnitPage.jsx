@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import CreateUnit from "./modals/CreateUnit";
 import CreateVisitor from "./modals/CreateVisitorUnit";
 import { RiDoorLockFill } from "react-icons/ri";
-import EditVisitor from "./modals/EditVisitor";
+import EditVisitor from "./modals/EditVisitorUnit";
 import {
   BiChevronLeft,
   BiChevronRight,
@@ -25,7 +25,7 @@ export default function UnitPage({
   const [timeProfiles, setTimeProfiles] = useState({});
   const [accessProfiles, setAccessProfiles] = useState({});
   const [isEditVisitorModalOpen, setIsEditVisitorModalOpen] = useState(false);
-  const [selectedVisitor, setSelectedVisitor] = useState({});
+  const [visitors, setVisitors] = useState([]);
   const [filteredUnits, setFilteredUnits] = useState(units);
   const [sortDirection, setSortDirection] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
@@ -355,8 +355,9 @@ export default function UnitPage({
       error: <b>{unit.unitNumber} failed deletion!</b>,
     });
   };
-  const editTenant = async (unit) => {
+  const editTenants = async (unit) => {
     if (unit.status === "Vacant") return;
+    setSelectedUnit(unit);
     const handleVisitorFetch = async () => {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -378,15 +379,15 @@ export default function UnitPage({
       };
       return axios(config)
         .then(function (response) {
-          return response.data[0];
+          return response.data;
         })
         .catch(function (error) {
           throw error;
         });
     };
 
-    const visitor = await handleVisitorFetch();
-    setSelectedVisitor(visitor);
+    const visitors = await handleVisitorFetch();
+    setVisitors(visitors);
     setIsEditVisitorModalOpen(true);
   };
 
@@ -409,7 +410,7 @@ export default function UnitPage({
         unit.status.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredUnits(filteredUnits);
-  }, [units]);
+  }, [units, searchQuery]);
 
   // Pagination logic
   const pageCount = Math.ceil(filteredUnits.length / rowsPerPage);
@@ -497,10 +498,11 @@ export default function UnitPage({
           <EditVisitor
             setIsEditVisitorModalOpen={setIsEditVisitorModalOpen}
             currentFacility={currentFacility}
-            visitor={selectedVisitor}
-            setVisitors={[]}
+            visitors={visitors}
+            unit={selectedUnit}
           />
         )}
+
         <div>
           <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
             <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
@@ -753,7 +755,7 @@ export default function UnitPage({
                   >
                     <td
                       className="border-y border-gray-300 dark:border-border px-4 py-2"
-                      onClick={() => editTenant(unit)}
+                      onClick={() => editTenants(unit)}
                     >
                       {unit.status === "Rented" ||
                       unit.status === "Delinquent" ? (
