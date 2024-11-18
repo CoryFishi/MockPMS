@@ -13,9 +13,6 @@ import {
 
 export default function VisitorPage({ currentFacility, currentFacilityName }) {
   const [visitors, setVisitors] = useState([]);
-  const [tenants, setTenants] = useState("");
-  const [nonTenants, setNonTenants] = useState("");
-  const [guests, setGuests] = useState("");
   const [isCreateVisitorModalOpen, setIsCreateVisitorModalOpen] =
     useState(false);
   const [selectedVisitor, setSelectedVisitor] = useState("");

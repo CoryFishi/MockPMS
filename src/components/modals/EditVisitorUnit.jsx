@@ -10,6 +10,7 @@ import {
 } from "react-icons/bi";
 
 import EditVisitorVisitor from "./EditVisitorVisitor";
+import CreateVisitorUnitModal from "./CreateVisitorUnitModal";
 
 export default function EditVisitor({
   setIsEditVisitorModalOpen,
@@ -214,6 +215,15 @@ export default function EditVisitor({
           currentFacility={currentFacility}
           setVisitors={setFilteredVisitors}
           visitor={selectedVisitor}
+        />
+      )}
+      {/* Create Visitor Modal Popup */}
+      {isCreateVisitorModalOpen && (
+        <CreateVisitorUnitModal
+          setIsCreateVisitorModalOpen={setIsCreateVisitorModalOpen}
+          currentFacility={currentFacility}
+          setVisitors={setFilteredVisitors}
+          unit={unit}
         />
       )}
       <div className="bg-white rounded shadow-lg w-[95vw] h-[95vh] dark:bg-darkPrimary">
