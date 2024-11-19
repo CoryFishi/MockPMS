@@ -1,28 +1,24 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useState, useEffect } from "react";
-import { IoIosCreate } from "react-icons/io";
+import { MdEdit } from "react-icons/md";
 import { useAuth } from "../../context/AuthProvider";
 
-export default function CreateVisitorUnit({
-  setIsCreateVisitorModalOpen,
-  setUnits,
-  unit,
+export default function EditVisitor({
+  setIsEditVisitorModalOpen,
+  setVisitors,
+  visitor,
   addEvent,
 }) {
-  const [newVisitor, setNewVisitor] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    email: "",
-    gateCode: "",
-    timeProfile: "",
-    accessProfile: "",
+  const [newVisitorData, setNewVisitorData] = useState(visitor);
+  const [newVisitorName, setNewVisitorName] = useState({
+    firstName: visitor.name.split(" ")[0],
+    lastName: visitor.name.split(" ")[1],
   });
-  const { user, currentFacility } = useAuth();
   const [timeProfiles, setTimeProfiles] = useState({});
   const [accessProfiles, setAccessProfiles] = useState({});
-  // API call handler to get time profiles
+  const { currentFacility } = useAuth();
+
   const handleTimeProfiles = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
@@ -50,7 +46,6 @@ export default function CreateVisitorUnit({
         console.log(error);
       });
   };
-  // API call handler to get access profiles
   const handleAccessProfiles = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
@@ -78,15 +73,8 @@ export default function CreateVisitorUnit({
         console.log(error);
       });
   };
-  // API call handler to create the new visitor
-  const handleCreateVisitor = async (e) => {
+  const handleEditVisitor = (e) => {
     e.preventDefault();
-    if (!newVisitor.timeProfile) {
-      newVisitor.timeProfile = timeProfiles[0].id;
-    }
-    if (!newVisitor.accessProfile) {
-      newVisitor.accessProfile = accessProfiles[0].id;
-    }
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "cia-stg-1.aws.") {
@@ -94,27 +82,21 @@ export default function CreateVisitorUnit({
     } else {
       tokenEnvKey = currentFacility.environment;
     }
-
     const data = {
-      timeGroupId: newVisitor.timeProfile,
-      accessProfileId: newVisitor.accessProfile,
-      unitId: unit.id,
-      accessCode: newVisitor.gateCode,
-      lastName: newVisitor.lastName,
-      firstName: newVisitor.firstName,
-      email: newVisitor.email,
-      mobilePhoneNumber: newVisitor.phone,
-      isTenant: true,
-      extendedData: {
-        additionalProp1: null,
-        additionalProp2: null,
-        additionalProp3: null,
-      },
+      timeGroupId: newVisitorData.timeGroupId,
+      accessProfileId: newVisitorData.accessProfileId,
+      unitId: newVisitorData.unitId,
+      accessCode: newVisitorData.code,
+      lastName: newVisitorName.lastName,
+      firstName: newVisitorName.firstName,
+      email: newVisitorData.email,
+      mobilePhoneNumber: newVisitorData.mobilePhoneNumber,
       suppressCommands: true,
     };
+
     const config = {
       method: "post",
-      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/visitors`,
+      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/visitors/${visitor.id}/update`,
       headers: {
         Authorization: "Bearer " + currentFacility?.token?.access_token,
         accept: "application/json",
@@ -125,66 +107,70 @@ export default function CreateVisitorUnit({
     };
     toast.promise(
       axios(config)
-        .then(function (response) {
-          setUnits((prevUnits) => {
-            const updatedUnits = prevUnits.map((u) =>
-              u.unitNumber === unit.unitNumber ? { ...u, status: "Rented" } : u
+        .then(async function (response) {
+          const newVisitorData = response.data;
+          if (typeof setVisitors === "function") {
+            await addEvent(
+              "Edit Visitor",
+              `${user.email} edited visitor ${visitor.id} at facility ${currentFacility.name}, ${currentFacility.id}`,
+              true
             );
-            return updatedUnits.sort((a, b) => {
-              if (a.unitNumber < b.unitNumber) return -1;
-              if (a.unitNumber > b.unitNumber) return 1;
-              return 0;
+            setVisitors((prevVisitors) => {
+              const updatedVisitors = prevVisitors.map((visitor) => {
+                if (visitor.id === newVisitorData.id) {
+                  return { ...visitor, ...newVisitorData };
+                }
+                return visitor;
+              });
+              return updatedVisitors.sort((a, b) => {
+                if (a.unitNumber < b.unitNumber) return -1;
+                if (a.unitNumber > b.unitNumber) return 1;
+                return 0;
+              });
             });
-          });
+          }
         })
+
         .catch(function (error) {
+          console.log(error);
           throw error;
         }),
       {
-        loading: `Renting unit ${unit.unitNumber}...`,
-        success: <b>Unit {unit.unitNumber} rented successfully!</b>,
-        error: <b>Failed to rent unit {unit.unitNumber}.</b>,
+        loading: `Updating ${visitor.id}...`,
+        success: <b> {visitor.id} successfully updated!</b>,
+        error: <b>Failed to update {visitor.id}.</b>,
       }
     );
-    await addEvent(
-      "Add Tenant",
-      `${user.email} rented unit ${unit.unitNumber} at facility ${currentFacility.name}, ${currentFacility.id}`,
-      true
-    );
+
     // Close modal and clear input after submitting
-    setIsCreateVisitorModalOpen(false);
-    setNewVisitor("");
+    setIsEditVisitorModalOpen(false);
   };
 
-  // On load get dependencies
   useEffect(() => {
     handleTimeProfiles();
     handleAccessProfiles();
   }, []);
 
   return (
-    // Background Filter
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      {/* Modal Container */}
       <div className="bg-white rounded shadow-lg w-96 dark:bg-darkPrimary">
-        {/* Header Container */}
         <div className="pl-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">
-            <IoIosCreate />
+            <MdEdit />
             <h2 className="ml-2 text-lg font-bold text-center items-center">
-              Renting Unit {unit.unitNumber}
+              Editing Visitor {visitor.id}
             </h2>
           </div>
         </div>
-        {/* Content Container */}
-        <form onSubmit={handleCreateVisitor} className="px-5 py-3">
+
+        <form onSubmit={handleEditVisitor} className="px-5 py-3">
           <label className="block">First Name</label>
           <input
             type="text"
             className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitor.firstName}
+            value={newVisitorName.firstName}
             onChange={(e) =>
-              setNewVisitor((prevState) => ({
+              setNewVisitorName((prevState) => ({
                 ...prevState,
                 firstName: e.target.value,
               }))
@@ -196,9 +182,9 @@ export default function CreateVisitorUnit({
           <input
             type="text"
             className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitor.lastName}
+            value={newVisitorName.lastName}
             onChange={(e) =>
-              setNewVisitor((prevState) => ({
+              setNewVisitorName((prevState) => ({
                 ...prevState,
                 lastName: e.target.value,
               }))
@@ -210,11 +196,11 @@ export default function CreateVisitorUnit({
           <input
             type="text"
             className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitor.phone}
+            value={newVisitorData.mobilePhoneNumber}
             onChange={(e) =>
-              setNewVisitor((prevState) => ({
+              setNewVisitorData((prevState) => ({
                 ...prevState,
-                phone: e.target.value,
+                mobilePhoneNumber: e.target.value,
               }))
             }
             placeholder="Enter mobile phone number"
@@ -224,9 +210,9 @@ export default function CreateVisitorUnit({
           <input
             type="text"
             className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitor.email}
+            value={newVisitorData.email}
             onChange={(e) =>
-              setNewVisitor((prevState) => ({
+              setNewVisitorData((prevState) => ({
                 ...prevState,
                 email: e.target.value,
               }))
@@ -238,11 +224,11 @@ export default function CreateVisitorUnit({
           <input
             type="text"
             className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitor.gateCode}
+            value={newVisitorData.code}
             onChange={(e) =>
-              setNewVisitor((prevState) => ({
+              setNewVisitorData((prevState) => ({
                 ...prevState,
-                gateCode: e.target.value,
+                code: e.target.value,
               }))
             }
             placeholder="Enter gate code"
@@ -253,13 +239,14 @@ export default function CreateVisitorUnit({
             name="timeProfiles"
             id="timeProfiles"
             className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitor.timeProfile}
+            value={newVisitorData.timeGroupId}
             onChange={(e) =>
-              setNewVisitor((prevState) => ({
+              setNewVisitorData((prevState) => ({
                 ...prevState,
-                timeProfile: e.target.value,
+                timeGroupId: e.target.value,
               }))
             }
+            required
           >
             {timeProfiles && timeProfiles.length > 0 ? (
               timeProfiles.map((profile) => (
@@ -271,18 +258,19 @@ export default function CreateVisitorUnit({
               <option value="">Loading...</option>
             )}
           </select>
-
           <label className="block">Access Profile</label>
           <select
             name="accessProfiles"
             id="accessProfiles"
             className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
+            value={newVisitorData.accessProfileId}
             onChange={(e) =>
-              setNewVisitor((prevState) => ({
+              setNewVisitorData((prevState) => ({
                 ...prevState,
-                accessProfile: e.target.value,
+                accessProfileId: e.target.value,
               }))
             }
+            required
           >
             {accessProfiles && accessProfiles.length > 0 ? (
               accessProfiles.map((profile) => (
@@ -294,11 +282,11 @@ export default function CreateVisitorUnit({
               <option value="">Loading...</option>
             )}
           </select>
-
           <div className="mt-4 flex justify-end">
             <button
               className="bg-gray-400 px-4 py-2 rounded mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
-              onClick={() => setIsCreateVisitorModalOpen(false)}
+              onClick={() => setIsEditVisitorModalOpen(false)}
+              type="button"
             >
               Cancel
             </button>

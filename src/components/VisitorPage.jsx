@@ -2,7 +2,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
 import CreateVisitorVisitor from "./modals/CreateVisitorVisitor";
-import EditVisitor from "./modals/EditVisitor";
+import EditVisitor from "./modals/EditVisitorVisitor";
 import { FaPerson } from "react-icons/fa6";
 import {
   BiChevronLeft,
@@ -193,7 +193,7 @@ export default function VisitorPage({ currentFacilityName }) {
         (visitor.code?.toLowerCase() || "").includes(searchQuery.toLowerCase())
     );
     setFilteredVisitors(filteredVisitors);
-  }, [visitors]);
+  }, [visitors, searchQuery]);
 
   // Pagination logic
   const pageCount = Math.ceil(filteredVisitors.length / rowsPerPage);
@@ -249,7 +249,6 @@ export default function VisitorPage({ currentFacilityName }) {
         {isCreateVisitorModalOpen && (
           <CreateVisitorVisitor
             setIsCreateVisitorModalOpen={setIsCreateVisitorModalOpen}
-            currentFacility={currentFacility}
             setVisitors={setVisitors}
           />
         )}
@@ -258,7 +257,6 @@ export default function VisitorPage({ currentFacilityName }) {
         {isEditVisitorModalOpen && (
           <EditVisitor
             setIsEditVisitorModalOpen={setIsEditVisitorModalOpen}
-            currentFacility={currentFacility}
             setVisitors={setVisitors}
             visitor={selectedVisitor}
           />

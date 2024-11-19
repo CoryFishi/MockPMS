@@ -43,7 +43,6 @@ export default function AllSmartLocksEventsReport({
         }
       );
       const smartLockEvents = response.data;
-      console.log(smartLockEvents);
       return smartLockEvents;
     } catch (error) {
       console.error(`Error fetching Events for: ${facility.name}`, error);

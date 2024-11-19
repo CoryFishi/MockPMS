@@ -292,7 +292,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     // Create a link to download the file
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "settings.csv");
+    link.setAttribute("download", `Authentication-Settings.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -324,57 +324,38 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     importFacilities(data);
     console.log("Imported Data:", data);
   };
-  const importFacilities = (facilities) => {
-    const updatedFacilities = [
-      ...(settingsSavedFacilities || []),
-      ...facilities.map(
-        ({ api, apiSecret, client, clientSecret, environment }) => ({
-          api,
-          apiSecret,
-          client,
-          clientSecret,
-          environment:
-            environment == "Development"
-              ? "-dev"
-              : environment == "QA"
-              ? "-qa"
-              : environment == "Staging"
-              ? "cia-stg-1.aws."
-              : environment == "Production"
-              ? ""
-              : "UNRESOLVED",
-        })
-      ),
-    ];
-
-    const updatedSettingsFacilities = [
-      ...(settingsSavedFacilities || []),
-      ...facilities.map(
-        ({ api, apiSecret, client, clientSecret, environment }) => ({
-          api,
-          apiSecret,
-          client,
-          clientSecret,
-          environment:
-            environment === "Devlopment"
-              ? "-dev"
-              : environment === "QA"
-              ? "-qa"
-              : environment === "Staging"
-              ? "cia-stg-1.aws."
-              : environment === "Production"
-              ? ""
-              : "UNRESOLVED",
-
-          isAuthenticated: false,
-        })
-      ),
-    ];
-
-    localStorage.setItem("savedFacilities", JSON.stringify(updatedFacilities));
-
-    setSavedFacilities(updatedFacilities);
-    setSettingsSavedFacilities(updatedSettingsFacilities);
+  const importFacilities = async (facilities) => {
+    const updatedFacilities = facilities.map(
+      ({ api, apiSecret, client, clientSecret, environment }) => ({
+        api,
+        apiSecret,
+        client,
+        clientSecret,
+        environment:
+          environment == "Development"
+            ? "-dev"
+            : environment == "QA"
+            ? "-qa"
+            : environment == "Staging"
+            ? "cia-stg-1.aws."
+            : environment == "Production"
+            ? ""
+            : "UNRESOLVED",
+      })
+    );
+    const allTokens = [...(tokens || []), ...updatedFacilities];
+    const { data, error } = await supabase.from("user_data").upsert(
+      {
+        user_id: user.id,
+        tokens: allTokens,
+        last_update_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" }
+    );
+    if (error) {
+      alert("Failed to import!");
+      return;
+    }
     window.location.reload();
   };
   // Simulate a click on the hidden file input
@@ -401,22 +382,21 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
           <div className="w-full h-full px-5 flex flex-col rounded-lg overflow-y-auto">
             <div className="flex justify-between mt-2">
               <div></div>
-              <div>
+              <div className="flex">
                 <button
-                  className="bg-gray-100 dark:bg-darkSecondary m-1 rounded text-black dark:text-white p-3 hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer"
-                  title="DISABLED - Export Tokens"
+                  className="flex bg-gray-100 dark:bg-darkSecondary m-1 rounded text-black dark:text-white p-3 hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer"
+                  title="Export Tokens"
                   onClick={() => exportFacilities()}
-                  disabled
                 >
-                  <CiExport className="text-2xl" />
+                  <CiExport className="text-2xl" /> Export
                 </button>
                 <button
-                  className="bg-gray-100 dark:bg-darkSecondary m-1 rounded text-black dark:text-white p-3 hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer"
-                  title="DISABLED - Import Tokens"
+                  className="flex bg-gray-100 dark:bg-darkSecondary m-1 rounded text-black dark:text-white p-3 hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer"
+                  title="Import Tokens"
                   onClick={triggerFileInput}
-                  disabled
                 >
                   <CiImport className="text-2xl" />
+                  Import
                 </button>
                 {/* Hidden File Input */}
                 <input

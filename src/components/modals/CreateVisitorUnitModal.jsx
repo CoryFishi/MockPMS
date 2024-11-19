@@ -1,23 +1,30 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useState, useEffect } from "react";
-import { MdEdit } from "react-icons/md";
+import { IoIosCreate } from "react-icons/io";
 import { useAuth } from "../../context/AuthProvider";
-import { supabase } from "../../supabaseClient";
 
-export default function EditVisitor({
-  setIsEditVisitorModalOpen,
+export default function CreateVisitorUnitModal({
+  setIsCreateVisitorModalOpen,
   setVisitors,
-  visitor,
+  unit,
+  addEvent,
 }) {
-  const [newVisitorData, setNewVisitorData] = useState(visitor);
-  const [newVisitorName, setNewVisitorName] = useState({
-    firstName: visitor.name.split(" ")[0],
-    lastName: visitor.name.split(" ")[1],
+  const [newVisitor, setNewVisitor] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+    gateCode: "",
+    timeProfile: "",
+    accessProfile: "",
+    type: "",
   });
+
   const [timeProfiles, setTimeProfiles] = useState({});
   const [accessProfiles, setAccessProfiles] = useState({});
-  const { currentFacility } = useAuth();
+  const [selectedUnit, setSelectedUnit] = useState(unit.id);
+  const { currentFacility, user } = useAuth();
 
   const handleTimeProfiles = async () => {
     var tokenStageKey = "";
@@ -73,8 +80,7 @@ export default function EditVisitor({
         console.log(error);
       });
   };
-
-  const handleEditVisitor = (e) => {
+  const handleCreateVisitor = (e) => {
     e.preventDefault();
     var tokenStageKey = "";
     var tokenEnvKey = "";
@@ -83,21 +89,28 @@ export default function EditVisitor({
     } else {
       tokenEnvKey = currentFacility.environment;
     }
+
     const data = {
-      timeGroupId: newVisitorData.timeGroupId,
-      accessProfileId: newVisitorData.accessProfileId,
-      unitId: newVisitorData.unitId,
-      accessCode: newVisitorData.code,
-      lastName: newVisitorName.lastName,
-      firstName: newVisitorName.firstName,
-      email: newVisitorData.email,
-      mobilePhoneNumber: newVisitorData.mobilePhoneNumber,
+      timeGroupId: newVisitor.timeProfile,
+      accessProfileId: newVisitor.accessProfile,
+      unitId: selectedUnit,
+      accessCode: newVisitor.gateCode,
+      lastName: newVisitor.lastName,
+      firstName: newVisitor.firstName,
+      email: newVisitor.email,
+      mobilePhoneNumber: newVisitor.phone,
+      isTenant: false,
+      extendedData: {
+        additionalProp1: null,
+        additionalProp2: null,
+        additionalProp3: null,
+      },
       suppressCommands: true,
     };
 
     const config = {
       method: "post",
-      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/visitors/${visitor.id}/update`,
+      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/visitors`,
       headers: {
         Authorization: "Bearer " + currentFacility?.token?.access_token,
         accept: "application/json",
@@ -108,39 +121,38 @@ export default function EditVisitor({
     };
     toast.promise(
       axios(config)
-        .then(function (response) {
-          const newVisitorData = response.data;
-          if (typeof setVisitors === "function") {
-            setVisitors((prevVisitors) => {
-              const updatedVisitors = prevVisitors.map((visitor) => {
-                if (visitor.id === newVisitorData.id) {
-                  return { ...visitor, ...newVisitorData };
-                }
-                return visitor;
-              });
-
-              return updatedVisitors.sort((a, b) => {
-                if (a.unitNumber < b.unitNumber) return -1;
-                if (a.unitNumber > b.unitNumber) return 1;
-                return 0;
-              });
+        .then(async function (response) {
+          const newVisitorData = [response.data.visitor];
+          await addEvent(
+            "Add Guest",
+            `${user.email} added visitor ${newVisitorData[0].id} to unit ${unit.unitNumber} at facility ${currentFacility.name}, ${currentFacility.id}`,
+            true
+          );
+          setVisitors((prevVisitors) => {
+            const updatedVisitors = [...prevVisitors, ...newVisitorData];
+            updatedVisitors.sort((a, b) => {
+              if (a.unitNumber < b.unitNumber) return -1;
+              if (a.unitNumber > b.unitNumber) return 1;
+              return 0;
             });
-          }
-        })
 
+            return updatedVisitors;
+          });
+        })
         .catch(function (error) {
           console.log(error);
           throw error;
         }),
       {
-        loading: `Updating ${visitor.id}...`,
-        success: <b> {visitor.id} successfully updated!</b>,
-        error: <b>Failed to update {visitor.id}.</b>,
+        loading: `Creating ${newVisitor.type}...`,
+        success: <b> {newVisitor.type} successfully added!</b>,
+        error: <b>Failed to add {newVisitor.type}.</b>,
       }
     );
 
     // Close modal and clear input after submitting
-    setIsEditVisitorModalOpen(false);
+    setIsCreateVisitorModalOpen(false);
+    setNewVisitor("");
   };
 
   useEffect(() => {
@@ -153,21 +165,20 @@ export default function EditVisitor({
       <div className="bg-white rounded shadow-lg w-96 dark:bg-darkPrimary">
         <div className="pl-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">
-            <MdEdit />
+            <IoIosCreate />
             <h2 className="ml-2 text-lg font-bold text-center items-center">
-              Editing Visitor {visitor.id}
+              Creating New Guest
             </h2>
           </div>
         </div>
-
-        <form onSubmit={handleEditVisitor} className="px-5 py-3">
+        <form onSubmit={handleCreateVisitor} className="px-5 py-2">
           <label className="block">First Name</label>
           <input
             type="text"
             className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitorName.firstName}
+            value={newVisitor.firstName}
             onChange={(e) =>
-              setNewVisitorName((prevState) => ({
+              setNewVisitor((prevState) => ({
                 ...prevState,
                 firstName: e.target.value,
               }))
@@ -179,9 +190,9 @@ export default function EditVisitor({
           <input
             type="text"
             className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitorName.lastName}
+            value={newVisitor.lastName}
             onChange={(e) =>
-              setNewVisitorName((prevState) => ({
+              setNewVisitor((prevState) => ({
                 ...prevState,
                 lastName: e.target.value,
               }))
@@ -193,11 +204,11 @@ export default function EditVisitor({
           <input
             type="text"
             className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitorData.mobilePhoneNumber}
+            value={newVisitor.phone}
             onChange={(e) =>
-              setNewVisitorData((prevState) => ({
+              setNewVisitor((prevState) => ({
                 ...prevState,
-                mobilePhoneNumber: e.target.value,
+                phone: e.target.value,
               }))
             }
             placeholder="Enter mobile phone number"
@@ -207,9 +218,9 @@ export default function EditVisitor({
           <input
             type="text"
             className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitorData.email}
+            value={newVisitor.email}
             onChange={(e) =>
-              setNewVisitorData((prevState) => ({
+              setNewVisitor((prevState) => ({
                 ...prevState,
                 email: e.target.value,
               }))
@@ -221,11 +232,11 @@ export default function EditVisitor({
           <input
             type="text"
             className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitorData.code}
+            value={newVisitor.gateCode}
             onChange={(e) =>
-              setNewVisitorData((prevState) => ({
+              setNewVisitor((prevState) => ({
                 ...prevState,
-                code: e.target.value,
+                gateCode: e.target.value,
               }))
             }
             placeholder="Enter gate code"
@@ -236,15 +247,16 @@ export default function EditVisitor({
             name="timeProfiles"
             id="timeProfiles"
             className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitorData.timeGroupId}
+            value={newVisitor.timeProfile}
             onChange={(e) =>
-              setNewVisitorData((prevState) => ({
+              setNewVisitor((prevState) => ({
                 ...prevState,
-                timeGroupId: e.target.value,
+                timeProfile: e.target.value,
               }))
             }
             required
           >
+            <option value="">Select a Time Profile</option>
             {timeProfiles && timeProfiles.length > 0 ? (
               timeProfiles.map((profile) => (
                 <option key={profile.id} value={profile.id}>
@@ -260,15 +272,15 @@ export default function EditVisitor({
             name="accessProfiles"
             id="accessProfiles"
             className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitorData.accessProfileId}
             onChange={(e) =>
-              setNewVisitorData((prevState) => ({
+              setNewVisitor((prevState) => ({
                 ...prevState,
-                accessProfileId: e.target.value,
+                accessProfile: e.target.value,
               }))
             }
             required
           >
+            <option value="">Select an Access Profile</option>
             {accessProfiles && accessProfiles.length > 0 ? (
               accessProfiles.map((profile) => (
                 <option key={profile.id} value={profile.id}>
@@ -279,11 +291,11 @@ export default function EditVisitor({
               <option value="">Loading...</option>
             )}
           </select>
+
           <div className="mt-4 flex justify-end">
             <button
               className="bg-gray-400 px-4 py-2 rounded mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
-              onClick={() => setIsEditVisitorModalOpen(false)}
-              type="button"
+              onClick={() => setIsCreateVisitorModalOpen(false)}
             >
               Cancel
             </button>

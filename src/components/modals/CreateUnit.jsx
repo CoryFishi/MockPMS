@@ -5,27 +5,10 @@ import { IoIosCreate } from "react-icons/io";
 import { useAuth } from "../../context/AuthProvider";
 import { supabase } from "../../supabaseClient";
 
-export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
+export default function CreateUnit({ setIsUnitModalOpen, setUnits, addEvent }) {
   // Store the unit number to be created
   const [newUnitNumber, setNewUnitNumber] = useState("");
   const { user, currentFacility } = useAuth();
-
-  // Event handler
-  async function addEvent(eventName, eventDescription, completed) {
-    const { data, error } = await supabase.from("user_events").insert([
-      {
-        event_name: eventName,
-        event_description: eventDescription,
-        completed: completed,
-      },
-    ]);
-
-    if (error) {
-      console.error("Error inserting event:", error);
-    } else {
-      console.log("Inserted event:", data);
-    }
-  }
 
   // API call handler to create the new unit
   const handleCreateUnit = async () => {

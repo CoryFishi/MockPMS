@@ -3,7 +3,6 @@ import toast from "react-hot-toast";
 import React, { useState, useEffect } from "react";
 import { IoIosCreate } from "react-icons/io";
 import { useAuth } from "../../context/AuthProvider";
-import { supabase } from "../../supabaseClient";
 
 export default function CreateVisitorVisitor({
   setIsCreateVisitorModalOpen,
@@ -24,17 +23,7 @@ export default function CreateVisitorVisitor({
   const [accessProfiles, setAccessProfiles] = useState({});
   const [units, setUnits] = useState({});
   const [selectedUnit, setSelectedUnit] = useState({});
-  const {
-    user,
-    tokens,
-    isPulled,
-    favoriteTokens,
-    setFavoriteTokens,
-    selectedTokens,
-    currentFacility,
-    setCurrentFacility,
-    isLoading,
-  } = useAuth();
+  const { currentFacility } = useAuth();
 
   const handleUnits = async () => {
     var tokenStageKey = "";
@@ -57,7 +46,6 @@ export default function CreateVisitorVisitor({
 
     return axios(config)
       .then(function (response) {
-        console.log();
         const sortedUnits = response.data.sort((a, b) => {
           if (a.unitNumber < b.unitNumber) return -1;
           if (a.unitNumber > b.unitNumber) return 1;
@@ -91,7 +79,6 @@ export default function CreateVisitorVisitor({
 
     axios(config)
       .then(function (response) {
-        console.log(response.data, currentFacility);
         setTimeProfiles(response.data);
       })
       .catch(function (error) {
@@ -125,6 +112,7 @@ export default function CreateVisitorVisitor({
         console.log(error);
       });
   };
+
   const handleCreateVisitor = (e) => {
     e.preventDefault();
     var tokenStageKey = "";
