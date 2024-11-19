@@ -26,13 +26,44 @@ export default function SignUp() {
     if (error) {
       setError(error.message);
     } else {
-      setMessage("Sign-up successful! Please check your email to confirm.");
+      setMessage(
+        "Sign-up successful! Please check your email to confirm. Once confirmed please login."
+      );
       setError(null);
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-darkPrimary">
+      {error && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-4 rounded shadow-lg max-w-sm w-full">
+            <h1 className="font-bold text-center text-3xl">Oh no!</h1>
+            <p className="text-center text-red-500 mt-3">{error}</p>
+            <button
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded w-full"
+              onClick={() => setError(null)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {message && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-4 rounded shadow-lg max-w-sm w-full">
+            <h1 className="font-bold text-center text-3xl">Success!</h1>
+            <p className="text-center text-blue-500 mt-3">{message}</p>
+            <button
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded w-full"
+              onClick={() => setMessage(null)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
       <form
         onSubmit={handleSignUp}
         className="bg-white dark:bg-darkSecondary shadow-lg rounded-lg p-8 max-w-md w-full space-y-4 mb-16"
@@ -72,13 +103,6 @@ export default function SignUp() {
           Sign Up
         </button>
 
-        {error && (
-          <p className="text-sm text-red-500 mt-2 text-center">{error}</p>
-        )}
-
-        {message && (
-          <p className="text-sm text-blue-500 mt-2 text-center">{message}</p>
-        )}
         <p className="text-center dark:text-white">
           Already have an account? Sign In{" "}
           <span
