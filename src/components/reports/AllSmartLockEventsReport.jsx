@@ -17,7 +17,7 @@ export default function AllSmartLocksEventsReport({
   const [hoveredRow, setHoveredRow] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [sortDirection, setSortDirection] = useState("asc");
+  const [sortDirection, setSortDirection] = useState("desc");
   const [sortedColumn, setSortedColumn] = useState(null);
 
   const fetchSmartLockEvents = async (facility) => {
@@ -43,6 +43,7 @@ export default function AllSmartLocksEventsReport({
         }
       );
       const smartLockEvents = response.data;
+      console.log(smartLockEvents);
       return smartLockEvents;
     } catch (error) {
       console.error(`Error fetching Events for: ${facility.name}`, error);
@@ -73,10 +74,10 @@ export default function AllSmartLocksEventsReport({
   }, [selectedFacilities]);
 
   useEffect(() => {
-    setSortedColumn("Facility");
+    setSortedColumn("Created On");
     var sortedSmartLockEvents = [...smartlockEvents].sort((a, b) => {
-      if (a.createdOn < b.createdOn) return -1;
-      if (a.facilityName > b.createdOn) return 1;
+      if (a.createdOn < b.createdOn) return 1;
+      if (a.createdOn > b.createdOn) return -1;
       return 0;
     });
 
@@ -108,7 +109,7 @@ export default function AllSmartLocksEventsReport({
 
   return (
     <div className="w-full px-2">
-      <p className="text-left text-sm">Last 7 days</p>
+      <p className="text-left text-sm">Events shown from the last 7 days</p>
       <table className="w-full table-auto border-collapse border border-gray-300 dark:border-border">
         <thead className="select-none">
           <tr className="bg-gray-200 dark:bg-darkNavSecondary sticky top-[-1px] z-10">
@@ -150,9 +151,9 @@ export default function AllSmartLocksEventsReport({
                 setSortedColumn("Name");
                 setFilteredSmartLockEvents(
                   [...filteredSmartLockEvents].sort((a, b) => {
-                    if (a.name.toLowerCase() < b.name.toLowerCase())
+                    if (a.deviceName < b.deviceName)
                       return newDirection === "asc" ? -1 : 1;
-                    if (a.name.toLowerCase() > b.name.toLowerCase())
+                    if (a.deviceName > b.deviceName)
                       return newDirection === "asc" ? 1 : -1;
                     return 0;
                   })
@@ -171,12 +172,18 @@ export default function AllSmartLocksEventsReport({
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
-                setSortedColumn("Unit");
+                setSortedColumn("Event Category");
                 setFilteredSmartLockEvents(
                   [...filteredSmartLockEvents].sort((a, b) => {
-                    if (a.unitName.toLowerCase() < b.unitName.toLowerCase())
+                    if (
+                      a.eventCategory.toLowerCase() <
+                      b.eventCategory.toLowerCase()
+                    )
                       return newDirection === "asc" ? -1 : 1;
-                    if (a.unitName.toLowerCase() > b.unitName.toLowerCase())
+                    if (
+                      a.eventCategory.toLowerCase() >
+                      b.eventCategory.toLowerCase()
+                    )
                       return newDirection === "asc" ? 1 : -1;
                     return 0;
                   })
@@ -184,7 +191,7 @@ export default function AllSmartLocksEventsReport({
               }}
             >
               Event Category
-              {sortedColumn === "Unit" && (
+              {sortedColumn === "Event Category" && (
                 <span className="ml-2">
                   {sortDirection === "asc" ? "▲" : "▼"}
                 </span>
@@ -195,13 +202,13 @@ export default function AllSmartLocksEventsReport({
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
-                setSortedColumn("Device Type");
+                setSortedColumn("Event Type");
 
                 setFilteredSmartLockEvents(
                   [...filteredSmartLockEvents].sort((a, b) => {
-                    if (a.deviceType < b.deviceType)
+                    if (a.eventType < b.eventType)
                       return newDirection === "asc" ? -1 : 1;
-                    if (a.deviceType > b.deviceType)
+                    if (a.eventType > b.eventType)
                       return newDirection === "asc" ? 1 : -1;
                     return 0;
                   })
@@ -209,7 +216,7 @@ export default function AllSmartLocksEventsReport({
               }}
             >
               Event Type
-              {sortedColumn === "Device Type" && (
+              {sortedColumn === "Event Type" && (
                 <span className="ml-2">
                   {sortDirection === "asc" ? "▲" : "▼"}
                 </span>
@@ -220,20 +227,26 @@ export default function AllSmartLocksEventsReport({
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
-                setSortedColumn("Signal Quality");
+                setSortedColumn("Event Details");
                 setFilteredSmartLockEvents(
                   [...filteredSmartLockEvents].sort((a, b) => {
-                    if (a.signalQuality < b.signalQuality)
+                    if (
+                      a.eventDetails.toLowerCase() <
+                      b.eventDetails.toLowerCase()
+                    )
                       return newDirection === "asc" ? -1 : 1;
-                    if (a.signalQuality > b.signalQuality)
+                    if (
+                      a.eventDetails.toLowerCase() >
+                      b.eventDetails.toLowerCase()
+                    )
                       return newDirection === "asc" ? 1 : -1;
                     return 0;
                   })
                 );
               }}
             >
-              Signal Quality
-              {sortedColumn === "Signal Quality" && (
+              Event Details
+              {sortedColumn === "Event Details" && (
                 <span className="ml-2">
                   {sortDirection === "asc" ? "▲" : "▼"}
                 </span>
@@ -244,12 +257,12 @@ export default function AllSmartLocksEventsReport({
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
-                setSortedColumn("Last Update");
+                setSortedColumn("Created On");
                 setFilteredSmartLockEvents(
                   [...filteredSmartLockEvents].sort((a, b) => {
-                    if (a.lastUpdateTimestamp < b.lastUpdateTimestamp)
+                    if (a.createdOn < b.createdOn)
                       return newDirection === "asc" ? -1 : 1;
-                    if (a.lastUpdateTimestamp > b.lastUpdateTimestamp)
+                    if (a.createdOn > b.createdOn)
                       return newDirection === "asc" ? 1 : -1;
                     return 0;
                   })
@@ -257,7 +270,7 @@ export default function AllSmartLocksEventsReport({
               }}
             >
               Created On
-              {sortedColumn === "Last Update" && (
+              {sortedColumn === "Created On" && (
                 <span className="ml-2">
                   {sortDirection === "asc" ? "▲" : "▼"}
                 </span>

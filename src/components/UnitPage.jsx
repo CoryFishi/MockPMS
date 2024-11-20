@@ -882,7 +882,7 @@ export default function UnitPage({
                       {unit.additionalProp3}
                     </td>
 
-                    <td className="border-y border-gray-300 dark:border-border px-4 py-2 select-none">
+                    <td className="border-y border-gray-300 dark:border-border px-4 py-2 select-none space-x-2">
                       {unit.status === "Rented" ? (
                         <>
                           <button
@@ -892,7 +892,7 @@ export default function UnitPage({
                             Turn Delinquent
                           </button>
                           <button
-                            className="bg-red-500 text-white px-2 py-1 rounded ml-2 hover:bg-red-600 font-bold"
+                            className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 font-bold"
                             onClick={() => moveOut(unit)}
                           >
                             Move Out
@@ -907,7 +907,7 @@ export default function UnitPage({
                             Move In
                           </button>
                           <button
-                            className="bg-red-500 text-white px-2 py-1 rounded ml-2 hover:bg-red-600 font-bold"
+                            className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 font-bold"
                             onClick={() => deleteUnit(unit)}
                           >
                             Delete
@@ -922,7 +922,7 @@ export default function UnitPage({
                             Turn Rented
                           </button>
                           <button
-                            className="bg-red-500 text-white px-2 py-1 rounded ml-2 hover:bg-red-600 font-bold"
+                            className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 font-bold"
                             onClick={() => moveOut(unit)}
                           >
                             Move Out

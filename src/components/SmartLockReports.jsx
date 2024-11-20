@@ -7,6 +7,7 @@ import AllEdgeRoutersReport from "./reports/AllEdgeRoutersReport";
 import AllAccessPointsReport from "./reports/AllAccessPointsReport";
 import { useAuth } from "../context/AuthProvider";
 import AllSmartLocksEventsReport from "./reports/AllSmartLockEventsReport";
+import AllSmartLockOnlineTimeReport from "./reports/AllSmartLockOnlineTimeReport";
 
 export default function SmartLockReports({}) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -135,14 +136,9 @@ export default function SmartLockReports({}) {
           <option value="AllEdgeRoutersReport">All EdgeRouters</option>
           <option value="AllAccessPointsReport">All AccessPoints</option>
           <option value="AllSmartLockEventsReport">SmartLock Events</option>
-          <option value="ApplicationEventsReport">Option #5 - TBD</option>
-          <option value="AllSmartLocksReport">Option #6 - TBD</option>
-          <option value="AllSmartLocksReport">Option #7 - TBD</option>
-          <option value="AllSmartLocksReport">Option #8 - TBD</option>
-          <option value="AllSmartLocksReport">Option #9 - TBD</option>
-          <option value="AllSmartLocksReport">Option #10 - TBD</option>
-          <option value="AllSmartLocksReport">Option #11 - TBD</option>
-          <option value="AllSmartLocksReport">Option #12 - TBD</option>
+          <option value="AllSmartLockOnlineTimeReport">
+            SmartLock Online Time
+          </option>
         </select>
         <div className="ml-2 relative inline-block w-96">
           <button
@@ -211,6 +207,12 @@ export default function SmartLockReports({}) {
       )}
       {openPage === "AllSmartLockEventsReport" && reportSearch === true && (
         <AllSmartLocksEventsReport
+          selectedFacilities={newSelectedFacilities}
+          searchQuery={searchQuery}
+        />
+      )}
+      {openPage === "AllSmartLockOnlineTimeReport" && reportSearch === true && (
+        <AllSmartLockOnlineTimeReport
           selectedFacilities={newSelectedFacilities}
           searchQuery={searchQuery}
         />
