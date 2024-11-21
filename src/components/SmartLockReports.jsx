@@ -119,12 +119,6 @@ export default function SmartLockReports({}) {
 
     // Initial fetch
     fetchFacilitiesWithBearers();
-
-    // Set up interval for every 2 minutes
-    const interval = setInterval(fetchFacilitiesWithBearers, 5 * 60 * 1000);
-
-    // Clear interval on component unmount
-    return () => clearInterval(interval);
   }, [selectedTokens]);
   // Set all facilities as selected by default
   useEffect(() => {

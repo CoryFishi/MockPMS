@@ -296,6 +296,11 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    addEvent(
+      "Export Authentication",
+      `${user.email} exported their authentication connections`,
+      true
+    );
   };
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -354,8 +359,18 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     );
     if (error) {
       alert("Failed to import!");
+      await addEvent(
+        "Create Authentication",
+        `${user.email} imported an authentication connection`,
+        false
+      );
       return;
     }
+    await addEvent(
+      "Create Authentication",
+      `${user.email} imported an authentication connection`,
+      true
+    );
     window.location.reload();
   };
   // Simulate a click on the hidden file input
@@ -379,7 +394,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       {user ? (
         <div>
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          <div className="w-full h-full px-5 flex flex-col rounded-lg overflow-y-auto">
+          <div className="w-full h-full px-5 flex flex-col rounded-lg">
             <div className="flex justify-between mt-2">
               <div></div>
               <div className="flex">
@@ -409,7 +424,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
               </div>
             </div>
 
-            <div className="mt-3 h-full">
+            <div className="mt-3 overflow-y-auto max-h-[80vh]">
               <table className="w-full table-auto border-collapse">
                 <thead>
                   <tr className="bg-gray-200 dark:bg-darkNavSecondary">

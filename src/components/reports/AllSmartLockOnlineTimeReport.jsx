@@ -20,7 +20,7 @@ export default function AllSmartLockOnlineTimeReport({
   const [sortedColumn, setSortedColumn] = useState(null);
   const [durations, setDurations] = useState({});
   const [filteredDurations, setFilteredDurations] = useState({});
-  const [dayValue, setDayValue] = useState(21);
+  const [dayValue, setDayValue] = useState(7);
   const currentTime = Math.floor(Date.now() / 1000);
   const pastDayValue = currentTime - dayValue * 24 * 60 * 60;
   const [hoveredRow, setHoveredRow] = useState(null);
