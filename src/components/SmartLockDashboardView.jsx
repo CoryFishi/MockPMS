@@ -327,13 +327,18 @@ export default function SmartLockDashboardView({}) {
                     "% Warning"
                   }
                 >
-                  {edgeRouterOnlineCount} Online <br />
-                  {edgeRouterOfflineCount > 0
-                    ? edgeRouterOfflineCount + " Offline"
+                  {edgeRouterOnlineCount > 0
+                    ? edgeRouterOnlineCount + " Online"
                     : ""}
-                  <br />
+                  {edgeRouterWarningCount > 0 && edgeRouterOnlineCount > 0 && (
+                    <br />
+                  )}
                   {edgeRouterWarningCount > 0
                     ? edgeRouterWarningCount + " Warning"
+                    : ""}
+                  {edgeRouterOfflineCount > 0 && <br />}
+                  {edgeRouterOfflineCount > 0
+                    ? edgeRouterOfflineCount + " Offline"
                     : ""}
                 </td>
                 <td

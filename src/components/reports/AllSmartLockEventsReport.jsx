@@ -19,11 +19,12 @@ export default function AllSmartLocksEventsReport({
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [sortDirection, setSortDirection] = useState("desc");
   const [sortedColumn, setSortedColumn] = useState(null);
+  const [dayValue, setDayValue] = useState(7);
+  const currentTime = Math.floor(Date.now() / 1000);
+  const pastDayValue = currentTime - dayValue * 24 * 60 * 60;
 
   const fetchSmartLockEvents = async (facility) => {
     try {
-      const currentTime = Math.floor(Date.now() / 1000);
-      const oneWeekAgo = currentTime - 7 * 24 * 60 * 60;
       var tokenStageKey = "";
       var tokenEnvKey = "";
       if (facility.environment === "cia-stg-1.aws.") {
@@ -33,7 +34,7 @@ export default function AllSmartLocksEventsReport({
       }
 
       const response = await axios.get(
-        `https://accessevent.${tokenStageKey}insomniaccia${tokenEnvKey}.com/combinedevents/facilities/${facility.id}?uq=&vq=&etq=1&etq=2&etq=3&etq=4&etq=5&etq=6&etq=7&etq=8&etq=9&etq=10&etq=11&etq=12&etq=13&etq=14&etq=15&etq=16&etq=17&etq=18&etq=19&etq=20&etq=21&etq=22&etq=23&etq=24&etq=25&minDate=${oneWeekAgo}&maxDate=${currentTime}&hideMetadata=true`,
+        `https://accessevent.${tokenStageKey}insomniaccia${tokenEnvKey}.com/combinedevents/facilities/${facility.id}?uq=&vq=&etq=1&etq=2&etq=3&etq=4&etq=5&etq=6&etq=7&etq=8&etq=9&etq=10&etq=11&etq=12&etq=13&etq=14&etq=15&etq=16&etq=17&etq=18&etq=19&etq=20&etq=21&etq=22&etq=23&etq=24&etq=25&minDate=${pastDayValue}&maxDate=${currentTime}&hideMetadata=true`,
         {
           headers: {
             Authorization: "Bearer " + facility.bearer,
@@ -43,7 +44,6 @@ export default function AllSmartLocksEventsReport({
         }
       );
       const smartLockEvents = response.data;
-      console.log(smartLockEvents);
       return smartLockEvents;
     } catch (error) {
       console.error(`Error fetching Events for: ${facility.name}`, error);
@@ -109,7 +109,24 @@ export default function AllSmartLocksEventsReport({
 
   return (
     <div className="w-full px-2">
-      <p className="text-left text-sm">Events shown from the last 7 days</p>
+      <p className="text-left text-sm ml-2 mb-1">
+        Events shown from the last
+        <select
+          className="border rounded mx-2 dark:bg-darkSecondary dark:border-border"
+          id="dayValue"
+          value={dayValue}
+          onChange={(e) => {
+            setDayValue(Number(e.target.value));
+          }}
+        >
+          <option value={7}>7</option>
+          <option value={30}>30</option>
+          <option value={90}>90</option>
+          <option value={120}>120</option>
+          <option value={180}>180</option>
+        </select>
+        days
+      </p>
       <table className="w-full table-auto border-collapse border border-gray-300 dark:border-border">
         <thead className="select-none">
           <tr className="bg-gray-200 dark:bg-darkNavSecondary sticky top-[-1px] z-10">

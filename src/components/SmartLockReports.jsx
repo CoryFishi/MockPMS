@@ -1,6 +1,6 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaLock } from "react-icons/fa";
 import AllSmartLocksReport from "./reports/AllSmartLocksReport";
 import AllEdgeRoutersReport from "./reports/AllEdgeRoutersReport";
@@ -19,16 +19,40 @@ export default function SmartLockReports({}) {
   const [openPage, setOpenPage] = useState("AllSmartLocksReport");
   const [reportSearch, setReportSearch] = useState(false);
   const { selectedTokens } = useAuth();
+  const modalRef = useRef(null);
+
+  // Close modal if clicking outside of it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        setIsOpen(false); // Close the modal
+      }
+    };
+
+    // Add event listener
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup event listener
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [setIsOpen]);
 
   // Function to select all selected facilities
   const selectAllFacilities = () => {
+    setReportSearch(false);
+
     const allSelection = facilitiesWithBearers.map((facility) => facility);
     setNewSelectedFacilities(allSelection);
   };
+
   // Function to deselect all selected facilities
   const deselectAllFacilities = () => {
+    setReportSearch(false);
+
     setNewSelectedFacilities([]);
   };
+
   // Function to get a bearer token for each facility
   const fetchBearerToken = async (facility) => {
     try {
@@ -65,15 +89,16 @@ export default function SmartLockReports({}) {
       return null;
     }
   };
+
   // Facility dropdown toggle
   const toggleDropdown = () => setIsOpen(!isOpen);
+
   // Facility Selection handler
   const handleFacilitySelection = (e, facility) => {
+    setReportSearch(false);
     if (e.target.checked) {
-      // Add to selected list
       setNewSelectedFacilities((prev) => [...prev, facility]);
     } else {
-      // Remove from selected list
       setNewSelectedFacilities((prev) =>
         prev.filter((item) => item !== facility)
       );
@@ -96,7 +121,7 @@ export default function SmartLockReports({}) {
     fetchFacilitiesWithBearers();
 
     // Set up interval for every 2 minutes
-    const interval = setInterval(fetchFacilitiesWithBearers, 2 * 60 * 1000);
+    const interval = setInterval(fetchFacilitiesWithBearers, 5 * 60 * 1000);
 
     // Clear interval on component unmount
     return () => clearInterval(interval);
@@ -140,7 +165,7 @@ export default function SmartLockReports({}) {
             SmartLock Online Time
           </option>
         </select>
-        <div className="ml-2 relative inline-block w-96">
+        <div className="ml-2 relative inline-block w-96" ref={modalRef}>
           <button
             onClick={toggleDropdown}
             className="w-full border rounded dark:bg-darkNavSecondary dark:border-border text-black dark:text-white p-2"
@@ -149,8 +174,8 @@ export default function SmartLockReports({}) {
           </button>
 
           {isOpen && (
-            <div className="absolute mt-2 w-full bg-white dark:bg-darkNavSecondary border border-border rounded shadow-lg p-2 z-50 max-h-60 overflow-y-auto">
-              <div className="w-full text-white text-left px-2 justify-evenly flex">
+            <div className="absolute mt-1 w-full bg-white dark:bg-darkNavSecondary border border-gray-300 dark:border-border rounded-lg shadow-lg p-2 z-50 max-h-60 overflow-y-auto">
+              <div className="w-full text-white text-left px-1 justify-between flex">
                 <button
                   className="text-green-400"
                   onClick={() => selectAllFacilities()}
@@ -187,6 +212,7 @@ export default function SmartLockReports({}) {
           Search
         </button>
       </div>
+      {reportSearch === false && <div>Choose and search a report...</div>}
       {openPage === "AllSmartLocksReport" && reportSearch === true && (
         <AllSmartLocksReport
           selectedFacilities={newSelectedFacilities}

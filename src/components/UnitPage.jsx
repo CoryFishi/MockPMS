@@ -881,7 +881,6 @@ export default function UnitPage({
                     <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
                       {unit.additionalProp3}
                     </td>
-
                     <td className="border-y border-gray-300 dark:border-border px-4 py-2 select-none space-x-2">
                       {unit.status === "Rented" ? (
                         <>

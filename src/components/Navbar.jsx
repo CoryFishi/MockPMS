@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { RiMenuFold3Fill, RiMenuFold4Fill } from "react-icons/ri";
 import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MdExpandLess, MdExpandMore, MdOutlineWbSunny } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { FaMoon } from "react-icons/fa";
@@ -29,6 +29,7 @@ export default function Navbar({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const [version, setVersion] = useState(packageJson.version);
+  const userRef = useRef(null);
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -44,7 +45,26 @@ export default function Navbar({
   };
 
   const showSideToggle =
-    location.pathname === "/" || location.pathname === "/smartlock-dashboard";
+    location.pathname === "/" ||
+    location.pathname === "/smartlock" ||
+    location.pathname === "/admin";
+
+  // Close modal if clicking outside of it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userRef.current && !userRef.current.contains(event.target)) {
+        setIsDropdownOpen(false); // Close the modal
+      }
+    };
+
+    // Add event listener
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup event listener
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   return (
     <nav className="bg-white dark:bg-darkPrimary p-2 w-full border-slate-200 dark:border-gray-700 border-b select-none relative">
@@ -122,7 +142,7 @@ export default function Navbar({
             </Link>
           )}
           {user ? (
-            <div>
+            <div className="relative" ref={userRef}>
               <h2
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="cursor-pointer bg-gray-100 dark:bg-darkSecondary rounded-md p-2 px-4 flex items-center text-center"
@@ -131,7 +151,7 @@ export default function Navbar({
                 {isDropdownOpen ? <MdExpandLess /> : <MdExpandMore />}
               </h2>
               {isDropdownOpen && (
-                <div className="absolute right-7 mt-1 w-48 bg-white dark:bg-darkSecondary border border-gray-200 dark:border-border rounded-lg shadow-lg p-2 z-20 flex flex-col">
+                <div className="absolute right-0 mt-1 w-full bg-white dark:bg-darkSecondary border border-gray-200 dark:border-border rounded-lg shadow-lg p-2 z-20 flex flex-col">
                   <Link
                     to="/user-settings"
                     className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-center"
