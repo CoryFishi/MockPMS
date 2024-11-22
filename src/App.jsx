@@ -21,7 +21,7 @@ function App() {
     }
   }, []);
 
-  // Toggle dark mode and save preference to localStorage.
+  // Toggle dark mode and save preference to localStorage
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
     if (!darkMode) {
