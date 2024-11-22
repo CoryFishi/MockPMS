@@ -106,6 +106,8 @@ export default function Users() {
         <EditUser
           setIsEditUserModalOpen={setIsEditUserModalOpen}
           selectedUser={selectedUser}
+          setUsers={setUsers}
+          users={users}
         />
       )}
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
@@ -120,7 +122,7 @@ export default function Users() {
           <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary w-full">
             <tr className="bg-gray-200 dark:bg-darkNavSecondary w-full">
               <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                User Id
+                User
               </th>
               <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Tokens
@@ -154,7 +156,7 @@ export default function Users() {
                   className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
                 >
                   <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                    {user.user_id}
+                    {user.user_email}
                   </td>
                   <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                     {user.tokens.length}
@@ -190,7 +192,8 @@ export default function Users() {
                           className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-left"
                           onClick={() => {
                             setSelectedUser(user) &
-                              setIsEditUserModalOpen(true);
+                              setIsEditUserModalOpen(true) &
+                              setDropdownIndex(null);
                           }}
                         >
                           Edit
@@ -198,6 +201,7 @@ export default function Users() {
                         <button
                           className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-left"
                           onClick={() => {
+                            setDropdownIndex(null);
                             if (selfUser.id != user.user_id) {
                               toast.promise(
                                 deleteUser(user.user_id).then((result) => {
@@ -224,12 +228,6 @@ export default function Users() {
                           }}
                         >
                           Delete
-                        </button>
-                        <button
-                          className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-left"
-                          onClick={() => console.log(user)}
-                        >
-                          View Details
                         </button>
                       </div>
                     )}

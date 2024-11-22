@@ -12,7 +12,7 @@ import {
 import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 
-export default function FavoritesPage() {
+export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
   const [facilities, setFacilities] = useState([]);
   const [sortDirection, setSortDirection] = useState("asc");
   const [searchQuery, setSearchQuery] = useState("");

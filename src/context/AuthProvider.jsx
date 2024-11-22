@@ -35,6 +35,7 @@ export const AuthProvider = ({ children }) => {
           selected_tokens: [],
           current_facility: {},
           role: "user",
+          user_email: user.email,
         });
 
         if (insertError) {
