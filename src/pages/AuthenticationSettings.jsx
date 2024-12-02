@@ -378,6 +378,11 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     fileInputRef.current.click();
   };
 
+  const test = async () => {
+    let { data: roles, error } = await supabase.from("roles").select("*");
+    console.log(roles);
+  };
+
   // Run login for all saved facilities when settingsSavedFacilities changes
   useEffect(() => {
     if (!user) {
@@ -396,7 +401,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           <div className="w-full h-full px-5 flex flex-col rounded-lg">
             <div className="flex justify-between mt-2">
-              <div></div>
+              <div onClick={() => test()}>asdasdasdasdasd</div>
               <div className="flex">
                 <button
                   className="flex bg-gray-100 dark:bg-darkSecondary m-1 rounded text-black dark:text-white p-3 hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer"
@@ -423,7 +428,6 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                 />
               </div>
             </div>
-
             <div className="mt-3 overflow-y-auto max-h-[80vh]">
               <table className="w-full table-auto border-collapse">
                 <thead>

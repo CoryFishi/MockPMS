@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isPulled, setIsPulled] = useState(false);
   const [role, setRole] = useState("");
+  const [permissions, setPermissions] = useState({});
 
   // Get the current facility selection
   const getUserData = async () => {
@@ -90,7 +91,6 @@ export const AuthProvider = ({ children }) => {
         );
         return;
       }
-
       console.error("Error fetching user data:", error);
       return null;
     } else {
@@ -149,11 +149,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const getUserPermissions = async () => {
+    let { data, error } = await supabase
+      .from("roles")
+      .select("*")
+      .eq("role_name", role);
+    setPermissions(data[0].permissions);
+  };
+
+  useEffect(() => {
+    if (role) {
+      getUserPermissions();
+      setIsLoading(false);
+    }
+  }, [role]);
+
   useEffect(() => {
     const fetchSession = async () => {
       const { data: sessionData } = await supabase.auth.getSession();
       setUser(sessionData?.user ?? null);
-      setIsLoading(false);
     };
 
     fetchSession();
@@ -161,7 +175,6 @@ export const AuthProvider = ({ children }) => {
     const { data: listener } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setUser(session?.user ?? null);
-        setIsLoading(false);
       }
     );
 
@@ -195,6 +208,7 @@ export const AuthProvider = ({ children }) => {
         currentFacility,
         setCurrentFacility,
         isLoading,
+        permissions,
       }}
     >
       {children}

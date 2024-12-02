@@ -25,6 +25,7 @@ export default function Navbar({
     setFavoriteTokens,
     setSelectedTokens,
     role,
+    permissions,
   } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -107,7 +108,7 @@ export default function Navbar({
               )}
             </div>
           </div>
-          {user && (
+          {user && permissions.smartlockPlatform && (
             <Link
               to="/smartlock"
               className={`hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium ${
@@ -119,7 +120,7 @@ export default function Navbar({
               SmartLock
             </Link>
           )}
-          {user && (
+          {user && permissions.pmsPlatform && (
             <Link
               to="/"
               className={`hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium ${
@@ -129,7 +130,7 @@ export default function Navbar({
               Property Manager
             </Link>
           )}
-          {user && role === "admin" && (
+          {user && permissions.adminPlatform && (
             <Link
               to="/admin"
               className={`hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium ${

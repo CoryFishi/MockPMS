@@ -4,6 +4,7 @@ import { BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import Users from "./UsersPage";
 import UserEvents from "./UserEvents";
+import Roles from "./RolesPage";
 
 export default function AdminDashboardLayout({ dashboardMenu }) {
   const [openSections, setOpenSections] = useState({
@@ -34,7 +35,9 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
             {/* Current Facility Side Bar */}
             <div
               className={`pl-2 pr-2 pb-8 mt-8 ${
-                openPage === "users" || openPage === "userEvents"
+                openPage === "users" ||
+                openPage === "userEvents" ||
+                openPage === "roles"
                   ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
                   : "dark:bg-darkNavPrimary"
               }`}
@@ -46,7 +49,9 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                 <div className="flex items-center space-x-2">
                   <BsBuildingFill
                     className={`${
-                      openPage === "users" || openPage === "userEvents"
+                      openPage === "users" ||
+                      openPage === "userEvents" ||
+                      openPage === "roles"
                         ? "text-yellow-500"
                         : ""
                     }`}
@@ -76,6 +81,15 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                   >
                     User Events
                   </Link>
+                  <Link
+                    onClick={() =>
+                      setOpenPage("roles") &
+                      localStorage.setItem("openPage3", "roles")
+                    }
+                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                  >
+                    Roles
+                  </Link>
                 </div>
               )}
             </div>
@@ -84,6 +98,7 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
         <div className="w-full flex flex-col bg-background-50 dark:bg-darkPrimary h-full">
           {openPage === "users" && <Users />}
           {openPage === "userEvents" && <UserEvents />}
+          {openPage === "roles" && <Roles />}
         </div>
       </div>
     </div>

@@ -1,7 +1,5 @@
-import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useState } from "react";
-import { useAuth } from "../../context/AuthProvider";
 import { supabase } from "../../supabaseClient";
 import {
   FaTrash,
@@ -20,7 +18,6 @@ export default function EditUser({
   selectedUser,
   setUsers,
 }) {
-  const { user } = useAuth();
   const [newUserData, setNewUserData] = useState(selectedUser);
   const [viewKey, setViewKey] = useState(null);
   const [isEditCurrentFacilityModalOpen, setIsEditCurrentFacilityModalOpen] =
@@ -125,6 +122,11 @@ export default function EditUser({
           {/* Created On */}
           <label className="block my-2 font-bold">Created On:</label>
           <h1 className="ml-2">{newUserData.created_at || "Never created"}</h1>
+          {/* Updated On */}
+          <label className="block my-2 font-bold">Last Update:</label>
+          <h1 className="ml-2">
+            {newUserData.last_update_at || "Never updated"}
+          </h1>
           {/* Role */}
           <label className="block my-2 font-bold">Role:</label>
           <select
