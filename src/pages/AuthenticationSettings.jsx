@@ -378,11 +378,6 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     fileInputRef.current.click();
   };
 
-  const test = async () => {
-    let { data: roles, error } = await supabase.from("roles").select("*");
-    console.log(roles);
-  };
-
   // Run login for all saved facilities when settingsSavedFacilities changes
   useEffect(() => {
     if (!user) {
@@ -401,19 +396,37 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           <div className="w-full h-full px-5 flex flex-col rounded-lg">
             <div className="flex justify-between mt-2">
-              <div onClick={() => test()}>asdasdasdasdasd</div>
+              <div></div>
               <div className="flex">
                 <button
-                  className="flex bg-gray-100 dark:bg-darkSecondary m-1 rounded text-black dark:text-white p-3 hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer"
+                  className={`flex m-1 rounded p-3 text-black dark:text-white transition duration-300 ease-in-out ${
+                    permissions.authenticationPlatformExport
+                      ? "bg-gray-100 dark:bg-darkSecondary hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer"
+                      : "bg-gray-200 dark:bg-darkTertiary text-gray-400 cursor-not-allowed"
+                  }`}
                   title="Export Tokens"
-                  onClick={() => exportFacilities()}
+                  onClick={() => {
+                    if (permissions.authenticationPlatformExport) {
+                      exportFacilities();
+                    }
+                  }}
+                  disabled={!permissions.authenticationPlatformExport}
                 >
                   <CiExport className="text-2xl" /> Export
                 </button>
                 <button
-                  className="flex bg-gray-100 dark:bg-darkSecondary m-1 rounded text-black dark:text-white p-3 hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer"
+                  className={`flex m-1 rounded p-3 text-black dark:text-white transition duration-300 ease-in-out ${
+                    permissions.authenticationPlatformImport
+                      ? "bg-gray-100 dark:bg-darkSecondary hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer"
+                      : "bg-gray-200 dark:bg-darkTertiary text-gray-400 cursor-not-allowed"
+                  }`}
                   title="Import Tokens"
-                  onClick={triggerFileInput}
+                  onClick={() => {
+                    if (permissions.authenticationPlatformImport) {
+                      triggerFileInput();
+                    }
+                  }}
+                  disabled={!permissions.authenticationPlatformImport}
                 >
                   <CiImport className="text-2xl" />
                   Import
@@ -425,6 +438,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                   ref={fileInputRef}
                   onChange={handleFileUpload}
                   style={{ display: "none" }}
+                  disabled={!permissions.authenticationPlatformImport}
                 />
               </div>
             </div>
@@ -585,14 +599,21 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                         <div className="text-center">
                           <button
-                            className="m-1 px-4 py-1 bg-red-500 rounded-md hover:bg-red-600 text-white"
-                            onClick={() =>
-                              toast.promise(removeToken(facility.api), {
-                                loading: "Deleting Credentials...",
-                                success: <b>Successfully deleted!</b>,
-                                error: <b>Failed deletion!</b>,
-                              })
-                            }
+                            className={`m-1 px-4 py-1 rounded-md text-white transition duration-300 ease-in-out ${
+                              permissions.authenticationPlatformDelete
+                                ? "bg-red-500 hover:bg-red-600 cursor-pointer"
+                                : "bg-red-300 cursor-not-allowed"
+                            }`}
+                            onClick={() => {
+                              if (permissions.authenticationPlatformDelete) {
+                                toast.promise(removeToken(facility.api), {
+                                  loading: "Deleting Credentials...",
+                                  success: <b>Successfully deleted!</b>,
+                                  error: <b>Failed deletion!</b>,
+                                });
+                              }
+                            }}
+                            disabled={!permissions.authenticationPlatformDelete}
                           >
                             Delete
                           </button>
@@ -600,102 +621,104 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       </td>
                     </tr>
                   ))}
-                  <tr className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary">
-                    <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
-                      <input
-                        type="text"
-                        className="border border-slate-100 shadow-md rounded"
-                        value={api}
-                        onChange={(e) => setApi(e.target.value)}
-                      />
-                    </td>
-                    <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
-                      <input
-                        type="text"
-                        className="border border-slate-100 shadow-md rounded"
-                        value={apiSecret}
-                        onChange={(e) => setApiSecret(e.target.value)}
-                      />
-                    </td>
-                    <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
-                      <input
-                        type="text"
-                        className="border border-slate-100 shadow-md rounded"
-                        value={client}
-                        onChange={(e) => setClient(e.target.value)}
-                      />
-                    </td>
-                    <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
-                      <input
-                        type="text"
-                        className="border border-slate-100 shadow-md rounded"
-                        value={clientSecret}
-                        onChange={(e) => setClientSecret(e.target.value)}
-                      />
-                    </td>
-                    <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
-                      <select
-                        value={environment}
-                        onChange={(e) =>
-                          setEnvironment(e.target.value) &
-                          handleNewLogin(e.target.value)
-                        }
-                        className="p-0.5 shadow-md border-y border-slate-100 rounded"
-                      >
-                        <option value="-">--Select an Option--</option>
-                        {(role === "admin" ||
-                          role === "qa" ||
-                          role === "dev") && (
-                          <option value="">Production</option>
-                        )}
-                        <option value="-dev">Development</option>
-                        <option value="-qa">QA</option>
-                        {(role === "admin" ||
-                          role === "qa" ||
-                          role === "dev") && (
-                          <option value="cia-stg-1.aws.">Staging</option>
-                        )}
-                      </select>
-                    </td>
-                    <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
-                      <div className="flex justify-center text-lg">
+                  {permissions.authenticationPlatformCreate && (
+                    <tr className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary">
+                      <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
+                        <input
+                          type="text"
+                          className="border border-slate-100 shadow-md rounded"
+                          value={api}
+                          onChange={(e) => setApi(e.target.value)}
+                        />
+                      </td>
+                      <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
+                        <input
+                          type="text"
+                          className="border border-slate-100 shadow-md rounded"
+                          value={apiSecret}
+                          onChange={(e) => setApiSecret(e.target.value)}
+                        />
+                      </td>
+                      <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
+                        <input
+                          type="text"
+                          className="border border-slate-100 shadow-md rounded"
+                          value={client}
+                          onChange={(e) => setClient(e.target.value)}
+                        />
+                      </td>
+                      <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
+                        <input
+                          type="text"
+                          className="border border-slate-100 shadow-md rounded"
+                          value={clientSecret}
+                          onChange={(e) => setClientSecret(e.target.value)}
+                        />
+                      </td>
+                      <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
+                        <select
+                          value={environment}
+                          onChange={(e) =>
+                            setEnvironment(e.target.value) &
+                            handleNewLogin(e.target.value)
+                          }
+                          className="p-0.5 shadow-md border-y border-slate-100 rounded"
+                        >
+                          <option value="-">--Select an Option--</option>
+                          {permissions.authenticationPlatformEnvironmentProduction && (
+                            <option value="">Production</option>
+                          )}
+                          {permissions.authenticationPlatformEnvironmentDevelopment && (
+                            <option value="-dev">Development</option>
+                          )}
+                          {permissions.authenticationPlatformEnvironmentQA && (
+                            <option value="-qa">QA</option>
+                          )}
+                          {permissions.authenticationPlatformEnvironmentStaging && (
+                            <option value="cia-stg-1.aws.">Staging</option>
+                          )}
+                        </select>
+                      </td>
+                      <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
+                        <div className="flex justify-center text-lg">
+                          {isAuthenticated ? (
+                            <FaCircleCheck className="text-green-500" />
+                          ) : (
+                            <MdOutlineError className="text-red-500" />
+                          )}
+                        </div>
+                      </td>
+                      <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
                         {isAuthenticated ? (
-                          <FaCircleCheck className="text-green-500" />
+                          <button
+                            className="m-1 px-4 py-1 bg-green-400 rounded-md hover:bg-green-500 text-white"
+                            onClick={() =>
+                              toast.promise(submitCredentials(), {
+                                loading: "Creating Credentials...",
+                                success: <b>Successfully created!</b>,
+                                error: <b>Failed to create!</b>,
+                              })
+                            }
+                          >
+                            Submit
+                          </button>
                         ) : (
-                          <MdOutlineError className="text-red-500" />
+                          <button
+                            className="m-1 px-4 py-1 bg-green-400 rounded-md hover:bg-green-500 text-white"
+                            onClick={() =>
+                              toast.promise(handleNewLogin(environment), {
+                                loading: "Authenticating Credentials...",
+                                success: <b>Successfully authenticated!</b>,
+                                error: <b>Failed to authenticate!</b>,
+                              })
+                            }
+                          >
+                            Authenticate
+                          </button>
                         )}
-                      </div>
-                    </td>
-                    <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
-                      {isAuthenticated ? (
-                        <button
-                          className="m-1 px-4 py-1 bg-green-400 rounded-md hover:bg-green-500 text-white"
-                          onClick={() =>
-                            toast.promise(submitCredentials(), {
-                              loading: "Creating Credentials...",
-                              success: <b>Successfully created!</b>,
-                              error: <b>Failed to create!</b>,
-                            })
-                          }
-                        >
-                          Submit
-                        </button>
-                      ) : (
-                        <button
-                          className="m-1 px-4 py-1 bg-green-400 rounded-md hover:bg-green-500 text-white"
-                          onClick={() =>
-                            toast.promise(handleNewLogin(environment), {
-                              loading: "Authenticating Credentials...",
-                              success: <b>Successfully authenticated!</b>,
-                              error: <b>Failed to authenticate!</b>,
-                            })
-                          }
-                        >
-                          Authenticate
-                        </button>
-                      )}
-                    </td>
-                  </tr>
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

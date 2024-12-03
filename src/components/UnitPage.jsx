@@ -36,7 +36,7 @@ export default function UnitPage({
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [unitsPulled, setUnitsPulled] = useState(false);
   const [visitors, setVisitors] = useState([]);
-  const { currentFacility, user } = useAuth();
+  const { currentFacility, user, permissions } = useAuth();
   const rentedCount = filteredUnits.filter(
     (unit) => unit.status === "Rented"
   ).length;
@@ -558,8 +558,13 @@ export default function UnitPage({
             ></div>
           </div>
           <button
-            className="bg-green-500 text-white p-1 py-2 rounded hover:bg-green-600 hover:scale-105 ml-3 w-44 font-bold transition duration-300 ease-in-out transform select-none"
+            className={`bg-green-500 text-white p-1 py-2 rounded font-bold ml-3 w-44 transition duration-300 ease-in-out transform select-none ${
+              permissions.pmsPlatformUnitCreate
+                ? "hover:bg-green-600 hover:scale-105"
+                : "opacity-50 cursor-not-allowed"
+            }`}
             onClick={() => setIsUnitModalOpen(true)}
+            disabled={!permissions.pmsPlatformUnitCreate}
           >
             Create Unit(s)
           </button>
@@ -885,14 +890,24 @@ export default function UnitPage({
                       {unit.status === "Rented" ? (
                         <>
                           <button
-                            className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 font-bold"
+                            className={`bg-yellow-500 text-white px-2 py-1 rounded font-bold ${
+                              permissions.pmsPlatformVisitorEdit
+                                ? "hover:bg-yellow-600"
+                                : "opacity-50 cursor-not-allowed"
+                            }`}
                             onClick={() => turnDelinquent(unit)}
+                            disabled={!permissions.pmsPlatformVisitorEdit}
                           >
                             Turn Delinquent
                           </button>
                           <button
-                            className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 font-bold"
+                            className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
+                              permissions.pmsPlatformVisitorDelete
+                                ? "hover:bg-red-600"
+                                : "opacity-50 cursor-not-allowed"
+                            }`}
                             onClick={() => moveOut(unit)}
+                            disabled={!permissions.pmsPlatformVisitorDelete}
                           >
                             Move Out
                           </button>
@@ -900,14 +915,24 @@ export default function UnitPage({
                       ) : unit.status === "Vacant" ? (
                         <>
                           <button
-                            className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 font-bold"
+                            className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
+                              permissions.pmsPlatformVisitorCreate
+                                ? "hover:bg-green-600"
+                                : "opacity-50 cursor-not-allowed"
+                            }`}
                             onClick={() => moveIn(unit) & setSelectedUnit(unit)}
+                            disabled={!permissions.pmsPlatformVisitorCreate}
                           >
                             Move In
                           </button>
                           <button
-                            className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 font-bold"
+                            className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
+                              permissions.pmsPlatformUnitDelete
+                                ? "hover:bg-red-600"
+                                : "opacity-50 cursor-not-allowed"
+                            }`}
                             onClick={() => deleteUnit(unit)}
+                            disabled={!permissions.pmsPlatformUnitDelete}
                           >
                             Delete
                           </button>
@@ -915,14 +940,24 @@ export default function UnitPage({
                       ) : unit.status === "Delinquent" ? (
                         <>
                           <button
-                            className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 font-bold"
+                            className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
+                              permissions.pmsPlatformVisitorEdit
+                                ? "hover:bg-green-600"
+                                : "opacity-50 cursor-not-allowed"
+                            }`}
                             onClick={() => turnRented(unit)}
+                            disabled={!permissions.pmsPlatformVisitorEdit}
                           >
                             Turn Rented
                           </button>
                           <button
-                            className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 font-bold"
+                            className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
+                              permissions.pmsPlatformVisitorDelete
+                                ? "hover:bg-red-600"
+                                : "opacity-50 cursor-not-allowed"
+                            }`}
                             onClick={() => moveOut(unit)}
+                            disabled={!permissions.pmsPlatformVisitorDelete}
                           >
                             Move Out
                           </button>

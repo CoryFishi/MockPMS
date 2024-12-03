@@ -32,7 +32,7 @@ export default function EditVisitor({
     useState(false);
   const [isEditVisitorModalOpen2, setIsEditVisitorModalOpen2] = useState(false);
   const [selectedVisitor, setSelectedVisitor] = useState({});
-  const { currentFacility, user } = useAuth();
+  const { currentFacility, user, permissions } = useAuth();
 
   const handleTimeProfiles = async () => {
     var tokenStageKey = "";
@@ -280,8 +280,13 @@ export default function EditVisitor({
                 </div>
               </div>
               <button
-                className="bg-green-500 text-white p-1 py-2 rounded hover:bg-green-600 hover:scale-105 ml-3 w-44 font-bold transition duration-300 ease-in-out transform select-none"
+                className={`bg-green-500 text-white p-1 py-2 rounded font-bold ml-3 w-44 transition duration-300 ease-in-out transform select-none ${
+                  permissions.pmsPlatformVisitorCreate
+                    ? "hover:bg-green-600 hover:scale-105"
+                    : "opacity-50 cursor-not-allowed"
+                }`}
                 onClick={() => createTenant()}
+                disabled={!permissions.pmsPlatformVisitorCreate}
               >
                 Add Guest
               </button>
@@ -363,25 +368,39 @@ export default function EditVisitor({
                       </td>
                       <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell gap-2">
                         <button
-                          className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 font-bold"
-                          onClick={() =>
-                            setIsEditVisitorModalOpen2(true) &
-                            setSelectedVisitor(visitor)
-                          }
+                          className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
+                            permissions.pmsPlatformVisitorEdit
+                              ? "hover:bg-green-600"
+                              : "opacity-50 cursor-not-allowed"
+                          }`}
+                          onClick={() => {
+                            if (permissions.pmsPlatformVisitorEdit) {
+                              setIsEditVisitorModalOpen2(true);
+                              setSelectedVisitor(visitor);
+                            }
+                          }}
+                          disabled={!permissions.pmsPlatformVisitorEdit}
                         >
                           Edit
                         </button>
                         {!visitor.isTenant && (
                           <button
-                            className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 font-bold"
-                            onClick={() =>
-                              toast.promise(removeVisitor(visitor.id), {
-                                loading: "Removing visitor...",
-                                success: "Visitor removed successfully!",
-                                error:
-                                  "Failed to remove visitor. Please try again.",
-                              })
-                            }
+                            className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
+                              permissions.pmsPlatformVisitorDelete
+                                ? "hover:bg-red-600"
+                                : "opacity-50 cursor-not-allowed"
+                            }`}
+                            onClick={() => {
+                              if (permissions.pmsPlatformVisitorDelete) {
+                                toast.promise(removeVisitor(visitor.id), {
+                                  loading: "Removing visitor...",
+                                  success: "Visitor removed successfully!",
+                                  error:
+                                    "Failed to remove visitor. Please try again.",
+                                });
+                              }
+                            }}
+                            disabled={!permissions.pmsPlatformVisitorDelete}
                           >
                             Delete
                           </button>
