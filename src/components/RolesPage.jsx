@@ -12,6 +12,7 @@ import {
 } from "react-icons/bi";
 import EditUser from "./modals/EditUser";
 import CreateRole from "./modals/CreateRole";
+import EditRole from "./modals/EditRole";
 
 export default function Roles() {
   const { user } = useAuth();
@@ -23,10 +24,22 @@ export default function Roles() {
   const pageCount = Math.ceil(filteredRoles.length / rowsPerPage);
   const [dropdownIndex, setDropdownIndex] = useState(null);
   const modalRef = useRef(null);
-  const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
+  const [isEditRoleModalOpen, setIsEditRoleModalOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateRoleModalOpen, setIsCreateRoleModalOpen] = useState(false);
+  const [users, setUsers] = useState([]);
+
+  async function getUsers() {
+    if (!user) return;
+    const { data, error } = await supabaseAdmin.from("user_data").select("*");
+
+    if (error) {
+      console.error("Error fetching events:", error);
+    } else {
+      setUsers(data);
+    }
+  }
 
   async function addEvent(eventName, eventDescription, completed) {
     const { data, error } = await supabase.from("user_events").insert([
@@ -63,7 +76,7 @@ export default function Roles() {
     };
   }, [setDropdownIndex]);
 
-  async function getUsers() {
+  async function getRoles() {
     if (!user) return;
     const { data, error } = await supabaseAdmin.from("roles").select("*");
 
@@ -75,36 +88,17 @@ export default function Roles() {
     }
   }
 
-  const deleteUser = async (userId) => {
+  const deleteRole = async (roleId) => {
     try {
-      // Delete the user from Supabase Auth
-      const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(
-        userId
-      );
-      if (authError) {
-        addEvent("User Deleted", `${user.email} deleted user ${userId}`, false);
-        console.error("Error deleting user:", authError);
-        throw new Error("Failed to delete user from Auth.");
+      // Delete the role
+      const { error } = await supabase.from("roles").delete().eq("id", roleId);
+      if (error) {
+        console.error("Error deleting the role:", authError);
+        throw new Error("Failed to delete role.");
       }
-
-      // Delete the user's row from the user_data table
-      const { error: dataError } = await supabaseAdmin
-        .from("user_data")
-        .delete()
-        .eq("user_id", userId);
-
-      if (dataError) {
-        addEvent("User Deleted", `${user.email} deleted user ${userId}`, false);
-        console.error("Error deleting user data:", dataError);
-        throw new Error("Failed to delete user data.");
-      }
-
       // Success
-      addEvent("User Deleted", `${user.email} deleted user ${userId}`, true);
-      setFilteredRoles((prevFilteredUsers) =>
-        prevFilteredUsers.filter((user) => user.user_id !== userId)
-      );
-      return `User ${userId} and associated data deleted successfully.`;
+      setRoles((prevRoles) => prevRoles.filter((role) => role.id !== roleId));
+      return `Role ${roleId} deleted successfully.`;
     } catch (err) {
       console.error("Unexpected error:", err);
       throw err; // Re-throw the error to let `toast.promise` handle it
@@ -112,7 +106,7 @@ export default function Roles() {
   };
 
   useEffect(() => {
-    if (!rolesPulled) getUsers();
+    if (!rolesPulled) getRoles() & getUsers();
   }, [user]);
 
   useEffect(() => {
@@ -126,12 +120,11 @@ export default function Roles() {
 
   return (
     <div className="overflow-auto dark:text-white dark:bg-darkPrimary mb-14 h-full">
-      {isEditUserModalOpen && (
-        <EditUser
-          setIsEditUserModalOpen={setIsEditUserModalOpen}
-          selectedUser={selectedRole}
-          setUsers={setRoles}
-          users={roles}
+      {isEditRoleModalOpen && (
+        <EditRole
+          setIsEditRoleModalOpen={setIsEditRoleModalOpen}
+          selectedRole={selectedRole}
+          setRoles={setRoles}
         />
       )}
       {isCreateRoleModalOpen && (
@@ -175,6 +168,9 @@ export default function Roles() {
                 Permissions
               </th>
               <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                Users
+              </th>
+              <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Actions
               </th>
             </tr>
@@ -198,6 +194,12 @@ export default function Roles() {
                       (value) => value === true
                     )?.length || 0}
                   </td>
+                  <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                    {
+                      users.filter((user) => user.role === role.role_name)
+                        .length
+                    }
+                  </td>
                   <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell relative">
                     <button
                       className=" dark:bg-darkSecondary border rounded-lg dark:border-border p-2 hover:dark:bg-darkPrimary w-full"
@@ -214,12 +216,31 @@ export default function Roles() {
                           className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-left"
                           onClick={() => {
                             setSelectedRole(role) &
-                              setIsEditUserModalOpen(true) &
+                              setIsEditRoleModalOpen(true) &
                               setDropdownIndex(null);
                           }}
                         >
                           Edit
                         </button>
+                        {users.filter((user) => user.role === role.role_name)
+                          .length < 1 ? (
+                          <button
+                            className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-left"
+                            onClick={() =>
+                              toast.promise(deleteRole(role.id), {
+                                loading: `Deleting role...`,
+                                success: <b>Role deleted successfully!</b>,
+                                error: (
+                                  <b>
+                                    Failed to delete role. Please try again.
+                                  </b>
+                                ),
+                              })
+                            }
+                          >
+                            Delete
+                          </button>
+                        ) : null}
                       </div>
                     )}
                   </td>

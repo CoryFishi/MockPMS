@@ -20,7 +20,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [sortDirection, setSortDirection] = useState("asc");
   const fileInputRef = useRef(null);
-  const { user, tokens, setTokens, role } = useAuth();
+  const { user, tokens, setTokens, role, permissions } = useAuth();
 
   async function addEvent(eventName, eventDescription, completed) {
     const { data, error } = await supabase.from("user_events").insert([
@@ -396,7 +396,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
 
   return (
     <div className="dark:text-white dark:bg-darkPrimary h-screen w-screen flex flex-col overflow-x-hidden overflow-hidden font-roboto">
-      {user ? (
+      {user && permissions.authenticationPlatform ? (
         <div>
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           <div className="w-full h-full px-5 flex flex-col rounded-lg">

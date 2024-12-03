@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
 import {
   FaTrash,
@@ -12,6 +12,7 @@ import EditCurrentFacility from "./EditCurrentFacility";
 import AddToken from "./AddToken";
 import AddFavoriteFacility from "./AddFavoriteFacility";
 import AddSelectedFacility from "./AddSelectedFacility";
+import { data } from "autoprefixer";
 
 export default function EditUser({
   setIsEditUserModalOpen,
@@ -28,6 +29,13 @@ export default function EditUser({
     useState(false);
   const [isAddSelectedFacilityModalOpen, setIsAddSelectedFacilityModalOpen] =
     useState(false);
+  const [roles, setRoles] = useState([]);
+
+  const getRoles = async () => {
+    let { data, error } = await supabase.from("roles").select("role_name");
+    setRoles(data);
+  };
+
   const updateUserData = async () => {
     try {
       const { data, error } = await supabase
@@ -73,6 +81,10 @@ export default function EditUser({
     if (token === viewKey) setViewKey(null);
     else setViewKey(token);
   };
+
+  useEffect(() => {
+    getRoles();
+  }, []);
 
   return (
     // Background Filter
@@ -139,11 +151,11 @@ export default function EditUser({
               }))
             }
           >
-            {/* Switch to a stored table of roles in the future */}
-            <option value="admin">admin</option>
-            <option value="cae">cae</option>
-            <option value="qa">qa</option>
-            <option value="user">user</option>
+            {Object.values(roles).map((role, index) => (
+              <option key={index} value={role.role_name}>
+                {role.role_name}
+              </option>
+            ))}
           </select>
           {/* Current Facility */}
           <label className="block my-2 font-bold">Current Facility:</label>

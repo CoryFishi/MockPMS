@@ -6,12 +6,11 @@ import NotFound from "../components/NotFound";
 
 export default function SmartLockDashboard({ darkMode, toggleDarkMode }) {
   const [dashboardMenu, setDashboardMenu] = useState(true);
-  const { user } = useAuth();
-  const { tokens } = useAuth();
+  const { user, permissions } = useAuth();
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-x-hidden overflow-hidden font-roboto">
-      {user ? (
+      {user && permissions.smartlockPlatform ? (
         <div>
           <Navbar
             setDashboardMenu={setDashboardMenu}

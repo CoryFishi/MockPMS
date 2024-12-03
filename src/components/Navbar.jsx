@@ -130,7 +130,7 @@ export default function Navbar({
               Property Manager
             </Link>
           )}
-          {user && permissions.adminPlatform && (
+          {user && role === "admin" && (
             <Link
               to="/admin"
               className={`hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium ${
@@ -159,12 +159,15 @@ export default function Navbar({
                   >
                     User Settings
                   </Link>
-                  <Link
-                    to="/authentication-settings"
-                    className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-center border-t border-t-gray-100 dark:border-t-border"
-                  >
-                    Authentication
-                  </Link>
+                  {permissions.authenticationPlatform && (
+                    <Link
+                      to="/authentication-settings"
+                      className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-center border-t border-t-gray-100 dark:border-t-border"
+                    >
+                      Authentication
+                    </Link>
+                  )}
+
                   <button
                     className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium border-opacity-50 border-t border-t-gray-100 dark:border-t-border"
                     onClick={() => handleLogout()}

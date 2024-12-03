@@ -6,11 +6,11 @@ import NotFound from "../components/NotFound";
 
 export default function Dashboard({ darkMode, toggleDarkMode }) {
   const [dashboardMenu, setDashboardMenu] = useState(true);
-  const { user } = useAuth();
+  const { user, permissions } = useAuth();
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-x-hidden overflow-hidden font-roboto">
-      {user ? (
+      {user && permissions.pmsPlatform ? (
         <div>
           <Navbar
             setDashboardMenu={setDashboardMenu}

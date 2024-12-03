@@ -5,33 +5,21 @@ import { IoIosCreate } from "react-icons/io";
 import { useAuth } from "../../context/AuthProvider";
 import { supabase } from "../../supabaseClient";
 
-export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
+export default function EditRole({
+  setIsEditRoleModalOpen,
+  setRoles,
+  selectedRole,
+}) {
   // Store the unit number to be created
-  const [roleName, setRoleName] = useState("");
-  const [roleDesc, setRoleDesc] = useState("");
-  const [rolePermissions, setRolePermissions] = useState({
-    authenticationPlatform: false,
-    authenticationPlatformCreate: false,
-    authenticationPlatformEnvironmentProduction: false,
-    authenticationPlatformEnvironmentDevelopment: false,
-    authenticationPlatformEnvironmentStaging: false,
-    authenticationPlatformEnvironmentQA: false,
-    authenticationPlatformDelete: false,
-    authenticationPlatformImport: false,
-    authenticationPlatformExport: false,
-    pmsPlatform: false,
-    pmsPlatformUnitCreate: false,
-    pmsPlatformUnitEdit: false,
-    pmsPlatformUnitDelete: false,
-    pmsPlatformVisitorCreate: false,
-    pmsPlatformVisitorEdit: false,
-    pmsPlatformVisitorDelete: false,
-    smartlockPlatform: false,
-  });
+  const [roleName, setRoleName] = useState(selectedRole.role_name);
+  const [roleDesc, setRoleDesc] = useState(selectedRole.role_description);
+  const [rolePermissions, setRolePermissions] = useState(
+    selectedRole.permissions
+  );
   const [error, setError] = useState("");
 
   // API call handler to create the new role
-  const handleCreateRole = async () => {
+  const handleEditRole = async () => {
     try {
       setError("");
       if (!roleName) {
@@ -45,13 +33,12 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
 
       const { data, error } = await supabase
         .from("roles")
-        .insert([
-          {
-            role_name: roleName,
-            role_description: roleDesc,
-            permissions: rolePermissions,
-          },
-        ])
+        .update({
+          role_name: roleName,
+          role_description: roleDesc,
+          permissions: rolePermissions,
+        })
+        .eq("id", selectedRole.id)
         .select();
 
       if (error) {
@@ -75,7 +62,7 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
           <div className="flex text-center items-center">
             <IoIosCreate />
             <h2 className="ml-2 text-lg font-bold text-center items-center">
-              Create Role
+              Editing Role
             </h2>
           </div>
         </div>
@@ -306,7 +293,7 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
           <div className="mt-4 flex justify-end">
             <button
               className="bg-gray-400 px-4 py-2 rounded mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
-              onClick={() => setIsCreateRoleModalOpen(false)}
+              onClick={() => setIsEditRoleModalOpen(false)}
             >
               Cancel
             </button>
@@ -314,18 +301,22 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
               onClick={() =>
                 toast.promise(
-                  handleCreateRole().then((result) => {
+                  handleEditRole().then((result) => {
                     if (result.success) {
-                      setRoles((prevRoles) => [...prevRoles, result.data[0]]);
-                      setIsCreateRoleModalOpen(false);
+                      setRoles((prevRoles) =>
+                        prevRoles.map((role) =>
+                          role.id === result.data[0].id ? result.data[0] : role
+                        )
+                      );
+                      setIsEditRoleModalOpen(false);
                     }
                     return result;
                   }),
                   {
-                    loading: `Creating ${roleName}...`,
-                    success: <b>{roleName} successfully created!</b>,
+                    loading: `Updating ${roleName}...`,
+                    success: <b>{roleName} successfully updated!</b>,
                     error: (error) => (
-                      <b>{error?.message || `Could not create ${roleName}.`}</b>
+                      <b>{error?.message || `Could not update ${roleName}.`}</b>
                     ),
                   }
                 )
