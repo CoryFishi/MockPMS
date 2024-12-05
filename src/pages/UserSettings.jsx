@@ -23,6 +23,8 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [eventsPulled, setEventsPulled] = useState(false);
   const pageCount = Math.ceil(filteredEvents.length / rowsPerPage);
+  const [sortedColumn, setSortedColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState("desc");
 
   async function addEvent(eventName, eventDescription, completed) {
     const { data, error } = await supabase.from("user_events").insert([
@@ -111,7 +113,6 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
       {user ? (
         <div className="flex flex-col h-screen">
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          {/* Main content container with scrolling */}
           <div className="flex-1 overflow-y-auto px-5 flex flex-col items-center">
             <div className="flex gap-5 mt-2 text-center rounded max-w-2xl justify-evenly">
               <div className="dark:bg-darkNavSecondary rounded p-5 border shadow-md dark:border-border">
@@ -167,19 +168,119 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
             <div className="w-full mt-2">
               <h1 className="text-2xl text-center">User Events</h1>
               <table className="w-full table-auto border-collapse border-gray-300 dark:border-border mt-1">
-                <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary w-full">
+                <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary w-full hover:cursor-pointer">
                   <tr className="bg-gray-200 dark:bg-darkNavSecondary w-full">
-                    <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                    <th
+                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      onClick={() => {
+                        const newDirection =
+                          sortDirection === "asc" ? "desc" : "asc";
+                        setSortDirection(newDirection);
+                        setSortedColumn("Created On");
+                        setFilteredEvents(
+                          [...events].sort((a, b) => {
+                            if (a.created_at < b.created_at)
+                              return newDirection === "asc" ? -1 : 1;
+                            if (a.created_at > b.created_at)
+                              return newDirection === "asc" ? 1 : -1;
+                            return 0;
+                          })
+                        );
+                      }}
+                    >
                       Created On
+                      {sortedColumn === "Created On" && (
+                        <span className="ml-2">
+                          {sortDirection === "asc" ? "▲" : "▼"}
+                        </span>
+                      )}
                     </th>
-                    <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                    <th
+                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      onClick={() => {
+                        const newDirection =
+                          sortDirection === "asc" ? "desc" : "asc";
+                        setSortDirection(newDirection);
+                        setSortedColumn("Event");
+                        setFilteredEvents(
+                          [...events].sort((a, b) => {
+                            if (
+                              a.event_name.toLowerCase() <
+                              b.event_name.toLowerCase()
+                            )
+                              return newDirection === "asc" ? -1 : 1;
+                            if (
+                              a.event_name.toLowerCase() >
+                              b.event_name.toLowerCase()
+                            )
+                              return newDirection === "asc" ? 1 : -1;
+                            return 0;
+                          })
+                        );
+                      }}
+                    >
                       Event
+                      {sortedColumn === "Event" && (
+                        <span className="ml-2">
+                          {sortDirection === "asc" ? "▲" : "▼"}
+                        </span>
+                      )}
                     </th>
-                    <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                    <th
+                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      onClick={() => {
+                        const newDirection =
+                          sortDirection === "asc" ? "desc" : "asc";
+                        setSortDirection(newDirection);
+                        setSortedColumn("Description");
+                        setFilteredEvents(
+                          [...events].sort((a, b) => {
+                            if (
+                              a.event_description.toLowerCase() <
+                              b.event_description.toLowerCase()
+                            )
+                              return newDirection === "asc" ? -1 : 1;
+                            if (
+                              a.event_description.toLowerCase() >
+                              b.event_description.toLowerCase()
+                            )
+                              return newDirection === "asc" ? 1 : -1;
+                            return 0;
+                          })
+                        );
+                      }}
+                    >
                       Description
+                      {sortedColumn === "Description" && (
+                        <span className="ml-2">
+                          {sortDirection === "asc" ? "▲" : "▼"}
+                        </span>
+                      )}
                     </th>
-                    <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                      Completed
+                    <th
+                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      onClick={() => {
+                        const newDirection =
+                          sortDirection === "asc" ? "desc" : "asc";
+                        setSortDirection(newDirection);
+                        setSortedColumn("Success");
+                        setFilteredEvents(
+                          [...events].sort((a, b) => {
+                            if (a.completed < b.completed)
+                              return newDirection === "asc" ? -1 : 1;
+                            if (a.completed > b.completed)
+                              return newDirection === "asc" ? 1 : -1;
+                            return 0;
+                          })
+                        );
+                      }}
+                    >
+                      Success
+                      {sortedColumn === "Success" && (
+                        <span className="ml-2">
+                          {sortDirection === "asc" ? "▲" : "▼"}
+                        </span>
+                      )}
                     </th>
                   </tr>
                 </thead>

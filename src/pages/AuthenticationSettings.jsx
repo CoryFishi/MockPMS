@@ -20,7 +20,8 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [sortDirection, setSortDirection] = useState("asc");
   const fileInputRef = useRef(null);
-  const { user, tokens, setTokens, role, permissions } = useAuth();
+  const { user, tokens, setTokens, permissions } = useAuth();
+  const [sortedColumn, setSortedColumn] = useState(null);
 
   async function addEvent(eventName, eventDescription, completed) {
     const { data, error } = await supabase.from("user_events").insert([
@@ -442,7 +443,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                 />
               </div>
             </div>
-            <div className="mt-3 overflow-y-auto max-h-[80vh]">
+            <div className="mt-3 overflow-auto max-h-[80vh]">
               <table className="w-full table-auto border-collapse">
                 <thead>
                   <tr className="bg-gray-200 dark:bg-darkNavSecondary">
@@ -452,6 +453,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
                         setSortDirection(newDirection);
+                        setSortedColumn("API Key");
                         setSettingsSavedFacilities(
                           [...settingsSavedFacilities].sort((a, b) => {
                             if (a.api < b.api)
@@ -464,6 +466,11 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       }}
                     >
                       API Key
+                      {sortedColumn === "API Key" && (
+                        <span className="ml-2">
+                          {sortDirection === "asc" ? "▲" : "▼"}
+                        </span>
+                      )}
                     </th>
                     <th
                       className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
@@ -471,6 +478,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
                         setSortDirection(newDirection);
+                        setSortedColumn("API Secret");
                         setSettingsSavedFacilities(
                           [...settingsSavedFacilities].sort((a, b) => {
                             if (a.apiSecret < b.apiSecret)
@@ -483,6 +491,11 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       }}
                     >
                       API Secret
+                      {sortedColumn === "API Secret" && (
+                        <span className="ml-2">
+                          {sortDirection === "asc" ? "▲" : "▼"}
+                        </span>
+                      )}
                     </th>
                     <th
                       className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
@@ -490,6 +503,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
                         setSortDirection(newDirection);
+                        setSortedColumn("Client");
                         setSettingsSavedFacilities(
                           [...settingsSavedFacilities].sort((a, b) => {
                             if (a.client < b.client)
@@ -502,6 +516,11 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       }}
                     >
                       Client
+                      {sortedColumn === "Client" && (
+                        <span className="ml-2">
+                          {sortDirection === "asc" ? "▲" : "▼"}
+                        </span>
+                      )}
                     </th>
                     <th
                       className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
@@ -509,6 +528,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
                         setSortDirection(newDirection);
+                        setSortedColumn("Client Secret");
                         setSettingsSavedFacilities(
                           [...settingsSavedFacilities].sort((a, b) => {
                             if (a.clientSecret < b.clientSecret)
@@ -521,6 +541,11 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       }}
                     >
                       Client Secret
+                      {sortedColumn === "Client Secret" && (
+                        <span className="ml-2">
+                          {sortDirection === "asc" ? "▲" : "▼"}
+                        </span>
+                      )}
                     </th>
                     <th
                       className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
@@ -528,6 +553,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
                         setSortDirection(newDirection);
+                        setSortedColumn("Environment");
                         setSettingsSavedFacilities(
                           [...settingsSavedFacilities].sort((a, b) => {
                             if (a.environment < b.environment)
@@ -540,6 +566,11 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       }}
                     >
                       Environment
+                      {sortedColumn === "Environment" && (
+                        <span className="ml-2">
+                          {sortDirection === "asc" ? "▲" : "▼"}
+                        </span>
+                      )}
                     </th>
                     <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                       Authenticated

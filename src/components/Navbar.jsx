@@ -84,30 +84,10 @@ export default function Navbar({
             </button>
           )}
         </div>
-
-        {/* Centered PMS */}
         <div className="absolute left-1/2 transform -translate-x-1/2 text-2xl font-medium">
           PMS
         </div>
-
         <div className="flex space-x-4 items-center mr-5">
-          {/* Rest of your navigation */}
-          <div
-            onClick={toggleDarkMode}
-            className={`w-8 h-4 flex items-center rounded-full p-1 cursor-pointer bg-gray-300 dark:bg-gray-600`}
-          >
-            <div
-              className={`bg-white shadow-md shadow-gray-300 dark:shadow-sm dark:shadow-gray-600 dark:bg-darkSecondary w-4 h-4 rounded-full transform transition-transform duration-500 ease-out flex items-center justify-center ${
-                darkMode ? "translate-x-2" : ""
-              }`}
-            >
-              {darkMode ? (
-                <FaMoon className="text-[10px] text-gray-500" />
-              ) : (
-                <MdOutlineWbSunny className="text-[10px] text-gray-500 " />
-              )}
-            </div>
-          </div>
           {user && permissions.smartlockPlatform && (
             <Link
               to="/smartlock"
@@ -153,9 +133,17 @@ export default function Navbar({
               </h2>
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-1 w-full bg-white dark:bg-darkSecondary border border-gray-200 dark:border-border rounded-lg shadow-lg p-2 z-20 flex flex-col">
+                  <button
+                    className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-center"
+                    onClick={() =>
+                      toggleDarkMode() & setIsDropdownOpen(!isDropdownOpen)
+                    }
+                  >
+                    {darkMode ? "Light Mode" : "Dark Mode"}
+                  </button>
                   <Link
                     to="/user-settings"
-                    className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-center"
+                    className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-center border-t border-t-gray-100 dark:border-t-border"
                   >
                     User Settings
                   </Link>
@@ -167,7 +155,6 @@ export default function Navbar({
                       Authentication
                     </Link>
                   )}
-
                   <button
                     className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium border-opacity-50 border-t border-t-gray-100 dark:border-t-border"
                     onClick={() => handleLogout()}
