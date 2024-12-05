@@ -10,7 +10,6 @@ import {
   BiChevronsLeft,
   BiChevronsRight,
 } from "react-icons/bi";
-import EditUser from "./modals/EditUser";
 import CreateRole from "./modals/CreateRole";
 import EditRole from "./modals/EditRole";
 
@@ -29,6 +28,8 @@ export default function Roles() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateRoleModalOpen, setIsCreateRoleModalOpen] = useState(false);
   const [users, setUsers] = useState([]);
+  const [sortedColumn, setSortedColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState("asc");
 
   async function getUsers() {
     if (!user) return;
@@ -111,12 +112,30 @@ export default function Roles() {
 
   useEffect(() => {
     const filteredUsers = roles.sort((a, b) => {
-      if (a.created_at > b.created_at) return -1;
-      if (a.created_at < b.created_at) return 1;
+      if ((a.role_name || "").toLowerCase() < (b.role_name || "").toLowerCase())
+        return -1;
+      if ((a.role_name || "").toLowerCase() > (b.role_name || "").toLowerCase())
+        return 1;
       return 0;
     });
+    setSortedColumn("Role");
     setFilteredRoles(filteredUsers);
   }, [roles]);
+
+  useEffect(() => {
+    // Filter roles based on the search query
+    const filteredRoles = roles.filter(
+      (role) =>
+        (role.id?.toString() || "").includes(searchQuery) ||
+        (role.role_name?.toLowerCase() || "").includes(
+          searchQuery.toLowerCase()
+        ) ||
+        (role.role_description?.toLowerCase() || "").includes(
+          searchQuery.toLowerCase()
+        )
+    );
+    setFilteredRoles(filteredRoles);
+  }, [searchQuery]);
 
   return (
     <div className="overflow-auto dark:text-white dark:bg-darkPrimary mb-14 h-full">
@@ -136,7 +155,7 @@ export default function Roles() {
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <FaPerson className="text-lg" />
-          &ensp; Users
+          &ensp; Roles
         </div>
       </div>
       <div className="mt-2  flex items-center justify-end text-center px-5">
@@ -158,17 +177,127 @@ export default function Roles() {
         <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
           <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary w-full">
             <tr className="bg-gray-200 dark:bg-darkNavSecondary w-full">
-              <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Role");
+                  setFilteredRoles(
+                    [...roles].sort((a, b) => {
+                      if (
+                        (a.role_name || "").toLowerCase() <
+                        (b.role_name || "").toLowerCase()
+                      )
+                        return newDirection === "asc" ? -1 : 1;
+                      if (
+                        (a.role_name || "").toLowerCase() >
+                        (b.role_name || "").toLowerCase()
+                      )
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Role
+                {sortedColumn === "Role" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Description");
+                  setFilteredRoles(
+                    [...roles].sort((a, b) => {
+                      if (
+                        (a.role_description || "").toLowerCase() <
+                        (b.role_description || "").toLowerCase()
+                      )
+                        return newDirection === "asc" ? -1 : 1;
+                      if (
+                        (a.role_description || "").toLowerCase() >
+                        (b.role_description || "").toLowerCase()
+                      )
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Description
+                {sortedColumn === "Description" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Permissions");
+                  setFilteredRoles(
+                    [...roles].sort((a, b) => {
+                      const permissionA = Object.values(
+                        a.permissions || {}
+                      ).filter((value) => value === true).length;
+                      const permissionB = Object.values(
+                        b.permissions || {}
+                      ).filter((value) => value === true).length;
+
+                      if (permissionA < permissionB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (permissionA > permissionB)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Permissions
+                {sortedColumn === "Permissions" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Users");
+                  setFilteredRoles(
+                    [...roles].sort((a, b) => {
+                      const userCountA = users.filter(
+                        (user) => user.role === a.role_name
+                      ).length;
+                      const userCountB = users.filter(
+                        (user) => user.role === b.role_name
+                      ).length;
+
+                      if (userCountA < userCountB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (userCountA > userCountB)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Users
+                {sortedColumn === "Users" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Actions

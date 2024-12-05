@@ -25,6 +25,9 @@ export default function Users() {
   const modalRef = useRef(null);
   const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortedColumn, setSortedColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState("asc");
 
   async function addEvent(eventName, eventDescription, completed) {
     const { data, error } = await supabase.from("user_events").insert([
@@ -115,12 +118,38 @@ export default function Users() {
 
   useEffect(() => {
     const filteredUsers = users.sort((a, b) => {
-      if (a.created_at > b.created_at) return -1;
-      if (a.created_at < b.created_at) return 1;
+      if (
+        (a.user_email || "").toLowerCase() < (b.user_email || "").toLowerCase()
+      )
+        return -1;
+      if (
+        (a.user_email || "").toLowerCase() > (b.user_email || "").toLowerCase()
+      )
+        return 1;
       return 0;
     });
+    setSortedColumn("User");
     setFilteredUsers(filteredUsers);
   }, [users]);
+
+  useEffect(() => {
+    // Filter users based on the search query
+    const filteredUsers = users.filter(
+      (user) =>
+        (user.id?.toString() || "").includes(searchQuery) ||
+        (user.user_email?.toLowerCase() || "").includes(
+          searchQuery.toLowerCase()
+        ) ||
+        (user.role?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+        (user.current_facility?.name?.toLowerCase() || "").includes(
+          searchQuery.toLowerCase()
+        ) ||
+        (user.created_at?.toLowerCase() || "").includes(
+          searchQuery.toLowerCase()
+        )
+    );
+    setFilteredUsers(filteredUsers);
+  }, [searchQuery]);
 
   return (
     <div className="overflow-auto dark:text-white dark:bg-darkPrimary mb-14 h-full">
@@ -138,36 +167,202 @@ export default function Users() {
           &ensp; Users
         </div>
       </div>
-      <p
-        className="text-sm dark:text-white text-left"
-        onClick={() => console.log(filteredUsers)}
-      >
-        {Date()}
-      </p>
+      <div className="mt-2  flex items-center justify-end text-center px-5">
+        <input
+          type="text"
+          placeholder="Search users..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
+        />
+      </div>
       <div className="w-full px-5 py-2">
-        <table className="w-full table-auto border-collapse border-gray-300 dark:border-border my-2">
+        <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
           <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary w-full">
             <tr className="bg-gray-200 dark:bg-darkNavSecondary w-full">
-              <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("User");
+                  setFilteredUsers(
+                    [...users].sort((a, b) => {
+                      const userA = (a.user_email || "").toLowerCase();
+                      const userB = (b.user_email || "").toLowerCase();
+
+                      if (userA < userB) return newDirection === "asc" ? -1 : 1;
+                      if (userA > userB) return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 User
+                {sortedColumn === "User" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Tokens");
+                  setFilteredUsers(
+                    [...users].sort((a, b) => {
+                      const tokenA = a.tokens.length;
+                      const tokenB = b.tokens.length;
+
+                      if (tokenA < tokenB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (tokenA > tokenB)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Tokens
+                {sortedColumn === "Tokens" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Favorites");
+                  setFilteredUsers(
+                    [...users].sort((a, b) => {
+                      const tokenA = a.favorite_tokens.length;
+                      const tokenB = b.favorite_tokens.length;
+
+                      if (tokenA < tokenB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (tokenA > tokenB)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Favorites
+                {sortedColumn === "Favorites" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Selected");
+                  setFilteredUsers(
+                    [...users].sort((a, b) => {
+                      const tokenA = a.selected_tokens.length;
+                      const tokenB = b.selected_tokens.length;
+
+                      if (tokenA < tokenB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (tokenA > tokenB)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Selected
+                {sortedColumn === "Selected" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Current Facility");
+                  setFilteredUsers(
+                    [...users].sort((a, b) => {
+                      const userA = (
+                        a.current_facility.name || ""
+                      ).toLowerCase();
+                      const userB = (
+                        b.current_facility.name || ""
+                      ).toLowerCase();
+
+                      if (userA < userB) return newDirection === "asc" ? -1 : 1;
+                      if (userA > userB) return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Current Facility
+                {sortedColumn === "Current Facility" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Role");
+                  setFilteredUsers(
+                    [...users].sort((a, b) => {
+                      const userA = (a.role || "").toLowerCase();
+                      const userB = (b.role || "").toLowerCase();
+
+                      if (userA < userB) return newDirection === "asc" ? -1 : 1;
+                      if (userA > userB) return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Role
+                {sortedColumn === "Role" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Created On");
+                  setFilteredUsers(
+                    [...users].sort((a, b) => {
+                      if (a.created_at < b.created_at)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.created_at > b.created_at)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
                 Created On
+                {sortedColumn === "Created On" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
               </th>
               <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Actions
