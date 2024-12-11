@@ -2,9 +2,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
 import SmartLock from "./modals/SmartLock";
-
-import { FaCheckCircle } from "react-icons/fa";
-
+import { FaCheckCircle, FaExternalLinkAlt } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
 
 export default function SmartLockFacilityRow({ setFacilitiesInfo, facility }) {
@@ -250,7 +248,26 @@ export default function SmartLockFacilityRow({ setFacilitiesInfo, facility }) {
         className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
         onClick={() => openSmartLockModal("")}
       >
-        {facility.name}
+        <div className="flex gap-3 items-center justify-center">
+          {facility.name}
+          <FaExternalLinkAlt
+            className="text-blue-300 group-hover:text-blue-500"
+            title={
+              facility.environment === "cia-stg-1.aws."
+                ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
+                : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`
+            }
+            onClick={(e) => {
+              e.stopPropagation();
+              e.prev;
+              const baseUrl =
+                facility.environment === "cia-stg-1.aws."
+                  ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
+                  : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`;
+              window.open(baseUrl, "_blank");
+            }}
+          />
+        </div>
       </td>
       <td
         className="border border-gray-300 dark:border-border px-4 py-2"

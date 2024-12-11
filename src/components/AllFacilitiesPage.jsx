@@ -12,6 +12,7 @@ import {
 } from "react-icons/bi";
 import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
 export default function AllFacilitiesPage({
   setOpenPage,
@@ -447,10 +448,10 @@ export default function AllFacilitiesPage({
                 .map((facility, index) => (
                   <tr
                     key={index}
-                    className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
+                    className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary border-y border-gray-300 dark:border-border"
                   >
                     <td
-                      className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                      className="px-4 py-2 hover:cursor-pointer"
                       onClick={() => addToFavorite(facility)}
                     >
                       <div className="flex justify-center text-yellow-500">
@@ -462,7 +463,7 @@ export default function AllFacilitiesPage({
                       </div>
                     </td>
                     <td
-                      className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                      className="px-4 py-2 hover:cursor-pointer"
                       onClick={() => addToFavorite(facility)}
                     >
                       {facility.environment == "-dev"
@@ -476,24 +477,39 @@ export default function AllFacilitiesPage({
                         : "N?A"}
                     </td>
                     <td
-                      className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                      className="px-4 py-2 hover:cursor-pointer"
                       onClick={() => addToFavorite(facility)}
                     >
                       {facility.id}
                     </td>
                     <td
-                      className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
-                      onClick={() => addToFavorite(facility)}
+                      className="px-4 py-2 hover:cursor-pointer"
+                      title={
+                        facility.environment === "cia-stg-1.aws."
+                          ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
+                          : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`
+                      }
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const baseUrl =
+                          facility.environment === "cia-stg-1.aws."
+                            ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
+                            : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`;
+                        window.open(baseUrl, "_blank");
+                      }}
                     >
-                      {facility.name}
+                      <div className="flex gap-3 items-center">
+                        {facility.name}
+                        <FaExternalLinkAlt className="text-blue-300 group-hover:text-blue-500" />
+                      </div>
                     </td>
                     <td
-                      className="border-y border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                      className=" border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
                       onClick={() => addToFavorite(facility)}
                     >
                       {facility.propertyNumber}
                     </td>
-                    <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                    <td className="px-4 py-2 hover:cursor-pointer">
                       {currentFacility.id == facility.id &&
                       currentFacility.environment == facility.environment ? (
                         <button

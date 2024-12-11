@@ -15,6 +15,7 @@ import {
 } from "react-icons/bi";
 import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
 export default function SmartLockAllFacilitiesPage({}) {
   const [facilities, setFacilities] = useState([]);
@@ -362,10 +363,10 @@ export default function SmartLockAllFacilitiesPage({}) {
                 .map((facility, index) => (
                   <tr
                     key={index}
-                    className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary hover:cursor-pointer"
+                    className="border-y border-gray-300 dark:border-border hover:bg-gray-100 dark:hover:bg-darkNavSecondary hover:cursor-pointer"
                     onClick={() => addToSelected(facility)}
                   >
-                    <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                    <td className="px-4 py-2">
                       <div className="flex justify-center text-yellow-500">
                         {isFacilitySelected(facility.id) ? (
                           <RiCheckboxCircleFill className="text-lg" />
@@ -374,7 +375,7 @@ export default function SmartLockAllFacilitiesPage({}) {
                         )}
                       </div>
                     </td>
-                    <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                    <td className="px-4 py-2 hover:cursor-pointer">
                       {facility.environment == "-dev"
                         ? "Development"
                         : facility.environment == ""
@@ -388,10 +389,28 @@ export default function SmartLockAllFacilitiesPage({}) {
                     <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                       {facility.id}
                     </td>
-                    <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                      {facility.name}
+                    <td
+                      className="px-4 py-2 hover:cursor-pointer"
+                      title={
+                        facility.environment === "cia-stg-1.aws."
+                          ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
+                          : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`
+                      }
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const baseUrl =
+                          facility.environment === "cia-stg-1.aws."
+                            ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
+                            : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`;
+                        window.open(baseUrl, "_blank");
+                      }}
+                    >
+                      <div className="flex gap-3 items-center">
+                        {facility.name}
+                        <FaExternalLinkAlt className="text-blue-300 group-hover:text-blue-500" />
+                      </div>
                     </td>
-                    <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                    <td className="px-4 py-2 hover:cursor-pointer">
                       {facility.propertyNumber}
                     </td>
                   </tr>

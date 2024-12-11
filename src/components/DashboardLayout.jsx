@@ -200,6 +200,19 @@ export default function DashboardLayout({ dashboardMenu }) {
                   >
                     Units
                   </Link>
+                  <Link
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const baseUrl =
+                        currentFacility.environment === "cia-stg-1.aws."
+                          ? `https://portal.${currentFacility.environment}insomniaccia.com/facility/${currentFacility.id}/dashboard`
+                          : `https://portal.insomniaccia${currentFacility.environment}.com/facility/${currentFacility.id}/dashboard`;
+                      window.open(baseUrl, "_blank");
+                    }}
+                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                  >
+                    Control Center
+                  </Link>
                 </div>
               )}
             </div>
