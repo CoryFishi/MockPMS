@@ -2,12 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaPerson } from "react-icons/fa6";
 import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
-import {
-  BiChevronLeft,
-  BiChevronRight,
-  BiChevronsLeft,
-  BiChevronsRight,
-} from "react-icons/bi";
+import PaginationFooter from "./PaginationFooter";
 
 export default function UserEvents() {
   const { user } = useAuth();
@@ -16,7 +11,6 @@ export default function UserEvents() {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [eventsPulled, setEventsPulled] = useState(false);
-  const pageCount = Math.ceil(filteredEvents.length / rowsPerPage);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortedColumn, setSortedColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("desc");
@@ -220,66 +214,19 @@ export default function UserEvents() {
               ))}
           </tbody>
         </table>
-        {events.length < 1 && <p className="text-center">No events found.</p>}
-        {/* Modal footer/pagination */}
-        <div className="flex justify-between items-center px-2 py-5 mx-1">
-          <div className="flex gap-3">
-            <div>
-              <select
-                className="border rounded ml-2 dark:bg-darkSecondary dark:border-border"
-                id="rowsPerPage"
-                value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
-                  setCurrentPage(1); // Reset to first page on rows per page change
-                }}
-              >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={100}>100</option>
-              </select>
-            </div>
-            <p className="text-sm">
-              {currentPage === 1 ? 1 : (currentPage - 1) * rowsPerPage + 1} -{" "}
-              {currentPage * rowsPerPage > filteredEvents.length
-                ? filteredEvents.length
-                : currentPage * rowsPerPage}{" "}
-              of {filteredEvents.length}
-            </p>
-          </div>
-          <div className="gap-2 flex">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(1)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronsLeft />
-            </button>
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((prev) => prev - 1)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronLeft />
-            </button>
-            <p>
-              {currentPage} of {pageCount}
-            </p>
-            <button
-              disabled={currentPage === pageCount}
-              onClick={() => setCurrentPage((prev) => prev + 1)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronRight />
-            </button>
-            <button
-              disabled={currentPage === pageCount}
-              onClick={() => setCurrentPage(pageCount)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronsRight />
-            </button>
-          </div>
+        {/* No Events Notification Text */}
+        {filteredEvents.length < 1 && (
+          <p className="text-center p-4 font-bold text-lg">No events found.</p>
+        )}
+        {/* Pagination Footer */}
+        <div className="px-2 py-5 mx-1">
+          <PaginationFooter
+            rowsPerPage={rowsPerPage}
+            setRowsPerPage={setRowsPerPage}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            items={filteredEvents}
+          />
         </div>
       </div>
     </div>

@@ -11,7 +11,7 @@ export default function Dashboard({ darkMode, toggleDarkMode }) {
   return (
     <div className="h-screen w-screen flex flex-col overflow-x-hidden overflow-hidden font-roboto">
       {user && permissions.pmsPlatform ? (
-        <div>
+        <>
           <Navbar
             setDashboardMenu={setDashboardMenu}
             dashboardMenu={dashboardMenu}
@@ -21,17 +21,9 @@ export default function Dashboard({ darkMode, toggleDarkMode }) {
           <div className="flex flex-1">
             <DashboardLayout dashboardMenu={dashboardMenu} />
           </div>
-        </div>
+        </>
       ) : (
-        <div>
-          <Navbar
-            setDashboardMenu={setDashboardMenu}
-            dashboardMenu={dashboardMenu}
-            darkMode={darkMode}
-            toggleDarkMode={toggleDarkMode}
-          />
-          <NotFound />
-        </div>
+        <NotFound />
       )}
     </div>
   );

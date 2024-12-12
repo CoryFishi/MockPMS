@@ -5,14 +5,9 @@ import CreateUnit from "./modals/CreateUnit";
 import CreateVisitor from "./modals/CreateVisitorUnit";
 import { RiDoorLockFill } from "react-icons/ri";
 import EditVisitor from "./modals/EditVisitorUnit";
-import {
-  BiChevronLeft,
-  BiChevronRight,
-  BiChevronsLeft,
-  BiChevronsRight,
-} from "react-icons/bi";
 import { useAuth } from "../context/AuthProvider";
-import { supabase } from "../supabaseClient";
+import { addEvent } from "../functions/events";
+import PaginationFooter from "./PaginationFooter";
 
 export default function UnitPage({
   currentFacilityName = { currentFacilityName },
@@ -47,19 +42,6 @@ export default function UnitPage({
     (unit) => unit.status === "Vacant"
   ).length;
 
-  async function addEvent(eventName, eventDescription, completed) {
-    const { data, error } = await supabase.from("user_events").insert([
-      {
-        event_name: eventName,
-        event_description: eventDescription,
-        completed: completed,
-      },
-    ]);
-
-    if (error) {
-      console.error("Error inserting event:", error);
-    }
-  }
   const handleTimeProfiles = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
@@ -483,11 +465,7 @@ export default function UnitPage({
     if (!currentFacility.token) return;
     // Return if units have already been pulled
     if (unitsPulled) return;
-    toast.promise(handleUnits(), {
-      loading: "Loading units...",
-      success: <b>Units loaded successfully!</b>,
-      error: <b>Could not load units.</b>,
-    });
+    handleUnits();
     handleAccessProfiles();
     handleTimeProfiles();
   }, [currentFacility]);
@@ -502,20 +480,19 @@ export default function UnitPage({
     setFilteredUnits(filteredUnits);
   }, [units, searchQuery]);
 
-  // Pagination logic
-  const pageCount = Math.ceil(filteredUnits.length / rowsPerPage);
-
   return (
     <div className="overflow-auto dark:text-white dark:bg-darkPrimary mb-14">
+      {/* Page Header */}
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <RiDoorLockFill className="text-lg" />
           &ensp; Units | {currentFacilityName}
         </div>
       </div>
+      {/* Load Time Label */}
       <p className="text-sm dark:text-white text-left">{Date()}</p>
-
       <div className="w-full px-5 flex flex-col rounded-lg h-full">
+        {/* Totals Header */}
         <div className="min-h-12 flex justify-center gap-32">
           <div className="text-center">
             <div className="font-bold text-2xl">{rentedCount}</div>
@@ -537,6 +514,7 @@ export default function UnitPage({
           </div>
         </div>
         <div className="mt-5 mb-2 flex items-center justify-end text-center">
+          {/* Search Bar */}
           <input
             type="text"
             placeholder="Search units..."
@@ -544,6 +522,7 @@ export default function UnitPage({
             onChange={(e) => setSearchQuery(e.target.value)}
             className="border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
           />
+          {/* Visitor Autofill Toggle */}
           <h3 className="mr-2 w-36">Visitor Autofill</h3>
           <div
             className={`w-8 h-4 flex items-center rounded-full p-1 cursor-pointer ${
@@ -557,6 +536,7 @@ export default function UnitPage({
               }`}
             ></div>
           </div>
+          {/* Create Unit Button */}
           <button
             className={`bg-green-500 text-white p-1 py-2 rounded font-bold ml-3 w-44 transition duration-300 ease-in-out transform select-none ${
               permissions.pmsPlatformUnitCreate
@@ -589,6 +569,7 @@ export default function UnitPage({
           />
         )}
 
+        {/* Multi Visitor Edit Modal */}
         {isEditVisitorModalOpen && (
           <EditVisitor
             setIsEditVisitorModalOpen={setIsEditVisitorModalOpen}
@@ -599,437 +580,369 @@ export default function UnitPage({
           />
         )}
 
-        <div>
-          <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
-            <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
-              <tr className="bg-gray-200 dark:bg-darkNavSecondary">
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("Unit Id");
+        {/* Unit Table */}
+        <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
+          {/* Header */}
+          <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
+            <tr className="border border-gray-300 dark:border-border bg-gray-200 dark:bg-darkNavSecondary">
+              <th
+                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Unit Id");
 
-                    setFilteredUnits(
-                      [...filteredUnits].sort((a, b) => {
-                        if (a.id < b.id) return newDirection === "asc" ? -1 : 1;
-                        if (a.id > b.id) return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
-                >
-                  Unit Id
-                  {sortedColumn === "Unit Id" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("Unit Number");
-                    setFilteredUnits(
-                      [...filteredUnits].sort((a, b) => {
-                        if (
-                          a.unitNumber.toLowerCase() <
-                          b.unitNumber.toLowerCase()
-                        )
-                          return newDirection === "asc" ? -1 : 1;
-                        if (
-                          a.unitNumber.toLowerCase() >
-                          b.unitNumber.toLowerCase()
-                        )
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
-                >
-                  Unit Number
-                  {sortedColumn === "Unit Number" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("Status");
-
-                    setFilteredUnits(
-                      [...filteredUnits].sort((a, b) => {
-                        if (a.status < b.status)
-                          return newDirection === "asc" ? -1 : 1;
-                        if (a.status > b.status)
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
-                >
-                  Status
-                  {sortedColumn === "Status" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hidden sm:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("Facility ID");
-                    setFilteredUnits(
-                      [...filteredUnits].sort((a, b) => {
-                        if (a.facilityId < b.facilityId)
-                          return newDirection === "asc" ? -1 : 1;
-                        if (a.facilityId > b.facilityId)
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
-                >
-                  Facility ID
-                  {sortedColumn === "Facility ID" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hidden md:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("Property Number");
-                    setFilteredUnits(
-                      [...filteredUnits].sort((a, b) => {
-                        const propertyNumberA = (
-                          a.propertyNumber || ""
-                        ).toLowerCase();
-                        const propertyNumberB = (
-                          b.propertyNumber || ""
-                        ).toLowerCase();
-                        if (propertyNumberA < propertyNumberB)
-                          return newDirection === "asc" ? -1 : 1;
-                        if (propertyNumberA > propertyNumberB)
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
-                >
-                  Property Number
-                  {sortedColumn === "Property Number" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hidden md:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("Additional Prop 1");
-                    setFilteredUnits(
-                      [...filteredUnits].sort((a, b) => {
-                        const extendedDataA = (
-                          a.extendedData?.additionalProp1 || ""
-                        ).toLowerCase();
-                        const extendedDataB = (
-                          b.extendedData?.additionalProp1 || ""
-                        ).toLowerCase();
-                        if (extendedDataA < extendedDataB)
-                          return newDirection === "asc" ? -1 : 1;
-                        if (extendedDataA > extendedDataB)
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
-                >
-                  Additional Prop 1
-                  {sortedColumn === "Additional Prop 1" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hidden lg:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("Additional Prop 2");
-                    setFilteredUnits(
-                      [...filteredUnits].sort((a, b) => {
-                        const extendedDataA = (
-                          a.extendedData?.additionalProp2 || ""
-                        ).toLowerCase();
-                        const extendedDataB = (
-                          b.extendedData?.additionalProp2 || ""
-                        ).toLowerCase();
-                        if (extendedDataA < extendedDataB)
-                          return newDirection === "asc" ? -1 : 1;
-                        if (extendedDataA > extendedDataB)
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
-                >
-                  Additional Prop 2
-                  {sortedColumn === "Additional Prop 2" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hidden lg:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("Additional Prop 3");
-                    setFilteredUnits(
-                      [...filteredUnits].sort((a, b) => {
-                        const extendedDataA = (
-                          a.extendedData?.additionalProp3 || ""
-                        ).toLowerCase();
-                        const extendedDataB = (
-                          b.extendedData?.additionalProp3 || ""
-                        ).toLowerCase();
-                        if (extendedDataA < extendedDataB)
-                          return newDirection === "asc" ? -1 : 1;
-                        if (extendedDataA > extendedDataB)
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
-                >
-                  Additional Prop 3
-                  {sortedColumn === "Additional Prop 3" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUnits
-                .slice(
-                  (currentPage - 1) * rowsPerPage,
-                  currentPage * rowsPerPage
-                )
-                .map((unit, index) => (
-                  <tr
-                    key={index}
-                    className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
-                  >
-                    <td
-                      className="border-y border-gray-300 dark:border-border px-4 py-2"
-                      onClick={() => editTenants(unit)}
-                    >
-                      {unit.status === "Rented" ||
-                      unit.status === "Delinquent" ? (
-                        <p
-                          className="text-blue-500  hover:cursor-pointer"
-                          title="edit tenant"
-                        >
-                          {unit.id}
-                        </p>
-                      ) : (
-                        unit.id
-                      )}
-                    </td>
-                    <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                      {unit.unitNumber}
-                    </td>
-                    <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                      {unit.status}
-                    </td>
-                    <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
-                      {unit.facilityId}
-                    </td>
-                    <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden md:table-cell">
-                      {unit.propertyNumber}
-                    </td>
-                    <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden md:table-cell">
-                      {unit.additionalProp1}
-                    </td>
-                    <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
-                      {unit.additionalProp2}
-                    </td>
-                    <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
-                      {unit.additionalProp3}
-                    </td>
-                    <td className="border-y border-gray-300 dark:border-border px-4 py-2 select-none space-x-2">
-                      {unit.status === "Rented" ? (
-                        <>
-                          <button
-                            className={`bg-yellow-500 text-white px-2 py-1 rounded font-bold ${
-                              permissions.pmsPlatformVisitorEdit
-                                ? "hover:bg-yellow-600"
-                                : "opacity-50 cursor-not-allowed"
-                            }`}
-                            onClick={() => turnDelinquent(unit)}
-                            disabled={!permissions.pmsPlatformVisitorEdit}
-                          >
-                            Turn Delinquent
-                          </button>
-                          <button
-                            className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
-                              permissions.pmsPlatformVisitorDelete
-                                ? "hover:bg-red-600"
-                                : "opacity-50 cursor-not-allowed"
-                            }`}
-                            onClick={() => moveOut(unit)}
-                            disabled={!permissions.pmsPlatformVisitorDelete}
-                          >
-                            Move Out
-                          </button>
-                        </>
-                      ) : unit.status === "Vacant" ? (
-                        <>
-                          <button
-                            className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
-                              permissions.pmsPlatformVisitorCreate
-                                ? "hover:bg-green-600"
-                                : "opacity-50 cursor-not-allowed"
-                            }`}
-                            onClick={() => moveIn(unit) & setSelectedUnit(unit)}
-                            disabled={!permissions.pmsPlatformVisitorCreate}
-                          >
-                            Move In
-                          </button>
-                          <button
-                            className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
-                              permissions.pmsPlatformUnitDelete
-                                ? "hover:bg-red-600"
-                                : "opacity-50 cursor-not-allowed"
-                            }`}
-                            onClick={() => deleteUnit(unit)}
-                            disabled={!permissions.pmsPlatformUnitDelete}
-                          >
-                            Delete
-                          </button>
-                        </>
-                      ) : unit.status === "Delinquent" ? (
-                        <>
-                          <button
-                            className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
-                              permissions.pmsPlatformVisitorEdit
-                                ? "hover:bg-green-600"
-                                : "opacity-50 cursor-not-allowed"
-                            }`}
-                            onClick={() => turnRented(unit)}
-                            disabled={!permissions.pmsPlatformVisitorEdit}
-                          >
-                            Turn Rented
-                          </button>
-                          <button
-                            className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
-                              permissions.pmsPlatformVisitorDelete
-                                ? "hover:bg-red-600"
-                                : "opacity-50 cursor-not-allowed"
-                            }`}
-                            onClick={() => moveOut(unit)}
-                            disabled={!permissions.pmsPlatformVisitorDelete}
-                          >
-                            Move Out
-                          </button>
-                        </>
-                      ) : (
-                        <>error</>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
-        {/* Modal footer/pagination */}
-        <div className="flex justify-between items-center px-2 py-5 mx-1">
-          <div className="flex gap-3">
-            <div>
-              <select
-                className="border rounded ml-2 dark:bg-darkSecondary dark:border-border"
-                id="rowsPerPage"
-                value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
-                  setCurrentPage(1); // Reset to first page on rows per page change
+                  setFilteredUnits(
+                    [...filteredUnits].sort((a, b) => {
+                      if (a.id < b.id) return newDirection === "asc" ? -1 : 1;
+                      if (a.id > b.id) return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
                 }}
               >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={100}>100</option>
-              </select>
-            </div>
-            <p className="text-sm">
-              {currentPage === 1 ? 1 : (currentPage - 1) * rowsPerPage + 1} -{" "}
-              {currentPage * rowsPerPage > filteredUnits.length
-                ? filteredUnits.length
-                : currentPage * rowsPerPage}{" "}
-              of {filteredUnits.length}
-            </p>
-          </div>
-          <div className="gap-2 flex">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(1)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronsLeft />
-            </button>
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((prev) => prev - 1)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronLeft />
-            </button>
-            <p>
-              {currentPage} of {pageCount}
-            </p>
-            <button
-              disabled={currentPage === pageCount}
-              onClick={() => setCurrentPage((prev) => prev + 1)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronRight />
-            </button>
-            <button
-              disabled={currentPage === pageCount}
-              onClick={() => setCurrentPage(pageCount)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronsRight />
-            </button>
-          </div>
+                Unit Id
+                {sortedColumn === "Unit Id" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
+              </th>
+              <th
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Unit Number");
+                  setFilteredUnits(
+                    [...filteredUnits].sort((a, b) => {
+                      if (
+                        a.unitNumber.toLowerCase() < b.unitNumber.toLowerCase()
+                      )
+                        return newDirection === "asc" ? -1 : 1;
+                      if (
+                        a.unitNumber.toLowerCase() > b.unitNumber.toLowerCase()
+                      )
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
+                Unit Number
+                {sortedColumn === "Unit Number" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
+              </th>
+              <th
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Status");
+
+                  setFilteredUnits(
+                    [...filteredUnits].sort((a, b) => {
+                      if (a.status < b.status)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.status > b.status)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
+                Status
+                {sortedColumn === "Status" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
+              </th>
+              <th
+                className="px-4 py-2 hover:cursor-pointer hidden sm:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Facility ID");
+                  setFilteredUnits(
+                    [...filteredUnits].sort((a, b) => {
+                      if (a.facilityId < b.facilityId)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.facilityId > b.facilityId)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
+                Facility ID
+                {sortedColumn === "Facility ID" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
+              </th>
+              <th
+                className="px-4 py-2 hover:cursor-pointer hidden md:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Property Number");
+                  setFilteredUnits(
+                    [...filteredUnits].sort((a, b) => {
+                      const propertyNumberA = (
+                        a.propertyNumber || ""
+                      ).toLowerCase();
+                      const propertyNumberB = (
+                        b.propertyNumber || ""
+                      ).toLowerCase();
+                      if (propertyNumberA < propertyNumberB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (propertyNumberA > propertyNumberB)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
+                Property Number
+                {sortedColumn === "Property Number" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
+              </th>
+              <th
+                className="px-4 py-2 hover:cursor-pointer hidden md:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Additional Prop 1");
+                  setFilteredUnits(
+                    [...filteredUnits].sort((a, b) => {
+                      const extendedDataA = (
+                        a.extendedData?.additionalProp1 || ""
+                      ).toLowerCase();
+                      const extendedDataB = (
+                        b.extendedData?.additionalProp1 || ""
+                      ).toLowerCase();
+                      if (extendedDataA < extendedDataB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (extendedDataA > extendedDataB)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
+                Additional Prop 1
+                {sortedColumn === "Additional Prop 1" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
+              </th>
+              <th
+                className="px-4 py-2 hover:cursor-pointer hidden lg:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Additional Prop 2");
+                  setFilteredUnits(
+                    [...filteredUnits].sort((a, b) => {
+                      const extendedDataA = (
+                        a.extendedData?.additionalProp2 || ""
+                      ).toLowerCase();
+                      const extendedDataB = (
+                        b.extendedData?.additionalProp2 || ""
+                      ).toLowerCase();
+                      if (extendedDataA < extendedDataB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (extendedDataA > extendedDataB)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
+                Additional Prop 2
+                {sortedColumn === "Additional Prop 2" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
+              </th>
+              <th
+                className="px-4 py-2 hover:cursor-pointer hidden lg:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Additional Prop 3");
+                  setFilteredUnits(
+                    [...filteredUnits].sort((a, b) => {
+                      const extendedDataA = (
+                        a.extendedData?.additionalProp3 || ""
+                      ).toLowerCase();
+                      const extendedDataB = (
+                        b.extendedData?.additionalProp3 || ""
+                      ).toLowerCase();
+                      if (extendedDataA < extendedDataB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (extendedDataA > extendedDataB)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
+                Additional Prop 3
+                {sortedColumn === "Additional Prop 3" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
+              </th>
+              <th className="px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          {/* Body */}
+          <tbody>
+            {filteredUnits
+              .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+              .map((unit, index) => (
+                <tr
+                  key={index}
+                  className="border-y border-gray-300 dark:border-border hover:bg-gray-100 dark:hover:bg-darkNavSecondary text-center"
+                >
+                  <td className="px-4 py-2" onClick={() => editTenants(unit)}>
+                    {unit.status === "Rented" ||
+                    unit.status === "Delinquent" ? (
+                      <p
+                        className="text-blue-500  hover:cursor-pointer"
+                        title="edit tenant"
+                      >
+                        {unit.id}
+                      </p>
+                    ) : (
+                      unit.id
+                    )}
+                  </td>
+                  <td className="px-4 py-2">{unit.unitNumber}</td>
+                  <td className="px-4 py-2">{unit.status}</td>
+                  <td className="px-4 py-2 hidden sm:table-cell">
+                    {unit.facilityId}
+                  </td>
+                  <td className="px-4 py-2 hidden md:table-cell">
+                    {unit.propertyNumber}
+                  </td>
+                  <td className="px-4 py-2 hidden md:table-cell">
+                    {unit.additionalProp1}
+                  </td>
+                  <td className="px-4 py-2 hidden lg:table-cell">
+                    {unit.additionalProp2}
+                  </td>
+                  <td className="px-4 py-2 hidden lg:table-cell">
+                    {unit.additionalProp3}
+                  </td>
+                  <td className="px-4 py-2 select-none">
+                    {unit.status === "Rented" ? (
+                      <div className="text-center space-x-1">
+                        <button
+                          className={`bg-yellow-500 text-white px-2 py-1 rounded font-bold ${
+                            permissions.pmsPlatformVisitorEdit
+                              ? "hover:bg-yellow-600"
+                              : "opacity-50 cursor-not-allowed"
+                          }`}
+                          onClick={() => turnDelinquent(unit)}
+                          disabled={!permissions.pmsPlatformVisitorEdit}
+                        >
+                          Turn Delinquent
+                        </button>
+                        <button
+                          className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
+                            permissions.pmsPlatformVisitorDelete
+                              ? "hover:bg-red-600"
+                              : "opacity-50 cursor-not-allowed"
+                          }`}
+                          onClick={() => moveOut(unit)}
+                          disabled={!permissions.pmsPlatformVisitorDelete}
+                        >
+                          Move Out
+                        </button>
+                      </div>
+                    ) : unit.status === "Vacant" ? (
+                      <div className="text-center space-x-1">
+                        <button
+                          className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
+                            permissions.pmsPlatformVisitorCreate
+                              ? "hover:bg-green-600"
+                              : "opacity-50 cursor-not-allowed"
+                          }`}
+                          onClick={() => moveIn(unit) & setSelectedUnit(unit)}
+                          disabled={!permissions.pmsPlatformVisitorCreate}
+                        >
+                          Move In
+                        </button>
+                        <button
+                          className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
+                            permissions.pmsPlatformUnitDelete
+                              ? "hover:bg-red-600"
+                              : "opacity-50 cursor-not-allowed"
+                          }`}
+                          onClick={() => deleteUnit(unit)}
+                          disabled={!permissions.pmsPlatformUnitDelete}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ) : unit.status === "Delinquent" ? (
+                      <div className="text-center space-x-1">
+                        <button
+                          className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
+                            permissions.pmsPlatformVisitorEdit
+                              ? "hover:bg-green-600"
+                              : "opacity-50 cursor-not-allowed"
+                          }`}
+                          onClick={() => turnRented(unit)}
+                          disabled={!permissions.pmsPlatformVisitorEdit}
+                        >
+                          Turn Rented
+                        </button>
+                        <button
+                          className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
+                            permissions.pmsPlatformVisitorDelete
+                              ? "hover:bg-red-600"
+                              : "opacity-50 cursor-not-allowed"
+                          }`}
+                          onClick={() => moveOut(unit)}
+                          disabled={!permissions.pmsPlatformVisitorDelete}
+                        >
+                          Move Out
+                        </button>
+                      </div>
+                    ) : (
+                      <>error</>
+                    )}
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+
+        {/* Pagination Footer */}
+        <div className="px-2 py-5 mx-1">
+          <PaginationFooter
+            rowsPerPage={rowsPerPage}
+            setRowsPerPage={setRowsPerPage}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            items={filteredUnits}
+          />
         </div>
       </div>
     </div>

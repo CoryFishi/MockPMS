@@ -23,7 +23,7 @@ export default function Register({ darkMode, toggleDarkMode }) {
         darkMode={darkMode}
         toggleDarkMode={toggleDarkMode}
       />
-      <SignUp></SignUp>
+      <SignUp />
     </div>
   );
 }

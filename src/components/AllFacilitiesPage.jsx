@@ -4,15 +4,10 @@ import React, { useEffect, useState } from "react";
 import { GoStar, GoStarFill } from "react-icons/go";
 import qs from "qs";
 import { FaWarehouse } from "react-icons/fa6";
-import {
-  BiChevronLeft,
-  BiChevronRight,
-  BiChevronsLeft,
-  BiChevronsRight,
-} from "react-icons/bi";
 import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import PaginationFooter from "./PaginationFooter";
 
 export default function AllFacilitiesPage({
   setOpenPage,
@@ -303,11 +298,9 @@ export default function AllFacilitiesPage({
     setFilteredFacilities(filtered);
   }, [facilities, searchQuery]);
 
-  // Pagination logic
-  const pageCount = Math.ceil(filteredFacilities.length / rowsPerPage);
-
   return (
     <div className="overflow-auto dark:text-white dark:bg-darkPrimary mb-14">
+      {/* Page Header */}
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <FaWarehouse className="text-lg" />
@@ -315,6 +308,7 @@ export default function AllFacilitiesPage({
         </div>
       </div>
       <div className="w-full px-5 flex flex-col rounded-lg h-full">
+        {/* Search Bar */}
         <div className="mt-5 mb-2 flex items-center justify-end text-center">
           <input
             type="text"
@@ -324,281 +318,227 @@ export default function AllFacilitiesPage({
             className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
           />
         </div>
-        <div>
-          <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
-            <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
-              <tr className="bg-gray-200 dark:bg-darkNavSecondary">
-                <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"></th>
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("Environment");
-                    setFilteredFacilities(
-                      [...filteredFacilities].sort((a, b) => {
-                        if (a.environment < b.environment)
-                          return newDirection === "asc" ? -1 : 1;
-                        if (a.environment > b.environment)
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
-                >
-                  Environment
-                  {sortedColumn === "Environment" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out min-w-28"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("Facility Id");
-                    setFilteredFacilities(
-                      [...filteredFacilities].sort((a, b) => {
-                        if (a.id < b.id) return newDirection === "asc" ? -1 : 1;
-                        if (a.id > b.id) return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
-                >
-                  Facility Id
-                  {sortedColumn === "Facility Id" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("Facility Name");
-                    setFilteredFacilities(
-                      [...filteredFacilities].sort((a, b) => {
-                        if (a.name.toLowerCase() < b.name.toLowerCase())
-                          return newDirection === "asc" ? -1 : 1;
-                        if (a.name.toLowerCase() > b.name.toLowerCase())
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
-                >
-                  Facility Name
-                  {sortedColumn === "Facility Name" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() =>
-                    setFilteredFacilities(
-                      [...filteredFacilities].sort((a, b) => {
-                        const newDirection =
-                          sortDirection === "asc" ? "desc" : "asc";
-                        setSortDirection(newDirection);
-                        setSortedColumn("Property Number");
-                        const propertyNumberA = a.propertyNumber
-                          ? a.propertyNumber.toLowerCase()
-                          : "";
-                        const propertyNumberB = b.propertyNumber
-                          ? b.propertyNumber.toLowerCase()
-                          : "";
-
-                        if (propertyNumberA < propertyNumberB)
-                          return newDirection === "asc" ? -1 : 1;
-                        if (propertyNumberA > propertyNumberB)
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    )
-                  }
-                >
-                  Property Number
-                  {sortedColumn === "Property Number" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredFacilities
-                .slice(
-                  (currentPage - 1) * rowsPerPage,
-                  currentPage * rowsPerPage
-                )
-                .map((facility, index) => (
-                  <tr
-                    key={index}
-                    className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary border-y border-gray-300 dark:border-border"
-                  >
-                    <td
-                      className="px-4 py-2 hover:cursor-pointer"
-                      onClick={() => addToFavorite(facility)}
-                    >
-                      <div className="flex justify-center text-yellow-500">
-                        {isFacilityFavorite(facility.id) ? (
-                          <GoStarFill />
-                        ) : (
-                          <GoStar className="text-slate-400" />
-                        )}
-                      </div>
-                    </td>
-                    <td
-                      className="px-4 py-2 hover:cursor-pointer"
-                      onClick={() => addToFavorite(facility)}
-                    >
-                      {facility.environment == "-dev"
-                        ? "Development"
-                        : facility.environment == ""
-                        ? "Production"
-                        : facility.environment == "-qa"
-                        ? "QA"
-                        : facility.environment == "cia-stg-1.aws."
-                        ? "Staging"
-                        : "N?A"}
-                    </td>
-                    <td
-                      className="px-4 py-2 hover:cursor-pointer"
-                      onClick={() => addToFavorite(facility)}
-                    >
-                      {facility.id}
-                    </td>
-                    <td
-                      className="px-4 py-2 hover:cursor-pointer"
-                      title={
-                        facility.environment === "cia-stg-1.aws."
-                          ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
-                          : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`
-                      }
-                      onClick={(e) => {
-                        e.preventDefault();
-                        const baseUrl =
-                          facility.environment === "cia-stg-1.aws."
-                            ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
-                            : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`;
-                        window.open(baseUrl, "_blank");
-                      }}
-                    >
-                      <div className="flex gap-3 items-center">
-                        {facility.name}
-                        <FaExternalLinkAlt className="text-blue-300 group-hover:text-blue-500" />
-                      </div>
-                    </td>
-                    <td
-                      className=" border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
-                      onClick={() => addToFavorite(facility)}
-                    >
-                      {facility.propertyNumber}
-                    </td>
-                    <td className="px-4 py-2 hover:cursor-pointer">
-                      {currentFacility.id == facility.id &&
-                      currentFacility.environment == facility.environment ? (
-                        <button
-                          className="font-bold bg-gray-200 text-white px-2 py-1 rounded hover:bg-gray-300 select-none"
-                          onClick={() =>
-                            localStorage.setItem("openPage", "units") &
-                            setOpenPage("units")
-                          }
-                        >
-                          Selected
-                        </button>
-                      ) : (
-                        <button
-                          className="font-bold bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 select-none"
-                          onClick={() => handleSelect(facility)}
-                        >
-                          Select
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-          {noFacilities && (
-            <div className="w-full text-center mt-5 text-red-500">
-              No Authorized Facilities To Choose From...
-            </div>
-          )}
-        </div>
-        {/* Modal footer/pagination */}
-        <div className="flex justify-between items-center px-2 py-5 mx-1">
-          <div className="flex gap-3">
-            <div>
-              <select
-                className="border rounded ml-2 dark:bg-darkSecondary dark:border-border"
-                id="rowsPerPage"
-                value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
-                  setCurrentPage(1); // Reset to first page on rows per page change
+        {/* Facilities Table */}
+        <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
+          {/* Header */}
+          <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
+            <tr className="border border-gray-300 dark:border-border bg-gray-200 dark:bg-darkNavSecondary text-center">
+              <th className="px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"></th>
+              <th
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Environment");
+                  setFilteredFacilities(
+                    [...filteredFacilities].sort((a, b) => {
+                      if (a.environment < b.environment)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.environment > b.environment)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
                 }}
               >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={100}>100</option>
-              </select>
-            </div>
-            <p className="text-sm">
-              {currentPage === 1 ? 1 : (currentPage - 1) * rowsPerPage + 1} -{" "}
-              {currentPage * rowsPerPage > filteredFacilities.length
-                ? filteredFacilities.length
-                : currentPage * rowsPerPage}{" "}
-              of {filteredFacilities.length}
-            </p>
-          </div>
-          <div className="gap-2 flex">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(1)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronsLeft />
-            </button>
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((prev) => prev - 1)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronLeft />
-            </button>
-            <p>
-              {currentPage} of {pageCount}
-            </p>
-            <button
-              disabled={currentPage === pageCount}
-              onClick={() => setCurrentPage((prev) => prev + 1)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronRight />
-            </button>
-            <button
-              disabled={currentPage === pageCount}
-              onClick={() => setCurrentPage(pageCount)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronsRight />
-            </button>
-          </div>
+                Environment
+                {sortedColumn === "Environment" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
+              </th>
+              <th
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out min-w-28"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Facility Id");
+                  setFilteredFacilities(
+                    [...filteredFacilities].sort((a, b) => {
+                      if (a.id < b.id) return newDirection === "asc" ? -1 : 1;
+                      if (a.id > b.id) return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
+                Facility Id
+                {sortedColumn === "Facility Id" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
+              </th>
+              <th
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() => {
+                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                  setSortDirection(newDirection);
+                  setSortedColumn("Facility Name");
+                  setFilteredFacilities(
+                    [...filteredFacilities].sort((a, b) => {
+                      if (a.name.toLowerCase() < b.name.toLowerCase())
+                        return newDirection === "asc" ? -1 : 1;
+                      if (a.name.toLowerCase() > b.name.toLowerCase())
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  );
+                }}
+              >
+                Facility Name
+                {sortedColumn === "Facility Name" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
+              </th>
+              <th
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                onClick={() =>
+                  setFilteredFacilities(
+                    [...filteredFacilities].sort((a, b) => {
+                      const newDirection =
+                        sortDirection === "asc" ? "desc" : "asc";
+                      setSortDirection(newDirection);
+                      setSortedColumn("Property Number");
+                      const propertyNumberA = a.propertyNumber
+                        ? a.propertyNumber.toLowerCase()
+                        : "";
+                      const propertyNumberB = b.propertyNumber
+                        ? b.propertyNumber.toLowerCase()
+                        : "";
+
+                      if (propertyNumberA < propertyNumberB)
+                        return newDirection === "asc" ? -1 : 1;
+                      if (propertyNumberA > propertyNumberB)
+                        return newDirection === "asc" ? 1 : -1;
+                      return 0;
+                    })
+                  )
+                }
+              >
+                Property Number
+                {sortedColumn === "Property Number" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
+              </th>
+              <th className="px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredFacilities
+              .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+              .map((facility, index) => (
+                <tr
+                  key={index}
+                  className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary border-y border-gray-300 dark:border-border text-center"
+                >
+                  <td
+                    className="px-4 py-2 hover:cursor-pointer"
+                    onClick={() => addToFavorite(facility)}
+                  >
+                    <div className="flex justify-center text-center items-center text-yellow-500">
+                      {isFacilityFavorite(facility.id) ? (
+                        <GoStarFill />
+                      ) : (
+                        <GoStar className="text-slate-400" />
+                      )}
+                    </div>
+                  </td>
+                  <td
+                    className="px-4 py-2 hover:cursor-pointer"
+                    onClick={() => addToFavorite(facility)}
+                  >
+                    {facility.environment == "-dev"
+                      ? "Development"
+                      : facility.environment == ""
+                      ? "Production"
+                      : facility.environment == "-qa"
+                      ? "QA"
+                      : facility.environment == "cia-stg-1.aws."
+                      ? "Staging"
+                      : "N?A"}
+                  </td>
+                  <td
+                    className="px-4 py-2 hover:cursor-pointer"
+                    onClick={() => addToFavorite(facility)}
+                  >
+                    {facility.id}
+                  </td>
+                  <td
+                    className="px-4 py-2 hover:cursor-pointer"
+                    title={
+                      facility.environment === "cia-stg-1.aws."
+                        ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
+                        : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`
+                    }
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const baseUrl =
+                        facility.environment === "cia-stg-1.aws."
+                          ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
+                          : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`;
+                      window.open(baseUrl, "_blank");
+                    }}
+                  >
+                    <div className="flex gap-3 items-center text-center justify-center">
+                      {facility.name}
+                      <FaExternalLinkAlt className="text-blue-300 group-hover:text-blue-500" />
+                    </div>
+                  </td>
+                  <td
+                    className=" border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                    onClick={() => addToFavorite(facility)}
+                  >
+                    {facility.propertyNumber}
+                  </td>
+                  <td className="px-4 py-2 hover:cursor-pointer">
+                    {currentFacility.id == facility.id &&
+                    currentFacility.environment == facility.environment ? (
+                      <button
+                        className="font-bold bg-gray-200 text-white px-2 py-1 rounded hover:bg-gray-300 select-none"
+                        onClick={() =>
+                          localStorage.setItem("openPage", "units") &
+                          setOpenPage("units")
+                        }
+                      >
+                        Selected
+                      </button>
+                    ) : (
+                      <button
+                        className="font-bold bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 select-none"
+                        onClick={() => handleSelect(facility)}
+                      >
+                        Select
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+        {/* No Facilities Notification Text */}
+        {noFacilities && (
+          <p className="text-center p-4 font-bold text-lg">
+            No authorized facilities to choose from...
+          </p>
+        )}
+
+        {/* Pagination Footer */}
+        <div className="px-2 py-5 mx-1">
+          <PaginationFooter
+            rowsPerPage={rowsPerPage}
+            setRowsPerPage={setRowsPerPage}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            items={filteredFacilities}
+          />
         </div>
       </div>
     </div>

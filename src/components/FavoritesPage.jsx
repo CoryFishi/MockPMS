@@ -3,15 +3,10 @@ import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
 import { GoStar, GoStarFill } from "react-icons/go";
 import qs from "qs";
-import {
-  BiChevronLeft,
-  BiChevronRight,
-  BiChevronsLeft,
-  BiChevronsRight,
-} from "react-icons/bi";
 import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import PaginationFooter from "./PaginationFooter";
 
 export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
   const [facilities, setFacilities] = useState([]);
@@ -30,9 +25,6 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
     setCurrentFacility,
   } = useAuth();
   const [noFacilities, setNoFacilities] = useState(false);
-
-  // Pagination logic
-  const pageCount = Math.ceil(filteredFacilities.length / rowsPerPage);
 
   const handleCurrentFacilityUpdate = async (updatedInfo) => {
     const { data, error } = await supabase.from("user_data").upsert(
@@ -190,7 +182,6 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
     setSortedColumn("Facility Id");
     try {
       setFacilities(sortedFacilities);
-      toast.success(<b>Favorites loaded successfully!</b>);
     } catch {
       alert("It broke");
     }
@@ -214,7 +205,7 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
   }, [facilities, searchQuery]);
 
   return (
-    <div className="overflow-auto dark:text-white dark:bg-darkPrimary mb-14">
+    <div className="overflow-auto dark:text-white dark:bg-darkPrimary mb-14 h-full">
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <GoStarFill className="text-lg" />
@@ -233,10 +224,10 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
         </div>
         <table className="w-full table-auto border-collapse pb-96">
           <thead className="sticky top-[-1px] z-10 select-none">
-            <tr className="bg-gray-200 dark:bg-darkNavSecondary">
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"></th>
+            <tr className="border border-gray-300 dark:border-border bg-gray-200 dark:bg-darkNavSecondary">
+              <th className="px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"></th>
               <th
-                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -260,7 +251,7 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
                 )}
               </th>
               <th
-                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out min-w-28"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out min-w-28"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -282,7 +273,7 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
                 )}
               </th>
               <th
-                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -306,7 +297,7 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
                 )}
               </th>
               <th
-                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() =>
                   setFilteredFacilities(
                     [...filteredFacilities].sort((a, b) => {
@@ -337,7 +328,7 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
                   </span>
                 )}
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th className="px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Actions
               </th>
             </tr>
@@ -348,7 +339,7 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
               .map((facility, index) => (
                 <tr
                   key={index}
-                  className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary border-y border-gray-300 dark:border-border "
+                  className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary border-y border-gray-300 dark:border-border text-center"
                 >
                   <td
                     className="px-4 py-2 hover:cursor-pointer"
@@ -398,7 +389,7 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
                       window.open(baseUrl, "_blank");
                     }}
                   >
-                    <div className="flex gap-3 items-center">
+                    <div className="flex gap-3 items-center text-center justify-center">
                       {facility.name}
                       <FaExternalLinkAlt className="text-blue-300 group-hover:text-blue-500" />
                     </div>
@@ -434,70 +425,21 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
               ))}
           </tbody>
         </table>
+        {/* No Facilities Notification Text */}
         {noFacilities && (
-          <div className="w-full text-center mt-5 text-red-500">
-            No Facilities Currently Favorited...
-          </div>
+          <p className="text-center p-4 font-bold text-lg">
+            No facilities currently favorited...
+          </p>
         )}
-        {/* Modal footer/pagination */}
-        <div className="flex justify-between items-center px-2 py-5 mx-1">
-          <div className="flex gap-3">
-            <div>
-              <select
-                className="border rounded ml-2 dark:bg-darkSecondary dark:border-border"
-                id="rowsPerPage"
-                value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
-                  setCurrentPage(1); // Reset to first page on rows per page change
-                }}
-              >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={100}>100</option>
-              </select>
-            </div>
-            <p className="text-sm">
-              {currentPage === 1 ? 1 : (currentPage - 1) * rowsPerPage + 1} -{" "}
-              {currentPage * rowsPerPage > filteredFacilities.length
-                ? filteredFacilities.length
-                : currentPage * rowsPerPage}{" "}
-              of {filteredFacilities.length}
-            </p>
-          </div>
-          <div className="gap-2 flex">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(1)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronsLeft />
-            </button>
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((prev) => prev - 1)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronLeft />
-            </button>
-            <p>
-              {currentPage} of {pageCount}
-            </p>
-            <button
-              disabled={currentPage === pageCount}
-              onClick={() => setCurrentPage((prev) => prev + 1)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronRight />
-            </button>
-            <button
-              disabled={currentPage === pageCount}
-              onClick={() => setCurrentPage(pageCount)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronsRight />
-            </button>
-          </div>
+        {/* Pagination Footer */}
+        <div className="px-2 py-5 mx-1">
+          <PaginationFooter
+            rowsPerPage={rowsPerPage}
+            setRowsPerPage={setRowsPerPage}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            items={filteredFacilities}
+          />
         </div>
       </div>
     </div>

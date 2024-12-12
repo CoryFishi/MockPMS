@@ -756,10 +756,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
           </div>
         </div>
       ) : (
-        <div>
-          <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          <NotFound />
-        </div>
+        <NotFound />
       )}
     </div>
   );

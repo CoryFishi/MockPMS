@@ -23,15 +23,7 @@ export default function Admin({ darkMode, toggleDarkMode }) {
           </div>
         </div>
       ) : (
-        <div>
-          <Navbar
-            setDashboardMenu={setDashboardMenu}
-            dashboardMenu={dashboardMenu}
-            darkMode={darkMode}
-            toggleDarkMode={toggleDarkMode}
-          />
-          <NotFound />
-        </div>
+        <NotFound />
       )}
     </div>
   );

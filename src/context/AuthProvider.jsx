@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [isPulled, setIsPulled] = useState(false);
   const [role, setRole] = useState("");
   const [permissions, setPermissions] = useState({});
+  const [noUser, setNoUser] = useState(true);
 
   // Get the current facility selection
   const getUserData = async () => {
@@ -160,7 +161,6 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (role) {
       getUserPermissions();
-      setIsLoading(false);
     }
   }, [role]);
 
@@ -168,6 +168,12 @@ export const AuthProvider = ({ children }) => {
     const fetchSession = async () => {
       const { data: sessionData } = await supabase.auth.getSession();
       setUser(sessionData?.user ?? null);
+      if (sessionData) {
+        setNoUser(false);
+      } else {
+        setNoUser(true);
+        setIsLoading(false);
+      }
     };
 
     fetchSession();
@@ -209,6 +215,7 @@ export const AuthProvider = ({ children }) => {
         setCurrentFacility,
         isLoading,
         permissions,
+        noUser,
       }}
     >
       {children}

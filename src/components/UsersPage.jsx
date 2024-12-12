@@ -3,14 +3,8 @@ import { FaPerson } from "react-icons/fa6";
 import { useAuth } from "../context/AuthProvider";
 import { supabaseAdmin, supabase } from "../supabaseClient";
 import toast from "react-hot-toast";
-
-import {
-  BiChevronLeft,
-  BiChevronRight,
-  BiChevronsLeft,
-  BiChevronsRight,
-} from "react-icons/bi";
 import EditUser from "./modals/EditUser";
+import PaginationFooter from "./PaginationFooter";
 
 export default function Users() {
   const { user } = useAuth();
@@ -19,7 +13,6 @@ export default function Users() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [usersPulled, setUsersPulled] = useState(false);
-  const pageCount = Math.ceil(filteredUsers.length / rowsPerPage);
   const [dropdownIndex, setDropdownIndex] = useState(null);
   const [selfUser, setSelfUser] = useState(user);
   const modalRef = useRef(null);
@@ -458,66 +451,19 @@ export default function Users() {
               ))}
           </tbody>
         </table>
-        {users.length < 1 && <p className="text-center">No users found.</p>}
-        {/* Modal footer/pagination */}
-        <div className="flex justify-between items-center px-2 py-5 mx-1">
-          <div className="flex gap-3">
-            <div>
-              <select
-                className="border rounded ml-2 dark:bg-darkSecondary dark:border-border"
-                id="rowsPerPage"
-                value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
-                  setCurrentPage(1); // Reset to first page on rows per page change
-                }}
-              >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={100}>100</option>
-              </select>
-            </div>
-            <p className="text-sm">
-              {currentPage === 1 ? 1 : (currentPage - 1) * rowsPerPage + 1} -{" "}
-              {currentPage * rowsPerPage > filteredUsers.length
-                ? filteredUsers.length
-                : currentPage * rowsPerPage}{" "}
-              of {filteredUsers.length}
-            </p>
-          </div>
-          <div className="gap-2 flex">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(1)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronsLeft />
-            </button>
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((prev) => prev - 1)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronLeft />
-            </button>
-            <p>
-              {currentPage} of {pageCount}
-            </p>
-            <button
-              disabled={currentPage === pageCount}
-              onClick={() => setCurrentPage((prev) => prev + 1)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronRight />
-            </button>
-            <button
-              disabled={currentPage === pageCount}
-              onClick={() => setCurrentPage(pageCount)}
-              className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-            >
-              <BiChevronsRight />
-            </button>
-          </div>
+        {/* No Users Notification */}
+        {filteredUsers.length < 1 && (
+          <p className="text-center p-4 font-bold text-lg">No users found.</p>
+        )}
+        {/* Pagination Footer */}
+        <div className="px-2 py-5 mx-1">
+          <PaginationFooter
+            rowsPerPage={rowsPerPage}
+            setRowsPerPage={setRowsPerPage}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            items={filteredUsers}
+          />
         </div>
       </div>
     </div>

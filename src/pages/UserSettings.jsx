@@ -5,6 +5,7 @@ import NotFound from "../components/NotFound";
 import { supabase } from "../supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
+
 import {
   BiChevronLeft,
   BiChevronRight,
@@ -381,10 +382,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
           </div>
         </div>
       ) : (
-        <div>
-          <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          <NotFound />
-        </div>
+        <NotFound />
       )}
     </div>
   );
