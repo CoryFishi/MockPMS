@@ -1,5 +1,4 @@
 const axios = require("axios");
-const weatherAPI = import.meta.env.VITE_RESEND_KEY;
 
 exports.handler = async (event, context) => {
   try {
@@ -15,7 +14,7 @@ exports.handler = async (event, context) => {
       },
       {
         headers: {
-          Authorization: `Bearer ${weatherAPI}`,
+          Authorization: `Bearer ${process.env.RESEND_KEY}`,
           "Content-Type": "application/json",
         },
       }
