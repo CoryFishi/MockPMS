@@ -29,18 +29,8 @@ export default function SmartLockDashboardView({}) {
   const [totalAccessPoints, setTotalAccessPoints] = useState(0);
   const [totalEdgeRouters, setTotalEdgeRouters] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
-  const {
-    user,
-    tokens,
-    isPulled,
-    favoriteTokens,
-    setFavoriteTokens,
-    selectedTokens,
-    setSelectedTokens,
-    currentFacility,
-    setCurrentFacility,
-    isLoading,
-  } = useAuth();
+  const { selectedTokens } = useAuth();
+  const [expandedRows, setExpandedRows] = useState([]);
 
   // Search via search bar and button
   const search = () => {
@@ -207,7 +197,7 @@ export default function SmartLockDashboardView({}) {
   }, [selectedTokens]);
 
   return (
-    <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary text-center">
+    <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary text-center mb-14">
       {/* tab title */}
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
@@ -301,6 +291,8 @@ export default function SmartLockDashboardView({}) {
                   key={index}
                   facility={facility}
                   index={index}
+                  setExpandedRows={setExpandedRows}
+                  expandedRows={expandedRows}
                 />
               ))}
               <tr className="bg-slate-50 dark:bg-darkSecondary">

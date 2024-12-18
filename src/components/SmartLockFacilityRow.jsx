@@ -5,7 +5,12 @@ import SmartLock from "./modals/SmartLock";
 import { FaCheckCircle, FaExternalLinkAlt } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
 
-export default function SmartLockFacilityRow({ setFacilitiesInfo, facility }) {
+export default function SmartLockFacilityRow({
+  setFacilitiesInfo,
+  facility,
+  setExpandedRows,
+  expandedRows,
+}) {
   const [smartlocks, setSmartlocks] = useState([]);
   const [lowestSignal, setLowestSignal] = useState([]);
   const [offline, setOffline] = useState([]);
@@ -17,6 +22,18 @@ export default function SmartLockFacilityRow({ setFacilitiesInfo, facility }) {
   const [smartlockModalOption, setSmartlockModalOption] = useState(null);
   const [lowestSignalSmartlock, setLowestSignalSmartlock] = useState([]);
   const [lowestBatterySmartlock, setLowestBatterySmartlock] = useState([]);
+  const [facilityDetail, setFacilityDetail] = useState({});
+  const [currentWeather, setCurrentWeather] = useState({});
+
+  const weatherAPI = import.meta.env.VITE_WEATHER_KEY;
+
+  const toggleRowExpansion = (facilityId) => {
+    setExpandedRows((prev) =>
+      prev.includes(facilityId)
+        ? prev.filter((id) => id !== facilityId)
+        : [...prev, facilityId]
+    );
+  };
 
   useEffect(() => {
     const facilityData = {
@@ -63,6 +80,7 @@ export default function SmartLockFacilityRow({ setFacilitiesInfo, facility }) {
     edgeRouter,
     accessPoints,
   ]);
+
   const openSmartLockModal = (option) => {
     if (isSmartlockModalOpen) {
       return;
@@ -70,6 +88,7 @@ export default function SmartLockFacilityRow({ setFacilitiesInfo, facility }) {
     setSmartlockModalOption(option);
     setIsSmartlockModalOpen(true);
   };
+
   const fetchSmartLockSummary = async () => {
     try {
       var tokenStageKey = "";
@@ -211,6 +230,81 @@ export default function SmartLockFacilityRow({ setFacilitiesInfo, facility }) {
       return null;
     }
   };
+  const fetchFacilityDetail = async () => {
+    try {
+      var tokenStageKey = "";
+      var tokenEnvKey = "";
+      if (facility.environment === "cia-stg-1.aws.") {
+        tokenStageKey = "cia-stg-1.aws.";
+      } else {
+        tokenEnvKey = facility.environment;
+      }
+
+      const response = await axios.get(
+        `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${facility.id}`,
+        {
+          headers: {
+            Authorization: "Bearer " + facility.bearer,
+            accept: "application/json",
+            "api-version": "2.0",
+          },
+        }
+      );
+      const currentWeather = await fetchWeather(response.data.postalCode);
+      if (currentWeather) {
+        setCurrentWeather(currentWeather);
+      }
+      return response.data;
+    } catch (error) {
+      console.error(
+        `Error fetching facility detail for: ${facility.name}`,
+        error
+      );
+      toast.error(`${facility.name} can't be detailed`);
+      return null;
+    }
+  };
+  const fetchWeather = async (postalCode) => {
+    try {
+      const response = await axios.get(
+        `https://api.weatherapi.com/v1/current.json?q=${postalCode}&key=${weatherAPI}`,
+        {
+          headers: {
+            accept: "application/json",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(
+        `Error fetching facility weather for: ${facility.name}`,
+        error
+      );
+      toast.error(`${facility.name} can't find weather`);
+      return null;
+    }
+  };
+  const sendEmail = async () => {
+    try {
+      const response = await fetch("/.netlify/functions/sendEmail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: "coryjr2002@gmail.com",
+          subject: "Hello from Resend via Netlify Function",
+          html: "<strong>It works!</strong>",
+        }),
+      });
+
+      const data = await response.json();
+      console.log("Email sent:", data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       const edgeRouterData = await fetchEdgeRouter();
@@ -237,178 +331,277 @@ export default function SmartLockFacilityRow({ setFacilitiesInfo, facility }) {
       if (smartlockData) {
         setSmartlocks(smartlockData);
       }
+      const facilityDetail = await fetchFacilityDetail();
+      if (facilityDetail) {
+        setFacilityDetail(facilityDetail);
+      }
     };
 
     fetchData();
   }, []);
 
   return (
-    <tr className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary relative">
-      <td
-        className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
-        onClick={() => openSmartLockModal("")}
-      >
-        <div className="flex gap-3 items-center justify-center">
-          {facility.name}
-          <FaExternalLinkAlt
-            className="text-blue-300 group-hover:text-blue-500"
-            title={
-              facility.environment === "cia-stg-1.aws."
-                ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
-                : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`
-            }
-            onClick={(e) => {
-              e.stopPropagation();
-              e.prev;
-              const baseUrl =
+    <>
+      <tr className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary relative border border-gray-300 dark:border-border ">
+        <td
+          className="px-4 py-2"
+          onClick={() => toggleRowExpansion(facility.id)}
+        >
+          <div className="flex items-center gap-2 cursor-pointer">
+            <button
+              className="text-blue-500"
+              title={expandedRows.includes(facility.id) ? "Collapse" : "Expand"}
+            >
+              {expandedRows.includes(facility.id) ? "−" : "+"}
+            </button>
+            {facility.name}
+            <FaExternalLinkAlt
+              className="text-blue-300 group-hover:text-blue-500"
+              title={
                 facility.environment === "cia-stg-1.aws."
                   ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
-                  : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`;
-              window.open(baseUrl, "_blank");
-            }}
-          />
-        </div>
-      </td>
-      <td
-        className="border border-gray-300 dark:border-border px-4 py-2"
-        title={edgeRouter?.connectionStatusMessage}
-        onClick={() => console.log(edgeRouter)}
-      >
-        <div className="inline-flex items-center gap-1">
-          {edgeRouter?.connectionStatus === "error" ? (
-            <IoIosWarning className="text-red-500 mr-2" />
-          ) : edgeRouter?.connectionStatus === "warning" ? (
-            <IoIosWarning className="text-yellow-500 mr-2" />
-          ) : (
-            <FaCheckCircle className="text-green-500 mr-2" />
-          )}
-          {edgeRouter?.name}
-        </div>
-      </td>
-      <td
-        className="border border-gray-300 dark:border-border px-4 py-2"
-        title={
-          Array.isArray(accessPoints)
-            ? `${accessPoints
-                .filter((ap) => ap.isDeviceOffline === false)
-                .map((ap) => ap.name)
-                .join(", ")}\n${Math.round(
-                (accessPoints.filter((ap) => ap.isDeviceOffline === false)
-                  .length /
-                  accessPoints.length) *
-                  100
-              )}% Online`
-            : ""
-        }
-      >
-        {Array.isArray(accessPoints)
-          ? accessPoints.filter((ap) => ap.isDeviceOffline === false).length
-          : 0}
-      </td>
+                  : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`
+              }
+              onClick={(e) => {
+                e.stopPropagation();
+                e.prev;
+                const baseUrl =
+                  facility.environment === "cia-stg-1.aws."
+                    ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
+                    : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`;
+                window.open(baseUrl, "_blank");
+              }}
+            />
+          </div>
+        </td>
+        <td className="px-4 py-2" title={edgeRouter?.connectionStatusMessage}>
+          <div className="inline-flex items-center gap-1">
+            {edgeRouter?.connectionStatus === "error" ? (
+              <IoIosWarning className="text-red-500 mr-2" />
+            ) : edgeRouter?.connectionStatus === "warning" ? (
+              <IoIosWarning className="text-yellow-500 mr-2" />
+            ) : (
+              <FaCheckCircle className="text-green-500 mr-2" />
+            )}
+            {edgeRouter?.name}
+          </div>
+        </td>
+        <td
+          className="px-4 py-2"
+          title={
+            Array.isArray(accessPoints)
+              ? `${accessPoints
+                  .filter((ap) => ap.isDeviceOffline === false)
+                  .map((ap) => ap.name)
+                  .join(", ")}\n${Math.round(
+                  (accessPoints.filter((ap) => ap.isDeviceOffline === false)
+                    .length /
+                    accessPoints.length) *
+                    100
+                )}% Online`
+              : ""
+          }
+        >
+          {Array.isArray(accessPoints)
+            ? accessPoints.filter((ap) => ap.isDeviceOffline === false).length
+            : 0}
+        </td>
 
-      <td
-        className="border border-gray-300 dark:border-border px-4 py-2"
-        title={
-          Array.isArray(accessPoints)
-            ? `${accessPoints
-                .filter((ap) => ap.isDeviceOffline === true)
-                .map((ap) => ap.name)
-                .join(", ")}\n${Math.round(
-                (accessPoints.filter((ap) => ap.isDeviceOffline === true)
-                  .length /
-                  accessPoints.length) *
-                  100
-              )}% Offline`
-            : ""
-        }
-      >
-        {Array.isArray(accessPoints)
-          ? accessPoints.filter((ap) => ap.isDeviceOffline === true).length
-          : 0}
-      </td>
+        <td
+          className="px-4 py-2"
+          title={
+            Array.isArray(accessPoints)
+              ? `${accessPoints
+                  .filter((ap) => ap.isDeviceOffline === true)
+                  .map((ap) => ap.name)
+                  .join(", ")}\n${Math.round(
+                  (accessPoints.filter((ap) => ap.isDeviceOffline === true)
+                    .length /
+                    accessPoints.length) *
+                    100
+                )}% Offline`
+              : ""
+          }
+        >
+          {Array.isArray(accessPoints)
+            ? accessPoints.filter((ap) => ap.isDeviceOffline === true).length
+            : 0}
+        </td>
 
-      <td
-        className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
-        onClick={() => openSmartLockModal("good")}
-        title={
-          Math.round(
-            (smartlockSummary?.okCount /
-              (smartlockSummary?.okCount +
-                smartlockSummary?.warningCount +
-                smartlockSummary?.errorCount)) *
-              100
-          ) +
-          "%" +
-          " Okay Status"
-        }
-      >
-        {smartlockSummary?.okCount}
-      </td>
-      <td
-        className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
-        onClick={() => openSmartLockModal("warning")}
-        title={
-          Math.round(
-            (smartlockSummary?.warningCount /
-              (smartlockSummary?.okCount +
-                smartlockSummary?.warningCount +
-                smartlockSummary?.errorCount)) *
-              100
-          ) +
-          "%" +
-          " Warning Status"
-        }
-      >
-        {smartlockSummary?.warningCount}
-      </td>
-      <td
-        className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
-        onClick={() => openSmartLockModal("error")}
-        title={
-          Math.round(
-            (smartlockSummary?.errorCount /
-              (smartlockSummary?.okCount +
-                smartlockSummary?.warningCount +
-                smartlockSummary?.errorCount)) *
-              100
-          ) +
-          "%" +
-          " Error Status"
-        }
-      >
-        {smartlockSummary?.errorCount}
-      </td>
-      <td
-        className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
-        onClick={() => openSmartLockModal("offline")}
-        title={
-          Math.round(
-            (offline /
-              (smartlockSummary?.okCount +
-                smartlockSummary?.warningCount +
-                smartlockSummary?.errorCount)) *
-              100
-          ) +
-          "%" +
-          " Offline"
-        }
-      >
-        {offline}
-      </td>
-      <td
-        className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
-        onClick={() => openSmartLockModal("lowestSignal")}
-        title={"SmartLock " + lowestSignalSmartlock.name}
-      >
-        {lowestSignal}
-      </td>
-      <td
-        className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
-        onClick={() => openSmartLockModal("lowestBattery")}
-        title={"SmartLock " + lowestBatterySmartlock.name}
-      >
-        {lowestBattery}
-      </td>
+        <td
+          className="px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          onClick={() => openSmartLockModal("good")}
+          title={
+            Math.round(
+              (smartlockSummary?.okCount /
+                (smartlockSummary?.okCount +
+                  smartlockSummary?.warningCount +
+                  smartlockSummary?.errorCount)) *
+                100
+            ) +
+            "%" +
+            " Okay Status"
+          }
+        >
+          {smartlockSummary?.okCount}
+        </td>
+        <td
+          className="px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          onClick={() => openSmartLockModal("warning")}
+          title={
+            Math.round(
+              (smartlockSummary?.warningCount /
+                (smartlockSummary?.okCount +
+                  smartlockSummary?.warningCount +
+                  smartlockSummary?.errorCount)) *
+                100
+            ) +
+            "%" +
+            " Warning Status"
+          }
+        >
+          {smartlockSummary?.warningCount}
+        </td>
+        <td
+          className="px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          onClick={() => openSmartLockModal("error")}
+          title={
+            Math.round(
+              (smartlockSummary?.errorCount /
+                (smartlockSummary?.okCount +
+                  smartlockSummary?.warningCount +
+                  smartlockSummary?.errorCount)) *
+                100
+            ) +
+            "%" +
+            " Error Status"
+          }
+        >
+          {smartlockSummary?.errorCount}
+        </td>
+        <td
+          className="px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          onClick={() => openSmartLockModal("offline")}
+          title={
+            Math.round(
+              (offline /
+                (smartlockSummary?.okCount +
+                  smartlockSummary?.warningCount +
+                  smartlockSummary?.errorCount)) *
+                100
+            ) +
+            "%" +
+            " Offline"
+          }
+        >
+          {offline}
+        </td>
+        <td
+          className="px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          onClick={() => openSmartLockModal("lowestSignal")}
+          title={"SmartLock " + lowestSignalSmartlock.name}
+        >
+          {lowestSignal}
+        </td>
+        <td
+          className="px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          onClick={() => openSmartLockModal("lowestBattery")}
+          title={"SmartLock " + lowestBatterySmartlock.name}
+        >
+          {lowestBattery}
+        </td>
+      </tr>
+      {expandedRows.includes(facility.id) && (
+        <tr>
+          <td
+            colSpan="10"
+            className="bg-gray-100 dark:bg-darkNavPrimary p-5 border"
+          >
+            <div className="grid grid-cols-3">
+              <div className="grid-cols-2 grid gap-2 text-left">
+                <div>
+                  <h2 className="font-bold">Facility</h2>
+                  <p className="text-slate-600">{facilityDetail.name}</p>
+                  <h2 className="font-bold">Property Number</h2>
+                  <p className="text-slate-600">
+                    {facilityDetail.propertyNumber || "null"}
+                  </p>
+                  <h2 className="font-bold">Facility ID</h2>
+                  <p className="text-slate-600">
+                    {facilityDetail.id || "null"}
+                  </p>
+                </div>
+                <div>
+                  <h2 className="font-bold">Address</h2>
+                  <p className="text-slate-600">
+                    {facilityDetail.addressLine1} {facilityDetail.addressLine2}
+                  </p>
+                  <p className="text-slate-600">
+                    {facilityDetail.city} {facilityDetail.state}
+                  </p>
+                  <p className="text-slate-600">
+                    {facilityDetail.postalCode} {facilityDetail.country}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-slate-600">
+                {/* Icon and Temperature */}
+                <div className="flex items-center ">
+                  {/* Weather Icon */}
+                  <img
+                    src={currentWeather?.current?.condition?.icon}
+                    alt="Weather Icon"
+                    className="w-16 h-16"
+                  />
+                  {/* Temperature */}
+                  <div className="flex items-baseline">
+                    <span className="text-4xl font-bold text-black">
+                      {Math.round(currentWeather?.current?.temp_f)}
+                    </span>
+                    <span className="text-xl font-light">°F</span>
+                  </div>
+                  <div className="text-sm text-slate-600 text-left ml-2">
+                    <p>
+                      Precipitation:{" "}
+                      {currentWeather?.current?.precip_in.toFixed(1)}%
+                    </p>
+                    <p>
+                      Humidity: {currentWeather?.current?.humidity.toFixed(1)}%
+                    </p>
+                    <p>
+                      Wind: {currentWeather?.current?.wind_mph.toFixed(1)} mph
+                    </p>
+                  </div>
+                </div>
+                {/* Weather Header */}
+                <div className="text-right">
+                  <h3 className="text-2xl font-semibold text-black">Weather</h3>
+                  <p className="text-sm">
+                    {currentWeather?.current?.last_updated}
+                  </p>
+                  <p className="text-sm">
+                    {currentWeather?.current?.condition.text}
+                  </p>
+                </div>
+              </div>
+              <div className="items-end space-y-1 my-auto">
+                <button
+                  className="bg-gray-400 text-white px-2 py-1 rounded font-bold w-2/3 hover:bg-gray-500"
+                  onClick={() => openSmartLockModal("")}
+                >
+                  View all SmartLocks
+                </button>
+                <button
+                  className="bg-gray-400 text-white px-2 py-1 rounded font-bold w-2/3 hover:bg-gray-500"
+                  onClick={() => sendEmail()}
+                >
+                  Send Test Email
+                </button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      )}
       {isSmartlockModalOpen && (
         <SmartLock
           smartlockModalOption={smartlockModalOption}
@@ -417,6 +610,6 @@ export default function SmartLockFacilityRow({ setFacilitiesInfo, facility }) {
           setIsSmartlockModalOpen={setIsSmartlockModalOpen}
         />
       )}
-    </tr>
+    </>
   );
 }
