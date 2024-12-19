@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import SmartLock from "./modals/SmartLock";
 import { FaCheckCircle, FaExternalLinkAlt } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
+import { useAuth } from "../context/AuthProvider";
 
 export default function SmartLockFacilityRow({
   setFacilitiesInfo,
@@ -24,6 +25,7 @@ export default function SmartLockFacilityRow({
   const [lowestBatterySmartlock, setLowestBatterySmartlock] = useState([]);
   const [facilityDetail, setFacilityDetail] = useState({});
   const [currentWeather, setCurrentWeather] = useState({});
+  const { user } = useAuth();
 
   const weatherAPI = import.meta.env.VITE_WEATHER_KEY;
 
@@ -292,7 +294,7 @@ export default function SmartLockFacilityRow({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          to: "coryjr2002@gmail.com",
+          to: user.email,
           subject: "Hello from Resend via Netlify Function",
           html: "<strong>It works!</strong>",
         }),

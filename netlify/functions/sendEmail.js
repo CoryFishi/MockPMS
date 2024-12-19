@@ -4,11 +4,10 @@ require("dotenv").config();
 exports.handler = async (event, context) => {
   try {
     const { to, subject, html } = JSON.parse(event.body);
-    console.log(to, subject, html, process.env.RESEND_KEY + " ");
     const response = await axios.post(
       "https://api.resend.com/emails",
       {
-        from: "onboarding@cfishburn.dev",
+        from: "noreply@cfishburn.dev",
         to: [to],
         subject,
         html,

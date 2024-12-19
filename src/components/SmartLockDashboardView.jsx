@@ -32,6 +32,208 @@ export default function SmartLockDashboardView({}) {
   const { selectedTokens } = useAuth();
   const [expandedRows, setExpandedRows] = useState([]);
 
+  // Send email with facility information
+  const sendEmail = async () => {
+    try {
+      const response = await fetch("/.netlify/functions/sendEmail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: user.email,
+          subject: "SmartLock Status Report",
+          html: `<div className="w-full px-5">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-200 dark:bg-darkNavSecondary">
+                <th className="border border-gray-300 dark:border-border px-4 py-2"></th>
+                <th
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  colSpan="3"
+                >
+                  OpenNet
+                </th>
+                <th
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  colSpan="6"
+                >
+                  SmartLock
+                </th>
+              </tr>
+              <tr className="bg-gray-200 dark:bg-darkNavSecondary">
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Facility
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Edge Router
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Online APs
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Offline APs
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Okay
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Warning
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Error
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Offline
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Lowest Signal Quality
+                </th>
+                <th className="border border-gray-300 dark:border-border px-4 py-2">
+                  Lowest Battery Level
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filteredFacilities.map((facility, index) => (
+                <SmartLockFacilityRow
+                  setFacilitiesInfo={setFacilitiesInfo}
+                  key={index}
+                  facility={facility}
+                  index={index}
+                  setExpandedRows={setExpandedRows}
+                  expandedRows={expandedRows}
+                />
+              ))}
+              <tr className="bg-slate-50 dark:bg-darkSecondary">
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2 font-bold"
+                  title=${totalSmartlocks + " SmartLocks"}
+                >
+                  Totals:
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title=${
+                    Math.round(
+                      (edgeRouterOnlineCount / totalEdgeRouters) * 100
+                    ) +
+                    "% Online \n" +
+                    Math.round(
+                      (edgeRouterOfflineCount / totalEdgeRouters) * 100
+                    ) +
+                    "% Offline \n" +
+                    Math.round(
+                      (edgeRouterWarningCount / totalEdgeRouters) * 100
+                    ) +
+                    "% Warning"
+                  }
+                >
+                  ${
+                    edgeRouterOnlineCount > 0
+                      ? edgeRouterOnlineCount + " Online"
+                      : ""
+                  }
+                  ${
+                    edgeRouterWarningCount > 0 &&
+                    edgeRouterOnlineCount > 0 && <br />
+                  }
+                  ${
+                    edgeRouterWarningCount > 0
+                      ? edgeRouterWarningCount + " Warning"
+                      : ""
+                  }
+                  ${edgeRouterOfflineCount > 0 && <br />}
+                  ${
+                    edgeRouterOfflineCount > 0
+                      ? edgeRouterOfflineCount + " Offline"
+                      : ""
+                  }
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title=${
+                    Math.round(
+                      (accessPointsOnlineCount / totalAccessPoints) * 100
+                    ) + "% Online"
+                  }
+                >
+                  ${accessPointsOnlineCount}
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title=${
+                    Math.round(
+                      (accessPointsOfflineCount / totalAccessPoints) * 100
+                    ) + "% Offline"
+                  }
+                >
+                  ${accessPointsOfflineCount}
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title=${
+                    Math.round((smartlockOkayCount / totalSmartlocks) * 100) +
+                    "% Okay Status"
+                  }
+                >
+                  ${smartlockOkayCount}
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title=${
+                    Math.round(
+                      (smartlockWarningCount / totalSmartlocks) * 100
+                    ) + "% Warning Status"
+                  }
+                >
+                  ${smartlockWarningCount}
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title=${
+                    Math.round((smartlockErrorCount / totalSmartlocks) * 100) +
+                    "% Error Status"
+                  }
+                >
+                  ${smartlockErrorCount}
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title=${
+                    Math.round(
+                      (smartlockOfflineCount / totalSmartlocks) * 100
+                    ) + "% Offline"
+                  }
+                >
+                  ${smartlockOfflineCount}
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title="Lowest Signal"
+                >
+                  ${smartlockLowestSignal}
+                </td>
+                <td
+                  className="border border-gray-300 dark:border-border px-4 py-2"
+                  title="Lowest Battery"
+                >
+                  ${smartlockLowestBattery}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>`,
+        }),
+      });
+
+      const data = await response.json();
+      console.log("Email sent:", data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   // Search via search bar and button
   const search = () => {
     setFilteredFacilities([]);
@@ -420,6 +622,15 @@ export default function SmartLockDashboardView({}) {
       {/* Export Button */}
       <div className="float-right px-5">
         <SmartLockExport facilitiesInfo={facilitiesInfo} />
+      </div>
+      {/* Email Button */}
+      <div>
+        <p
+          className="text-black dark:text-white p-1 py-2 rounded font-bold hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer mr-5"
+          onClick={() => sendEmail}
+        >
+          Email Report
+        </p>
       </div>
     </div>
   );
