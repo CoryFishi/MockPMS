@@ -80,17 +80,22 @@ export default function SmartLockDashboardView({}) {
     <h1 style="text-align: center;">SmartLock Status Report</h1>
     <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
       <thead>
-        <tr style="background-color: #f4f4f4; border: 1px solid #ddd;">
-          <th style="padding: 8px; border: 1px solid #ddd;">Facility</th>
-          <th style="padding: 8px; border: 1px solid #ddd;">Edge Router</th>
-          <th style="padding: 8px; border: 1px solid #ddd;">Online APs</th>
-          <th style="padding: 8px; border: 1px solid #ddd;">Offline APs</th>
-          <th style="padding: 8px; border: 1px solid #ddd;">Okay</th>
-          <th style="padding: 8px; border: 1px solid #ddd;">Warning</th>
-          <th style="padding: 8px; border: 1px solid #ddd;">Error</th>
-          <th style="padding: 8px; border: 1px solid #ddd;">Offline</th>
-          <th style="padding: 8px; border: 1px solid #ddd;">Lowest Signal</th>
-          <th style="padding: 8px; border: 1px solid #ddd;">Lowest Battery</th>
+        <tr style="background-color: #edf2f7; border: 1px solid #e2e8f0;">
+          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;"></th>
+          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;" colspan="3">OpenNet</th>
+          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;" colspan="6">SmartLock</th>
+        </tr>
+        <tr style="background-color: #edf2f7; border: 1px solid #e2e8f0;">
+          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Facility</th>
+          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Edge Router</th>
+          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Online APs</th>
+          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Offline APs</th>
+          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Okay</th>
+          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Warning</th>
+          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Error</th>
+          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Offline</th>
+          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Lowest Signal</th>
+          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Lowest Battery</th>
         </tr>
       </thead>
       <tbody>
@@ -98,16 +103,16 @@ export default function SmartLockDashboardView({}) {
           .map(
             (row) => `
           <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">${row.facilityName}</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${row.edgeRouter}</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${row.onlineAPs}</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${row.offlineAPs}</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${row.okay}</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${row.warning}</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${row.error}</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${row.offline}</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${row.lowestSignal}</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${row.lowestBattery}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.name}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.edgeRouterStatus}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.onlineAccessPointsCount}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.offlineAccessPointsCount}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.okCount}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.warningCount}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.errorCount}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.offlineCount}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.lowestSignal}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.lowestBattery}</td>
           </tr>
         `
           )
