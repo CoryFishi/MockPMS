@@ -103,14 +103,14 @@ export default function SmartLockDashboardView({}) {
           .map(
             (row) => `
           <tr>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.name}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.edgeRouterStatus}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.onlineAccessPointsCount}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.offlineAccessPointsCount}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.okCount}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.warningCount}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.errorCount}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.offlineCount}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.facilityName}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.edgeRouter}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.onlineAPs}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.offlineAPs}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.okay}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.warning}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.error}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.offline}</td>
             <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.lowestSignal}</td>
             <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.lowestBattery}</td>
           </tr>
