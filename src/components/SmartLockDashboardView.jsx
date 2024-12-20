@@ -34,17 +34,17 @@ export default function SmartLockDashboardView({}) {
 
   // Send email with facility information
   const sendEmail = async () => {
-    const rows = filteredFacilities.map((facility) => ({
+    const rows = facilitiesInfo.map((facility) => ({
       facilityName: facility.name,
-      edgeRouter: facility.edgeRouterName,
-      onlineAPs: facility.onlineAPCount,
-      offlineAPs: facility.offlineAPCount,
-      okay: facility.okayCount,
+      edgeRouter: facility.edgeRouterStatus,
+      onlineAPs: facility.onlineAccessPointsCount,
+      offlineAPs: facility.offlineAccessPointsCount,
+      okay: facility.okCount,
       warning: facility.warningCount,
       error: facility.errorCount,
       offline: facility.offlineCount,
-      lowestSignal: facility.lowestSignalQuality,
-      lowestBattery: facility.lowestBatteryLevel,
+      lowestSignal: facility.lowestSignal,
+      lowestBattery: facility.lowestBattery,
     }));
 
     const html = generateHTML(rows);
