@@ -117,6 +117,36 @@ export default function SmartLockDashboardView({}) {
         `
           )
           .join("")}
+          <tr>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">Totals:</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${
+              edgeRouterOnlineCount > 0 ? edgeRouterOnlineCount + " Online" : ""
+            }
+                  ${
+                    edgeRouterWarningCount > 0 &&
+                    edgeRouterOnlineCount > 0 && <br />
+                  }
+                  ${
+                    edgeRouterWarningCount > 0
+                      ? edgeRouterWarningCount + " Warning"
+                      : ""
+                  }
+                  ${edgeRouterOfflineCount > 0 && <br />}
+                  ${
+                    edgeRouterOfflineCount > 0
+                      ? edgeRouterOfflineCount + " Offline"
+                      : ""
+                  }
+                    </td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${accessPointsOnlineCount}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${accessPointsOfflineCount}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${smartlockOkayCount}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${smartlockWarningCount}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${smartlockErrorCount}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${smartlockOfflineCount}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${smartlockLowestSignal}</td>
+            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${smartlockLowestBattery}</td>
+          </tr>
       </tbody>
     </table>
   </div>
