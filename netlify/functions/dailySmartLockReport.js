@@ -1,12 +1,12 @@
 const axios = require("axios");
-const { supabaseAdmin } = require("../supabaseClient"); // Use require for consistency
+const { supabaseAdmin } = require("../../src/supabaseClient");
 
 async function getUsers() {
   const { data, error } = await supabaseAdmin.from("user_data").select("*");
 
   if (error) {
     console.error("Error fetching users:", error);
-    throw error; // Explicitly throw to handle errors in the handler
+    throw error;
   }
 
   return data;
