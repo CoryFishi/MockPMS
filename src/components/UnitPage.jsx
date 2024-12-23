@@ -32,6 +32,9 @@ export default function UnitPage({
   const [unitsPulled, setUnitsPulled] = useState(false);
   const [visitors, setVisitors] = useState([]);
   const { currentFacility, user, permissions } = useAuth();
+  const [pageLoadDateTime, setPageLoadDateTime] = useState(
+    new Date().toLocaleString()
+  );
   const rentedCount = filteredUnits.filter(
     (unit) => unit.status === "Rented"
   ).length;
@@ -490,7 +493,7 @@ export default function UnitPage({
         </div>
       </div>
       {/* Load Time Label */}
-      <p className="text-sm dark:text-white text-left">{Date()}</p>
+      <p className="text-sm dark:text-white text-left">{pageLoadDateTime}</p>
       <div className="w-full px-5 flex flex-col rounded-lg h-full">
         {/* Totals Header */}
         <div className="min-h-12 flex justify-center gap-32">

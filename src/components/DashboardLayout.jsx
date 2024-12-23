@@ -152,70 +152,74 @@ export default function DashboardLayout({ dashboardMenu }) {
             </div>
 
             {/* Current Facility Side Bar */}
-            <div
-              className={`pl-2 pr-2 pb-8 mt-8 ${
-                openPage === "visitors" || openPage === "units"
-                  ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
-                  : "dark:bg-darkNavPrimary"
-              }`}
-            >
+            {currentFacility && currentFacility.id > 0 && (
               <div
-                className="flex justify-between items-center cursor-pointer mt-8"
-                onClick={() => toggleSection("currentFacility")}
+                className={`pl-2 pr-2 pb-8 mt-8 ${
+                  openPage === "visitors" || openPage === "units"
+                    ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
+                    : "dark:bg-darkNavPrimary"
+                }`}
               >
-                <div className="flex items-center space-x-2">
-                  <BsBuildingFill
-                    className={`${
-                      openPage === "visitors" || openPage === "units"
-                        ? "text-yellow-500"
-                        : ""
-                    }`}
-                  />
-                  <span className="pl-2">{currentFacilityName}</span>
+                <div
+                  className="flex justify-between items-center cursor-pointer mt-8"
+                  onClick={() => toggleSection("currentFacility")}
+                >
+                  <div className="flex items-center space-x-2">
+                    <BsBuildingFill
+                      className={`${
+                        openPage === "visitors" || openPage === "units"
+                          ? "text-yellow-500"
+                          : ""
+                      }`}
+                    />
+                    <span className="pl-2">{currentFacilityName}</span>
+                  </div>
+                  {openSections.currentFacility ? (
+                    <MdExpandLess />
+                  ) : (
+                    <MdExpandMore />
+                  )}
                 </div>
-                {openSections.currentFacility ? (
-                  <MdExpandLess />
-                ) : (
-                  <MdExpandMore />
+
+                {!openSections.currentFacility && (
+                  <div className="mx-4 mt-4 space-y-2">
+                    <Link
+                      onClick={() =>
+                        setOpenPage("visitors") &
+                        localStorage.setItem("openPage", "visitors")
+                      }
+                      className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    >
+                      Visitors
+                    </Link>
+                    <Link
+                      onClick={() =>
+                        setOpenPage("units") &
+                        localStorage.setItem("openPage", "units")
+                      }
+                      className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    >
+                      Units
+                    </Link>
+                    {currentFacility && currentFacility.id > 0 ? (
+                      <Link
+                        onClick={(e) => {
+                          e.preventDefault();
+                          const baseUrl =
+                            currentFacility.environment === "cia-stg-1.aws."
+                              ? `https://portal.${currentFacility.environment}insomniaccia.com/facility/${currentFacility.id}/dashboard`
+                              : `https://portal.insomniaccia${currentFacility.environment}.com/facility/${currentFacility.id}/dashboard`;
+                          window.open(baseUrl, "_blank");
+                        }}
+                        className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                      >
+                        Control Center
+                      </Link>
+                    ) : null}
+                  </div>
                 )}
               </div>
-
-              {!openSections.currentFacility && (
-                <div className="mx-4 mt-4 space-y-2">
-                  <Link
-                    onClick={() =>
-                      setOpenPage("visitors") &
-                      localStorage.setItem("openPage", "visitors")
-                    }
-                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
-                  >
-                    Visitors
-                  </Link>
-                  <Link
-                    onClick={() =>
-                      setOpenPage("units") &
-                      localStorage.setItem("openPage", "units")
-                    }
-                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
-                  >
-                    Units
-                  </Link>
-                  <Link
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const baseUrl =
-                        currentFacility.environment === "cia-stg-1.aws."
-                          ? `https://portal.${currentFacility.environment}insomniaccia.com/facility/${currentFacility.id}/dashboard`
-                          : `https://portal.insomniaccia${currentFacility.environment}.com/facility/${currentFacility.id}/dashboard`;
-                      window.open(baseUrl, "_blank");
-                    }}
-                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
-                  >
-                    Control Center
-                  </Link>
-                </div>
-              )}
-            </div>
+            )}
 
             {/* Facilities Side Bar */}
             <div

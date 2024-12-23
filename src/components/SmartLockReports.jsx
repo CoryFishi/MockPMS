@@ -21,6 +21,10 @@ export default function SmartLockReports({}) {
   const { selectedTokens } = useAuth();
   const modalRef = useRef(null);
 
+  const [pageLoadDateTime, setPageLoadDateTime] = useState(
+    new Date().toLocaleString()
+  );
+
   // Close modal if clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -135,7 +139,7 @@ export default function SmartLockReports({}) {
           &ensp; SmartLock Reports
         </div>
       </div>
-      <p className="text-sm dark:text-white text-left">{Date()}</p>
+      <p className="text-sm dark:text-white text-left">{pageLoadDateTime}</p>
       <div className="mt-5 mb-2 flex items-center justify-end text-center mx-5">
         {/* Search Bar */}
         <input

@@ -32,6 +32,10 @@ export default function SmartLockDashboardView({}) {
   const { selectedTokens, user } = useAuth();
   const [expandedRows, setExpandedRows] = useState([]);
 
+  const [pageLoadDateTime, setPageLoadDateTime] = useState(
+    new Date().toLocaleString()
+  );
+
   // Send email with facility information
   const sendEmail = async () => {
     const rows = facilitiesInfo.map((facility) => ({
@@ -326,7 +330,7 @@ export default function SmartLockDashboardView({}) {
         </div>
       </div>
       {/* Last update date/time */}
-      <p className="text-sm dark:text-white text-left">{Date()}</p>
+      <p className="text-sm dark:text-white text-left">{pageLoadDateTime}</p>
       <div className="mt-5 mb-2 flex items-center justify-end text-center mx-5">
         {/* Search Bar */}
         <input

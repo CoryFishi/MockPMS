@@ -22,6 +22,10 @@ export default function VisitorPage({ currentFacilityName }) {
   const [visitorsPulled, setVisitorsPulled] = useState(false);
   const { currentFacility, permissions } = useAuth();
 
+  const [pageLoadDateTime, setPageLoadDateTime] = useState(
+    new Date().toLocaleString()
+  );
+
   const tenantCount = filteredVisitors.filter(
     (visitor) => visitor.isTenant === true
   ).length;
@@ -196,7 +200,7 @@ export default function VisitorPage({ currentFacilityName }) {
         </div>
       </div>
       {/* Load Time Label */}
-      <p className="text-sm dark:text-white text-left">{Date()}</p>
+      <p className="text-sm dark:text-white text-left">{pageLoadDateTime}</p>
       <div className="w-full px-5 flex flex-col rounded-lg h-full">
         {/* Totals Header */}
         <div className="min-h-12 flex justify-center gap-32">

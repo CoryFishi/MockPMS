@@ -517,31 +517,37 @@ export default function SmartLockFacilityRow({
         <tr>
           <td
             colSpan="10"
-            className="bg-gray-100 dark:bg-darkNavPrimary p-5 border"
+            className="bg-gray-100 dark:border-border dark:bg-darkNavPrimary p-5 border"
           >
             <div className="grid grid-cols-3">
               <div className="grid-cols-2 grid gap-2 text-left">
                 <div>
-                  <h2 className="font-bold">Facility</h2>
-                  <p className="text-slate-600">{facilityDetail.name}</p>
-                  <h2 className="font-bold">Property Number</h2>
-                  <p className="text-slate-600">
+                  <h2 className="font-bold dark:text-yellow-500">Facility</h2>
+                  <p className="text-slate-600 dark:text-gray-200">
+                    {facilityDetail.name}
+                  </p>
+                  <h2 className="font-bold dark:text-yellow-500">
+                    Property Number
+                  </h2>
+                  <p className="text-slate-600 dark:text-gray-200">
                     {facilityDetail.propertyNumber || "null"}
                   </p>
-                  <h2 className="font-bold">Facility ID</h2>
-                  <p className="text-slate-600">
+                  <h2 className="font-bold dark:text-yellow-500">
+                    Facility ID
+                  </h2>
+                  <p className="text-slate-600 dark:text-gray-200">
                     {facilityDetail.id || "null"}
                   </p>
                 </div>
                 <div>
-                  <h2 className="font-bold">Address</h2>
-                  <p className="text-slate-600">
+                  <h2 className="font-bold dark:text-yellow-500">Address</h2>
+                  <p className="text-slate-600 dark:text-gray-200">
                     {facilityDetail.addressLine1} {facilityDetail.addressLine2}
                   </p>
-                  <p className="text-slate-600">
+                  <p className="text-slate-600 dark:text-gray-200">
                     {facilityDetail.city} {facilityDetail.state}
                   </p>
-                  <p className="text-slate-600">
+                  <p className="text-slate-600 dark:text-gray-200">
                     {facilityDetail.postalCode} {facilityDetail.country}
                   </p>
                 </div>
@@ -557,12 +563,14 @@ export default function SmartLockFacilityRow({
                   />
                   {/* Temperature */}
                   <div className="flex items-baseline">
-                    <span className="text-4xl font-bold text-black">
+                    <span className="text-4xl font-bold text-black dark:text-white">
                       {Math.round(currentWeather?.current?.temp_f)}
                     </span>
-                    <span className="text-xl font-light">°F</span>
+                    <span className="text-xl font-light dark:text-yellow-500">
+                      °F
+                    </span>
                   </div>
-                  <div className="text-sm text-slate-600 text-left ml-2">
+                  <div className="text-sm text-slate-600 text-left ml-2 dark:text-gray-200">
                     <p>
                       Precipitation:{" "}
                       {currentWeather?.current?.precip_in.toFixed(1)}%
@@ -577,11 +585,13 @@ export default function SmartLockFacilityRow({
                 </div>
                 {/* Weather Header */}
                 <div className="text-right">
-                  <h3 className="text-2xl font-semibold text-black">Weather</h3>
-                  <p className="text-sm">
+                  <h3 className="text-2xl font-semibold text-black dark:text-yellow-500">
+                    Weather
+                  </h3>
+                  <p className="text-sm dark:text-gray-200">
                     {currentWeather?.current?.last_updated}
                   </p>
-                  <p className="text-sm">
+                  <p className="text-sm dark:text-gray-200">
                     {currentWeather?.current?.condition.text}
                   </p>
                 </div>

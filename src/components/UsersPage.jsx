@@ -5,6 +5,7 @@ import { supabaseAdmin, supabase } from "../supabaseClient";
 import toast from "react-hot-toast";
 import EditUser from "./modals/EditUser";
 import PaginationFooter from "./PaginationFooter";
+import { addEvent } from "../functions/events";
 
 export default function Users() {
   const { user } = useAuth();
@@ -21,20 +22,6 @@ export default function Users() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortedColumn, setSortedColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
-
-  async function addEvent(eventName, eventDescription, completed) {
-    const { data, error } = await supabase.from("user_events").insert([
-      {
-        event_name: eventName,
-        event_description: eventDescription,
-        completed: completed,
-      },
-    ]);
-
-    if (error) {
-      console.error("Error inserting event:", error);
-    }
-  }
 
   const toggleDropdown = (index) => {
     setDropdownIndex(dropdownIndex === index ? null : index);
