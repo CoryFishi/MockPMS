@@ -1,33 +1,14 @@
 const axios = require("axios");
-const { supabaseAdmin } = require("../../src/supabaseClient");
-
-async function getUsers() {
-  const { data, error } = await supabaseAdmin.from("user_data").select("*");
-
-  if (error) {
-    console.error("Error fetching users:", error);
-    throw error;
-  }
-
-  return data;
-}
 
 exports.handler = async (event, context) => {
   try {
-    // Fetch users
-    const users = await getUsers();
-    console.log("Fetched users:", users);
-
-    // Uncomment to send an email
-    /*
-    const { to, subject, html } = JSON.parse(event.body);
     const response = await axios.post(
       "https://api.resend.com/emails",
       {
         from: "noreply@cfishburn.dev",
-        to: [to],
-        subject,
-        html,
+        to: "coryjr2002@gmail.com",
+        subject: "Test email",
+        html: <p>Hello</p>,
       },
       {
         headers: {
@@ -38,7 +19,6 @@ exports.handler = async (event, context) => {
     );
 
     console.log("Email sent successfully:", response.data);
-    */
 
     return {
       statusCode: 200,
