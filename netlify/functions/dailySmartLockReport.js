@@ -8,7 +8,7 @@ exports.handler = async (event, context) => {
         from: "noreply@cfishburn.dev",
         to: "coryjr2002@gmail.com",
         subject: "Test email",
-        html: <p>Hello</p>,
+        html: "<p>Hello</p>",
       },
       {
         headers: {
