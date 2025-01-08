@@ -136,74 +136,43 @@ export async function sendFacilityReportEmail(
         >
           Operational Status
         </h2>
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            marginBottom: "20px",
-          }}
-        >
-          <thead>
-            <tr style={{ backgroundColor: "#f4f4f4" }}>
-              <th style={{ padding: "10px", border: "1px solid #ddd" }}>
-                Edge Router
-              </th>
-              <th style={{ padding: "10px", border: "1px solid #ddd" }}>
-                Online APs
-              </th>
-              <th style={{ padding: "10px", border: "1px solid #ddd" }}>
-                Offline APs
-              </th>
-              <th style={{ padding: "10px", border: "1px solid #ddd" }}>
-                Okay Status
-              </th>
-              <th style={{ padding: "10px", border: "1px solid #ddd" }}>
-                Warning Status
-              </th>
-              <th style={{ padding: "10px", border: "1px solid #ddd" }}>
-                Error Status
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                <span
-                  style={{
-                    color:
-                      edgeRouter?.connectionStatus === "error"
-                        ? "red"
-                        : edgeRouter?.connectionStatus === "warning"
-                        ? "orange"
-                        : "green",
-                  }}
-                >
-                  &#9679;
-                </span>{" "}
-                {edgeRouter?.name}
-              </td>
-              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                {Array.isArray(accessPoints)
-                  ? accessPoints.filter((ap) => !ap.isDeviceOffline).length
-                  : 0}
-              </td>
-              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                {Array.isArray(accessPoints)
-                  ? accessPoints.filter((ap) => ap.isDeviceOffline).length
-                  : 0}
-              </td>
-              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                {smartlockSummary?.okCount}
-              </td>
-              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                {smartlockSummary?.warningCount}
-              </td>
-              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                {smartlockSummary?.errorCount}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <p>
+          <strong>Edge Router:</strong>{" "}
+          <span
+            style={{
+              color:
+                edgeRouter?.connectionStatus === "error"
+                  ? "red"
+                  : edgeRouter?.connectionStatus === "warning"
+                  ? "orange"
+                  : "green",
+            }}
+          >
+            &#9679;
+          </span>{" "}
+          {edgeRouter?.name}
+        </p>
+        <p>
+          <strong>Online Access Points:</strong>{" "}
+          {Array.isArray(accessPoints)
+            ? accessPoints.filter((ap) => !ap.isDeviceOffline).length
+            : 0}
+        </p>
+        <p>
+          <strong>Offline Access Points:</strong>{" "}
+          {Array.isArray(accessPoints)
+            ? accessPoints.filter((ap) => ap.isDeviceOffline).length
+            : 0}
+        </p>
+        <p>
+          <strong>Okay Status:</strong> {smartlockSummary?.okCount}
+        </p>
+        <p>
+          <strong>Warning Status:</strong> {smartlockSummary?.warningCount}
+        </p>
+        <p>
+          <strong>Error Status:</strong> {smartlockSummary?.errorCount}
+        </p>
       </div>
 
       <p style={{ fontSize: "14px", color: "#666" }}>
