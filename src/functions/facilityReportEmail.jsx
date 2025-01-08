@@ -219,8 +219,17 @@ export async function sendFacilityReportEmail(
   try {
     const response = await fetch("/.netlify/functions/sendEmail", {
       method: "POST",
-      body: formData,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        to: user.email,
+        subject: "Facility Detailed Report",
+        html,
+      }),
     });
+
+    // Check if response is JSON
     if (response.ok) {
       const data = await response.json();
       console.log("Email sent:", data);
