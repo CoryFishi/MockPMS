@@ -620,11 +620,6 @@ export default function SmartLockFacilityRow({
                 >
                   Send Facility Detail Report
                 </button>
-                <button
-                  onClick={() => console.log(currentWeather, facilityDetail)}
-                >
-                  asdasd
-                </button>
               </div>
             </div>
           </td>

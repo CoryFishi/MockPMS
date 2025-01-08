@@ -11,7 +11,7 @@ exports.handler = async (event, context) => {
         to: [to],
         subject,
         html,
-        attachments: attachment,
+        attachments: [attachment],
       },
       {
         headers: {
