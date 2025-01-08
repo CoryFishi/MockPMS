@@ -3,7 +3,7 @@ require("dotenv").config();
 
 exports.handler = async (event, context) => {
   try {
-    const { to, subject, html } = JSON.parse(event.body);
+    const { to, subject, html, attachment } = JSON.parse(event.body);
     const response = await axios.post(
       "https://api.resend.com/emails",
       {
@@ -11,6 +11,7 @@ exports.handler = async (event, context) => {
         to: [to],
         subject,
         html,
+        attachments: attachment,
       },
       {
         headers: {
