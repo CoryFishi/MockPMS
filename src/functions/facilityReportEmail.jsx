@@ -242,19 +242,25 @@ export async function sendFacilityReportEmail(
     formData.append("to", user.email);
     formData.append("subject", "Facility Detailed Report");
     formData.append("html", html);
-    formData.append("attachment", csvBlob, "facility_detail.csv");
 
-    const response = await fetch("/.netlify/functions/sendEmail", {
-      method: "POST",
-      body: formData,
-    });
-    if (response.ok) {
-      const data = await response.json();
-      console.log("Email sent:", data);
-    } else {
-      const errorText = await response.text(); // Read error as text
-      console.error("Error:", errorText);
-    }
+    // Convert the CSV Blob to base64
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64Csv = reader.result.split(",")[1]; // Strip metadata
+      formData.append("attachment", base64Csv);
+
+      const response = await fetch("/.netlify/functions/sendEmail", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        console.error("Failed to send email:", await response.json());
+      } else {
+        console.log("Email sent successfully");
+      }
+    };
+    reader.readAsDataURL(csvBlob);
   } catch (error) {
     console.error("Fetch error:", error);
   }
