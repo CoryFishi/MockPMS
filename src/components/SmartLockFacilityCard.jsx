@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
 import SmartLock from "./modals/SmartLock";
 
-export default function SmartLockFacilityCard({ facility }) {
+export default function SmartLockFacilityCard({ setFacilitiesInfo, facility }) {
   const [smartlocks, setSmartlocks] = useState([]);
   const [lowestSignal, setLowestSignal] = useState([]);
   const [offline, setOffline] = useState([]);
@@ -163,6 +163,52 @@ export default function SmartLockFacilityCard({ facility }) {
       return null;
     }
   };
+
+  useEffect(() => {
+    const facilityData = {
+      name: facility.name,
+      lowestSignal:
+        lowestSignal && Object.keys(lowestSignal).length > 0
+          ? lowestSignal
+          : "100%",
+      offlineCount: offline > 0 ? offline : 0,
+      lowestBattery:
+        lowestBattery && Object.keys(lowestBattery).length > 0
+          ? lowestBattery
+          : "100%",
+      errorCount: smartlockSummary?.errorCount || 0,
+      okCount: smartlockSummary?.okCount || 0,
+      warningCount: smartlockSummary?.warningCount || 0,
+      edgeRouterStatus: edgeRouter?.connectionStatus,
+      offlineAccessPointsCount: Array.isArray(accessPoints)
+        ? accessPoints.filter((ap) => ap.isDeviceOffline === true).length
+        : 0,
+      onlineAccessPointsCount: Array.isArray(accessPoints)
+        ? accessPoints.filter((ap) => ap.isDeviceOffline === false).length
+        : 0,
+    };
+
+    setFacilitiesInfo((prev) => {
+      const existingIndex = prev.findIndex((f) => f.name === facility.name);
+
+      if (existingIndex !== -1) {
+        const updatedFacilities = [...prev];
+        updatedFacilities[existingIndex] = facilityData;
+        return updatedFacilities;
+      } else {
+        return [...prev, facilityData];
+      }
+    });
+  }, [
+    facility,
+    smartlocks,
+    lowestSignal,
+    offline,
+    lowestBattery,
+    smartlockSummary,
+    edgeRouter,
+    accessPoints,
+  ]);
 
   useEffect(() => {
     const fetchData = async () => {

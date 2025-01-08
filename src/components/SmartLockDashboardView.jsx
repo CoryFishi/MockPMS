@@ -360,7 +360,7 @@ export default function SmartLockDashboardView({}) {
         <div className="w-full px-5">
           <table className="w-full">
             <thead>
-              <tr className="bg-gray-200 dark:bg-darkNavSecondary">
+              <tr className="bg-slate-100 dark:bg-darkNavSecondary">
                 <th className="border border-gray-300 dark:border-border px-4 py-2"></th>
                 <th
                   className="border border-gray-300 dark:border-border px-4 py-2"
@@ -375,7 +375,7 @@ export default function SmartLockDashboardView({}) {
                   SmartLock
                 </th>
               </tr>
-              <tr className="bg-gray-200 dark:bg-darkNavSecondary">
+              <tr className="bg-slate-100 dark:bg-darkNavSecondary">
                 <th className="border border-gray-300 dark:border-border px-4 py-2">
                   Facility
                 </th>
@@ -419,7 +419,7 @@ export default function SmartLockDashboardView({}) {
                   expandedRows={expandedRows}
                 />
               ))}
-              <tr className="bg-slate-50 dark:bg-darkSecondary">
+              <tr className="bg-slate-100 dark:bg-darkSecondary">
                 <td
                   className="border border-gray-300 dark:border-border px-4 py-2 font-bold"
                   title={totalSmartlocks + " SmartLocks"}
@@ -533,12 +533,173 @@ export default function SmartLockDashboardView({}) {
         </div>
       ) : (
         // Card View
-        <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 p-5 pt-1 text-left">
-          {filteredFacilities.map((facility, index) => (
-            <div key={index}>
-              <SmartLockFacilityCard facility={facility} />
+        <div className="p-5 pt-1 text-left">
+          <div className="bg-white shadow-lg rounded-lg p-5 mb-4 border dark:bg-darkSecondary text-black dark:text-white dark:border-border flex justify-center gap-8">
+            <div>
+              <h1 className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg hover:cursor-pointer">
+                Edge Routers:
+              </h1>
+              <div className="flex gap-2">
+                <div
+                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  title={
+                    Math.round(
+                      (edgeRouterOnlineCount / totalEdgeRouters) * 100
+                    ) + "% Online \n"
+                  }
+                >
+                  <h2 className="text-3xl font-bold">
+                    {edgeRouterOnlineCount > 0 ? edgeRouterOnlineCount : "0"}
+                  </h2>
+                  <p className="text-sm">Online</p>
+                </div>
+                <div
+                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  title={
+                    Math.round(
+                      (edgeRouterWarningCount / totalEdgeRouters) * 100
+                    ) + "% Warning"
+                  }
+                >
+                  <h2 className="text-3xl font-bold">
+                    {edgeRouterWarningCount > 0 ? edgeRouterWarningCount : "0"}
+                  </h2>
+                  <p className="text-sm">Warning</p>
+                </div>
+                <div
+                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  title={
+                    Math.round(
+                      (edgeRouterOfflineCount / totalEdgeRouters) * 100
+                    ) + "% Offline \n"
+                  }
+                >
+                  <h2 className="text-3xl font-bold">
+                    {edgeRouterOfflineCount > 0 ? edgeRouterOfflineCount : "0"}
+                  </h2>
+                  <p className="text-sm">Offline</p>
+                </div>
+              </div>
             </div>
-          ))}
+            <div>
+              <h1 className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg hover:cursor-pointer">
+                Access Points:
+              </h1>
+              <div className="flex gap-2">
+                <div
+                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  title={
+                    Math.round(
+                      (accessPointsOnlineCount / totalAccessPoints) * 100
+                    ) + "% Online \n"
+                  }
+                >
+                  <h2 className="text-3xl font-bold">
+                    {accessPointsOnlineCount > 0
+                      ? accessPointsOnlineCount
+                      : "0"}
+                  </h2>
+                  <p className="text-sm">Online</p>
+                </div>
+                <div
+                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  title={
+                    Math.round(
+                      (accessPointsOfflineCount / totalAccessPoints) * 100
+                    ) + "% Offline \n"
+                  }
+                >
+                  <h2 className="text-3xl font-bold">
+                    {accessPointsOfflineCount > 0
+                      ? accessPointsOfflineCount
+                      : "0"}
+                  </h2>
+                  <p className="text-sm">Offlline</p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h1 className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg hover:cursor-pointer">
+                SmartLocks:
+              </h1>
+              <div className="flex gap-2">
+                <div
+                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  title={
+                    Math.round((smartlockOkayCount / totalSmartlocks) * 100) +
+                    "% Okay Status"
+                  }
+                >
+                  <h2 className="text-3xl font-bold">{smartlockOkayCount}</h2>
+                  <p className="text-sm">Okay</p>
+                </div>
+                <div
+                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  title={
+                    Math.round(
+                      (smartlockWarningCount / totalSmartlocks) * 100
+                    ) + "% Warning Status"
+                  }
+                >
+                  <h2 className="text-3xl font-bold">
+                    {smartlockWarningCount}
+                  </h2>
+                  <p className="text-sm">Warning</p>
+                </div>
+                <div
+                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  title={
+                    Math.round((smartlockErrorCount / totalSmartlocks) * 100) +
+                    "% Error Status"
+                  }
+                >
+                  <h2 className="text-3xl font-bold">{smartlockErrorCount}</h2>
+                  <p className="text-sm">Error</p>
+                </div>
+                <div
+                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  title={
+                    Math.round(
+                      (smartlockOfflineCount / totalSmartlocks) * 100
+                    ) + "% Offline"
+                  }
+                >
+                  <h2 className="text-3xl font-bold">
+                    {smartlockOfflineCount}
+                  </h2>
+                  <p className="text-sm">Offline</p>
+                </div>
+                <div
+                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  title="Lowest Signal"
+                >
+                  <h2 className="text-3xl font-bold">
+                    {smartlockLowestSignal}
+                  </h2>
+                  <p className="text-sm">Lowest Signal</p>
+                </div>
+                <div
+                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  title="Lowest Battery"
+                >
+                  <h2 className="text-3xl font-bold">
+                    {smartlockLowestBattery}{" "}
+                  </h2>
+                  <p className="text-sm">Lowest Battery</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="columns-1 sm:columns-2 lg:columns-3 gap-4">
+            {filteredFacilities.map((facility, index) => (
+              <div key={index} className="break-inside-avoid">
+                <SmartLockFacilityCard
+                  setFacilitiesInfo={setFacilitiesInfo}
+                  facility={facility}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
       {/* Export Button */}
