@@ -18,7 +18,7 @@ exports.handler = async (event, context) => {
     const subject = formData.get("subject");
     const html = formData.get("html");
     const attachment = formData.get("attachment");
-
+    console.log(to, subject, html, attachment);
     if (!to || !subject || !html || !attachment) {
       return {
         statusCode: 400,
