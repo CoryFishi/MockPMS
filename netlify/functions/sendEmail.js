@@ -3,30 +3,15 @@ require("dotenv").config();
 
 exports.handler = async (event, context) => {
   try {
-    const contentType = event.headers["content-type"] || "";
-    const isMultipart = contentType.includes("multipart/form-data");
+    const { to, subject, html } = JSON.parse(event.body);
 
-    if (!isMultipart) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Invalid content type" }),
-      };
-    }
-
-    const formData = new URLSearchParams(new URLSearchParams(event.body));
-    const to = formData.get("to");
-    const subject = formData.get("subject");
-    const html = formData.get("html");
-    const attachment = formData.get("attachment");
-    console.log(to, subject, html, attachment);
-    if (!to || !subject || !html || !attachment) {
+    if (!to || !subject || !html) {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: "Missing required fields" }),
       };
     }
 
-    // Send email via Resend API
     const response = await axios.post(
       "https://api.resend.com/emails",
       {
@@ -34,13 +19,6 @@ exports.handler = async (event, context) => {
         to: [to],
         subject,
         html,
-        attachments: [
-          {
-            filename: "facility_detail.csv",
-            content: attachment,
-            contentType: "text/csv",
-          },
-        ],
       },
       {
         headers: {
