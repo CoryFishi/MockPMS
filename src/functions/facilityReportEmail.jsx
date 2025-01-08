@@ -1,6 +1,7 @@
 import { supabase } from "../supabaseClient";
 
 export async function sendFacilityReportEmail(
+  user,
   facility,
   edgeRouter,
   accessPoints,

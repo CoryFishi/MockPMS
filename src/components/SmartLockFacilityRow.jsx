@@ -608,6 +608,7 @@ export default function SmartLockFacilityRow({
                   className="bg-gray-400 text-white px-2 py-1 rounded font-bold w-2/3 hover:bg-gray-500"
                   onClick={() =>
                     sendFacilityReportEmail(
+                      user,
                       facility,
                       edgeRouter,
                       accessPoints,
