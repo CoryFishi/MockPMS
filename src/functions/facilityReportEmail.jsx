@@ -1,4 +1,6 @@
 import { supabase } from "../supabaseClient";
+import React from "react";
+import ReactDOMServer from "react-dom/server";
 
 export async function sendFacilityReportEmail(
   user,
@@ -9,7 +11,7 @@ export async function sendFacilityReportEmail(
   facilityDetail,
   currentWeather
 ) {
-  const html = (
+  const html = ReactDOMServer.renderToString(
     <tr
       style={{
         position: "relative",
