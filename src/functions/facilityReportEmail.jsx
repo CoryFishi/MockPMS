@@ -36,12 +36,14 @@ export async function sendFacilityReportEmail(
           marginBottom: "20px",
         }}
       >
-        Facility Report
+        Facility Report: {facilityDetail.name}
       </h1>
+
       <p style={{ fontSize: "16px", marginBottom: "20px" }}>
-        Below is the detailed report for the facility monitoring system. It
-        includes information about facility statuses, edge routers, access
-        points, and smart locks.
+        This is the detailed report for the facility located in{" "}
+        {facilityDetail.city}, {facilityDetail.state}. Below, you will find key
+        information about the facility, its operational status, and the current
+        weather conditions.
       </p>
 
       <div
@@ -56,116 +58,156 @@ export async function sendFacilityReportEmail(
         <h2
           style={{ fontSize: "18px", color: "#007bff", marginBottom: "10px" }}
         >
-          Summary
+          Facility Details
         </h2>
-        <ul style={{ listStyleType: "circle", paddingLeft: "20px" }}>
-          <li>Total Facilities: 1</li>
-          <li>
-            Edge Routers with Issues:{" "}
-            {edgeRouter?.connectionStatus === "error" ? "1" : "0"}
-          </li>
-          <li>
-            Total Access Points:{" "}
-            {Array.isArray(accessPoints) ? accessPoints.length : 0}
-          </li>
-          <li>
-            Smart Locks with Warnings or Errors:{" "}
-            {smartlockSummary?.warningCount + smartlockSummary?.errorCount || 0}
-          </li>
-        </ul>
+        <p>
+          <strong>Facility Name:</strong> {facilityDetail.name}
+        </p>
+        <p>
+          <strong>Property Number:</strong> {facilityDetail.propertyNumber}
+        </p>
+        <p>
+          <strong>Address:</strong> {facilityDetail.addressLine1}
+          {facilityDetail.addressLine2
+            ? `, ${facilityDetail.addressLine2}`
+            : ""}
+          , {facilityDetail.city}, {facilityDetail.state}{" "}
+          {facilityDetail.postalCode}, {facilityDetail.country}
+        </p>
+        <p>
+          <strong>Phone Number:</strong> {facilityDetail.phoneNumber}
+        </p>
       </div>
 
-      <table
+      <div
         style={{
-          width: "100%",
-          borderCollapse: "collapse",
+          padding: "15px",
+          backgroundColor: "#eaf9ea",
+          border: "1px solid #b3d7f2",
+          borderRadius: "5px",
           marginBottom: "20px",
+        }}
+      >
+        <h2
+          style={{ fontSize: "18px", color: "#007bff", marginBottom: "10px" }}
+        >
+          Current Weather Conditions
+        </h2>
+        <p>
+          <strong>Location:</strong> {currentWeather.location.name},{" "}
+          {currentWeather.location.region}, {currentWeather.location.country}
+        </p>
+        <p>
+          <strong>Temperature:</strong> {currentWeather.current.temp_f}°F (
+          {currentWeather.current.temp_c}°C)
+        </p>
+        <p>
+          <strong>Condition:</strong> {currentWeather.current.condition.text}{" "}
+          <img
+            src={currentWeather.current.condition.icon}
+            alt="Weather icon"
+            style={{ verticalAlign: "middle" }}
+          />
+        </p>
+        <p>
+          <strong>Humidity:</strong> {currentWeather.current.humidity}%
+        </p>
+        <p>
+          <strong>Wind:</strong> {currentWeather.current.wind_mph} mph (
+          {currentWeather.current.wind_kph} kph) from{" "}
+          {currentWeather.current.wind_dir}
+        </p>
+        <p>
+          <strong>Last Updated:</strong> {currentWeather.current.last_updated}
+        </p>
+      </div>
+
+      <div
+        style={{
+          padding: "15px",
           backgroundColor: "#fff",
           border: "1px solid #ddd",
           borderRadius: "5px",
-          overflow: "hidden",
+          marginBottom: "20px",
         }}
       >
-        <thead>
-          <tr style={{ backgroundColor: "#f4f4f4" }}>
-            <th style={{ padding: "10px", border: "1px solid #ddd" }}>
-              Facility Name
-            </th>
-            <th style={{ padding: "10px", border: "1px solid #ddd" }}>
-              Edge Router
-            </th>
-            <th style={{ padding: "10px", border: "1px solid #ddd" }}>
-              Online APs
-            </th>
-            <th style={{ padding: "10px", border: "1px solid #ddd" }}>
-              Offline APs
-            </th>
-            <th style={{ padding: "10px", border: "1px solid #ddd" }}>
-              Okay Status
-            </th>
-            <th style={{ padding: "10px", border: "1px solid #ddd" }}>
-              Warning Status
-            </th>
-            <th style={{ padding: "10px", border: "1px solid #ddd" }}>
-              Error Status
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-              <a
-                href={
-                  facility.environment === "cia-stg-1.aws."
-                    ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
-                    : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`
-                }
-                style={{ color: "#007bff", textDecoration: "none" }}
-                target="_blank"
-              >
-                {facility.name}
-              </a>
-            </td>
-            <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-              <span
-                style={{
-                  color:
-                    edgeRouter?.connectionStatus === "error"
-                      ? "red"
-                      : edgeRouter?.connectionStatus === "warning"
-                      ? "orange"
-                      : "green",
-                }}
-              >
-                &#9679;
-              </span>{" "}
-              {edgeRouter?.name}
-            </td>
-            <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-              {Array.isArray(accessPoints)
-                ? accessPoints.filter((ap) => !ap.isDeviceOffline).length
-                : 0}
-            </td>
-            <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-              {Array.isArray(accessPoints)
-                ? accessPoints.filter((ap) => ap.isDeviceOffline).length
-                : 0}
-            </td>
-            <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-              {smartlockSummary?.okCount}
-            </td>
-            <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-              {smartlockSummary?.warningCount}
-            </td>
-            <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-              {smartlockSummary?.errorCount}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+        <h2
+          style={{ fontSize: "18px", color: "#007bff", marginBottom: "10px" }}
+        >
+          Operational Status
+        </h2>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            marginBottom: "20px",
+          }}
+        >
+          <thead>
+            <tr style={{ backgroundColor: "#f4f4f4" }}>
+              <th style={{ padding: "10px", border: "1px solid #ddd" }}>
+                Edge Router
+              </th>
+              <th style={{ padding: "10px", border: "1px solid #ddd" }}>
+                Online APs
+              </th>
+              <th style={{ padding: "10px", border: "1px solid #ddd" }}>
+                Offline APs
+              </th>
+              <th style={{ padding: "10px", border: "1px solid #ddd" }}>
+                Okay Status
+              </th>
+              <th style={{ padding: "10px", border: "1px solid #ddd" }}>
+                Warning Status
+              </th>
+              <th style={{ padding: "10px", border: "1px solid #ddd" }}>
+                Error Status
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                <span
+                  style={{
+                    color:
+                      edgeRouter?.connectionStatus === "error"
+                        ? "red"
+                        : edgeRouter?.connectionStatus === "warning"
+                        ? "orange"
+                        : "green",
+                  }}
+                >
+                  &#9679;
+                </span>{" "}
+                {edgeRouter?.name}
+              </td>
+              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                {Array.isArray(accessPoints)
+                  ? accessPoints.filter((ap) => !ap.isDeviceOffline).length
+                  : 0}
+              </td>
+              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                {Array.isArray(accessPoints)
+                  ? accessPoints.filter((ap) => ap.isDeviceOffline).length
+                  : 0}
+              </td>
+              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                {smartlockSummary?.okCount}
+              </td>
+              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                {smartlockSummary?.warningCount}
+              </td>
+              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                {smartlockSummary?.errorCount}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <p style={{ fontSize: "14px", color: "#666" }}>
-        For more information, click on the facility name to view its dashboard.
+        For more information, please refer to the detailed facility dashboard.
       </p>
       <p style={{ fontSize: "16px", marginTop: "20px" }}>
         Best regards, <br />
