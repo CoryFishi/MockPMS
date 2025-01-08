@@ -35,13 +35,6 @@ export async function sendFacilityReportEmail(
         <div
           style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
         >
-          {edgeRouter?.connectionStatus === "error" ? (
-            <IoIosWarning style={{ color: "#FF0000", marginRight: "8px" }} />
-          ) : edgeRouter?.connectionStatus === "warning" ? (
-            <IoIosWarning style={{ color: "#FFD700", marginRight: "8px" }} />
-          ) : (
-            <FaCheckCircle style={{ color: "#00FF00", marginRight: "8px" }} />
-          )}
           {edgeRouter?.name}
         </div>
       </td>
