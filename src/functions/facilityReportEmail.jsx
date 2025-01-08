@@ -217,19 +217,37 @@ export async function sendFacilityReportEmail(
   );
 
   try {
+    // Convert facilityDetail array to CSV
+    const facilityDetailArray = [
+      ["Facility Name", "Property Number", "Address", "Phone Number"],
+      [
+        facilityDetail.name,
+        facilityDetail.propertyNumber,
+        `${facilityDetail.addressLine1}${
+          facilityDetail.addressLine2 ? `, ${facilityDetail.addressLine2}` : ""
+        }, ${facilityDetail.city}, ${facilityDetail.state} ${
+          facilityDetail.postalCode
+        }, ${facilityDetail.country}`,
+        facilityDetail.phoneNumber,
+      ],
+    ];
+
+    const csvContent = facilityDetailArray.map((e) => e.join(",")).join("\n");
+
+    // Create a Blob from the CSV content
+    const csvBlob = new Blob([csvContent], { type: "text/csv" });
+
+    // Create a FormData object to send the email with attachment
+    const formData = new FormData();
+    formData.append("to", user.email);
+    formData.append("subject", "Facility Detailed Report");
+    formData.append("html", html);
+    formData.append("attachment", csvBlob, "facility_detail.csv");
+
     const response = await fetch("/.netlify/functions/sendEmail", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        to: user.email,
-        subject: "Facility Detailed Report",
-        html,
-      }),
+      body: formData,
     });
-
-    // Check if response is JSON
     if (response.ok) {
       const data = await response.json();
       console.log("Email sent:", data);
