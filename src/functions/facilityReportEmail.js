@@ -23,17 +23,9 @@ export async function sendFacilityReportEmail(
         }
         onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "inherit")}
       >
-        <td
-          style={{ padding: "8px 16px" }}
-          onClick={() => toggleRowExpansion(facility.id)}
-        >
+        <td style={{ padding: "8px 16px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <button
-              style={{ color: "#007BFF" }}
-              title={expandedRows.includes(facility.id) ? "Collapse" : "Expand"}
-            >
-              {expandedRows.includes(facility.id) ? "−" : "+"}
-            </button>
+            <button style={{ color: "#007BFF" }}></button>
             {facility.name}
           </div>
         </td>
