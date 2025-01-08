@@ -5,6 +5,7 @@ import SmartLock from "./modals/SmartLock";
 import { FaCheckCircle, FaExternalLinkAlt } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
 import { useAuth } from "../context/AuthProvider";
+import { sendFacilityReportEmail } from "../functions/facilityReportEmail";
 
 export default function SmartLockFacilityRow({
   setFacilitiesInfo,
@@ -605,9 +606,18 @@ export default function SmartLockFacilityRow({
                 </button>
                 <button
                   className="bg-gray-400 text-white px-2 py-1 rounded font-bold w-2/3 hover:bg-gray-500"
-                  onClick={() => sendEmail()}
+                  onClick={() =>
+                    sendFacilityReportEmail(
+                      facility,
+                      edgeRouter,
+                      accessPoints,
+                      smartlockSummary,
+                      facilityDetail,
+                      currentWeather
+                    )
+                  }
                 >
-                  Send Test Email
+                  Send Facility Detail Report
                 </button>
               </div>
             </div>
