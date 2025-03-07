@@ -36,6 +36,7 @@ export default function UnitPage({
     new Date().toLocaleString()
   );
   const [smartLocks, setSmartLocks] = useState([]);
+  const [hoveredRow, setHoveredRow] = useState(null);
   const rentedCount = filteredUnits.filter(
     (unit) => unit.status === "Rented"
   ).length;
@@ -158,7 +159,6 @@ export default function UnitPage({
       );
       const smartLocks = response.data;
       if (smartLocks.length > 0) {
-        console.log(smartLocks);
         setSmartLocks(smartLocks);
         return smartLocks;
       } else {
@@ -582,7 +582,7 @@ export default function UnitPage({
           <button
             className={`bg-green-500 text-white p-1 py-2 rounded font-bold ml-3 w-44 transition duration-300 ease-in-out transform select-none ${
               permissions.pmsPlatformUnitCreate
-                ? "hover:bg-green-600 hover:scale-105"
+                ? "hover:bg-green-600 hover:scale-105 hover:cursor-pointer"
                 : "opacity-50 cursor-not-allowed"
             }`}
             onClick={() => setIsUnitModalOpen(true)}
@@ -764,19 +764,15 @@ export default function UnitPage({
                     setSortedColumn("SmartLock");
                     setFilteredUnits(
                       [...filteredUnits].sort((a, b) => {
-                        // Find the matching lock for each unit
                         const lockA = smartLocks.find(
                           (lock) => lock.unitId === a.id
                         );
                         const lockB = smartLocks.find(
                           (lock) => lock.unitId === b.id
                         );
-
-                        // Safely get their names (default to empty string if no lock is found)
                         const nameA = lockA?.name?.toLowerCase() ?? "";
                         const nameB = lockB?.name?.toLowerCase() ?? "";
 
-                        // Compare
                         if (nameA < nameB)
                           return newDirection === "asc" ? -1 : 1;
                         if (nameA > nameB)
@@ -806,7 +802,7 @@ export default function UnitPage({
               .map((unit, index) => (
                 <tr
                   key={index}
-                  className="border-y border-gray-300 dark:border-border hover:bg-gray-100 dark:hover:bg-darkNavPrimary text-center"
+                  className="border-y border-gray-300 dark:border-border hover:bg-gray-100 dark:hover:bg-darkNavPrimary text-center relative"
                 >
                   <td className="px-4 py-2" onClick={() => editTenants(unit)}>
                     {unit.status === "Rented" ||
@@ -830,14 +826,48 @@ export default function UnitPage({
                     {unit.propertyNumber}
                   </td>
                   {smartLocks.length > 0 && (
-                    <td className="px-4 py-2 hidden md:table-cell">
+                    <td
+                      className="px-4 py-2 hover:cursor-pointer"
+                      onMouseDown={() => setHoveredRow(index)}
+                      onMouseLeave={() => setHoveredRow(null)}
+                    >
                       {(() => {
                         const matchingLock = smartLocks.find(
                           (lock) => lock.unitId === unit.id
                         );
-                        return matchingLock
-                          ? `${matchingLock.deviceType} - ${matchingLock.name}`
-                          : "No smart lock";
+                        if (!matchingLock) return "";
+                        return (
+                          <>
+                            <span>{`${matchingLock.deviceType} - ${matchingLock.name}`}</span>
+                            {hoveredRow === index && (
+                              <div className="absolute bg-gray-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-4/5">
+                                <div className="grid grid-cols-4 gap-1 overflow-hidden">
+                                  {Object.entries(matchingLock).map(
+                                    ([key, value], i) => (
+                                      <div key={i} className="break-words">
+                                        <span className="font-bold text-yellow-500">
+                                          {key}:
+                                        </span>
+                                        <br />
+                                        <span className="whitespace-normal break-words">
+                                          {value === null
+                                            ? "null"
+                                            : value === ""
+                                            ? "null"
+                                            : value === true
+                                            ? "true"
+                                            : value === false
+                                            ? "false"
+                                            : value}
+                                        </span>
+                                      </div>
+                                    )
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        );
                       })()}
                     </td>
                   )}
@@ -847,7 +877,7 @@ export default function UnitPage({
                         <button
                           className={`bg-yellow-500 text-white px-2 py-1 rounded font-bold ${
                             permissions.pmsPlatformVisitorEdit
-                              ? "hover:bg-yellow-600"
+                              ? "hover:bg-yellow-600 hover:cursor-pointer"
                               : "opacity-50 cursor-not-allowed"
                           }`}
                           onClick={() => turnDelinquent(unit)}
@@ -858,7 +888,7 @@ export default function UnitPage({
                         <button
                           className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
                             permissions.pmsPlatformVisitorDelete
-                              ? "hover:bg-red-600"
+                              ? "hover:bg-red-600 hover:cursor-pointer"
                               : "opacity-50 cursor-not-allowed"
                           }`}
                           onClick={() => moveOut(unit)}
@@ -872,7 +902,7 @@ export default function UnitPage({
                         <button
                           className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
                             permissions.pmsPlatformVisitorCreate
-                              ? "hover:bg-green-600"
+                              ? "hover:bg-green-600 hover:cursor-pointer"
                               : "opacity-50 cursor-not-allowed"
                           }`}
                           onClick={() => moveIn(unit) & setSelectedUnit(unit)}
@@ -883,7 +913,7 @@ export default function UnitPage({
                         <button
                           className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
                             permissions.pmsPlatformUnitDelete
-                              ? "hover:bg-red-600"
+                              ? "hover:bg-red-600 hover:cursor-pointer"
                               : "opacity-50 cursor-not-allowed"
                           }`}
                           onClick={() => deleteUnit(unit)}
@@ -897,7 +927,7 @@ export default function UnitPage({
                         <button
                           className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
                             permissions.pmsPlatformVisitorEdit
-                              ? "hover:bg-green-600"
+                              ? "hover:bg-green-600 hover:cursor-pointer"
                               : "opacity-50 cursor-not-allowed"
                           }`}
                           onClick={() => turnRented(unit)}
@@ -908,7 +938,7 @@ export default function UnitPage({
                         <button
                           className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
                             permissions.pmsPlatformVisitorDelete
-                              ? "hover:bg-red-600"
+                              ? "hover:bg-red-600 hover:cursor-pointer"
                               : "opacity-50 cursor-not-allowed"
                           }`}
                           onClick={() => moveOut(unit)}

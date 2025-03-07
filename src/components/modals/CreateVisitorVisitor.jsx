@@ -228,7 +228,7 @@ export default function CreateVisitorVisitor({
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
       <div className="bg-white rounded-sm shadow-lg w-96 dark:bg-darkPrimary">
         <div className="pl-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">
@@ -243,7 +243,7 @@ export default function CreateVisitorVisitor({
           <select
             name="types"
             id="types"
-            className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
+            className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border hover:cursor-pointer"
             onChange={(e) =>
               setNewVisitor((prevState) => ({
                 ...prevState,
@@ -263,7 +263,7 @@ export default function CreateVisitorVisitor({
               <select
                 name="units"
                 id="units"
-                className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
+                className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border hover:cursor-pointer"
                 onChange={(e) => setSelectedUnit(e.target.value)}
                 required
               >
@@ -368,7 +368,7 @@ export default function CreateVisitorVisitor({
               <select
                 name="timeProfiles"
                 id="timeProfiles"
-                className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
+                className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border hover:cursor-pointer"
                 value={newVisitor.timeProfile}
                 onChange={(e) =>
                   setNewVisitor((prevState) => ({
@@ -393,7 +393,7 @@ export default function CreateVisitorVisitor({
               <select
                 name="accessProfiles"
                 id="accessProfiles"
-                className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
+                className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border hover:cursor-pointer"
                 onChange={(e) =>
                   setNewVisitor((prevState) => ({
                     ...prevState,
@@ -418,13 +418,13 @@ export default function CreateVisitorVisitor({
 
           <div className="mt-4 flex justify-end">
             <button
-              className="bg-gray-400 px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
+              className="bg-gray-400 hover:cursor-pointer px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
               onClick={() => setIsCreateVisitorModalOpen(false)}
             >
               Cancel
             </button>
             <button
-              className="bg-green-500 text-white px-4 py-2 rounded-sm hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
+              className="bg-green-500 hover:cursor-pointer text-white px-4 py-2 rounded-sm hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
               type="submit"
             >
               Submit

@@ -224,7 +224,7 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
         </div>
         <table className="w-full table-auto border-collapse pb-96">
           <thead className="sticky top-[-1px] z-10 select-none">
-            <tr className="border border-gray-300 dark:border-border bg-gray-200 dark:bg-darkNavSecondary">
+            <tr className="bg-gray-200 dark:bg-darkNavSecondary">
               <th className="px-4 py-2 hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"></th>
               <th
                 className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
@@ -400,11 +400,11 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
                   >
                     {facility.propertyNumber}
                   </td>
-                  <td className="px-4 py-2 hover:cursor-pointer">
+                  <td className="px-4 py-2">
                     {currentFacility.id == facility.id &&
                     currentFacility.environment == facility.environment ? (
                       <button
-                        className="font-bold bg-gray-200 text-white px-2 py-1 rounded-sm hover:bg-gray-300 select-none"
+                        className="font-bold hover:cursor-pointer bg-gray-200 text-white px-2 py-1 rounded-sm hover:bg-gray-300 select-none"
                         onClick={() =>
                           localStorage.setItem("openPage", "units") &
                           setOpenPage("units")
@@ -414,7 +414,7 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
                       </button>
                     ) : (
                       <button
-                        className="font-bold bg-green-500 text-white px-2 py-1 rounded-sm hover:bg-green-600 select-none"
+                        className="font-bold hover:cursor-pointer bg-green-500 text-white px-2 py-1 rounded-sm hover:bg-green-600 select-none"
                         onClick={() => handleSelect(facility)}
                       >
                         Select

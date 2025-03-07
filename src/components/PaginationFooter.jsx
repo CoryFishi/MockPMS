@@ -18,7 +18,7 @@ export default function PaginationFooter({
       <div className="flex gap-3">
         <div>
           <select
-            className="border rounded-sm ml-2 dark:bg-darkSecondary dark:border-border"
+            className="border rounded-sm ml-2 dark:bg-darkSecondary dark:border-border hover:cursor-pointer"
             id="rowsPerPage"
             value={rowsPerPage}
             onChange={(e) => {
@@ -44,14 +44,14 @@ export default function PaginationFooter({
         <button
           disabled={currentPage === 1}
           onClick={() => setCurrentPage(1)}
-          className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
+          className="hover:cursor-pointer disabled:cursor-not-allowed p-1 disabled:text-slate-500"
         >
           <BiChevronsLeft />
         </button>
         <button
           disabled={currentPage === 1}
           onClick={() => setCurrentPage((prev) => prev - 1)}
-          className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
+          className="hover:cursor-pointer disabled:cursor-not-allowed p-1 disabled:text-slate-500"
         >
           <BiChevronLeft />
         </button>
@@ -61,14 +61,14 @@ export default function PaginationFooter({
         <button
           disabled={currentPage === pageCount}
           onClick={() => setCurrentPage((prev) => prev + 1)}
-          className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
+          className="hover:cursor-pointer disabled:cursor-not-allowed p-1 disabled:text-slate-500"
         >
           <BiChevronRight />
         </button>
         <button
           disabled={currentPage === pageCount}
           onClick={() => setCurrentPage(pageCount)}
-          className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
+          className="hover:cursor-pointer disabled:cursor-not-allowed p-1 disabled:text-slate-500"
         >
           <BiChevronsRight />
         </button>

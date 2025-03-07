@@ -21,6 +21,9 @@ export default function VisitorPage({ currentFacilityName }) {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [visitorsPulled, setVisitorsPulled] = useState(false);
   const { currentFacility, permissions } = useAuth();
+  const [smartLocks, setSmartLocks] = useState([]);
+  const [hoveredRow, setHoveredRow] = useState(null);
+  const [devices, setDevices] = useState([]);
 
   const [pageLoadDateTime, setPageLoadDateTime] = useState(
     new Date().toLocaleString()
@@ -65,11 +68,48 @@ export default function VisitorPage({ currentFacilityName }) {
         setSortedColumn("Unit Number");
         setVisitors(sortedVisitors);
         setVisitorsPulled(true);
+        handleSmartLocks();
         return response;
       })
       .catch(function (error) {
         throw error;
       });
+  };
+  const handleSmartLocks = async () => {
+    try {
+      var tokenStageKey = "";
+      var tokenEnvKey = "";
+      if (currentFacility.environment === "cia-stg-1.aws.") {
+        tokenStageKey = "cia-stg-1.aws.";
+      } else {
+        tokenEnvKey = currentFacility.environment;
+      }
+
+      const response = await axios.get(
+        `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/smartlockstatus`,
+        {
+          headers: {
+            Authorization: "Bearer " + currentFacility?.token?.access_token,
+            accept: "application/json",
+            "api-version": "2.0",
+          },
+        }
+      );
+      const smartLocks = response.data;
+      if (smartLocks.length > 0) {
+        setSmartLocks(smartLocks);
+        return smartLocks;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error(
+        `Error fetching SmartLocks for: ${currentFacility.name}`,
+        error
+      );
+      console.error(`${currentFacility.name} does not have SmartLocks`);
+      return null;
+    }
   };
   const moveOutVisitor = (visitor) => {
     const handleDelete = async () => {
@@ -236,7 +276,7 @@ export default function VisitorPage({ currentFacilityName }) {
           <button
             className={`bg-green-500 text-white p-1 py-2 rounded font-bold ml-3 w-44 transition duration-300 ease-in-out transform ${
               permissions.pmsPlatformVisitorCreate
-                ? "hover:bg-green-600 hover:scale-105"
+                ? "hover:bg-green-600 hover:scale-105 hover:cursor-pointer"
                 : "opacity-50 cursor-not-allowed"
             }`}
             onClick={() => {
@@ -270,10 +310,10 @@ export default function VisitorPage({ currentFacilityName }) {
         {/* Visitor Table */}
         <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
           {/* Header */}
-          <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
-            <tr className="border border-gray-300 dark:border-border  bg-gray-200 dark:bg-darkNavSecondary ">
+          <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary border-b border-gray-300 dark:border-border">
+            <tr className="dark:border-border bg-gray-200 dark:bg-darkNavSecondary">
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out hidden md:table-cell"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -295,7 +335,7 @@ export default function VisitorPage({ currentFacilityName }) {
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -320,7 +360,7 @@ export default function VisitorPage({ currentFacilityName }) {
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -344,7 +384,7 @@ export default function VisitorPage({ currentFacilityName }) {
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -368,7 +408,7 @@ export default function VisitorPage({ currentFacilityName }) {
                 )}
               </th>
               <th
-                className="px-4 py-2 hidden sm:table-cell hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hidden sm:table-cell hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -392,7 +432,7 @@ export default function VisitorPage({ currentFacilityName }) {
                 )}
               </th>
               <th
-                className="px-4 py-2 hidden sm:table-cell hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hidden sm:table-cell hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -416,7 +456,7 @@ export default function VisitorPage({ currentFacilityName }) {
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hidden lg:table-cell hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hidden lg:table-cell hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -440,7 +480,7 @@ export default function VisitorPage({ currentFacilityName }) {
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hidden lg:table-cell hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hidden lg:table-cell hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -468,7 +508,7 @@ export default function VisitorPage({ currentFacilityName }) {
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hidden xl:table-cell hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hidden xl:table-cell hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -495,7 +535,47 @@ export default function VisitorPage({ currentFacilityName }) {
                   </span>
                 )}
               </th>
-              <th className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              {smartLocks.length > 0 && (
+                <th
+                  className="px-4 py-2 hover:cursor-pointer hidden md:table-cell hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                  onClick={() => {
+                    const newDirection =
+                      sortDirection === "asc" ? "desc" : "asc";
+                    setSortDirection(newDirection);
+                    setSortedColumn("SmartLock");
+
+                    setFilteredVisitors(
+                      [...filteredVisitors].sort((a, b) => {
+                        const lockA = smartLocks.find(
+                          (lock) => lock.unitId === a.unitId
+                        );
+                        const lockB = smartLocks.find(
+                          (lock) => lock.unitId === b.unitId
+                        );
+
+                        const nameA = lockA?.name?.toLowerCase() ?? "";
+                        const nameB = lockB?.name?.toLowerCase() ?? "";
+
+                        // Compare the names
+                        if (nameA < nameB)
+                          return newDirection === "asc" ? -1 : 1;
+                        if (nameA > nameB)
+                          return newDirection === "asc" ? 1 : -1;
+                        return 0;
+                      })
+                    );
+                  }}
+                >
+                  SmartLock
+                  {sortedColumn === "SmartLock" && (
+                    <span className="ml-2">
+                      {sortDirection === "asc" ? "▲" : "▼"}
+                    </span>
+                  )}
+                </th>
+              )}
+
+              <th className="px-4 py-2 hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Actions
               </th>
             </tr>
@@ -507,7 +587,7 @@ export default function VisitorPage({ currentFacilityName }) {
               .map((visitor, index) => (
                 <tr
                   key={index}
-                  className="text-center border-y border-gray-300 dark:border-border border-collapse hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
+                  className="border-y border-gray-300 dark:border-border hover:bg-gray-100 dark:hover:bg-darkNavPrimary text-center relative"
                 >
                   <td className="px-4 py-2 hidden md:table-cell">
                     {visitor.id}
@@ -538,13 +618,59 @@ export default function VisitorPage({ currentFacilityName }) {
                   <td className="px-4 py-2 hidden xl:table-cell">
                     {visitor.email}
                   </td>
+                  {smartLocks.length > 0 && (
+                    <td
+                      className="px-4 py-2 hover:cursor-pointer"
+                      onMouseDown={() => setHoveredRow(index)}
+                      onMouseLeave={() => setHoveredRow(null)}
+                    >
+                      {(() => {
+                        const matchingLock = smartLocks.find(
+                          (lock) => lock.unitId === visitor.unitId
+                        );
+                        if (!matchingLock) return "";
+                        return (
+                          <>
+                            <span>{`${matchingLock.deviceType} - ${matchingLock.name}`}</span>
+                            {hoveredRow === index && (
+                              <div className="absolute bg-gray-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-4/5">
+                                <div className="grid grid-cols-4 gap-1 overflow-hidden">
+                                  {Object.entries(matchingLock).map(
+                                    ([key, value], i) => (
+                                      <div key={i} className="break-words">
+                                        <span className="font-bold text-yellow-500">
+                                          {key}:
+                                        </span>
+                                        <br />
+                                        <span className="whitespace-normal break-words">
+                                          {value === null
+                                            ? "null"
+                                            : value === ""
+                                            ? "null"
+                                            : value === true
+                                            ? "true"
+                                            : value === false
+                                            ? "false"
+                                            : value}
+                                        </span>
+                                      </div>
+                                    )
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </td>
+                  )}
                   <td className="px-4 py-2 select-none">
                     {visitor.isTenant ? (
                       <div className="text-center space-x-1">
                         <button
                           className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
                             permissions.pmsPlatformVisitorEdit
-                              ? "hover:bg-green-600"
+                              ? "hover:bg-green-600 hover:cursor-pointer"
                               : "opacity-50 cursor-not-allowed"
                           }`}
                           onClick={() => {
@@ -560,7 +686,7 @@ export default function VisitorPage({ currentFacilityName }) {
                         <button
                           className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
                             permissions.pmsPlatformVisitorDelete
-                              ? "hover:bg-red-600"
+                              ? "hover:bg-red-600 hover:cursor-pointer"
                               : "opacity-50 cursor-not-allowed"
                           }`}
                           onClick={() => {
@@ -578,7 +704,7 @@ export default function VisitorPage({ currentFacilityName }) {
                         <button
                           className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
                             permissions.pmsPlatformVisitorEdit
-                              ? "hover:bg-green-600"
+                              ? "hover:bg-green-600 hover:cursor-pointer"
                               : "opacity-50 cursor-not-allowed"
                           }`}
                           onClick={() => {
@@ -594,7 +720,7 @@ export default function VisitorPage({ currentFacilityName }) {
                         <button
                           className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
                             permissions.pmsPlatformVisitorDelete
-                              ? "hover:bg-red-600"
+                              ? "hover:bg-red-600 hover:cursor-pointer"
                               : "opacity-50 cursor-not-allowed"
                           }`}
                           onClick={() => {
@@ -612,7 +738,7 @@ export default function VisitorPage({ currentFacilityName }) {
                         <button
                           className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
                             permissions.pmsPlatformVisitorEdit
-                              ? "hover:bg-green-600"
+                              ? "hover:bg-green-600 hover:cursor-pointer"
                               : "opacity-50 cursor-not-allowed"
                           }`}
                           onClick={() => {
@@ -628,7 +754,7 @@ export default function VisitorPage({ currentFacilityName }) {
                         <button
                           className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
                             permissions.pmsPlatformVisitorDelete
-                              ? "hover:bg-red-600"
+                              ? "hover:bg-red-600 hover:cursor-pointer"
                               : "opacity-50 cursor-not-allowed"
                           }`}
                           onClick={() => {

@@ -11,6 +11,7 @@ import {
 import EditVisitorVisitor from "./EditVisitorVisitor";
 import CreateVisitorUnitModal from "./CreateVisitorUnitModal";
 import { useAuth } from "../../context/AuthProvider";
+import PaginationFooter from "../PaginationFooter";
 
 export default function EditVisitor({
   setIsEditVisitorModalOpen,
@@ -217,7 +218,7 @@ export default function EditVisitor({
   }, [visitors, searchQuery]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
       {/* Edit Visitor Modal Popup */}
       {isEditVisitorModalOpen2 && (
         <EditVisitorVisitor
@@ -248,7 +249,7 @@ export default function EditVisitor({
           </div>
 
           <button
-            className="right-0 text-gray-600 bg-gray-100 hover:bg-gray-300 dark:text-white dark:hover:bg-red-500 h-full px-5 rounded-tr dark:bg-gray-800"
+            className="hover:cursor-pointer right-0 text-gray-600 bg-gray-100 hover:bg-gray-300 dark:text-white dark:hover:bg-red-500 h-full px-5 rounded-tr dark:bg-gray-800"
             onClick={() => setIsEditVisitorModalOpen(false)}
           >
             x
@@ -282,7 +283,7 @@ export default function EditVisitor({
               <button
                 className={`bg-green-500 text-white p-1 py-2 rounded font-bold ml-3 w-44 transition duration-300 ease-in-out transform select-none ${
                   permissions.pmsPlatformVisitorCreate
-                    ? "hover:bg-green-600 hover:scale-105"
+                    ? "hover:bg-green-600 hover:scale-105 hover:cursor-pointer"
                     : "opacity-50 cursor-not-allowed"
                 }`}
                 onClick={() => createTenant()}
@@ -293,37 +294,37 @@ export default function EditVisitor({
             </div>
           </div>
           <div className="overflow-y-auto h-[77vh]">
-            <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
+            <table className="w-full table-auto">
               <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
                 <tr className="bg-gray-200 dark:bg-darkNavSecondary">
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Visitor Id
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Unit Number
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Visitor Name
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     isTenant
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Time Group
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Access Profile
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Gate Code
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Email Address
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Phone Number
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="px-4 py-2 text-left hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Actions
                   </th>
                 </tr>
@@ -366,111 +367,62 @@ export default function EditVisitor({
                       <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
                         {visitor.mobilePhoneNumber}
                       </td>
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell gap-2">
-                        <button
-                          className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
-                            permissions.pmsPlatformVisitorEdit
-                              ? "hover:bg-green-600"
-                              : "opacity-50 cursor-not-allowed"
-                          }`}
-                          onClick={() => {
-                            if (permissions.pmsPlatformVisitorEdit) {
-                              setIsEditVisitorModalOpen2(true);
-                              setSelectedVisitor(visitor);
-                            }
-                          }}
-                          disabled={!permissions.pmsPlatformVisitorEdit}
-                        >
-                          Edit
-                        </button>
-                        {!visitor.isTenant && (
+                      <td className="border-y border-gray-300 dark:border-border px-4 py-2 select-none">
+                        <div className="text-center space-x-1">
                           <button
-                            className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
-                              permissions.pmsPlatformVisitorDelete
-                                ? "hover:bg-red-600"
+                            className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
+                              permissions.pmsPlatformVisitorEdit
+                                ? "hover:bg-green-600 hover:cursor-pointer"
                                 : "opacity-50 cursor-not-allowed"
                             }`}
                             onClick={() => {
-                              if (permissions.pmsPlatformVisitorDelete) {
-                                toast.promise(removeVisitor(visitor.id), {
-                                  loading: "Removing visitor...",
-                                  success: "Visitor removed successfully!",
-                                  error:
-                                    "Failed to remove visitor. Please try again.",
-                                });
+                              if (permissions.pmsPlatformVisitorEdit) {
+                                setIsEditVisitorModalOpen2(true);
+                                setSelectedVisitor(visitor);
                               }
                             }}
-                            disabled={!permissions.pmsPlatformVisitorDelete}
+                            disabled={!permissions.pmsPlatformVisitorEdit}
                           >
-                            Delete
+                            Edit
                           </button>
-                        )}
+                          {!visitor.isTenant && (
+                            <button
+                              className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
+                                permissions.pmsPlatformVisitorDelete
+                                  ? "hover:bg-red-600 hover:cursor-pointer"
+                                  : "opacity-50 cursor-not-allowed"
+                              }`}
+                              onClick={() => {
+                                if (permissions.pmsPlatformVisitorDelete) {
+                                  toast.promise(removeVisitor(visitor.id), {
+                                    loading: "Removing visitor...",
+                                    success: "Visitor removed successfully!",
+                                    error:
+                                      "Failed to remove visitor. Please try again.",
+                                  });
+                                }
+                              }}
+                              disabled={!permissions.pmsPlatformVisitorDelete}
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
               </tbody>
             </table>
           </div>
-
-          {/* Modal footer/pagination */}
-          <div className="flex justify-between items-center px-2 py-5 mx-1">
-            <div className="flex gap-3">
-              <div>
-                <select
-                  className="border rounded-sm ml-2 dark:bg-darkSecondary dark:border-border"
-                  id="rowsPerPage"
-                  value={rowsPerPage}
-                  onChange={(e) => {
-                    setRowsPerPage(Number(e.target.value));
-                    setCurrentPage(1); // Reset to first page on rows per page change
-                  }}
-                >
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={100}>100</option>
-                </select>
-              </div>
-              <p className="text-sm">
-                {currentPage === 1 ? 1 : (currentPage - 1) * rowsPerPage + 1} -{" "}
-                {currentPage * rowsPerPage > filteredVisitors.length
-                  ? filteredVisitors.length
-                  : currentPage * rowsPerPage}{" "}
-                of {filteredVisitors.length}
-              </p>
-            </div>
-            <div className="gap-2 flex">
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(1)}
-                className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-              >
-                <BiChevronsLeft />
-              </button>
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((prev) => prev - 1)}
-                className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-              >
-                <BiChevronLeft />
-              </button>
-              <p>
-                {currentPage} of {pageCount}
-              </p>
-              <button
-                disabled={currentPage === pageCount}
-                onClick={() => setCurrentPage((prev) => prev + 1)}
-                className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-              >
-                <BiChevronRight />
-              </button>
-              <button
-                disabled={currentPage === pageCount}
-                onClick={() => setCurrentPage(pageCount)}
-                className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-              >
-                <BiChevronsRight />
-              </button>
-            </div>
+          {/* Pagination Footer */}
+          <div className="px-2 py-5 mx-1">
+            <PaginationFooter
+              rowsPerPage={rowsPerPage}
+              setRowsPerPage={setRowsPerPage}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              items={filteredVisitors}
+            />
           </div>
         </div>
       </div>

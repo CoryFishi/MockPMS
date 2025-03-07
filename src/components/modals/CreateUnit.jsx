@@ -98,7 +98,7 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits, addEvent }) {
 
   return (
     // Background Filter
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
       {/* Modal Container */}
       <div className="bg-white rounded-sm shadow-lg dark:bg-darkPrimary">
         {/* Header Container */}
@@ -127,13 +127,13 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits, addEvent }) {
           {/* Button Container */}
           <div className="mt-4 flex justify-end">
             <button
-              className="bg-gray-400 px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
+              className="bg-gray-400 px-4 py-2 rounded-sm mr-2 hover:cursor-pointer hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
               onClick={() => setIsUnitModalOpen(false)}
             >
               Cancel
             </button>
             <button
-              className="bg-green-500 text-white px-4 py-2 rounded-sm hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
+              className="bg-green-500 text-white hover:cursor-pointer px-4 py-2 rounded-sm hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
               onClick={handleCreateUnit}
             >
               Submit

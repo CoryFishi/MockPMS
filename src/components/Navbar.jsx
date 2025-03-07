@@ -68,7 +68,7 @@ export default function Navbar({
   }, [isDropdownOpen]);
 
   return (
-    <nav className="bg-white dark:bg-darkPrimary p-2 w-full border-slate-200 dark:border-gray-700 border-b select-none relative">
+    <nav className="bg-white dark:bg-darkPrimary p-2 w-full border-gray-200 dark:border-gray-700 border-b select-none relative">
       <div className="flex items-center justify-between text-black dark:text-white relative">
         <div className="flex">
           {showSideToggle && (
@@ -91,7 +91,7 @@ export default function Navbar({
           {user && permissions.smartlockPlatform && (
             <Link
               to="/smartlock"
-              className={`hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium ${
+              className={`hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium ${
                 location.pathname === "/smartlock"
                   ? "border-b-2 border-yellow-400"
                   : ""
@@ -103,7 +103,7 @@ export default function Navbar({
           {user && permissions.pmsPlatform && (
             <Link
               to="/"
-              className={`hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium ${
+              className={`hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium ${
                 location.pathname === "/" ? "border-b-2 border-yellow-400" : ""
               }`}
             >
@@ -113,7 +113,7 @@ export default function Navbar({
           {user && role === "admin" && (
             <Link
               to="/admin"
-              className={`hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium ${
+              className={`hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium ${
                 location.pathname === "/admin"
                   ? "border-b-2 border-yellow-400"
                   : ""
@@ -134,7 +134,7 @@ export default function Navbar({
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-1 w-full bg-white dark:bg-darkSecondary border border-gray-200 dark:border-border rounded-lg shadow-lg p-2 z-20 flex flex-col">
                   <button
-                    className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-center"
+                    className="hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-center hover:cursor-pointer"
                     onClick={() =>
                       toggleDarkMode() & setIsDropdownOpen(!isDropdownOpen)
                     }
@@ -143,20 +143,20 @@ export default function Navbar({
                   </button>
                   <Link
                     to="/user-settings"
-                    className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-center border-t border-t-gray-100 dark:border-t-border"
+                    className="hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-center border-t border-t-gray-100 dark:border-t-border"
                   >
                     User Settings
                   </Link>
                   {permissions.authenticationPlatform && (
                     <Link
                       to="/authentication-settings"
-                      className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-center border-t border-t-gray-100 dark:border-t-border"
+                      className="hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-center border-t border-t-gray-100 dark:border-t-border"
                     >
                       Authentication
                     </Link>
                   )}
                   <button
-                    className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium border-opacity-50 border-t border-t-gray-100 dark:border-t-border"
+                    className="hover:bg-gray-100 hover:cursor-pointer dark:hover:bg-gray-700 px-3 py-2 text-md font-medium border-opacity-50 border-t border-t-gray-100 dark:border-t-border"
                     onClick={() => handleLogout()}
                   >
                     Logout
@@ -168,7 +168,7 @@ export default function Navbar({
           ) : (
             <Link
               to="/login"
-              className={`hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 rounded-md text-md font-medium ${
+              className={`hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-md text-md font-medium ${
                 location.pathname === "/" ? "underline" : ""
               }`}
             >
