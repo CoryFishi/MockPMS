@@ -562,7 +562,7 @@ export default function UnitPage({
             placeholder="Search units..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
+            className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
           {/* Visitor Autofill Toggle */}
           <h3 className="mr-2 w-36">Visitor Autofill</h3>
@@ -623,9 +623,9 @@ export default function UnitPage({
         <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
           {/* Header */}
           <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
-            <tr className="border border-gray-300 dark:border-border bg-gray-200 dark:bg-darkNavSecondary">
+            <tr className="dark:border-border bg-gray-200 dark:bg-darkNavSecondary">
               <th
-                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -648,7 +648,7 @@ export default function UnitPage({
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -676,7 +676,7 @@ export default function UnitPage({
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -701,7 +701,7 @@ export default function UnitPage({
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hidden sm:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hidden sm:table-cell hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -725,7 +725,7 @@ export default function UnitPage({
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hidden md:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hidden md:table-cell hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -756,7 +756,7 @@ export default function UnitPage({
               </th>
               {smartLocks.length > 0 && (
                 <th
-                  className="px-4 py-2 hover:cursor-pointer hidden md:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                  className="px-4 py-2 hover:cursor-pointer hidden md:table-cell hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                   onClick={() => {
                     const newDirection =
                       sortDirection === "asc" ? "desc" : "asc";
@@ -764,15 +764,22 @@ export default function UnitPage({
                     setSortedColumn("SmartLock");
                     setFilteredUnits(
                       [...filteredUnits].sort((a, b) => {
-                        const propertyNumberA = (
-                          a.propertyNumber || ""
-                        ).toLowerCase();
-                        const propertyNumberB = (
-                          b.propertyNumber || ""
-                        ).toLowerCase();
-                        if (propertyNumberA < propertyNumberB)
+                        // Find the matching lock for each unit
+                        const lockA = smartLocks.find(
+                          (lock) => lock.unitId === a.id
+                        );
+                        const lockB = smartLocks.find(
+                          (lock) => lock.unitId === b.id
+                        );
+
+                        // Safely get their names (default to empty string if no lock is found)
+                        const nameA = lockA?.name?.toLowerCase() ?? "";
+                        const nameB = lockB?.name?.toLowerCase() ?? "";
+
+                        // Compare
+                        if (nameA < nameB)
                           return newDirection === "asc" ? -1 : 1;
-                        if (propertyNumberA > propertyNumberB)
+                        if (nameA > nameB)
                           return newDirection === "asc" ? 1 : -1;
                         return 0;
                       })
@@ -787,7 +794,7 @@ export default function UnitPage({
                   )}
                 </th>
               )}
-              <th className="px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th className="px-4 py-2 hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Actions
               </th>
             </tr>
@@ -799,7 +806,7 @@ export default function UnitPage({
               .map((unit, index) => (
                 <tr
                   key={index}
-                  className="border-y border-gray-300 dark:border-border hover:bg-gray-100 dark:hover:bg-darkNavSecondary text-center"
+                  className="border-y border-gray-300 dark:border-border hover:bg-gray-100 dark:hover:bg-darkNavPrimary text-center"
                 >
                   <td className="px-4 py-2" onClick={() => editTenants(unit)}>
                     {unit.status === "Rented" ||

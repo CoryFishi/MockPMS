@@ -315,7 +315,7 @@ export default function AllFacilitiesPage({
             placeholder="Search facilities..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
+            className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
         </div>
         {/* Facilities Table */}
@@ -323,9 +323,9 @@ export default function AllFacilitiesPage({
           {/* Header */}
           <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
             <tr className="border border-gray-300 dark:border-border bg-gray-200 dark:bg-darkNavSecondary text-center">
-              <th className="px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"></th>
+              <th className="px-4 py-2 hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"></th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -349,7 +349,7 @@ export default function AllFacilitiesPage({
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out min-w-28"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out min-w-28"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -371,7 +371,7 @@ export default function AllFacilitiesPage({
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -395,7 +395,7 @@ export default function AllFacilitiesPage({
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() =>
                   setFilteredFacilities(
                     [...filteredFacilities].sort((a, b) => {
@@ -426,7 +426,7 @@ export default function AllFacilitiesPage({
                   </span>
                 )}
               </th>
-              <th className="px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th className="px-4 py-2 hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Actions
               </th>
             </tr>
@@ -502,7 +502,7 @@ export default function AllFacilitiesPage({
                     {currentFacility.id == facility.id &&
                     currentFacility.environment == facility.environment ? (
                       <button
-                        className="font-bold bg-gray-200 text-white px-2 py-1 rounded hover:bg-gray-300 select-none"
+                        className="font-bold bg-gray-200 text-white px-2 py-1 rounded-sm hover:bg-gray-300 select-none"
                         onClick={() =>
                           localStorage.setItem("openPage", "units") &
                           setOpenPage("units")
@@ -512,7 +512,7 @@ export default function AllFacilitiesPage({
                       </button>
                     ) : (
                       <button
-                        className="font-bold bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 select-none"
+                        className="font-bold bg-green-500 text-white px-2 py-1 rounded-sm hover:bg-green-600 select-none"
                         onClick={() => handleSelect(facility)}
                       >
                         Select

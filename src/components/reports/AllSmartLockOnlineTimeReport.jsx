@@ -230,7 +230,7 @@ export default function AllSmartLockOnlineTimeReport({
         <p className="text-left text-sm ml-2">
           Events shown from the last
           <select
-            className="border rounded mx-2 dark:bg-darkSecondary dark:border-border"
+            className="border rounded-sm mx-2 dark:bg-darkSecondary dark:border-border"
             id="dayValue"
             value={dayValue}
             onChange={(e) => {
@@ -246,7 +246,7 @@ export default function AllSmartLockOnlineTimeReport({
           days
         </p>
         <p
-          className="text-black dark:text-white rounded hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer mr-2"
+          className="text-black dark:text-white rounded-sm hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer mr-2"
           onClick={() => exportDurations()}
         >
           Export
@@ -416,7 +416,7 @@ export default function AllSmartLockOnlineTimeReport({
                 <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {device.facilityName}
                   {hoveredRow === index && (
-                    <div className="absolute bg-gray-700 dark:bg-slate-700 text-white p-2 rounded shadow-lg z-10 top-1 left-2/4 transform -translate-x-1/2 text-left w-5/6">
+                    <div className="absolute bg-gray-700 dark:bg-slate-700 text-white p-2 rounded-sm shadow-lg z-10 top-1 left-2/4 transform -translate-x-1/2 text-left w-5/6">
                       <div className="grid grid-cols-4 gap-1 overflow-hidden">
                         <div>
                           <span className="font-bold text-yellow-500">
@@ -529,7 +529,7 @@ export default function AllSmartLockOnlineTimeReport({
         <div className="flex gap-3">
           <div>
             <select
-              className="border rounded ml-2 dark:bg-darkSecondary dark:border-border"
+              className="border rounded-sm ml-2 dark:bg-darkSecondary dark:border-border"
               id="rowsPerPage"
               value={rowsPerPage}
               onChange={(e) => {

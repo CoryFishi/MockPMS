@@ -238,7 +238,7 @@ export default function EditVisitor({
           addEvent={addEvent}
         />
       )}
-      <div className="bg-white rounded shadow-lg w-[95vw] h-[95vh] dark:bg-darkPrimary">
+      <div className="bg-white rounded-sm shadow-lg w-[95vw] h-[95vh] dark:bg-darkPrimary">
         <div className="pl-5 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">
             <MdEdit />
@@ -261,7 +261,7 @@ export default function EditVisitor({
               placeholder="Search visitors..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
+              className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
             />
             <div className="flex items-center justify-end text-center">
               <div className="flex">
@@ -296,34 +296,34 @@ export default function EditVisitor({
             <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
               <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
                 <tr className="bg-gray-200 dark:bg-darkNavSecondary">
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Visitor Id
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Unit Number
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Visitor Name
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     isTenant
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Time Group
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Access Profile
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Gate Code
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Email Address
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Phone Number
                   </th>
-                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                  <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                     Actions
                   </th>
                 </tr>
@@ -417,7 +417,7 @@ export default function EditVisitor({
             <div className="flex gap-3">
               <div>
                 <select
-                  className="border rounded ml-2 dark:bg-darkSecondary dark:border-border"
+                  className="border rounded-sm ml-2 dark:bg-darkSecondary dark:border-border"
                   id="rowsPerPage"
                   value={rowsPerPage}
                   onChange={(e) => {

@@ -75,7 +75,7 @@ export default function UserEvents() {
           placeholder="Search events..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
+          className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
         />
       </div>
       <div className="w-full px-5 py-2">
@@ -83,7 +83,7 @@ export default function UserEvents() {
           <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary w-full">
             <tr className="bg-gray-200 dark:bg-darkNavSecondary w-full hover:cursor-pointer">
               <th
-                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -107,7 +107,7 @@ export default function UserEvents() {
                 )}
               </th>
               <th
-                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -135,7 +135,7 @@ export default function UserEvents() {
                 )}
               </th>
               <th
-                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -165,7 +165,7 @@ export default function UserEvents() {
                 )}
               </th>
               <th
-                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);

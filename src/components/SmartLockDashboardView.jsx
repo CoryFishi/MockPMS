@@ -338,18 +338,18 @@ export default function SmartLockDashboardView({}) {
           placeholder="Search facilities..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
+          className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
         />
         {/* Search Button */}
         <button
-          className="bg-green-500 text-white p-1 py-2 rounded hover:bg-green-600 ml-3 w-44 font-bold"
+          className="bg-green-500 text-white p-1 py-2 rounded-sm hover:bg-green-600 ml-3 w-44 font-bold"
           onClick={() => search()}
         >
           Search
         </button>
         {/* Toggle view button */}
         <button
-          className="bg-slate-300 text-white p-1 py-2 rounded hover:bg-slate-400 ml-3 w-44 font-bold"
+          className="bg-slate-300 text-white p-1 py-2 rounded-sm hover:bg-slate-400 ml-3 w-44 font-bold"
           onClick={() => toggleListView()}
         >
           {listView ? "Card View" : "List View"}
@@ -709,7 +709,7 @@ export default function SmartLockDashboardView({}) {
       {/* Email Button */}
       <div>
         <p
-          className="text-black dark:text-white p-1 py-2 rounded font-bold hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer mr-5"
+          className="text-black dark:text-white p-1 py-2 rounded-sm font-bold hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer mr-5"
           onClick={() => sendEmail()}
         >
           Email Report

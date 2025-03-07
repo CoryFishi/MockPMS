@@ -115,8 +115,8 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
         <div className="flex flex-col h-screen">
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           <div className="flex-1 overflow-y-auto px-5 flex flex-col items-center">
-            <div className="flex gap-5 mt-2 text-center rounded max-w-2xl justify-evenly">
-              <div className="dark:bg-darkNavSecondary rounded p-5 border shadow-md dark:border-border">
+            <div className="flex gap-5 mt-2 text-center rounded-sm max-w-2xl justify-evenly">
+              <div className="dark:bg-darkNavSecondary rounded-sm p-5 border shadow-md dark:border-border">
                 <div className="flex flex-col items-center justify-center text-center gap-5">
                   <h1 className="text-2xl mt-2">Account Information</h1>
                   <div>
@@ -133,14 +133,14 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                 </div>
                 <div className="w-full mt-5">
                   <button
-                    className="w-96 bg-gray-100 dark:bg-darkPrimary m-1 rounded text-black dark:text-white p-3 hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer"
+                    className="w-96 bg-gray-100 dark:bg-darkPrimary m-1 rounded-sm text-black dark:text-white p-3 hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer"
                     onClick={() => handleLogout()}
                   >
                     Logout
                   </button>
                 </div>
               </div>
-              <div className="flex flex-col justify-center items-center text-center h-full dark:bg-darkNavSecondary rounded p-5 border shadow-md dark:border-border">
+              <div className="flex flex-col justify-center items-center text-center h-full dark:bg-darkNavSecondary rounded-sm p-5 border shadow-md dark:border-border">
                 <div className="flex flex-col items-center justify-center text-center max-w-5xl">
                   <h1 className="text-2xl py-2">Update Password</h1>
                   <input
@@ -148,17 +148,17 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                     placeholder="New Password"
                     value={newPassword1}
                     onChange={(e) => setNewPassword1(e.target.value)}
-                    className="text-black h-11 rounded m-2 border align-middle px-2"
+                    className="text-black h-11 rounded-sm m-2 border align-middle px-2"
                   />
                   <input
                     type="password"
                     placeholder="Confirm New Password"
                     value={newPassword2}
                     onChange={(e) => setNewPassword2(e.target.value)}
-                    className="text-black h-11 rounded m-2 border align-middle px-2"
+                    className="text-black h-11 rounded-sm m-2 border align-middle px-2"
                   />
                   <button
-                    className="bg-gray-100 dark:bg-darkPrimary m-1 rounded text-black dark:text-white p-3 hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer"
+                    className="bg-gray-100 dark:bg-darkPrimary m-1 rounded-sm text-black dark:text-white p-3 hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer"
                     onClick={() => handlePasswordChange()}
                   >
                     Change Password
@@ -172,7 +172,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                 <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary w-full hover:cursor-pointer">
                   <tr className="bg-gray-200 dark:bg-darkNavSecondary w-full">
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -197,7 +197,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                       )}
                     </th>
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -228,7 +228,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                       )}
                     </th>
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -259,7 +259,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                       )}
                     </th>
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -320,7 +320,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                 <div className="flex gap-3">
                   <div>
                     <select
-                      className="border rounded ml-2 dark:bg-darkSecondary dark:border-border"
+                      className="border rounded-sm ml-2 dark:bg-darkSecondary dark:border-border"
                       id="rowsPerPage"
                       value={rowsPerPage}
                       onChange={(e) => {

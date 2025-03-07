@@ -402,7 +402,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                 <button
                   className={`flex m-1 rounded p-3 text-black dark:text-white transition duration-300 ease-in-out ${
                     permissions.authenticationPlatformExport
-                      ? "bg-gray-100 dark:bg-darkSecondary hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer"
+                      ? "bg-gray-100 dark:bg-darkSecondary hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer"
                       : "bg-gray-200 dark:bg-darkTertiary text-gray-400 cursor-not-allowed"
                   }`}
                   title="Export Tokens"
@@ -418,7 +418,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                 <button
                   className={`flex m-1 rounded p-3 text-black dark:text-white transition duration-300 ease-in-out ${
                     permissions.authenticationPlatformImport
-                      ? "bg-gray-100 dark:bg-darkSecondary hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer"
+                      ? "bg-gray-100 dark:bg-darkSecondary hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer"
                       : "bg-gray-200 dark:bg-darkTertiary text-gray-400 cursor-not-allowed"
                   }`}
                   title="Import Tokens"
@@ -448,7 +448,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                 <thead>
                   <tr className="bg-gray-200 dark:bg-darkNavSecondary">
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -473,7 +473,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       )}
                     </th>
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -498,7 +498,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       )}
                     </th>
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -523,7 +523,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       )}
                     </th>
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -548,7 +548,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       )}
                     </th>
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -572,10 +572,10 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                         </span>
                       )}
                     </th>
-                    <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                    <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                       Authenticated
                     </th>
-                    <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                    <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                       Actions
                     </th>
                   </tr>
@@ -657,7 +657,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
                         <input
                           type="text"
-                          className="border border-slate-100 shadow-md rounded"
+                          className="border border-slate-100 shadow-md rounded-sm"
                           value={api}
                           onChange={(e) => setApi(e.target.value)}
                         />
@@ -665,7 +665,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
                         <input
                           type="text"
-                          className="border border-slate-100 shadow-md rounded"
+                          className="border border-slate-100 shadow-md rounded-sm"
                           value={apiSecret}
                           onChange={(e) => setApiSecret(e.target.value)}
                         />
@@ -673,7 +673,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
                         <input
                           type="text"
-                          className="border border-slate-100 shadow-md rounded"
+                          className="border border-slate-100 shadow-md rounded-sm"
                           value={client}
                           onChange={(e) => setClient(e.target.value)}
                         />
@@ -681,7 +681,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
                         <input
                           type="text"
-                          className="border border-slate-100 shadow-md rounded"
+                          className="border border-slate-100 shadow-md rounded-sm"
                           value={clientSecret}
                           onChange={(e) => setClientSecret(e.target.value)}
                         />
@@ -693,7 +693,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                             setEnvironment(e.target.value) &
                             handleNewLogin(e.target.value)
                           }
-                          className="p-0.5 shadow-md border-y border-slate-100 rounded"
+                          className="p-0.5 shadow-md border-y border-slate-100 rounded-sm"
                         >
                           <option value="-">--Select an Option--</option>
                           {permissions.authenticationPlatformEnvironmentProduction && (

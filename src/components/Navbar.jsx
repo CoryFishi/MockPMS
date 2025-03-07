@@ -74,7 +74,7 @@ export default function Navbar({
           {showSideToggle && (
             <button
               onClick={toggleSideMenu}
-              className="flex items-center flex-shrink-0 p-2"
+              className="flex items-center shrink-0 p-2"
             >
               {(dashboardMenu === true && (
                 <RiMenuFold3Fill className="text-2xl ml-1 hover:cursor-pointer" />

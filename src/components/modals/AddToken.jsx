@@ -60,7 +60,7 @@ export default function AddToken({
     // Background Filter
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       {/* Modal Container */}
-      <div className="bg-white rounded shadow-lg dark:bg-darkPrimary min-w-96">
+      <div className="bg-white rounded-sm shadow-lg dark:bg-darkPrimary min-w-96">
         {/* Header Container */}
         <div className="px-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">
@@ -75,7 +75,7 @@ export default function AddToken({
           <label className="block my-1 font-bold">API:</label>
           <input
             type="text"
-            className="border border-slate-100 shadow-md rounded dark:text-black w-full p-1"
+            className="border border-slate-100 shadow-md rounded-sm dark:text-black w-full p-1"
             value={api}
             placeholder="api token"
             onChange={(e) => setApi(e.target.value) & setIsAuthenticated(false)}
@@ -84,7 +84,7 @@ export default function AddToken({
           <label className="block my-1 font-bold">API Secret:</label>
           <input
             type="text"
-            className="border border-slate-100 shadow-md rounded dark:text-black w-full p-1"
+            className="border border-slate-100 shadow-md rounded-sm dark:text-black w-full p-1"
             value={apiSecret}
             placeholder="api secret token"
             onChange={(e) =>
@@ -95,7 +95,7 @@ export default function AddToken({
           <label className="block my-1 font-bold">Client:</label>
           <input
             type="text"
-            className="border border-slate-100 shadow-md rounded dark:text-black w-full p-1"
+            className="border border-slate-100 shadow-md rounded-sm dark:text-black w-full p-1"
             value={client}
             placeholder="client id"
             onChange={(e) =>
@@ -106,7 +106,7 @@ export default function AddToken({
           <label className="block my-1 font-bold">Client Secret:</label>
           <input
             type="text"
-            className="border border-slate-100 shadow-md rounded dark:text-black w-full p-1"
+            className="border border-slate-100 shadow-md rounded-sm dark:text-black w-full p-1"
             value={clientSecret}
             placeholder="client secret token"
             onChange={(e) =>
@@ -116,7 +116,7 @@ export default function AddToken({
           {/* Environment */}
           <label className="block my-1 font-bold">Environment:</label>
           <select
-            className="border border-slate-100 shadow-md rounded dark:text-black w-full p-2"
+            className="border border-slate-100 shadow-md rounded-sm dark:text-black w-full p-2"
             value={environment}
             onChange={(e) =>
               setEnvironment(e.target.value) & setIsAuthenticated(false)
@@ -141,7 +141,7 @@ export default function AddToken({
             </button>
             <div>
               <button
-                className="bg-gray-400 px-4 py-2 rounded mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
+                className="bg-gray-400 px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
                 onClick={() => setIsAddTokenFacilityModalOpen(false)}
               >
                 Cancel

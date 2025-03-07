@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
                       "https://propertymanager.netlify.app/authentication-settings";
                   }}
                 >
-                  <div className="flex-shrink-0 flex items-center justify-center">
+                  <div className="shrink-0 flex items-center justify-center">
                     <IoWarning className="text-4xl" />
                   </div>
                   <div className="ml-3 flex-1">
@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }) => {
               <div className="flex border-l border-gray-200">
                 <button
                   onClick={() => toast.dismiss(t.id)}
-                  className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                 >
                   Close
                 </button>
@@ -120,7 +120,7 @@ export const AuthProvider = ({ children }) => {
                     "https://propertymanager.netlify.app/authentication-settings";
                 }}
               >
-                <div className="flex-shrink-0 flex items-center justify-center">
+                <div className="shrink-0 flex items-center justify-center">
                   <IoWarning className="text-4xl" />
                 </div>
                 <div className="ml-3 flex-1">
@@ -138,7 +138,7 @@ export const AuthProvider = ({ children }) => {
             <div className="flex border-l border-gray-200">
               <button
                 onClick={() => toast.dismiss(t.id)}
-                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
               >
                 Close
               </button>

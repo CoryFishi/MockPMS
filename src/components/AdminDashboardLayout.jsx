@@ -68,7 +68,7 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                       setOpenPage("users") &
                       localStorage.setItem("openPage3", "users")
                     }
-                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                   >
                     Users
                   </Link>
@@ -77,7 +77,7 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                       setOpenPage("userEvents") &
                       localStorage.setItem("openPage3", "userEvents")
                     }
-                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                   >
                     User Events
                   </Link>
@@ -86,7 +86,7 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                       setOpenPage("roles") &
                       localStorage.setItem("openPage3", "roles")
                     }
-                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                   >
                     Roles
                   </Link>

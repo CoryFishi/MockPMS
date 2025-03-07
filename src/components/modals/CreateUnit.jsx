@@ -100,7 +100,7 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits, addEvent }) {
     // Background Filter
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       {/* Modal Container */}
-      <div className="bg-white rounded shadow-lg dark:bg-darkPrimary">
+      <div className="bg-white rounded-sm shadow-lg dark:bg-darkPrimary">
         {/* Header Container */}
         <div className="pl-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">
@@ -116,7 +116,7 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits, addEvent }) {
           <label className="block mb-2">Unit Number(s)</label>
           <input
             type="text"
-            className="border border-gray-300 rounded px-3 py-2 w-full dark:bg-darkSecondary dark:border-border"
+            className="border border-gray-300 rounded-sm px-3 py-2 w-full dark:bg-darkSecondary dark:border-border"
             value={newUnitNumber}
             onChange={(e) => setNewUnitNumber(e.target.value)}
             placeholder="Enter unit number"
@@ -127,13 +127,13 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits, addEvent }) {
           {/* Button Container */}
           <div className="mt-4 flex justify-end">
             <button
-              className="bg-gray-400 px-4 py-2 rounded mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
+              className="bg-gray-400 px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
               onClick={() => setIsUnitModalOpen(false)}
             >
               Cancel
             </button>
             <button
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
+              className="bg-green-500 text-white px-4 py-2 rounded-sm hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
               onClick={handleCreateUnit}
             >
               Submit

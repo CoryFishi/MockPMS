@@ -113,7 +113,7 @@ export default function ExtendedHistoryReport({
       <p className="text-left text-sm ml-2 mb-1">
         Events shown from the last
         <select
-          className="border rounded mx-2 dark:bg-darkSecondary dark:border-border"
+          className="border rounded-sm mx-2 dark:bg-darkSecondary dark:border-border"
           id="dayValue"
           value={dayValue}
           onChange={(e) => {
@@ -135,7 +135,7 @@ export default function ExtendedHistoryReport({
         >
           <tr className="bg-gray-200 dark:bg-darkNavSecondary sticky top-[-1px] z-10">
             <th
-              className="border border-gray-300 dark:border-border px-4 py-2  hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="border border-gray-300 dark:border-border px-4 py-2  hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -165,7 +165,7 @@ export default function ExtendedHistoryReport({
               )}
             </th>
             <th
-              className="border border-gray-300 dark:border-border px-4 py-2  hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="border border-gray-300 dark:border-border px-4 py-2  hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -312,7 +312,7 @@ export default function ExtendedHistoryReport({
                 <td className="border border-gray-300 dark:border-border px-4 py-2">
                   {smartlock.facilityName}
                   {hoveredRow === index && (
-                    <div className="absolute bg-gray-700 dark:bg-slate-700 text-white p-2 rounded shadow-lg z-10 top-1 left-2/4 transform -translate-x-1/2 text-left w-4/5">
+                    <div className="absolute bg-gray-700 dark:bg-slate-700 text-white p-2 rounded-sm shadow-lg z-10 top-1 left-2/4 transform -translate-x-1/2 text-left w-4/5">
                       <div className="grid grid-cols-4 gap-1 overflow-hidden">
                         {Object.entries(smartlock).map(
                           ([key, value], index) => (
@@ -363,7 +363,7 @@ export default function ExtendedHistoryReport({
         <div className="flex gap-3">
           <div>
             <select
-              className="border rounded ml-2 dark:bg-darkSecondary dark:border-border"
+              className="border rounded-sm ml-2 dark:bg-darkSecondary dark:border-border"
               id="rowsPerPage"
               value={rowsPerPage}
               onChange={(e) => {

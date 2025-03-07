@@ -12,7 +12,6 @@ import EditCurrentFacility from "./EditCurrentFacility";
 import AddToken from "./AddToken";
 import AddFavoriteFacility from "./AddFavoriteFacility";
 import AddSelectedFacility from "./AddSelectedFacility";
-import { data } from "autoprefixer";
 
 export default function EditUser({
   setIsEditUserModalOpen,
@@ -115,7 +114,7 @@ export default function EditUser({
         />
       )}
       {/* Modal Container */}
-      <div className="bg-white rounded shadow-lg dark:bg-darkPrimary">
+      <div className="bg-white rounded-sm shadow-lg dark:bg-darkPrimary">
         {/* Header Container */}
         <div className="px-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">
@@ -143,7 +142,7 @@ export default function EditUser({
           <label className="block my-2 font-bold">Role:</label>
           <select
             value={newUserData.role}
-            className="border border-gray-300 rounded px-3 py-2 w-full dark:bg-darkSecondary dark:border-border"
+            className="border border-gray-300 rounded-sm px-3 py-2 w-full dark:bg-darkSecondary dark:border-border"
             onChange={(e) =>
               setNewUserData((prevData) => ({
                 ...prevData,
@@ -165,7 +164,7 @@ export default function EditUser({
             </h1>
             <div className="flex gap-1">
               <button
-                className="hover:bg-gray-200 rounded px-1"
+                className="hover:bg-gray-200 rounded-sm px-1"
                 onClick={() => setIsEditCurrentFacilityModalOpen(true)}
               >
                 {newUserData.current_facility.name ? (
@@ -176,7 +175,7 @@ export default function EditUser({
               </button>
               {newUserData.current_facility.name && (
                 <button
-                  className="hover:bg-gray-200 rounded px-1"
+                  className="hover:bg-gray-200 rounded-sm px-1"
                   onClick={() =>
                     setNewUserData((prevData) => ({
                       ...prevData,
@@ -193,7 +192,7 @@ export default function EditUser({
           <div className="flex justify-between mt-4 mb-2">
             <label className="block font-bold">Tokens:</label>
             <button
-              className="hover:bg-gray-200 rounded px-1"
+              className="hover:bg-gray-200 rounded-sm px-1"
               onClick={() => setIsAddTokenFacilityModalOpen(true)}
             >
               <FaPlusCircle className="text-gray-500" />
@@ -220,7 +219,7 @@ export default function EditUser({
                   </p>
                   <div className="flex gap-2">
                     <button
-                      className="hover:bg-gray-200 rounded px-1"
+                      className="hover:bg-gray-200 rounded-sm px-1"
                       onClick={() => handleTokenView(token.api)}
                     >
                       {viewKey === token.api ? (
@@ -230,7 +229,7 @@ export default function EditUser({
                       )}
                     </button>
                     <button
-                      className="hover:bg-gray-200 rounded px-1"
+                      className="hover:bg-gray-200 rounded-sm px-1"
                       onClick={() => handleDeleteToken(token.api)}
                     >
                       <FaTrash className="text-gray-500" />
@@ -280,7 +279,7 @@ export default function EditUser({
           <div className="flex justify-between my-2">
             <label className="block font-bold">Favorite Facilities:</label>
             <button
-              className="hover:bg-gray-200 rounded px-1"
+              className="hover:bg-gray-200 rounded-sm px-1"
               onClick={() => setIsAddFavoriteFacilityModalOpen(true)}
             >
               <FaPlusCircle className="text-gray-500" />
@@ -294,7 +293,7 @@ export default function EditUser({
               >
                 <p>{token.name}</p>
                 <button
-                  className="hover:bg-gray-200 rounded px-1"
+                  className="hover:bg-gray-200 rounded-sm px-1"
                   onClick={() => handleDeleteFavoriteToken(token.id)}
                 >
                   <FaTrash className="text-gray-500" />
@@ -311,7 +310,7 @@ export default function EditUser({
           <div className="flex justify-between my-2">
             <label className="block font-bold">Selected Facilities:</label>
             <button
-              className="hover:bg-gray-200 rounded px-1"
+              className="hover:bg-gray-200 rounded-sm px-1"
               onClick={() => setIsAddSelectedFacilityModalOpen(true)}
             >
               <FaPlusCircle className="text-gray-500" />
@@ -325,7 +324,7 @@ export default function EditUser({
               >
                 <p>{token.name}</p>
                 <button
-                  className="hover:bg-gray-200 rounded px-1"
+                  className="hover:bg-gray-200 rounded-sm px-1"
                   onClick={() => handleDeleteSelectedToken(token.id)}
                 >
                   <FaTrash className="text-gray-500" />
@@ -341,13 +340,13 @@ export default function EditUser({
           {/* Button Container */}
           <div className="mt-4 flex justify-end">
             <button
-              className="bg-gray-400 px-4 py-2 rounded mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
+              className="bg-gray-400 px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
               onClick={() => setIsEditUserModalOpen(false)}
             >
               Cancel
             </button>
             <button
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
+              className="bg-green-500 text-white px-4 py-2 rounded-sm hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
               onClick={() =>
                 toast.promise(
                   updateUserData().then((result) => {

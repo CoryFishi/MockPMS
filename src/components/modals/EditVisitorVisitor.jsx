@@ -153,7 +153,7 @@ export default function EditVisitor({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white rounded shadow-lg w-96 dark:bg-darkPrimary">
+      <div className="bg-white rounded-sm shadow-lg w-96 dark:bg-darkPrimary">
         <div className="pl-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">
             <MdEdit />
@@ -169,7 +169,7 @@ export default function EditVisitor({
           </label>
           <input
             type="text"
-            className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
+            className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
             value={newVisitorName.firstName}
             onChange={(e) =>
               setNewVisitorName((prevState) => ({
@@ -185,7 +185,7 @@ export default function EditVisitor({
           </label>
           <input
             type="text"
-            className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
+            className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
             value={newVisitorName.lastName}
             onChange={(e) =>
               setNewVisitorName((prevState) => ({
@@ -199,7 +199,7 @@ export default function EditVisitor({
           <label className="block">Mobile Phone Number</label>
           <input
             type="text"
-            className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
+            className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
             value={newVisitorData.mobilePhoneNumber}
             onChange={(e) =>
               setNewVisitorData((prevState) => ({
@@ -212,7 +212,7 @@ export default function EditVisitor({
           <label className="block">Email Address</label>
           <input
             type="text"
-            className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
+            className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
             value={newVisitorData.email}
             onChange={(e) =>
               setNewVisitorData((prevState) => ({
@@ -227,7 +227,7 @@ export default function EditVisitor({
           </label>
           <input
             type="text"
-            className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
+            className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
             value={newVisitorData.code}
             onChange={(e) =>
               setNewVisitorData((prevState) => ({
@@ -244,7 +244,7 @@ export default function EditVisitor({
           <select
             name="timeProfiles"
             id="timeProfiles"
-            className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
+            className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
             value={newVisitorData.timeGroupId}
             onChange={(e) =>
               setNewVisitorData((prevState) => ({
@@ -270,7 +270,7 @@ export default function EditVisitor({
           <select
             name="accessProfiles"
             id="accessProfiles"
-            className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
+            className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
             value={newVisitorData.accessProfileId}
             onChange={(e) =>
               setNewVisitorData((prevState) => ({
@@ -292,14 +292,14 @@ export default function EditVisitor({
           </select>
           <div className="mt-4 flex justify-end">
             <button
-              className="bg-gray-400 px-4 py-2 rounded mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
+              className="bg-gray-400 px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
               onClick={() => setIsEditVisitorModalOpen(false)}
               type="button"
             >
               Cancel
             </button>
             <button
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
+              className="bg-green-500 text-white px-4 py-2 rounded-sm hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
               type="submit"
             >
               Submit

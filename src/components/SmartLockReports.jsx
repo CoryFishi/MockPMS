@@ -147,12 +147,12 @@ export default function SmartLockReports({}) {
           placeholder="Search..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
+          className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
         />
         <select
           name="report"
           id="report"
-          className="ml-2 w-96 border rounded dark:bg-darkNavSecondary dark:border-border text-black dark:text-white p-[10.5px]"
+          className="ml-2 w-96 border rounded-sm dark:bg-darkNavSecondary dark:border-border text-black dark:text-white p-[10.5px]"
           onChange={(e) => setOpenPage(e.target.value) & setReportSearch(false)}
         >
           <option value="AllSmartLocksReport">All SmartLocks</option>
@@ -167,7 +167,7 @@ export default function SmartLockReports({}) {
         <div className="ml-2 relative inline-block w-96" ref={modalRef}>
           <button
             onClick={toggleDropdown}
-            className="w-full border rounded dark:bg-darkNavSecondary dark:border-border text-black dark:text-white p-2"
+            className="w-full border rounded-sm dark:bg-darkNavSecondary dark:border-border text-black dark:text-white p-2"
           >
             {newSelectedFacilities.length} facilities selected
           </button>
@@ -205,7 +205,7 @@ export default function SmartLockReports({}) {
         </div>
         {/* Search Button */}
         <button
-          className="bg-green-500 text-white p-1 py-2 rounded hover:bg-green-600 ml-3 w-44 font-bold"
+          className="bg-green-500 text-white p-1 py-2 rounded-sm hover:bg-green-600 ml-3 w-44 font-bold"
           onClick={() => setReportSearch(true)}
         >
           Search

@@ -37,11 +37,11 @@ export default function SignUp() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-darkPrimary">
       {error && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-4 rounded shadow-lg max-w-sm w-full">
+          <div className="bg-white p-4 rounded-sm shadow-lg max-w-sm w-full">
             <h1 className="font-bold text-center text-3xl">Oh no!</h1>
             <p className="text-center text-red-500 mt-3">{error}</p>
             <button
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded w-full"
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-sm w-full"
               onClick={() => setError(null)}
             >
               Close
@@ -52,11 +52,11 @@ export default function SignUp() {
 
       {message && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-4 rounded shadow-lg max-w-sm w-full">
+          <div className="bg-white p-4 rounded-sm shadow-lg max-w-sm w-full">
             <h1 className="font-bold text-center text-3xl">Success!</h1>
             <p className="text-center text-blue-500 mt-3">{message}</p>
             <button
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded w-full"
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-sm w-full"
               onClick={() => setMessage(null)}
             >
               Close
@@ -77,7 +77,7 @@ export default function SignUp() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
         />
 
         <input
@@ -85,7 +85,7 @@ export default function SignUp() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
         />
 
         <input
@@ -93,12 +93,12 @@ export default function SignUp() {
           placeholder="Confirm Password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
         />
 
         <button
           type="submit"
-          className="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition duration-150"
+          className="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition duration-150"
         >
           Sign Up
         </button>

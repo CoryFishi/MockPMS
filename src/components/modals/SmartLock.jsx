@@ -132,7 +132,7 @@ export default function SmartLock({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white rounded shadow-lg text-black relative max-h-[95vh] w-full max-w-[95vw] dark:text-white dark:bg-darkPrimary">
+      <div className="bg-white rounded-sm shadow-lg text-black relative max-h-[95vh] w-full max-w-[95vw] dark:text-white dark:bg-darkPrimary">
         <div className="pl-5 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">
             <FaWarehouse />
@@ -162,14 +162,14 @@ export default function SmartLock({
             placeholder="Search SmartLocks..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
+            className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
           <div className="h-[73vh] overflow-y-auto text-center">
             <table className="w-full table-auto border-collapse border border-gray-300 dark:border-border">
               <thead className="select-none">
                 <tr className="bg-gray-200 dark:bg-darkNavSecondary sticky top-[-1px] z-10">
                   <th
-                    className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                    className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                     onClick={() => {
                       const newDirection =
                         sortDirection === "asc" ? "desc" : "asc";
@@ -416,7 +416,7 @@ export default function SmartLock({
                       <td className="border border-gray-300 dark:border-border px-4 py-2">
                         {smartlock.name}
                         {hoveredRow === index && (
-                          <div className="absolute bg-gray-700 dark:bg-slate-700 text-white p-2 rounded shadow-lg z-10 top-1 left-2/4 transform -translate-x-1/2 text-left w-4/5">
+                          <div className="absolute bg-gray-700 dark:bg-slate-700 text-white p-2 rounded-sm shadow-lg z-10 top-1 left-2/4 transform -translate-x-1/2 text-left w-4/5">
                             <div className="grid grid-cols-4 gap-1 overflow-hidden">
                               {Object.entries(smartlock).map(
                                 ([key, value], index) => (
@@ -592,7 +592,7 @@ export default function SmartLock({
             <div className="flex gap-3">
               <div>
                 <select
-                  className="border rounded ml-2 dark:bg-darkSecondary dark:border-border"
+                  className="border rounded-sm ml-2 dark:bg-darkSecondary dark:border-border"
                   id="rowsPerPage"
                   value={rowsPerPage}
                   onChange={(e) => {

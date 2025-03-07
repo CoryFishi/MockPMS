@@ -18,7 +18,7 @@ export default function PaginationFooter({
       <div className="flex gap-3">
         <div>
           <select
-            className="border rounded ml-2 dark:bg-darkSecondary dark:border-border"
+            className="border rounded-sm ml-2 dark:bg-darkSecondary dark:border-border"
             id="rowsPerPage"
             value={rowsPerPage}
             onChange={(e) => {

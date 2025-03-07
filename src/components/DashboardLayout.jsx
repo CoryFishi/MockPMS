@@ -188,7 +188,7 @@ export default function DashboardLayout({ dashboardMenu }) {
                         setOpenPage("visitors") &
                         localStorage.setItem("openPage", "visitors")
                       }
-                      className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                      className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                     >
                       Visitors
                     </Link>
@@ -197,7 +197,7 @@ export default function DashboardLayout({ dashboardMenu }) {
                         setOpenPage("units") &
                         localStorage.setItem("openPage", "units")
                       }
-                      className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                      className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                     >
                       Units
                     </Link>
@@ -211,7 +211,7 @@ export default function DashboardLayout({ dashboardMenu }) {
                               : `https://portal.insomniaccia${currentFacility.environment}.com/facility/${currentFacility.id}/dashboard`;
                           window.open(baseUrl, "_blank");
                         }}
-                        className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                        className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                       >
                         Control Center
                       </Link>
@@ -253,7 +253,7 @@ export default function DashboardLayout({ dashboardMenu }) {
                       setOpenPage("allFacilities") &
                       localStorage.setItem("openPage", "allFacilities")
                     }
-                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                   >
                     All Facilities
                   </Link>
@@ -262,7 +262,7 @@ export default function DashboardLayout({ dashboardMenu }) {
                       setOpenPage("favorites") &
                       localStorage.setItem("openPage", "favorites")
                     }
-                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                   >
                     Favorites
                   </Link>

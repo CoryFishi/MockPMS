@@ -230,7 +230,7 @@ export default function VisitorPage({ currentFacilityName }) {
             placeholder="Search visitors..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="border p-2 w-full dark:bg-darkNavSecondary rounded dark:border-border"
+            className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
           {/* Create Visitor Button */}
           <button
@@ -273,7 +273,7 @@ export default function VisitorPage({ currentFacilityName }) {
           <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
             <tr className="border border-gray-300 dark:border-border  bg-gray-200 dark:bg-darkNavSecondary ">
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out hidden md:table-cell"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out hidden md:table-cell"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -295,7 +295,7 @@ export default function VisitorPage({ currentFacilityName }) {
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -320,7 +320,7 @@ export default function VisitorPage({ currentFacilityName }) {
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -344,7 +344,7 @@ export default function VisitorPage({ currentFacilityName }) {
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -368,7 +368,7 @@ export default function VisitorPage({ currentFacilityName }) {
                 )}
               </th>
               <th
-                className="px-4 py-2 hidden sm:table-cell hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hidden sm:table-cell hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -392,7 +392,7 @@ export default function VisitorPage({ currentFacilityName }) {
                 )}
               </th>
               <th
-                className="px-4 py-2 hidden sm:table-cell hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hidden sm:table-cell hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -416,7 +416,7 @@ export default function VisitorPage({ currentFacilityName }) {
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hidden lg:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hidden lg:table-cell hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -440,7 +440,7 @@ export default function VisitorPage({ currentFacilityName }) {
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hidden lg:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hidden lg:table-cell hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -468,7 +468,7 @@ export default function VisitorPage({ currentFacilityName }) {
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hidden xl:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hidden xl:table-cell hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -495,7 +495,7 @@ export default function VisitorPage({ currentFacilityName }) {
                   </span>
                 )}
               </th>
-              <th className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Actions
               </th>
             </tr>

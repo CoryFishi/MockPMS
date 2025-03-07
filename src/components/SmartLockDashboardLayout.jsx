@@ -26,7 +26,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
 
   return (
     <div className="flex flex-col w-full h-screen overflow-auto">
-      <div className="flex flex-row w-full h-full  flex-shrink-0">
+      <div className="flex flex-row w-full h-full  shrink-0">
         {dashboardMenu === true && (
           <div className="flex flex-col h-full w-1/6 bg-navPrimary text-white text-xl dark:bg-darkNavPrimary border-r dark:border-border select-none">
             {/* Header Side Bar */}
@@ -70,7 +70,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                       setOpenPage("dashboard") &
                       localStorage.setItem("openPage2", "dashboard")
                     }
-                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left"
+                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left"
                   >
                     SmartLock
                   </button>
@@ -79,7 +79,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                       setOpenPage("reports") &
                       localStorage.setItem("openPage2", "reports")
                     }
-                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left"
+                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left"
                   >
                     Reports
                   </button>
@@ -119,7 +119,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                       setOpenPage("allFacilities") &
                       localStorage.setItem("openPage2", "allFacilities")
                     }
-                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left"
+                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left"
                   >
                     All Facilities
                   </button>
@@ -128,7 +128,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                       setOpenPage("selected") &
                       localStorage.setItem("openPage2", "selected")
                     }
-                    className="px-2 block rounded hover:bg-darkNavSecondary dark:hover:bg-darkPrimary text-left w-full"
+                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary text-left w-full"
                   >
                     Selected Facilities
                   </button>

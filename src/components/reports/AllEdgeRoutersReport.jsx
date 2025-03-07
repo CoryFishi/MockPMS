@@ -107,7 +107,7 @@ export default function AllEdgeRoutersReport({
         <thead className="select-none">
           <tr className="bg-gray-200 dark:bg-darkNavSecondary sticky top-[-1px] z-10">
             <th
-              className="border border-gray-300 dark:border-border px-4 py-2  hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="border border-gray-300 dark:border-border px-4 py-2  hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -137,7 +137,7 @@ export default function AllEdgeRoutersReport({
               )}
             </th>
             <th
-              className="border border-gray-300 dark:border-border px-4 py-2  hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="border border-gray-300 dark:border-border px-4 py-2  hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -349,7 +349,7 @@ export default function AllEdgeRoutersReport({
         <div className="flex gap-3">
           <div>
             <select
-              className="border rounded ml-2 dark:bg-darkSecondary dark:border-border"
+              className="border rounded-sm ml-2 dark:bg-darkSecondary dark:border-border"
               id="rowsPerPage"
               value={rowsPerPage}
               onChange={(e) => {

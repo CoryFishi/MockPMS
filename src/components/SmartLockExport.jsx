@@ -50,7 +50,7 @@ export default function SmartLockExport({ facilitiesInfo }) {
   return (
     // Export Button
     <p
-      className="text-black dark:text-white p-1 py-2 rounded font-bold hover:text-slate-400 hover:dark:text-slate-400 hover:cursor-pointer mr-5"
+      className="text-black dark:text-white p-1 py-2 rounded-sm font-bold hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer mr-5"
       onClick={exportTable}
     >
       Export
