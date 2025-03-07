@@ -8,7 +8,7 @@ import {
   BiChevronsRight,
 } from "react-icons/bi";
 
-export default function AllSmartLocksEventsReport({
+export default function ExtendedHistoryReport({
   selectedFacilities,
   searchQuery,
 }) {
@@ -34,7 +34,7 @@ export default function AllSmartLocksEventsReport({
       }
 
       const response = await axios.get(
-        `https://accessevent.${tokenStageKey}insomniaccia${tokenEnvKey}.com/combinedevents/facilities/${facility.id}?uq=&vq=&etq=1&etq=2&etq=3&etq=4&etq=5&etq=6&etq=7&etq=8&etq=9&etq=10&etq=11&etq=12&etq=13&etq=14&etq=15&etq=16&etq=17&etq=18&etq=19&etq=20&etq=21&etq=22&etq=23&etq=24&etq=25&minDate=${pastDayValue}&maxDate=${currentTime}&hideMetadata=true`,
+        `https://accessevent.${tokenStageKey}insomniaccia${tokenEnvKey}.com/combinedevents/facilities/${facility.id}?uq=219&vq=&gtq=1&gtq=3&gtq=5&gtq=8&gtq=9&gtq=10&gtq=11&gtq=12&gtq=15&gtq=16&gtq=17&gtq=18&gtq=19&gtq=20&gtq=24&gtq=25&gtq=26&gtq=27&gtq=28&gtq=29&gtq=30&gtq=31&gtq=32&gtq=33&gtq=34&gtq=35&gtq=36&gtq=37&gtq=38&gtq=39&itq=2&itq=3&itq=4&etq=1&etq=2&etq=3&etq=4&etq=5&etq=6&etq=7&etq=8&etq=9&etq=10&etq=11&etq=12&etq=13&etq=14&etq=15&etq=16&etq=17&etq=18&etq=19&etq=20&etq=21&etq=22&etq=23&etq=24&etq=25&minDate=${pastDayValue}&maxDate=${currentTime}&hideMetadata=true`,
         {
           headers: {
             Authorization: "Bearer " + facility.bearer,
@@ -44,6 +44,7 @@ export default function AllSmartLocksEventsReport({
         }
       );
       const smartLockEvents = response.data;
+      console.log(response.data);
       return smartLockEvents;
     } catch (error) {
       console.error(`Error fetching Events for: ${facility.name}`, error);
@@ -123,12 +124,15 @@ export default function AllSmartLocksEventsReport({
           <option value={30}>30</option>
           <option value={90}>90</option>
           <option value={120}>120</option>
-          <option value={180}>180</option>
+          <option value={1800}>1800</option>
         </select>
         days
       </p>
       <table className="w-full table-auto border-collapse border border-gray-300 dark:border-border">
-        <thead className="select-none">
+        <thead
+          className="select-none"
+          onClick={() => console.log(filteredSmartLockEvents)}
+        >
           <tr className="bg-gray-200 dark:bg-darkNavSecondary sticky top-[-1px] z-10">
             <th
               className="border border-gray-300 dark:border-border px-4 py-2  hover:cursor-pointer hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"

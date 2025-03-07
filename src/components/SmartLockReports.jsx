@@ -8,6 +8,7 @@ import AllAccessPointsReport from "./reports/AllAccessPointsReport";
 import { useAuth } from "../context/AuthProvider";
 import AllSmartLocksEventsReport from "./reports/AllSmartLockEventsReport";
 import AllSmartLockOnlineTimeReport from "./reports/AllSmartLockOnlineTimeReport";
+import ExtendedHistoryReport from "./reports/ExtendedHistoryReport";
 
 export default function SmartLockReports({}) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -15,7 +16,6 @@ export default function SmartLockReports({}) {
   const [isOpen, setIsOpen] = useState(false);
   const [facilitiesWithBearers, setFacilitiesWithBearers] = useState([]);
   const [filteredFacilities, setFilteredFacilities] = useState([]);
-  const [selectedReport, setSelectedReport] = useState("");
   const [openPage, setOpenPage] = useState("AllSmartLocksReport");
   const [reportSearch, setReportSearch] = useState(false);
   const { selectedTokens } = useAuth();
@@ -162,6 +162,7 @@ export default function SmartLockReports({}) {
           <option value="AllSmartLockOnlineTimeReport">
             SmartLock Online Time
           </option>
+          <option value="ExtendedReport">Extended Report</option>
         </select>
         <div className="ml-2 relative inline-block w-96" ref={modalRef}>
           <button
@@ -237,6 +238,12 @@ export default function SmartLockReports({}) {
       )}
       {openPage === "AllSmartLockOnlineTimeReport" && reportSearch === true && (
         <AllSmartLockOnlineTimeReport
+          selectedFacilities={newSelectedFacilities}
+          searchQuery={searchQuery}
+        />
+      )}
+      {openPage === "ExtendedReport" && reportSearch === true && (
+        <ExtendedHistoryReport
           selectedFacilities={newSelectedFacilities}
           searchQuery={searchQuery}
         />

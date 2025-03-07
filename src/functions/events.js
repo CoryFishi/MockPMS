@@ -2,7 +2,7 @@ import { supabase } from "../supabaseClient";
 
 export async function addEvent(eventName, eventDescription, completed) {
   try {
-    const { data, error } = await supabase.from("user_eventss").insert([
+    const { data, error } = await supabase.from("user_events").insert([
       {
         event_name: eventName,
         event_description: eventDescription,

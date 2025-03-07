@@ -558,7 +558,6 @@ export default function UnitPage({
           <CreateUnit
             setIsUnitModalOpen={setIsUnitModalOpen}
             setUnits={setUnits}
-            addEvent={addEvent}
           />
         )}
 
@@ -568,7 +567,6 @@ export default function UnitPage({
             setIsCreateVisitorModalOpen={setIsCreateVisitorModalOpen}
             setUnits={setUnits}
             unit={selectedUnit}
-            addEvent={addEvent}
           />
         )}
 
@@ -579,7 +577,6 @@ export default function UnitPage({
             currentFacility={currentFacility}
             visitors={visitors}
             unit={selectedUnit}
-            addEvent={addEvent}
           />
         )}
 

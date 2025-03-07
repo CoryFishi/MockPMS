@@ -3,12 +3,12 @@ import toast from "react-hot-toast";
 import React, { useState, useEffect } from "react";
 import { MdEdit } from "react-icons/md";
 import { useAuth } from "../../context/AuthProvider";
+import { addEvent } from "../../functions/events";
 
 export default function EditVisitor({
   setIsEditVisitorModalOpen,
   setVisitors,
   visitor,
-  addEvent,
 }) {
   const [newVisitorData, setNewVisitorData] = useState(visitor);
   const [newVisitorName, setNewVisitorName] = useState({
@@ -17,7 +17,7 @@ export default function EditVisitor({
   });
   const [timeProfiles, setTimeProfiles] = useState({});
   const [accessProfiles, setAccessProfiles] = useState({});
-  const { currentFacility } = useAuth();
+  const { currentFacility, user } = useAuth();
 
   const handleTimeProfiles = async () => {
     var tokenStageKey = "";
@@ -89,9 +89,9 @@ export default function EditVisitor({
       accessCode: newVisitorData.code,
       lastName: newVisitorName.lastName,
       firstName: newVisitorName.firstName,
-      email: newVisitorData.email,
-      mobilePhoneNumber: newVisitorData.mobilePhoneNumber,
-      suppressCommands: true,
+      email: newVisitorData?.email,
+      mobilePhoneNumber: newVisitorData?.mobilePhoneNumber,
+      suppressCommands: false,
     };
 
     const config = {
@@ -164,7 +164,9 @@ export default function EditVisitor({
         </div>
 
         <form onSubmit={handleEditVisitor} className="px-5 py-3">
-          <label className="block">First Name</label>
+          <label className="block">
+            First Name<span className="text-red-500">*</span>
+          </label>
           <input
             type="text"
             className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
@@ -178,7 +180,9 @@ export default function EditVisitor({
             placeholder="Enter first name"
             required
           />
-          <label className="block">Last Name</label>
+          <label className="block">
+            Last Name<span className="text-red-500">*</span>
+          </label>
           <input
             type="text"
             className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
@@ -204,7 +208,6 @@ export default function EditVisitor({
               }))
             }
             placeholder="Enter mobile phone number"
-            required
           />
           <label className="block">Email Address</label>
           <input
@@ -218,9 +221,10 @@ export default function EditVisitor({
               }))
             }
             placeholder="Enter email address"
-            required
           />
-          <label className="block">Gate Code</label>
+          <label className="block">
+            Gate Code<span className="text-red-500">*</span>
+          </label>
           <input
             type="text"
             className="border border-gray-300 rounded px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
@@ -234,7 +238,9 @@ export default function EditVisitor({
             placeholder="Enter gate code"
             required
           />
-          <label className="block">Time Profile</label>
+          <label className="block">
+            Time Profile<span className="text-red-500">*</span>
+          </label>
           <select
             name="timeProfiles"
             id="timeProfiles"
@@ -258,7 +264,9 @@ export default function EditVisitor({
               <option value="">Loading...</option>
             )}
           </select>
-          <label className="block">Access Profile</label>
+          <label className="block">
+            Access Profile<span className="text-red-500">*</span>
+          </label>
           <select
             name="accessProfiles"
             id="accessProfiles"
