@@ -35,6 +35,7 @@ export default function UnitPage({
   const [pageLoadDateTime, setPageLoadDateTime] = useState(
     new Date().toLocaleString()
   );
+  const [smartLocks, setSmartLocks] = useState([]);
   const rentedCount = filteredUnits.filter(
     (unit) => unit.status === "Rented"
   ).length;
@@ -128,11 +129,49 @@ export default function UnitPage({
         setSortedColumn("Unit Number");
         setUnits(sortedUnits);
         setUnitsPulled(true);
+        handleSmartLocks();
         return response;
       })
       .catch(function (error) {
         throw error;
       });
+  };
+  const handleSmartLocks = async () => {
+    try {
+      var tokenStageKey = "";
+      var tokenEnvKey = "";
+      if (currentFacility.environment === "cia-stg-1.aws.") {
+        tokenStageKey = "cia-stg-1.aws.";
+      } else {
+        tokenEnvKey = currentFacility.environment;
+      }
+
+      const response = await axios.get(
+        `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/smartlockstatus`,
+        {
+          headers: {
+            Authorization: "Bearer " + currentFacility?.token?.access_token,
+            accept: "application/json",
+            "api-version": "2.0",
+          },
+        }
+      );
+      const smartLocks = response.data;
+      if (smartLocks.length > 0) {
+        console.log(smartLocks);
+        setSmartLocks(smartLocks);
+        return smartLocks;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error(
+        `Error fetching SmartLocks for: ${currentFacility.name}`,
+        error
+      );
+      console.error(`${currentFacility.name} does not have SmartLocks`);
+      return null;
+    }
   };
   const moveIn = async (unit) => {
     const handleRent = async () => {
@@ -715,96 +754,39 @@ export default function UnitPage({
                   </span>
                 )}
               </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hidden md:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Additional Prop 1");
-                  setFilteredUnits(
-                    [...filteredUnits].sort((a, b) => {
-                      const extendedDataA = (
-                        a.extendedData?.additionalProp1 || ""
-                      ).toLowerCase();
-                      const extendedDataB = (
-                        b.extendedData?.additionalProp1 || ""
-                      ).toLowerCase();
-                      if (extendedDataA < extendedDataB)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (extendedDataA > extendedDataB)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Additional Prop 1
-                {sortedColumn === "Additional Prop 1" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hidden lg:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Additional Prop 2");
-                  setFilteredUnits(
-                    [...filteredUnits].sort((a, b) => {
-                      const extendedDataA = (
-                        a.extendedData?.additionalProp2 || ""
-                      ).toLowerCase();
-                      const extendedDataB = (
-                        b.extendedData?.additionalProp2 || ""
-                      ).toLowerCase();
-                      if (extendedDataA < extendedDataB)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (extendedDataA > extendedDataB)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Additional Prop 2
-                {sortedColumn === "Additional Prop 2" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hidden lg:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Additional Prop 3");
-                  setFilteredUnits(
-                    [...filteredUnits].sort((a, b) => {
-                      const extendedDataA = (
-                        a.extendedData?.additionalProp3 || ""
-                      ).toLowerCase();
-                      const extendedDataB = (
-                        b.extendedData?.additionalProp3 || ""
-                      ).toLowerCase();
-                      if (extendedDataA < extendedDataB)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (extendedDataA > extendedDataB)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Additional Prop 3
-                {sortedColumn === "Additional Prop 3" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
+              {smartLocks.length > 0 && (
+                <th
+                  className="px-4 py-2 hover:cursor-pointer hidden md:table-cell hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                  onClick={() => {
+                    const newDirection =
+                      sortDirection === "asc" ? "desc" : "asc";
+                    setSortDirection(newDirection);
+                    setSortedColumn("SmartLock");
+                    setFilteredUnits(
+                      [...filteredUnits].sort((a, b) => {
+                        const propertyNumberA = (
+                          a.propertyNumber || ""
+                        ).toLowerCase();
+                        const propertyNumberB = (
+                          b.propertyNumber || ""
+                        ).toLowerCase();
+                        if (propertyNumberA < propertyNumberB)
+                          return newDirection === "asc" ? -1 : 1;
+                        if (propertyNumberA > propertyNumberB)
+                          return newDirection === "asc" ? 1 : -1;
+                        return 0;
+                      })
+                    );
+                  }}
+                >
+                  SmartLock
+                  {sortedColumn === "SmartLock" && (
+                    <span className="ml-2">
+                      {sortDirection === "asc" ? "▲" : "▼"}
+                    </span>
+                  )}
+                </th>
+              )}
               <th className="px-4 py-2 hover:bg-slate-300 hover:dark:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Actions
               </th>
@@ -840,15 +822,18 @@ export default function UnitPage({
                   <td className="px-4 py-2 hidden md:table-cell">
                     {unit.propertyNumber}
                   </td>
-                  <td className="px-4 py-2 hidden md:table-cell">
-                    {unit.additionalProp1}
-                  </td>
-                  <td className="px-4 py-2 hidden lg:table-cell">
-                    {unit.additionalProp2}
-                  </td>
-                  <td className="px-4 py-2 hidden lg:table-cell">
-                    {unit.additionalProp3}
-                  </td>
+                  {smartLocks.length > 0 && (
+                    <td className="px-4 py-2 hidden md:table-cell">
+                      {(() => {
+                        const matchingLock = smartLocks.find(
+                          (lock) => lock.unitId === unit.id
+                        );
+                        return matchingLock
+                          ? `${matchingLock.deviceType} - ${matchingLock.name}`
+                          : "No smart lock";
+                      })()}
+                    </td>
+                  )}
                   <td className="px-4 py-2 select-none">
                     {unit.status === "Rented" ? (
                       <div className="text-center space-x-1">
