@@ -70,7 +70,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                       setOpenPage("dashboard") &
                       localStorage.setItem("openPage2", "dashboard")
                     }
-                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left"
+                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left hover:cursor-pointer"
                   >
                     SmartLock
                   </button>
@@ -79,7 +79,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                       setOpenPage("reports") &
                       localStorage.setItem("openPage2", "reports")
                     }
-                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left"
+                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left hover:cursor-pointer"
                   >
                     Reports
                   </button>
@@ -119,7 +119,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                       setOpenPage("allFacilities") &
                       localStorage.setItem("openPage2", "allFacilities")
                     }
-                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left"
+                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left hover:cursor-pointer"
                   >
                     All Facilities
                   </button>
@@ -128,7 +128,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                       setOpenPage("selected") &
                       localStorage.setItem("openPage2", "selected")
                     }
-                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary text-left w-full"
+                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary text-left w-full hover:cursor-pointer"
                   >
                     Selected Facilities
                   </button>

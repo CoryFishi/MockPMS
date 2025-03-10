@@ -599,13 +599,13 @@ export default function SmartLockFacilityRow({
               </div>
               <div className="items-end space-y-1 my-auto">
                 <button
-                  className="bg-gray-400 text-white px-2 py-1 rounded-sm font-bold w-2/3 hover:bg-gray-500"
+                  className="bg-gray-400 text-white px-2 py-1 rounded-sm font-bold w-2/3 hover:bg-gray-500 hover:cursor-pointer"
                   onClick={() => openSmartLockModal("")}
                 >
                   View all SmartLocks
                 </button>
                 <button
-                  className="bg-gray-400 text-white px-2 py-1 rounded-sm font-bold w-2/3 hover:bg-gray-500"
+                  className="bg-gray-400 text-white px-2 py-1 rounded-sm font-bold w-2/3 hover:bg-gray-500 hover:cursor-pointer"
                   onClick={() =>
                     sendFacilityReportEmail(
                       user,

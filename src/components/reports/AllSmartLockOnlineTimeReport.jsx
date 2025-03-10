@@ -1,12 +1,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
-import {
-  BiChevronLeft,
-  BiChevronRight,
-  BiChevronsLeft,
-  BiChevronsRight,
-} from "react-icons/bi";
+import PaginationFooter from "../PaginationFooter";
 import { FaCheckCircle } from "react-icons/fa";
 import { RiErrorWarningFill } from "react-icons/ri";
 
@@ -25,8 +20,6 @@ export default function AllSmartLockOnlineTimeReport({
   const pastDayValue = currentTime - dayValue * 24 * 60 * 60;
   const [hoveredRow, setHoveredRow] = useState(null);
   const [smartLockEvents, setSmartLockEvents] = useState([]);
-  // Pagination logic
-  const pageCount = Math.ceil(Object.values(durations).length / rowsPerPage);
 
   const exportDurations = () => {
     // Convert the data to CSV format
@@ -246,18 +239,19 @@ export default function AllSmartLockOnlineTimeReport({
           days
         </p>
         <p
-          className="text-black dark:text-white rounded-sm hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer mr-2"
+          className="text-black dark:text-white rounded-sm hover:text-gray-400 dark:hover:text-gray-400 hover:cursor-pointer mr-2"
           onClick={() => exportDurations()}
         >
           Export
         </p>
       </div>
-      <table className="w-full table-auto border-collapse border border-gray-300 dark:border-border">
-        <thead className="select-none">
-          <tr className="bg-gray-200 dark:bg-darkNavSecondary sticky top-[-1px] z-10">
+      <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
+        {/* Header */}
+        <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
+          <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
             {/* Facility Column */}
             <th
-              className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+              className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -292,7 +286,7 @@ export default function AllSmartLockOnlineTimeReport({
 
             {/* Device Name Column */}
             <th
-              className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+              className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -321,7 +315,7 @@ export default function AllSmartLockOnlineTimeReport({
 
             {/* Offline Time Column */}
             <th
-              className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+              className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -348,7 +342,7 @@ export default function AllSmartLockOnlineTimeReport({
 
             {/* Online Time Percentage Column */}
             <th
-              className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+              className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -375,7 +369,7 @@ export default function AllSmartLockOnlineTimeReport({
 
             {/* Status Column */}
             <th
-              className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+              className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -413,10 +407,10 @@ export default function AllSmartLockOnlineTimeReport({
                 onClick={() => setHoveredRow(index)}
                 onMouseLeave={() => setHoveredRow(null)}
               >
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {device.facilityName}
                   {hoveredRow === index && (
-                    <div className="absolute bg-gray-700 dark:bg-slate-700 text-white p-2 rounded-sm shadow-lg z-10 top-1 left-2/4 transform -translate-x-1/2 text-left w-5/6">
+                    <div className="absolute bg-gray-700 dark:bg-gray-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-5/6">
                       <div className="grid grid-cols-4 gap-1 overflow-hidden">
                         <div>
                           <span className="font-bold text-yellow-500">
@@ -484,14 +478,14 @@ export default function AllSmartLockOnlineTimeReport({
                     </div>
                   )}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2 cursor-pointer">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {device.deviceName}
                 </td>
 
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {Math.round(device.totalDuration / 60)}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                   {(
                     ((currentTime - pastDayValue - device.totalDuration) /
                       (currentTime - pastDayValue)) *
@@ -500,7 +494,7 @@ export default function AllSmartLockOnlineTimeReport({
                   %
                 </td>
                 <td
-                  className="text-center border border-gray-300 dark:border-border px-4 py-2 flex items-center gap-2"
+                  className="border-y border-gray-300 dark:border-border px-4 py-2"
                   title={
                     device.offlineStart
                       ? device.offlineStart.toISOString()
@@ -513,7 +507,7 @@ export default function AllSmartLockOnlineTimeReport({
                       <div>Offline</div>
                     </div>
                   ) : (
-                    <div className="inline-flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                       <FaCheckCircle className="text-green-500 text-xl" />
                       <div>Online</div>
                     </div>
@@ -525,64 +519,14 @@ export default function AllSmartLockOnlineTimeReport({
       </table>
 
       {/* Modal footer/pagination */}
-      <div className="flex justify-between items-center m-3 mx-1">
-        <div className="flex gap-3">
-          <div>
-            <select
-              className="border rounded-sm ml-2 dark:bg-darkSecondary dark:border-border"
-              id="rowsPerPage"
-              value={rowsPerPage}
-              onChange={(e) => {
-                setRowsPerPage(Number(e.target.value));
-                setCurrentPage(1); // Reset to first page on rows per page change
-              }}
-            >
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={100}>100</option>
-            </select>
-          </div>
-          <p className="text-sm">
-            {currentPage === 1 ? 1 : (currentPage - 1) * rowsPerPage + 1} -{" "}
-            {currentPage * rowsPerPage > Object.values(filteredDurations).length
-              ? Object.values(filteredDurations).length
-              : currentPage * rowsPerPage}{" "}
-            of {Object.values(filteredDurations).length}
-          </p>
-        </div>
-        <div className="gap-2 flex">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(1)}
-            className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-          >
-            <BiChevronsLeft />
-          </button>
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => prev - 1)}
-            className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-          >
-            <BiChevronLeft />
-          </button>
-          <p>
-            {currentPage} of {pageCount}
-          </p>
-          <button
-            disabled={currentPage === pageCount}
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-          >
-            <BiChevronRight />
-          </button>
-          <button
-            disabled={currentPage === pageCount}
-            onClick={() => setCurrentPage(pageCount)}
-            className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-          >
-            <BiChevronsRight />
-          </button>
-        </div>
+      <div className="px-2 py-5 mx-1">
+        <PaginationFooter
+          rowsPerPage={rowsPerPage}
+          setRowsPerPage={setRowsPerPage}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          items={filteredDurations}
+        />
       </div>
     </div>
   );

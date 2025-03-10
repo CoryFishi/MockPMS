@@ -131,7 +131,7 @@ export default function SmartLock({
   const pageCount = Math.ceil(filteredSmartLocks.length / rowsPerPage);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
       <div className="bg-white rounded-sm shadow-lg text-black relative max-h-[95vh] w-full max-w-[95vw] dark:text-white dark:bg-darkPrimary">
         <div className="pl-5 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">
@@ -142,7 +142,7 @@ export default function SmartLock({
           </div>
 
           <button
-            className="right-0 text-gray-600 bg-gray-100 hover:bg-gray-300 dark:text-white dark:hover:bg-red-500 h-full px-5 rounded-tr dark:bg-gray-800"
+            className="right-0 text-gray-600 hover:cursor-pointer bg-gray-100 hover:bg-gray-300 dark:text-white dark:hover:bg-red-500 h-full px-5 rounded-tr dark:bg-gray-800"
             onClick={() => setIsSmartlockModalOpen(false)}
           >
             x
@@ -165,11 +165,12 @@ export default function SmartLock({
             className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
           <div className="h-[73vh] overflow-y-auto text-center">
-            <table className="w-full table-auto border-collapse border border-gray-300 dark:border-border">
-              <thead className="select-none">
-                <tr className="bg-gray-200 dark:bg-darkNavSecondary sticky top-[-1px] z-10">
+            <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
+              {/* Header */}
+              <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
+                <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
                   <th
-                    className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                     onClick={() => {
                       const newDirection =
                         sortDirection === "asc" ? "desc" : "asc";
@@ -194,7 +195,7 @@ export default function SmartLock({
                     )}
                   </th>
                   <th
-                    className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                     onClick={() => {
                       const newDirection =
                         sortDirection === "asc" ? "desc" : "asc";
@@ -223,7 +224,7 @@ export default function SmartLock({
                     )}
                   </th>
                   <th
-                    className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                     onClick={() => {
                       const newDirection =
                         sortDirection === "asc" ? "desc" : "asc";
@@ -249,7 +250,7 @@ export default function SmartLock({
                     )}
                   </th>
                   <th
-                    className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                     onClick={() => {
                       const newDirection =
                         sortDirection === "asc" ? "desc" : "asc";
@@ -274,7 +275,7 @@ export default function SmartLock({
                     )}
                   </th>
                   <th
-                    className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                     onClick={() => {
                       const newDirection =
                         sortDirection === "asc" ? "desc" : "asc";
@@ -299,7 +300,7 @@ export default function SmartLock({
                     )}
                   </th>
                   <th
-                    className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                     onClick={() => {
                       const newDirection =
                         sortDirection === "asc" ? "desc" : "asc";
@@ -324,7 +325,7 @@ export default function SmartLock({
                     )}
                   </th>
                   <th
-                    className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                     onClick={() => {
                       const newDirection =
                         sortDirection === "asc" ? "desc" : "asc";
@@ -349,7 +350,7 @@ export default function SmartLock({
                     )}
                   </th>
                   <th
-                    className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                     onClick={() => {
                       const newDirection =
                         sortDirection === "asc" ? "desc" : "asc";
@@ -374,7 +375,7 @@ export default function SmartLock({
                     )}
                   </th>
                   <th
-                    className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                     onClick={() => {
                       const newDirection =
                         sortDirection === "asc" ? "desc" : "asc";
@@ -416,7 +417,7 @@ export default function SmartLock({
                       <td className="border border-gray-300 dark:border-border px-4 py-2">
                         {smartlock.name}
                         {hoveredRow === index && (
-                          <div className="absolute bg-gray-700 dark:bg-slate-700 text-white p-2 rounded-sm shadow-lg z-10 top-1 left-2/4 transform -translate-x-1/2 text-left w-4/5">
+                          <div className="absolute bg-gray-700 dark:bg-slate-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-4/5">
                             <div className="grid grid-cols-4 gap-1 overflow-hidden">
                               {Object.entries(smartlock).map(
                                 ([key, value], index) => (

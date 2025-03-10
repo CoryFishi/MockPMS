@@ -37,6 +37,7 @@ export default function DashboardLayout({ dashboardMenu }) {
       console.error("Error saving credentials:", error.message);
     } else {
       setCurrentFacility(updatedInfo);
+      setCurrentFacilityName(updatedInfo.name);
       setIsNameGrabbed(true);
     }
   };

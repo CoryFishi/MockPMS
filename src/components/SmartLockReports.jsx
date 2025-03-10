@@ -152,7 +152,7 @@ export default function SmartLockReports({}) {
         <select
           name="report"
           id="report"
-          className="ml-2 w-96 border rounded-sm dark:bg-darkNavSecondary dark:border-border text-black dark:text-white p-[10.5px]"
+          className="ml-2 w-96 border rounded-sm dark:bg-darkNavSecondary dark:border-border text-black dark:text-white p-[10.5px] hover:cursor-pointer"
           onChange={(e) => setOpenPage(e.target.value) & setReportSearch(false)}
         >
           <option value="AllSmartLocksReport">All SmartLocks</option>
@@ -167,7 +167,7 @@ export default function SmartLockReports({}) {
         <div className="ml-2 relative inline-block w-96" ref={modalRef}>
           <button
             onClick={toggleDropdown}
-            className="w-full border rounded-sm dark:bg-darkNavSecondary dark:border-border text-black dark:text-white p-2"
+            className="w-full border rounded-sm dark:bg-darkNavSecondary dark:border-border text-black dark:text-white p-2 hover:cursor-pointer"
           >
             {newSelectedFacilities.length} facilities selected
           </button>
@@ -176,20 +176,23 @@ export default function SmartLockReports({}) {
             <div className="absolute mt-1 w-full bg-white dark:bg-darkNavSecondary border border-gray-300 dark:border-border rounded-lg shadow-lg p-2 z-50 max-h-60 overflow-y-auto">
               <div className="w-full text-white text-left px-1 justify-between flex">
                 <button
-                  className="text-green-400"
+                  className="text-green-400 hover:cursor-pointer"
                   onClick={() => selectAllFacilities()}
                 >
                   Select all
                 </button>
                 <button
-                  className="text-yellow-400"
+                  className="text-yellow-400 hover:cursor-pointer"
                   onClick={() => deselectAllFacilities()}
                 >
                   Deselect all
                 </button>
               </div>
               {facilitiesWithBearers.map((facility) => (
-                <label key={facility.api} className="flex text-left gap-2 p-2">
+                <label
+                  key={facility.api}
+                  className="flex text-left gap-2 p-2 hover:cursor-pointer"
+                >
                   <input
                     type="checkbox"
                     value={facility.api}
@@ -205,7 +208,7 @@ export default function SmartLockReports({}) {
         </div>
         {/* Search Button */}
         <button
-          className="bg-green-500 text-white p-1 py-2 rounded-sm hover:bg-green-600 ml-3 w-44 font-bold"
+          className="bg-green-500 text-white p-1 py-2 rounded-sm hover:bg-green-600 ml-3 w-44 font-bold hover:cursor-pointer"
           onClick={() => setReportSearch(true)}
         >
           Search
