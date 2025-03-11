@@ -102,7 +102,7 @@ export default function EditCurrentFacility({
 
   return (
     // Background Filter
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
       {/* Modal Container */}
       <div className="bg-white rounded-sm shadow-lg dark:bg-darkPrimary min-w-96">
         {/* Header Container */}
@@ -122,7 +122,7 @@ export default function EditCurrentFacility({
           <label className="block mb-1 font-bold">Facility Id:</label>
           <input
             type="text"
-            className="border border-slate-100 shadow-md rounded-sm dark:text-black w-full p-1"
+            className="border border-slate-100 shadow-md rounded-sm w-full p-1 dark:border-border"
             value={id}
             onChange={(e) => setId(e.target.value) & setIsAuthenticated(false)}
           />
@@ -130,7 +130,7 @@ export default function EditCurrentFacility({
           <label className="block my-1 font-bold">API:</label>
           <input
             type="text"
-            className="border border-slate-100 shadow-md rounded-sm dark:text-black w-full p-1"
+            className="border border-slate-100 shadow-md rounded-sm w-full p-1 dark:border-border"
             value={api}
             onChange={(e) => setApi(e.target.value) & setIsAuthenticated(false)}
           />
@@ -138,7 +138,7 @@ export default function EditCurrentFacility({
           <label className="block my-1 font-bold">API Secret:</label>
           <input
             type="text"
-            className="border border-slate-100 shadow-md rounded-sm dark:text-black w-full p-1"
+            className="border border-slate-100 shadow-md rounded-sm w-full p-1 dark:border-border"
             value={apiSecret}
             onChange={(e) =>
               setApiSecret(e.target.value) & setIsAuthenticated(false)
@@ -148,7 +148,7 @@ export default function EditCurrentFacility({
           <label className="block my-1 font-bold">Client:</label>
           <input
             type="text"
-            className="border border-slate-100 shadow-md rounded-sm dark:text-black w-full p-1"
+            className="border border-slate-100 shadow-md rounded-sm w-full p-1 dark:border-border"
             value={client}
             onChange={(e) =>
               setClient(e.target.value) & setIsAuthenticated(false)
@@ -158,7 +158,7 @@ export default function EditCurrentFacility({
           <label className="block my-1 font-bold">Client Secret:</label>
           <input
             type="text"
-            className="border border-slate-100 shadow-md rounded-sm dark:text-black w-full p-1"
+            className="border border-slate-100 shadow-md rounded-sm w-full p-1 dark:border-border"
             value={clientSecret}
             onChange={(e) =>
               setClientSecret(e.target.value) & setIsAuthenticated(false)
@@ -167,16 +167,24 @@ export default function EditCurrentFacility({
           {/* Environment */}
           <label className="block my-1 font-bold">Environment:</label>
           <select
-            className="border border-slate-100 shadow-md rounded-sm dark:text-black w-full p-2"
+            className="border border-slate-100 shadow-md rounded-sm dark:border-border w-full p-2 hover:cursor-pointer"
             value={environment}
             onChange={(e) =>
               setEnvironment(e.target.value) & setIsAuthenticated(false)
             }
           >
-            <option value="">Production</option>
-            <option value="-dev">Development</option>
-            <option value="-qa">QA</option>
-            <option value="cia-stg-1.aws.">Staging</option>
+            <option className="dark:bg-darkNavSecondary" value="">
+              Production
+            </option>
+            <option className="dark:bg-darkNavSecondary" value="-dev">
+              Development
+            </option>
+            <option className="dark:bg-darkNavSecondary" value="-qa">
+              QA
+            </option>
+            <option className="dark:bg-darkNavSecondary" value="cia-stg-1.aws.">
+              Staging
+            </option>
           </select>
           {/* Button Container */}
           <div className="mt-4 flex justify-between">
@@ -185,14 +193,14 @@ export default function EditCurrentFacility({
                 isAuthenticated
                   ? "bg-green-500 hover:bg-green-600"
                   : "bg-yellow-600 hover:bg-yellow-700"
-              } text-white px-4 py-2 rounded font-bold transition duration-300 ease-in-out transform hover:scale-105`}
+              } text-white px-4 py-2 rounded font-bold transition duration-300 ease-in-out transform hover:scale-105 hover:cursor-pointer`}
               onClick={() => handleLogin()}
             >
               Authenticate
             </button>
             <div>
               <button
-                className="bg-gray-400 px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
+                className="hover:cursor-pointer bg-gray-400 px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
                 onClick={() => setIsEditCurrentFacilityModalOpen(false)}
               >
                 Cancel
@@ -202,7 +210,7 @@ export default function EditCurrentFacility({
                   isAuthenticated
                     ? "bg-green-500 hover:bg-green-600"
                     : "bg-red-500 hover:bg-red-600"
-                } text-white px-4 py-2 rounded font-bold transition duration-300 ease-in-out transform hover:scale-105`}
+                } text-white px-4 py-2 rounded font-bold transition duration-300 ease-in-out transform hover:scale-105 hover:cursor-pointer`}
                 onClick={() => {
                   if (isAuthenticated) {
                     setNewUserData((prevState) => ({

@@ -3,9 +3,9 @@ import toast from "react-hot-toast";
 import React, { useState } from "react";
 import { IoIosCreate } from "react-icons/io";
 import { useAuth } from "../../context/AuthProvider";
-import { supabase } from "../../supabaseClient";
+import { addEvent } from "../../functions/events";
 
-export default function CreateUnit({ setIsUnitModalOpen, setUnits, addEvent }) {
+export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
   // Store the unit number to be created
   const [newUnitNumber, setNewUnitNumber] = useState("");
   const { user, currentFacility } = useAuth();

@@ -23,8 +23,6 @@ export default function VisitorPage({ currentFacilityName }) {
   const { currentFacility, permissions } = useAuth();
   const [smartLocks, setSmartLocks] = useState([]);
   const [hoveredRow, setHoveredRow] = useState(null);
-  const [devices, setDevices] = useState([]);
-
   const [pageLoadDateTime, setPageLoadDateTime] = useState(
     new Date().toLocaleString()
   );

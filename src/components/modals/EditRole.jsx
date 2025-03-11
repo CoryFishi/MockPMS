@@ -54,7 +54,7 @@ export default function EditRole({
 
   return (
     // Background Filter
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
       {/* Modal Container */}
       <div className="bg-white rounded-sm shadow-lg dark:bg-darkPrimary min-w-96">
         {/* Header Container */}
@@ -95,7 +95,10 @@ export default function EditRole({
             {Object.keys(rolePermissions).map((key) => {
               if (key === "authenticationPlatform") {
                 return (
-                  <label key={key} className="inline-flex items-center mt-2">
+                  <label
+                    key={key}
+                    className="inline-flex items-center mt-2 hover:cursor-pointer"
+                  >
                     <input
                       type="checkbox"
                       className="form-checkbox h-5 w-5 text-yellow-500"
@@ -135,7 +138,10 @@ export default function EditRole({
               ) {
                 if (rolePermissions.authenticationPlatform) {
                   return (
-                    <label key={key} className="inline-flex items-center mt-2">
+                    <label
+                      key={key}
+                      className="inline-flex items-center mt-2 hover:cursor-pointer"
+                    >
                       <input
                         type="checkbox"
                         className="form-checkbox h-5 w-5 text-yellow-500"
@@ -162,7 +168,10 @@ export default function EditRole({
             {Object.keys(rolePermissions).map((key) => {
               if (key === "pmsPlatform") {
                 return (
-                  <label key={key} className="inline-flex items-center mt-2">
+                  <label
+                    key={key}
+                    className="inline-flex items-center mt-2 hover:cursor-pointer"
+                  >
                     <input
                       type="checkbox"
                       className="form-checkbox h-5 w-5 text-yellow-500"
@@ -199,7 +208,10 @@ export default function EditRole({
               if (key.startsWith("pmsPlatform") && key !== "pmsPlatform") {
                 if (rolePermissions.pmsPlatform) {
                   return (
-                    <label key={key} className="inline-flex items-center mt-2">
+                    <label
+                      key={key}
+                      className="inline-flex items-center mt-2 hover:cursor-pointer"
+                    >
                       <input
                         type="checkbox"
                         className="form-checkbox h-5 w-5 text-yellow-500"
@@ -226,10 +238,13 @@ export default function EditRole({
             {Object.keys(rolePermissions).map((key) => {
               if (key === "smartlockPlatform") {
                 return (
-                  <label key={key} className="inline-flex items-center mt-2">
+                  <label
+                    key={key}
+                    className="inline-flex items-center mt-2 hover:cursor-pointer"
+                  >
                     <input
                       type="checkbox"
-                      className="form-checkbox h-5 w-5 text-yellow-500"
+                      className="form-checkbox h-5 w-5 text-yellow-500 hover:cursor-pointer"
                       checked={rolePermissions[key]}
                       onChange={(e) => {
                         const isChecked = e.target.checked;
@@ -266,7 +281,10 @@ export default function EditRole({
               ) {
                 if (rolePermissions.smartlockPlatform) {
                   return (
-                    <label key={key} className="inline-flex items-center mt-2">
+                    <label
+                      key={key}
+                      className="inline-flex items-center mt-2 hover:cursor-pointer"
+                    >
                       <input
                         type="checkbox"
                         className="form-checkbox h-5 w-5 text-yellow-500"
@@ -292,13 +310,13 @@ export default function EditRole({
           {/* Button Container */}
           <div className="mt-4 flex justify-end">
             <button
-              className="bg-gray-400 px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
+              className="bg-gray-400 hover:cursor-pointer px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
               onClick={() => setIsEditRoleModalOpen(false)}
             >
               Cancel
             </button>
             <button
-              className="bg-green-500 text-white px-4 py-2 rounded-sm hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
+              className="bg-green-500 hover:cursor-pointer text-white px-4 py-2 rounded-sm hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
               onClick={() =>
                 toast.promise(
                   handleEditRole().then((result) => {

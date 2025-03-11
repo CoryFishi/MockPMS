@@ -473,23 +473,27 @@ export default function AllFacilitiesPage({
                   </td>
                   <td
                     className="px-4 py-2 hover:cursor-pointer"
-                    title={
-                      facility.environment === "cia-stg-1.aws."
-                        ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
-                        : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`
-                    }
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const baseUrl =
-                        facility.environment === "cia-stg-1.aws."
-                          ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
-                          : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`;
-                      window.open(baseUrl, "_blank");
-                    }}
+                    onClick={() => addToFavorite(facility)}
                   >
-                    <div className="flex gap-3 items-center text-center justify-center">
+                    <div className="flex gap-3 items-center">
                       {facility.name}
-                      <FaExternalLinkAlt className="text-blue-300 group-hover:text-blue-500" />
+                      <FaExternalLinkAlt
+                        title={
+                          facility.environment === "cia-stg-1.aws."
+                            ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
+                            : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`
+                        }
+                        className="text-blue-300 group-hover:text-blue-500"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const baseUrl =
+                            facility.environment === "cia-stg-1.aws."
+                              ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
+                              : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`;
+                          window.open(baseUrl, "_blank");
+                        }}
+                      />
                     </div>
                   </td>
                   <td

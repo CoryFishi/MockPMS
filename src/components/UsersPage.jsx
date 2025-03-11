@@ -158,10 +158,11 @@ export default function Users() {
       </div>
       <div className="w-full px-5 py-2">
         <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
-          <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary w-full">
-            <tr className="bg-gray-200 dark:bg-darkNavSecondary w-full">
+          {/* Header */}
+          <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary border-b border-gray-300 dark:border-border">
+            <tr className="dark:border-border bg-gray-200 dark:bg-darkNavSecondary">
               <th
-                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -186,7 +187,7 @@ export default function Users() {
                 )}
               </th>
               <th
-                className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -213,7 +214,7 @@ export default function Users() {
                 )}
               </th>
               <th
-                className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -240,7 +241,7 @@ export default function Users() {
                 )}
               </th>
               <th
-                className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -267,7 +268,7 @@ export default function Users() {
                 )}
               </th>
               <th
-                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -296,7 +297,7 @@ export default function Users() {
                 )}
               </th>
               <th
-                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -321,7 +322,7 @@ export default function Users() {
                 )}
               </th>
               <th
-                className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
                   setSortDirection(newDirection);
@@ -344,7 +345,7 @@ export default function Users() {
                   </span>
                 )}
               </th>
-              <th className="border border-gray-300 dark:border-border px-4 py-2 hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+              <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                 Actions
               </th>
             </tr>
@@ -380,7 +381,7 @@ export default function Users() {
                   </td>
                   <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell relative">
                     <button
-                      className=" dark:bg-darkSecondary border rounded-lg dark:border-border p-2 dark:hover:bg-darkPrimary w-full"
+                      className=" dark:bg-darkSecondary border rounded-lg dark:border-border p-2 dark:hover:bg-darkPrimary w-full hover:cursor-pointer"
                       onClick={() => toggleDropdown(index)}
                     >
                       Actions
@@ -388,10 +389,10 @@ export default function Users() {
                     {dropdownIndex === index && (
                       <div
                         ref={modalRef}
-                        className="absolute top-11 right-0 mt-2 w-full bg-white dark:bg-darkSecondary border border-gray-200 dark:border-border rounded-lg shadow-lg p-2 z-20 flex flex-col"
+                        className="absolute top-11 right-0 mt-2 w-full bg-white dark:bg-darkSecondary border border-gray-200 dark:border-border rounded-lg shadow-lg z-20 flex flex-col"
                       >
                         <button
-                          className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-left"
+                          className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-left hover:cursor-pointer rounded-t"
                           onClick={() => {
                             setSelectedUser(user) &
                               setIsEditUserModalOpen(true) &
@@ -401,7 +402,7 @@ export default function Users() {
                           Edit
                         </button>
                         <button
-                          className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-left"
+                          className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-left hover:cursor-pointer rounded-b"
                           onClick={() => {
                             setDropdownIndex(null);
                             if (selfUser.id != user.user_id) {

@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import React, { useState, useEffect } from "react";
 import { IoIosCreate } from "react-icons/io";
 import { useAuth } from "../../context/AuthProvider";
+import { addEvent } from "../../functions/events";
 
 export default function CreateVisitorVisitor({
   setIsCreateVisitorModalOpen,

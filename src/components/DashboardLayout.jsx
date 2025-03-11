@@ -10,6 +10,7 @@ import axios from "axios";
 import qs from "qs";
 import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
 export default function DashboardLayout({ dashboardMenu }) {
   const { user, currentFacility, setCurrentFacility } = useAuth();
@@ -212,9 +213,9 @@ export default function DashboardLayout({ dashboardMenu }) {
                               : `https://portal.insomniaccia${currentFacility.environment}.com/facility/${currentFacility.id}/dashboard`;
                           window.open(baseUrl, "_blank");
                         }}
-                        className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                        className="px-2 rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary flex items-center"
                       >
-                        Control Center
+                        <FaExternalLinkAlt /> Control Center
                       </Link>
                     ) : null}
                   </div>

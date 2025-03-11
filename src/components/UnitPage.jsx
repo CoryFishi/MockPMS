@@ -237,13 +237,13 @@ export default function UnitPage({
         });
         await addEvent(
           "Add Tenant",
-          `${user.email} rented ${unit.unitNumber} at ${currentFacilityName}, facility id ${currentFacility.id}`,
+          `${user.email} rented unit ${unit.unitNumber} to Tenant Temporary at facility ${currentFacility.name}, ${currentFacility.id}`,
           true
         );
       } catch (error) {
         await addEvent(
           "Add Tenant",
-          `${user.email} rented ${unit.unitNumber} at ${currentFacilityName}, facility id ${currentFacility.id}`,
+          `${user.email} rented unit ${unit.unitNumber} to Tenant Temporary at facility ${currentFacility.name}, ${currentFacility.id}`,
           false
         );
       }

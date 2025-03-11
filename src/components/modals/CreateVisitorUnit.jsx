@@ -3,12 +3,12 @@ import toast from "react-hot-toast";
 import React, { useState, useEffect } from "react";
 import { IoIosCreate } from "react-icons/io";
 import { useAuth } from "../../context/AuthProvider";
+import { addEvent } from "../../functions/events";
 
 export default function CreateVisitorUnit({
   setIsCreateVisitorModalOpen,
   setUnits,
   unit,
-  addEvent,
 }) {
   const [newVisitor, setNewVisitor] = useState({
     firstName: "",
@@ -148,7 +148,7 @@ export default function CreateVisitorUnit({
     );
     await addEvent(
       "Add Tenant",
-      `${user.email} rented unit ${unit.unitNumber} at facility ${currentFacility.name}, ${currentFacility.id}`,
+      `${user.email} rented unit ${unit.unitNumber} to ${newVisitor.firstName} ${newVisitor.lastName} at facility ${currentFacility.name}, ${currentFacility.id}`,
       true
     );
     // Close modal and clear input after submitting

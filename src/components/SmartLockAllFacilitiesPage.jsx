@@ -59,7 +59,6 @@ export default function SmartLockAllFacilitiesPage({}) {
         throw error;
       });
   };
-
   const handleFacilities = async (saved) => {
     const handleAccount = async (facility) => {
       const bearer = await handleLogin(facility);
@@ -117,16 +116,13 @@ export default function SmartLockAllFacilitiesPage({}) {
         const facility = saved[i];
         handleAccount(facility);
       }
-      if (saved.length > 0) {
-        toast.success(<b>Facilities Loaded Successfully!</b>);
-      } else {
+      if (saved.length < 1) {
         setNoFacilities(true);
       }
     } catch (error) {
       toast.error("Facilities Failed to Load!");
     }
   };
-
   const handleSelectedFacilitiesUpdate = async (newFacility, isSelected) => {
     // Fetch existing favorite tokens for the user
     const { data: currentData, error: fetchError } = await supabase
@@ -183,21 +179,17 @@ export default function SmartLockAllFacilitiesPage({}) {
       }
     }
   };
-
   const addToSelected = async (facility) => {
     const isSelected = isFacilitySelected(facility.id);
     handleSelectedFacilitiesUpdate(facility, isSelected);
   };
-
   const isFacilitySelected = (facilityId) => {
     return selectedTokens.some((facility) => facility.id === facilityId);
   };
-
   useEffect(() => {
     if (!tokens) return;
     handleFacilities(tokens);
   }, [tokens]);
-
   useEffect(() => {
     const filtered = facilities.filter(
       (facility) =>
@@ -214,9 +206,6 @@ export default function SmartLockAllFacilitiesPage({}) {
     );
     setFilteredFacilities(filtered);
   }, [facilities, searchQuery]);
-
-  // Pagination logic
-  const pageCount = Math.ceil(filteredFacilities.length / rowsPerPage);
 
   return (
     <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary mb-14">
