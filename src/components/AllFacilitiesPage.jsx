@@ -8,6 +8,7 @@ import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import PaginationFooter from "./PaginationFooter";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function AllFacilitiesPage({
   setOpenPage,
@@ -30,6 +31,8 @@ export default function AllFacilitiesPage({
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [noFacilities, setNoFacilities] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentLoadingText, setCurrentLoadingText] = useState("");
 
   const handleCurrentFacilityUpdate = async (updatedInfo) => {
     const { data, error } = await supabase.from("user_data").upsert(
@@ -47,7 +50,6 @@ export default function AllFacilitiesPage({
       setCurrentFacility(updatedInfo);
     }
   };
-
   const handleFavoriteFacilitiesUpdate = async (newFacility, isFavorite) => {
     // Fetch existing favorite tokens for the user
     const { data: currentData, error: fetchError } = await supabase
@@ -104,7 +106,6 @@ export default function AllFacilitiesPage({
       }
     }
   };
-
   const handleLogin = async (facility) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
@@ -141,7 +142,6 @@ export default function AllFacilitiesPage({
         throw error;
       });
   };
-
   const handleSelectLogin = async (facility) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
@@ -184,11 +184,11 @@ export default function AllFacilitiesPage({
         throw error;
       });
   };
-
   const handleFacilities = async (saved) => {
     setFilteredFacilities([]);
     setFacilities([]);
     const handleAccount = async (facility) => {
+      setCurrentLoadingText(`Loading ${facility.client}...`);
       const bearer = await handleLogin(facility);
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -220,7 +220,6 @@ export default function AllFacilitiesPage({
 
           setFacilities((prevFacilities) => {
             const combinedFacilities = [...prevFacilities, ...newFacilities];
-
             return combinedFacilities.sort((a, b) => {
               if (a.environment < b.environment) return -1;
               if (a.environment > b.environment) return 1;
@@ -229,6 +228,7 @@ export default function AllFacilitiesPage({
               return 0;
             });
           });
+
           setSortedColumn("Facility Id");
           if (response.data.length > 0) setNoFacilities(false);
           return response;
@@ -241,18 +241,19 @@ export default function AllFacilitiesPage({
     try {
       for (let i = 0; i < saved.length; i++) {
         const facility = saved[i];
-        handleAccount(facility);
+        setCurrentLoadingText(`Loading ${facility.name || facility.id}...`);
+        await handleAccount(facility);
       }
-      if (saved.length > 0) {
-        toast.success(<b>Facilities Loaded Successfully!</b>);
-      } else {
+      if (saved.length < 1) {
         setNoFacilities(true);
       }
     } catch (error) {
       toast.error("Facilities Failed to Load!");
+    } finally {
+      setCurrentLoadingText("");
+      setIsLoading(false);
     }
   };
-
   const handleSelect = async (facility) => {
     await handleCurrentFacilityUpdate(facility);
     await toast.promise(handleSelectLogin(facility), {
@@ -263,7 +264,6 @@ export default function AllFacilitiesPage({
     localStorage.setItem("openPage", "units");
     setOpenPage("units");
   };
-
   const addToFavorite = async (facility) => {
     const isFavorite = isFacilityFavorite(facility.id);
     handleFavoriteFacilitiesUpdate(facility, isFavorite);
@@ -299,7 +299,13 @@ export default function AllFacilitiesPage({
   }, [facilities, searchQuery]);
 
   return (
-    <div className="overflow-auto dark:text-white dark:bg-darkPrimary mb-14">
+    <div
+      className={`relative ${
+        isLoading ? "overflow-hidden min-h-full" : "overflow-auto"
+      } h-full dark:text-white dark:bg-darkPrimary relative`}
+    >
+      {/* Loading Spinner */}
+      {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* Page Header */}
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">

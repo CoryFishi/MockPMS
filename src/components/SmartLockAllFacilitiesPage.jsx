@@ -11,6 +11,7 @@ import PaginationFooter from "./PaginationFooter";
 import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function SmartLockAllFacilitiesPage({}) {
   const [facilities, setFacilities] = useState([]);
@@ -22,6 +23,8 @@ export default function SmartLockAllFacilitiesPage({}) {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [noFacilities, setNoFacilities] = useState(false);
   const { user, tokens, selectedTokens, setSelectedTokens } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentLoadingText, setCurrentLoadingText] = useState("");
 
   const handleLogin = async (facility) => {
     var tokenStageKey = "";
@@ -61,6 +64,7 @@ export default function SmartLockAllFacilitiesPage({}) {
   };
   const handleFacilities = async (saved) => {
     const handleAccount = async (facility) => {
+      setCurrentLoadingText(`Loading ${facility.client}...`);
       const bearer = await handleLogin(facility);
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -114,13 +118,17 @@ export default function SmartLockAllFacilitiesPage({}) {
     try {
       for (let i = 0; i < saved.length; i++) {
         const facility = saved[i];
-        handleAccount(facility);
+        setCurrentLoadingText(`Loading ${facility.name || facility.id}...`);
+        await handleAccount(facility);
       }
       if (saved.length < 1) {
         setNoFacilities(true);
       }
     } catch (error) {
       toast.error("Facilities Failed to Load!");
+    } finally {
+      setCurrentLoadingText("");
+      setIsLoading(false);
     }
   };
   const handleSelectedFacilitiesUpdate = async (newFacility, isSelected) => {
@@ -208,7 +216,13 @@ export default function SmartLockAllFacilitiesPage({}) {
   }, [facilities, searchQuery]);
 
   return (
-    <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary mb-14">
+    <div
+      className={`relative ${
+        isLoading ? "overflow-hidden min-h-full" : "overflow-auto"
+      } h-full dark:text-white dark:bg-darkPrimary relative`}
+    >
+      {/* Loading Spinner */}
+      {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <FaWarehouse className="text-lg" />

@@ -6,6 +6,7 @@ import EditVisitor from "./modals/EditVisitorVisitor";
 import { FaPerson } from "react-icons/fa6";
 import PaginationFooter from "./PaginationFooter";
 import { useAuth } from "../context/AuthProvider";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function VisitorPage({ currentFacilityName }) {
   const [visitors, setVisitors] = useState([]);
@@ -26,7 +27,9 @@ export default function VisitorPage({ currentFacilityName }) {
   const [pageLoadDateTime, setPageLoadDateTime] = useState(
     new Date().toLocaleString()
   );
-
+  const [currentLoadingText, setCurrentLoadingText] = useState(
+    "Loading Visitors..."
+  );
   const tenantCount = filteredVisitors.filter(
     (visitor) => visitor.isTenant === true
   ).length;
@@ -65,8 +68,6 @@ export default function VisitorPage({ currentFacilityName }) {
         });
         setSortedColumn("Unit Number");
         setVisitors(sortedVisitors);
-        setVisitorsPulled(true);
-        handleSmartLocks();
         return response;
       })
       .catch(function (error) {
@@ -193,12 +194,16 @@ export default function VisitorPage({ currentFacilityName }) {
 
   // Run handleUnits once when the component loads
   useEffect(() => {
-    //Return if no token is found
-    if (!currentFacility.token) return;
-    // Return if visitors have already been pulled
-    if (visitorsPulled) return;
-    handleVisitors();
-  }, [currentFacility]);
+    const fetchVisitors = async () => {
+      if (!currentFacility.token) return;
+      if (visitorsPulled) return;
+      await handleVisitors();
+      await handleSmartLocks();
+      setVisitorsPulled(true);
+    };
+
+    fetchVisitors();
+  }, [currentFacility, visitorsPulled]);
 
   useEffect(() => {
     // Filter facilities based on the search query
@@ -229,7 +234,9 @@ export default function VisitorPage({ currentFacilityName }) {
   }, [visitors, searchQuery]);
 
   return (
-    <div className="overflow-auto dark:text-white dark:bg-darkPrimary mb-14">
+    <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary relative">
+      {/* Loading Spinner */}
+      {!visitorsPulled && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* Page Header */}
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">

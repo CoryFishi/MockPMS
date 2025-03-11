@@ -26,7 +26,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
 
   return (
     <div className="flex flex-col w-full h-screen overflow-auto">
-      <div className="flex flex-row w-full h-full  shrink-0">
+      <div className="flex flex-row w-full h-full shrink-0">
         {dashboardMenu === true && (
           <div className="flex flex-col h-full w-1/6 bg-navPrimary text-white text-xl dark:bg-darkNavPrimary border-r dark:border-border select-none">
             {/* Header Side Bar */}

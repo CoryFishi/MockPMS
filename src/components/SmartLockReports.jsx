@@ -9,6 +9,7 @@ import { useAuth } from "../context/AuthProvider";
 import AllSmartLocksEventsReport from "./reports/AllSmartLockEventsReport";
 import AllSmartLockOnlineTimeReport from "./reports/AllSmartLockOnlineTimeReport";
 import ExtendedHistoryReport from "./reports/ExtendedHistoryReport";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function SmartLockReports({}) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,6 +21,8 @@ export default function SmartLockReports({}) {
   const [reportSearch, setReportSearch] = useState(false);
   const { selectedTokens } = useAuth();
   const modalRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentLoadingText, setCurrentLoadingText] = useState("");
 
   const [pageLoadDateTime, setPageLoadDateTime] = useState(
     new Date().toLocaleString()
@@ -111,19 +114,26 @@ export default function SmartLockReports({}) {
   // Get bearer tokens prior to creating rows/cards
   useEffect(() => {
     const fetchFacilitiesWithBearers = async () => {
-      const updatedFacilities = await Promise.all(
-        selectedTokens.map(async (facility) => {
-          const bearer = await fetchBearerToken(facility);
-          return { ...facility, bearer };
-        })
-      );
-      setFacilitiesWithBearers(updatedFacilities);
-      setFilteredFacilities(updatedFacilities);
+      try {
+        const updatedFacilities = await Promise.all(
+          selectedTokens.map(async (facility) => {
+            const bearer = await fetchBearerToken(facility);
+            return { ...facility, bearer };
+          })
+        );
+        setFacilitiesWithBearers(updatedFacilities);
+        setFilteredFacilities(updatedFacilities);
+      } catch (error) {
+        console.error("Error fetching facilities:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     // Initial fetch
     fetchFacilitiesWithBearers();
   }, [selectedTokens]);
+
   // Set all facilities as selected by default
   useEffect(() => {
     const initialSelection = facilitiesWithBearers.map((facility) => facility);
@@ -131,7 +141,13 @@ export default function SmartLockReports({}) {
   }, [facilitiesWithBearers]);
 
   return (
-    <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary text-center  mb-14">
+    <div
+      className={`relative ${
+        isLoading ? "overflow-hidden min-h-full" : "overflow-auto"
+      } h-full dark:text-white dark:bg-darkPrimary relative`}
+    >
+      {/* Loading Spinner */}
+      {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}{" "}
       {/* tab title */}
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">

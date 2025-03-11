@@ -5,13 +5,7 @@ import NotFound from "../components/NotFound";
 import { supabase } from "../supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
-
-import {
-  BiChevronLeft,
-  BiChevronRight,
-  BiChevronsLeft,
-  BiChevronsRight,
-} from "react-icons/bi";
+import PaginationFooter from "../components/PaginationFooter";
 
 export default function UserSettings({ darkMode, toggleDarkMode }) {
   const [newPassword1, setNewPassword1] = useState("");
@@ -23,7 +17,6 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [eventsPulled, setEventsPulled] = useState(false);
-  const pageCount = Math.ceil(filteredEvents.length / rowsPerPage);
   const [sortedColumn, setSortedColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("desc");
 
@@ -148,14 +141,14 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                     placeholder="New Password"
                     value={newPassword1}
                     onChange={(e) => setNewPassword1(e.target.value)}
-                    className="text-black h-11 rounded-sm m-2 border align-middle px-2"
+                    className="h-11 rounded-sm m-2 border align-middle px-2 dark:border-border dark:bg-darkPrimary"
                   />
                   <input
                     type="password"
                     placeholder="Confirm New Password"
                     value={newPassword2}
                     onChange={(e) => setNewPassword2(e.target.value)}
-                    className="text-black h-11 rounded-sm m-2 border align-middle px-2"
+                    className="h-11 rounded-sm m-2 border align-middle px-2 dark:border-border dark:bg-darkPrimary"
                   />
                   <button
                     className="bg-gray-100 dark:bg-darkPrimary m-1 rounded-sm text-black dark:text-white p-3 hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer"
@@ -168,11 +161,11 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
             </div>
             <div className="w-full mt-2">
               <h1 className="text-2xl text-center">User Events</h1>
-              <table className="w-full table-auto border-collapse border-gray-300 dark:border-border mt-1">
-                <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary w-full hover:cursor-pointer">
-                  <tr className="bg-gray-200 dark:bg-darkNavSecondary w-full">
+              <table className="w-full table-auto border-collapse pb-96">
+                <thead className="sticky top-[-1px] z-10 select-none">
+                  <tr className="bg-gray-200 dark:bg-darkNavSecondary">
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -197,7 +190,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                       )}
                     </th>
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -228,7 +221,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                       )}
                     </th>
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -259,7 +252,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                       )}
                     </th>
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -316,67 +309,14 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                 <p className="text-center">No events found.</p>
               )}
               {/* Modal footer/pagination */}
-              <div className="flex justify-between items-center px-2 py-4 mx-1">
-                <div className="flex gap-3">
-                  <div>
-                    <select
-                      className="border rounded-sm ml-2 dark:bg-darkSecondary dark:border-border"
-                      id="rowsPerPage"
-                      value={rowsPerPage}
-                      onChange={(e) => {
-                        setRowsPerPage(Number(e.target.value));
-                        setCurrentPage(1); // Reset to first page on rows per page change
-                      }}
-                    >
-                      <option value={10}>10</option>
-                      <option value={25}>25</option>
-                      <option value={100}>100</option>
-                    </select>
-                  </div>
-                  <p className="text-sm">
-                    {currentPage === 1
-                      ? 1
-                      : (currentPage - 1) * rowsPerPage + 1}{" "}
-                    -{" "}
-                    {currentPage * rowsPerPage > filteredEvents.length
-                      ? filteredEvents.length
-                      : currentPage * rowsPerPage}{" "}
-                    of {filteredEvents.length}
-                  </p>
-                </div>
-                <div className="gap-2 flex">
-                  <button
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(1)}
-                    className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-                  >
-                    <BiChevronsLeft />
-                  </button>
-                  <button
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage((prev) => prev - 1)}
-                    className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-                  >
-                    <BiChevronLeft />
-                  </button>
-                  <p>
-                    {currentPage} of {pageCount}
-                  </p>
-                  <button
-                    disabled={currentPage === pageCount}
-                    onClick={() => setCurrentPage((prev) => prev + 1)}
-                    className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-                  >
-                    <BiChevronRight />
-                  </button>
-                  <button
-                    disabled={currentPage === pageCount}
-                    onClick={() => setCurrentPage(pageCount)}
-                    className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-                  >
-                    <BiChevronsRight />
-                  </button>
-                </div>
+              <div className="px-2 py-5 mx-1">
+                <PaginationFooter
+                  rowsPerPage={rowsPerPage}
+                  setRowsPerPage={setRowsPerPage}
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                  items={filteredEvents}
+                />
               </div>
             </div>
           </div>

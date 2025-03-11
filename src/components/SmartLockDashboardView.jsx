@@ -6,6 +6,7 @@ import SmartLockFacilityCard from "./SmartLockFacilityCard";
 import SmartLockFacilityRow from "./SmartLockFacilityRow";
 import SmartLockExport from "./SmartLockExport";
 import { useAuth } from "../context/AuthProvider";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function SmartLockDashboardView({}) {
   const [facilitiesWithBearers, setFacilitiesWithBearers] = useState([]);
@@ -31,7 +32,8 @@ export default function SmartLockDashboardView({}) {
   const [searchQuery, setSearchQuery] = useState("");
   const { selectedTokens, user } = useAuth();
   const [expandedRows, setExpandedRows] = useState([]);
-
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentLoadingText, setCurrentLoadingText] = useState("");
   const [pageLoadDateTime, setPageLoadDateTime] = useState(
     new Date().toLocaleString()
   );
@@ -300,14 +302,21 @@ export default function SmartLockDashboardView({}) {
   // Get bearer tokens prior to creating rows/cards
   useEffect(() => {
     const fetchFacilitiesWithBearers = async () => {
-      const updatedFacilities = await Promise.all(
-        selectedTokens.map(async (facility) => {
-          const bearer = await fetchBearerToken(facility);
-          return { ...facility, bearer };
-        })
-      );
-      setFacilitiesWithBearers(updatedFacilities);
-      setFilteredFacilities(updatedFacilities);
+      try {
+        const updatedFacilities = await Promise.all(
+          selectedTokens.map(async (facility) => {
+            setCurrentLoadingText(`Loading ${facility.client}...`);
+            const bearer = await fetchBearerToken(facility);
+            return { ...facility, bearer };
+          })
+        );
+        setFacilitiesWithBearers(updatedFacilities);
+        setFilteredFacilities(updatedFacilities);
+      } catch (error) {
+        console.error("Error fetching facilities:", error);
+      } finally {
+        setIsLoading(false); // Set loading to false once all async operations complete
+      }
     };
 
     // Initial fetch
@@ -316,12 +325,17 @@ export default function SmartLockDashboardView({}) {
     // Set up interval for every 2 minutes
     const interval = setInterval(fetchFacilitiesWithBearers, 2 * 60 * 1000);
 
-    // Clear interval on component unmount
     return () => clearInterval(interval);
   }, [selectedTokens]);
 
   return (
-    <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary text-center mb-14">
+    <div
+      className={`relative ${
+        isLoading ? "overflow-hidden min-h-full" : "overflow-auto"
+      } h-full dark:text-white dark:bg-darkPrimary relative`}
+    >
+      {/* Loading Spinner */}
+      {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* tab title */}
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">

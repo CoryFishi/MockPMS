@@ -8,6 +8,7 @@ import PaginationFooter from "./PaginationFooter";
 import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function SmartLockSelectedPage() {
   const [facilities, setFacilities] = useState([]);
@@ -19,6 +20,8 @@ export default function SmartLockSelectedPage() {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [selectedTokensLoaded, setSelectedTokensLoaded] = useState(false);
   const [noFacilities, setNoFacilities] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentLoadingText, setCurrentLoadingText] = useState("");
 
   const { user, selectedTokens, setSelectedTokens } = useAuth();
 
@@ -91,26 +94,26 @@ export default function SmartLockSelectedPage() {
   };
 
   useEffect(() => {
-    if (selectedTokens.length < 1) {
-      if (facilities.length < 1) {
-        setNoFacilities(true);
-      }
-      return;
-    }
-    if (selectedTokensLoaded) return;
-    setSelectedTokensLoaded(true);
-    setNoFacilities(false);
-    const sortedFacilities = selectedTokens.sort((a, b) => {
-      if (a.environment < b.environment) return -1;
-      if (a.environment > b.environment) return 1;
-      if (a.id < b.id) return -1;
-      if (a.id > b.id) return 1;
-      return 0;
-    });
-    setSortedColumn("Facility Id");
     try {
+      if (selectedTokens.length < 1) {
+        if (facilities.length < 1) {
+          setNoFacilities(true);
+        }
+        return;
+      }
+      if (selectedTokensLoaded) return;
+      setSelectedTokensLoaded(true);
+      setNoFacilities(false);
+      const sortedFacilities = selectedTokens.sort((a, b) => {
+        if (a.environment < b.environment) return -1;
+        if (a.environment > b.environment) return 1;
+        if (a.id < b.id) return -1;
+        if (a.id > b.id) return 1;
+        return 0;
+      });
+      setSortedColumn("Facility Id");
       setFacilities(sortedFacilities);
-      toast.success(<b>Selected facilites loaded successfully!</b>);
+      setIsLoading(false);
     } catch {
       alert("It broke");
     }
@@ -137,7 +140,13 @@ export default function SmartLockSelectedPage() {
   const pageCount = Math.ceil(filteredFacilities.length / rowsPerPage);
 
   return (
-    <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary mb-14">
+    <div
+      className={`relative ${
+        isLoading ? "overflow-hidden min-h-full" : "overflow-auto"
+      } h-full dark:text-white dark:bg-darkPrimary relative`}
+    >
+      {/* Loading Spinner */}
+      {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <RiCheckboxCircleFill className="text-lg" />

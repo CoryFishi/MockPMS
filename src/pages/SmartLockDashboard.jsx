@@ -9,18 +9,16 @@ export default function SmartLockDashboard({ darkMode, toggleDarkMode }) {
   const { user, permissions, isLoading } = useAuth();
 
   return (
-    <div className="h-screen w-screen flex flex-col overflow-x-hidden overflow-hidden font-roboto">
+    <div className="flex flex-col w-screen h-screen overflow-hidden font-roboto">
       {user && permissions.smartlockPlatform ? (
-        <div>
+        <div className="flex flex-col flex-1 w-full min-h-full overflow-hidden">
           <Navbar
             setDashboardMenu={setDashboardMenu}
             dashboardMenu={dashboardMenu}
             darkMode={darkMode}
             toggleDarkMode={toggleDarkMode}
           />
-          <div className="flex flex-1">
-            <SmartLockDashboardLayout dashboardMenu={dashboardMenu} />
-          </div>
+          <SmartLockDashboardLayout dashboardMenu={dashboardMenu} />
         </div>
       ) : (
         <NotFound />

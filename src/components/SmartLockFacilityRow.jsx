@@ -352,7 +352,7 @@ export default function SmartLockFacilityRow({
         >
           <div className="flex items-center gap-2 cursor-pointer">
             <button
-              className="text-blue-500"
+              className="text-blue-500 hover:cursor-pointer"
               title={expandedRows.includes(facility.id) ? "Collapse" : "Expand"}
             >
               {expandedRows.includes(facility.id) ? "−" : "+"}
@@ -597,7 +597,7 @@ export default function SmartLockFacilityRow({
                   </p>
                 </div>
               </div>
-              <div className="items-end space-y-1 my-auto">
+              <div className="flex flex-col items-center justify-center space-y-1">
                 <button
                   className="bg-gray-400 text-white px-2 py-1 rounded-sm font-bold w-2/3 hover:bg-gray-500 hover:cursor-pointer"
                   onClick={() => openSmartLockModal("")}

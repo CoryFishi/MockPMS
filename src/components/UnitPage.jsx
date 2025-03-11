@@ -8,6 +8,7 @@ import EditVisitor from "./modals/EditVisitorUnit";
 import { useAuth } from "../context/AuthProvider";
 import { addEvent } from "../functions/events";
 import PaginationFooter from "./PaginationFooter";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function UnitPage({
   currentFacilityName = { currentFacilityName },
@@ -37,6 +38,8 @@ export default function UnitPage({
   );
   const [smartLocks, setSmartLocks] = useState([]);
   const [hoveredRow, setHoveredRow] = useState(null);
+  const [currentLoadingText, setCurrentLoadingText] =
+    useState("Loading Units...");
   const rentedCount = filteredUnits.filter(
     (unit) => unit.status === "Rented"
   ).length;
@@ -129,8 +132,6 @@ export default function UnitPage({
         });
         setSortedColumn("Unit Number");
         setUnits(sortedUnits);
-        setUnitsPulled(true);
-        handleSmartLocks();
         return response;
       })
       .catch(function (error) {
@@ -503,14 +504,22 @@ export default function UnitPage({
 
   // Run handleUnits once when the component loads
   useEffect(() => {
-    //Return if no token is found
-    if (!currentFacility.token) return;
-    // Return if units have already been pulled
-    if (unitsPulled) return;
-    handleUnits();
-    handleAccessProfiles();
-    handleTimeProfiles();
-  }, [currentFacility]);
+    const fetchData = async () => {
+      // Return if no token is found
+      if (!currentFacility.token) return;
+      // Return if units have already been pulled
+      if (unitsPulled) return;
+      await Promise.all([
+        handleUnits(),
+        handleAccessProfiles(),
+        handleTimeProfiles(),
+        handleSmartLocks(),
+      ]);
+      setUnitsPulled(true);
+    };
+
+    fetchData();
+  }, [currentFacility, unitsPulled]);
 
   useEffect(() => {
     const filteredUnits = units.filter(
@@ -523,7 +532,13 @@ export default function UnitPage({
   }, [units, searchQuery]);
 
   return (
-    <div className="overflow-auto dark:text-white dark:bg-darkPrimary mb-14">
+    <div
+      className={`relative ${
+        !unitsPulled ? "overflow-hidden min-h-full" : "overflow-auto"
+      } h-full dark:text-white dark:bg-darkPrimary relative`}
+    >
+      {/* Loading Spinner */}
+      {!unitsPulled && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* Page Header */}
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
@@ -533,7 +548,7 @@ export default function UnitPage({
       </div>
       {/* Load Time Label */}
       <p className="text-sm dark:text-white text-left">{pageLoadDateTime}</p>
-      <div className="w-full px-5 flex flex-col rounded-lg h-full">
+      <div className="w-full px-5 flex flex-col rounded-lg h-fit">
         {/* Totals Header */}
         <div className="min-h-12 flex justify-center gap-32">
           <div className="text-center">
