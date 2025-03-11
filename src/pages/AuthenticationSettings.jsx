@@ -444,11 +444,12 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
               </div>
             </div>
             <div className="mt-3 overflow-auto max-h-[80vh]">
-              <table className="w-full table-auto border-collapse">
-                <thead>
-                  <tr className="bg-gray-200 dark:bg-darkNavSecondary">
+              <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
+                {/* Header */}
+                <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
+                  <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -473,7 +474,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       )}
                     </th>
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -498,7 +499,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       )}
                     </th>
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -523,7 +524,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       )}
                     </th>
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -548,7 +549,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       )}
                     </th>
                     <th
-                      className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
                         const newDirection =
                           sortDirection === "asc" ? "desc" : "asc";
@@ -572,10 +573,10 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                         </span>
                       )}
                     </th>
-                    <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                    <th className="px-4 py-2 text-left hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                       Authenticated
                     </th>
-                    <th className="border border-gray-300 dark:border-border px-4 py-2 text-left hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
+                    <th className="px-4 py-2 text-left hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
                       Actions
                     </th>
                   </tr>
@@ -654,59 +655,88 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                   ))}
                   {permissions.authenticationPlatformCreate && (
                     <tr className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary">
-                      <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
+                      <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
                         <input
                           type="text"
-                          className="border border-slate-100 shadow-md rounded-sm"
+                          className="border border-slate-100 shadow-md rounded-sm dark:border-border p-1 w-full"
                           value={api}
+                          placeholder="API Key"
                           onChange={(e) => setApi(e.target.value)}
                         />
                       </td>
-                      <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
+                      <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
                         <input
                           type="text"
-                          className="border border-slate-100 shadow-md rounded-sm"
+                          className="border border-slate-100 shadow-md rounded-sm dark:border-border p-1 w-full"
                           value={apiSecret}
+                          placeholder="API Secret"
                           onChange={(e) => setApiSecret(e.target.value)}
                         />
                       </td>
-                      <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
+                      <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
                         <input
                           type="text"
-                          className="border border-slate-100 shadow-md rounded-sm"
+                          className="border border-slate-100 shadow-md rounded-sm dark:border-border p-1 w-full"
                           value={client}
+                          placeholder="Client"
                           onChange={(e) => setClient(e.target.value)}
                         />
                       </td>
-                      <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
+                      <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
                         <input
                           type="text"
-                          className="border border-slate-100 shadow-md rounded-sm"
+                          className="border border-slate-100 shadow-md rounded-sm dark:border-border p-1 w-full"
                           value={clientSecret}
+                          placeholder="Client Secret"
                           onChange={(e) => setClientSecret(e.target.value)}
                         />
                       </td>
-                      <td className="text-black text-center border-y border-gray-300 dark:border-border px-4 py-2">
+                      <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
                         <select
                           value={environment}
                           onChange={(e) =>
                             setEnvironment(e.target.value) &
                             handleNewLogin(e.target.value)
                           }
-                          className="p-0.5 shadow-md border-y border-slate-100 rounded-sm"
+                          className="shadow-md border border-slate-100 rounded-sm dark:border-border p-2 w-full hover:cursor-pointer"
                         >
-                          <option value="-">--Select an Option--</option>
+                          <option
+                            className="dark:bg-darkNavSecondary"
+                            value="-"
+                          >
+                            --Select an Option--
+                          </option>
                           {permissions.authenticationPlatformEnvironmentProduction && (
-                            <option value="">Production</option>
+                            <option
+                              className="dark:bg-darkNavSecondary"
+                              value=""
+                            >
+                              Production
+                            </option>
                           )}
                           {permissions.authenticationPlatformEnvironmentDevelopment && (
-                            <option value="-dev">Development</option>
+                            <option
+                              className="dark:bg-darkNavSecondary"
+                              value="-dev"
+                            >
+                              Development
+                            </option>
                           )}
                           {permissions.authenticationPlatformEnvironmentQA && (
-                            <option value="-qa">QA</option>
+                            <option
+                              className="dark:bg-darkNavSecondary"
+                              value="-qa"
+                            >
+                              QA
+                            </option>
                           )}
                           {permissions.authenticationPlatformEnvironmentStaging && (
-                            <option value="cia-stg-1.aws.">Staging</option>
+                            <option
+                              className="dark:bg-darkNavSecondary"
+                              value="cia-stg-1.aws."
+                            >
+                              Staging
+                            </option>
                           )}
                         </select>
                       </td>
@@ -722,7 +752,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
                         {isAuthenticated ? (
                           <button
-                            className="m-1 px-4 py-1 bg-green-400 rounded-md hover:bg-green-500 text-white"
+                            className="m-1 px-4 py-1 bg-green-400 rounded-md hover:bg-green-500 text-white hover:cursor-pointer"
                             onClick={() =>
                               toast.promise(submitCredentials(), {
                                 loading: "Creating Credentials...",
@@ -735,7 +765,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                           </button>
                         ) : (
                           <button
-                            className="m-1 px-4 py-1 bg-green-400 rounded-md hover:bg-green-500 text-white"
+                            className="m-1 px-4 py-1 bg-green-400 rounded-md hover:bg-green-500 text-white hover:cursor-pointer"
                             onClick={() =>
                               toast.promise(handleNewLogin(environment), {
                                 loading: "Authenticating Credentials...",
