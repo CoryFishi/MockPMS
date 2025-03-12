@@ -3,9 +3,8 @@ import { RiMenuFold3Fill, RiMenuFold4Fill } from "react-icons/ri";
 import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 import { useState, useEffect, useRef } from "react";
-import { MdExpandLess, MdExpandMore, MdOutlineWbSunny } from "react-icons/md";
+import { MdExpandLess, MdExpandMore } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { FaMoon } from "react-icons/fa";
 import packageJson from "../../package.json";
 
 export default function Navbar({
@@ -83,9 +82,6 @@ export default function Navbar({
               )}
             </button>
           )}
-        </div>
-        <div className="absolute left-1/2 transform -translate-x-1/2 text-2xl font-medium">
-          PMS
         </div>
         <div className="flex space-x-4 items-center mr-5">
           {user && permissions.smartlockPlatform && (

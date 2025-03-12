@@ -11,9 +11,17 @@ import qs from "qs";
 import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function DashboardLayout({ dashboardMenu }) {
-  const { user, currentFacility, setCurrentFacility } = useAuth();
+  const {
+    user,
+    currentFacility,
+    setCurrentFacility,
+    setTokens,
+    setFavoriteTokens,
+    setSelectedTokens,
+  } = useAuth();
   const [isNameGrabbed, setIsNameGrabbed] = useState(false);
   const [openSections, setOpenSections] = useState({
     facilities: false,
@@ -22,6 +30,7 @@ export default function DashboardLayout({ dashboardMenu }) {
   const [openPage, setOpenPage] = useState(
     localStorage.getItem("openPage") || "allFacilities"
   );
+  const navigate = useNavigate();
   const [currentFacilityName, setCurrentFacilityName] =
     useState("Select a Facility");
 
@@ -46,6 +55,19 @@ export default function DashboardLayout({ dashboardMenu }) {
   const handleFacilityHandles = async () => {
     await handleLogin();
     await handleFacilityInfo();
+  };
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error logging out:", error.message);
+    } else {
+      setTokens([]);
+      setCurrentFacility({});
+      setFavoriteTokens([]);
+      setSelectedTokens([]);
+      navigate("/login");
+    }
   };
 
   const handleLogin = async () => {
@@ -144,13 +166,13 @@ export default function DashboardLayout({ dashboardMenu }) {
   }, [currentFacility]);
 
   return (
-    <div className="flex flex-col w-full h-screen overflow-auto">
+    <div className="flex flex-col w-full h-screen overflow-y-auto overflow-hidden">
       <div className="flex flex-row w-full h-full shrink-0">
         {dashboardMenu === true && (
-          <div className="flex flex-col h-full w-1/6 bg-navPrimary text-white text-xl dark:bg-darkNavPrimary border-r dark:border-border select-none">
+          <div className="flex flex-col h-full md:min-w-[250px] min-w-full bg-navPrimary text-white dark:bg-darkNavPrimary border-r dark:border-border select-none text-lg relative">
             {/* Header Side Bar */}
             <div>
-              <h3 className="text-center m-5 text-2xl">OPENTECH IoE</h3>
+              <h3 className="text-center m-5 text-xl">OpenTech PMS</h3>
             </div>
 
             {/* Current Facility Side Bar */}
@@ -213,9 +235,10 @@ export default function DashboardLayout({ dashboardMenu }) {
                               : `https://portal.insomniaccia${currentFacility.environment}.com/facility/${currentFacility.id}/dashboard`;
                           window.open(baseUrl, "_blank");
                         }}
-                        className="px-2 rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary flex items-center"
+                        className="px-2 rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary flex items-center gap-2"
                       >
-                        <FaExternalLinkAlt /> Control Center
+                        <FaExternalLinkAlt />
+                        Control Center
                       </Link>
                     ) : null}
                   </div>
@@ -270,6 +293,30 @@ export default function DashboardLayout({ dashboardMenu }) {
                   </Link>
                 </div>
               )}
+            </div>
+
+            <div className="absolute bottom-0 w-full hidden md:flex justify-between text-sm hover:cursor-pointer text-center">
+              <Link
+                to="/user-settings"
+                className="hover:dark:bg-darkNavSecondary w-full p-2"
+              >
+                Settings
+              </Link>
+              <div className="hover:dark:bg-darkNavSecondary w-full p-2">
+                <a
+                  href="https://opentechalliancesupport.zendesk.com/hc/en-us/categories/115001966887-OpenTech-IoE"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Help
+                </a>
+              </div>
+              <div
+                className="hover:dark:bg-darkNavSecondary w-full p-2"
+                onClick={() => handleLogout()}
+              >
+                Logout
+              </div>
             </div>
           </div>
         )}

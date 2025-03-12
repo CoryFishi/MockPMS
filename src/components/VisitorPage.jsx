@@ -234,7 +234,7 @@ export default function VisitorPage({ currentFacilityName }) {
   }, [visitors, searchQuery]);
 
   return (
-    <div className="overflow-auto h-full dark:text-white dark:bg-darkPrimary relative">
+    <div className="overflow-x-auto h-full dark:text-white dark:bg-darkPrimary relative">
       {/* Loading Spinner */}
       {!visitorsPulled && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* Page Header */}
