@@ -5,6 +5,7 @@ import { supabaseAdmin, supabase } from "../supabaseClient";
 import toast from "react-hot-toast";
 import PaginationFooter from "./PaginationFooter";
 import EditRole from "./modals/EditRole";
+import CreateRole from "./modals/CreateRole";
 
 export default function Roles() {
   const { user } = useAuth();
@@ -31,20 +32,6 @@ export default function Roles() {
       console.error("Error fetching events:", error);
     } else {
       setUsers(data);
-    }
-  }
-
-  async function addEvent(eventName, eventDescription, completed) {
-    const { data, error } = await supabase.from("user_events").insert([
-      {
-        event_name: eventName,
-        event_description: eventDescription,
-        completed: completed,
-      },
-    ]);
-
-    if (error) {
-      console.error("Error inserting event:", error);
     }
   }
 
@@ -160,7 +147,7 @@ export default function Roles() {
         />
         <button
           onClick={() => setIsCreateRoleModalOpen(true)}
-          className="bg-green-500 text-white p-1 py-2 rounded-sm hover:bg-green-600 hover:scale-105 ml-3 w-44 font-bold transition duration-300 ease-in-out transform select-none"
+          className="hover:cursor-pointer bg-green-500 text-white p-1 py-2 rounded-sm hover:bg-green-600 hover:scale-105 ml-3 w-44 font-bold transition duration-300 ease-in-out transform select-none"
         >
           Create Role
         </button>

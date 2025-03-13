@@ -67,7 +67,7 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
 
   return (
     // Background Filter
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
       {/* Modal Container */}
       <div className="bg-white rounded-sm shadow-lg dark:bg-darkPrimary min-w-96">
         {/* Header Container */}
@@ -108,7 +108,10 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
             {Object.keys(rolePermissions).map((key) => {
               if (key === "authenticationPlatform") {
                 return (
-                  <label key={key} className="inline-flex items-center mt-2">
+                  <label
+                    key={key}
+                    className="hover:cursor-pointer inline-flex items-center mt-2"
+                  >
                     <input
                       type="checkbox"
                       className="form-checkbox h-5 w-5 text-yellow-500"
@@ -148,7 +151,10 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
               ) {
                 if (rolePermissions.authenticationPlatform) {
                   return (
-                    <label key={key} className="inline-flex items-center mt-2">
+                    <label
+                      key={key}
+                      className="hover:cursor-pointer inline-flex items-center mt-2"
+                    >
                       <input
                         type="checkbox"
                         className="form-checkbox h-5 w-5 text-yellow-500"
@@ -175,7 +181,10 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
             {Object.keys(rolePermissions).map((key) => {
               if (key === "pmsPlatform") {
                 return (
-                  <label key={key} className="inline-flex items-center mt-2">
+                  <label
+                    key={key}
+                    className="hover:cursor-pointer inline-flex items-center mt-2"
+                  >
                     <input
                       type="checkbox"
                       className="form-checkbox h-5 w-5 text-yellow-500"
@@ -212,7 +221,10 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
               if (key.startsWith("pmsPlatform") && key !== "pmsPlatform") {
                 if (rolePermissions.pmsPlatform) {
                   return (
-                    <label key={key} className="inline-flex items-center mt-2">
+                    <label
+                      key={key}
+                      className="hover:cursor-pointer inline-flex items-center mt-2"
+                    >
                       <input
                         type="checkbox"
                         className="form-checkbox h-5 w-5 text-yellow-500"
@@ -239,7 +251,10 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
             {Object.keys(rolePermissions).map((key) => {
               if (key === "smartlockPlatform") {
                 return (
-                  <label key={key} className="inline-flex items-center mt-2">
+                  <label
+                    key={key}
+                    className="hover:cursor-pointer inline-flex items-center mt-2"
+                  >
                     <input
                       type="checkbox"
                       className="form-checkbox h-5 w-5 text-yellow-500"
@@ -279,7 +294,10 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
               ) {
                 if (rolePermissions.smartlockPlatform) {
                   return (
-                    <label key={key} className="inline-flex items-center mt-2">
+                    <label
+                      key={key}
+                      className="hover:cursor-pointer inline-flex items-center mt-2"
+                    >
                       <input
                         type="checkbox"
                         className="form-checkbox h-5 w-5 text-yellow-500"
@@ -305,13 +323,13 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
           {/* Button Container */}
           <div className="mt-4 flex justify-end">
             <button
-              className="bg-gray-400 px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
+              className="hover:cursor-pointer bg-gray-400 px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
               onClick={() => setIsCreateRoleModalOpen(false)}
             >
               Cancel
             </button>
             <button
-              className="bg-green-500 text-white px-4 py-2 rounded-sm hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
+              className="hover:cursor-pointer bg-green-500 text-white px-4 py-2 rounded-sm hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
               onClick={() =>
                 toast.promise(
                   handleCreateRole().then((result) => {
