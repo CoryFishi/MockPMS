@@ -358,6 +358,8 @@ export default function SmartLockDashboardView({}) {
         <button
           className="bg-green-500 text-white p-1 py-2 rounded-sm hover:bg-green-600 ml-3 w-44 font-bold"
           onClick={() => search()}
+          disabled={!searchQuery || searchQuery.length < 2} // Disable if empty or less than 2 characters
+          title="Search for facilities by ID, property number, name, or environment"
         >
           Search
         </button>

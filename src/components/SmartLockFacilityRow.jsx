@@ -320,6 +320,10 @@ export default function SmartLockFacilityRow({
       if (accessPointsData) {
         setAccessPoints(accessPointsData);
       }
+      const facilityDetail = await fetchFacilityDetail();
+      if (facilityDetail) {
+        setFacilityDetail(facilityDetail);
+      }
       const locksSummaryData = await fetchSmartLockSummary();
       const totalLocks =
         locksSummaryData.errorCount +
@@ -333,10 +337,6 @@ export default function SmartLockFacilityRow({
       const smartlockData = await fetchSmartLock();
       if (smartlockData) {
         setSmartlocks(smartlockData);
-      }
-      const facilityDetail = await fetchFacilityDetail();
-      if (facilityDetail) {
-        setFacilityDetail(facilityDetail);
       }
     };
 
@@ -357,7 +357,7 @@ export default function SmartLockFacilityRow({
             >
               {expandedRows.includes(facility.id) ? "−" : "+"}
             </button>
-            {facility.name}
+            <p className=" truncate max-w-[20ch]">{facility.name}</p>
             <FaExternalLinkAlt
               className="text-blue-300 group-hover:text-blue-500"
               title={
@@ -378,7 +378,7 @@ export default function SmartLockFacilityRow({
           </div>
         </td>
         <td className="px-4 py-2" title={edgeRouter?.connectionStatusMessage}>
-          <div className="inline-flex items-center gap-1">
+          <div className="inline-flex items-center gap-1 text-center">
             {edgeRouter?.connectionStatus === "error" ? (
               <IoIosWarning className="text-red-500 mr-2" />
             ) : edgeRouter?.connectionStatus === "warning" ? (
@@ -390,7 +390,7 @@ export default function SmartLockFacilityRow({
           </div>
         </td>
         <td
-          className="px-4 py-2"
+          className="px-4 py-2 text-center"
           title={
             Array.isArray(accessPoints)
               ? `${accessPoints
@@ -411,7 +411,7 @@ export default function SmartLockFacilityRow({
         </td>
 
         <td
-          className="px-4 py-2"
+          className="px-4 py-2 text-center"
           title={
             Array.isArray(accessPoints)
               ? `${accessPoints
@@ -432,7 +432,7 @@ export default function SmartLockFacilityRow({
         </td>
 
         <td
-          className="px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          className="px-4 text-center py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
           onClick={() => openSmartLockModal("good")}
           title={
             Math.round(
@@ -449,7 +449,7 @@ export default function SmartLockFacilityRow({
           {smartlockSummary?.okCount}
         </td>
         <td
-          className="px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          className="px-4 text-center py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
           onClick={() => openSmartLockModal("warning")}
           title={
             Math.round(
@@ -466,7 +466,7 @@ export default function SmartLockFacilityRow({
           {smartlockSummary?.warningCount}
         </td>
         <td
-          className="px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          className="px-4 text-center py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
           onClick={() => openSmartLockModal("error")}
           title={
             Math.round(
@@ -483,7 +483,7 @@ export default function SmartLockFacilityRow({
           {smartlockSummary?.errorCount}
         </td>
         <td
-          className="px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          className="px-4 text-center py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
           onClick={() => openSmartLockModal("offline")}
           title={
             Math.round(
@@ -500,14 +500,14 @@ export default function SmartLockFacilityRow({
           {offline}
         </td>
         <td
-          className="px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          className="px-4 text-center py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
           onClick={() => openSmartLockModal("lowestSignal")}
           title={"SmartLock " + lowestSignalSmartlock.name}
         >
           {lowestSignal}
         </td>
         <td
-          className="px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          className="px-4 text-center py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
           onClick={() => openSmartLockModal("lowestBattery")}
           title={"SmartLock " + lowestBatterySmartlock.name}
         >

@@ -23,13 +23,13 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
   };
 
   return (
-    <div className="flex flex-col w-full h-screen overflow-hidden">
-      <div className="flex flex-row w-full h-full">
+    <div className="flex flex-col w-full h-screen overflow-y-auto overflow-hidden">
+      <div className="flex flex-row w-full h-full shrink-0">
         {dashboardMenu === true && (
-          <div className="flex flex-col h-full w-1/6 bg-navPrimary text-white text-xl dark:bg-darkNavPrimary border-r dark:border-border select-none">
+          <div className="flex flex-col h-full md:min-w-[250px] min-w-full bg-navPrimary text-white dark:bg-darkNavPrimary border-r dark:border-border select-none text-lg relative">
             {/* Header Side Bar */}
-            <div>
-              <h3 className="text-center m-5 text-2xl">OPENTECH IoE</h3>
+            <div className="pt-2">
+              <h3 className="text-center m-5 text-xl">OpenTech Admin</h3>
             </div>
 
             {/* Current Facility Side Bar */}
@@ -58,7 +58,11 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                   />
                   <span className="pl-2">User Administrastion</span>
                 </div>
-                {openSections.userAdmin ? <MdExpandLess /> : <MdExpandMore />}
+                {openSections.userAdmin ? (
+                  <MdExpandLess className="flex-shrink-0 text-2xl" />
+                ) : (
+                  <MdExpandMore className="flex-shrink-0 text-2xl" />
+                )}
               </div>
 
               {!openSections.userAdmin && (
@@ -92,6 +96,29 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                   </Link>
                 </div>
               )}
+            </div>
+            <div className="absolute bottom-0 w-full hidden md:flex justify-between text-sm hover:cursor-pointer text-center">
+              <Link
+                to="/user-settings"
+                className="hover:dark:bg-darkNavSecondary w-full p-2"
+              >
+                Settings
+              </Link>
+              <div className="hover:dark:bg-darkNavSecondary w-full p-2">
+                <a
+                  href="https://opentechalliancesupport.zendesk.com/hc/en-us/categories/115001966887-OpenTech-IoE"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Help
+                </a>
+              </div>
+              <div
+                className="hover:dark:bg-darkNavSecondary w-full p-2"
+                onClick={() => handleLogout()}
+              >
+                Logout
+              </div>
             </div>
           </div>
         )}

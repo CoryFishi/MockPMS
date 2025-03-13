@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
-import { FaCircleCheck } from "react-icons/fa6";
+import { FaCircleCheck, FaSpinner } from "react-icons/fa6";
 import { MdOutlineError } from "react-icons/md";
 import axios from "axios";
 import qs from "qs";
@@ -621,10 +621,12 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                       </td>
                       <td className="border-y border-gray-300 dark:border-border px-4 py-2">
                         <div className="flex justify-center text-lg">
-                          {facility.isAuthenticated ? (
+                          {facility.isAuthenticated === true ? (
                             <FaCircleCheck className="text-green-500" />
-                          ) : (
+                          ) : facility.isAuthenticated === false ? (
                             <MdOutlineError className="text-red-500" />
+                          ) : (
+                            <FaSpinner className="animate-spin text-gray-500" />
                           )}
                         </div>
                       </td>

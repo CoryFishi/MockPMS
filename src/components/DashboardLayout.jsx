@@ -171,7 +171,7 @@ export default function DashboardLayout({ dashboardMenu }) {
         {dashboardMenu === true && (
           <div className="flex flex-col h-full md:min-w-[250px] min-w-full bg-navPrimary text-white dark:bg-darkNavPrimary border-r dark:border-border select-none text-lg relative">
             {/* Header Side Bar */}
-            <div>
+            <div className="pt-2">
               <h3 className="text-center m-5 text-xl">OpenTech PMS</h3>
             </div>
 
@@ -196,12 +196,14 @@ export default function DashboardLayout({ dashboardMenu }) {
                           : ""
                       }`}
                     />
-                    <span className="pl-2">{currentFacilityName}</span>
+                    <span className="pl-1 truncate max-w-[18ch]">
+                      {currentFacilityName}
+                    </span>
                   </div>
                   {openSections.currentFacility ? (
-                    <MdExpandLess />
+                    <MdExpandLess className="flex-shrink-0 text-2xl" />
                   ) : (
-                    <MdExpandMore />
+                    <MdExpandMore className="flex-shrink-0 text-2xl" />
                   )}
                 </div>
 
@@ -225,22 +227,28 @@ export default function DashboardLayout({ dashboardMenu }) {
                     >
                       Units
                     </Link>
-                    {currentFacility && currentFacility.id > 0 ? (
-                      <Link
-                        onClick={(e) => {
-                          e.preventDefault();
+                    {currentFacility && currentFacility.id > 0
+                      ? (() => {
                           const baseUrl =
                             currentFacility.environment === "cia-stg-1.aws."
                               ? `https://portal.${currentFacility.environment}insomniaccia.com/facility/${currentFacility.id}/dashboard`
                               : `https://portal.insomniaccia${currentFacility.environment}.com/facility/${currentFacility.id}/dashboard`;
-                          window.open(baseUrl, "_blank");
-                        }}
-                        className="px-2 rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary flex items-center gap-2"
-                      >
-                        <FaExternalLinkAlt />
-                        Control Center
-                      </Link>
-                    ) : null}
+
+                          return (
+                            <Link
+                              onClick={(e) => {
+                                e.preventDefault();
+                                window.open(baseUrl, "_blank");
+                              }}
+                              title={baseUrl}
+                              className="px-2 rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary flex items-center gap-2"
+                            >
+                              <FaExternalLinkAlt />
+                              Control Center
+                            </Link>
+                          );
+                        })()
+                      : null}
                   </div>
                 )}
               </div>
@@ -266,9 +274,15 @@ export default function DashboardLayout({ dashboardMenu }) {
                         : ""
                     }`}
                   />
-                  <span>Other Options</span>
+                  <span className="pl-1 truncate max-w-[18ch]">
+                    Other Options
+                  </span>
                 </div>
-                {openSections.facilities ? <MdExpandLess /> : <MdExpandMore />}
+                {openSections.facilities ? (
+                  <MdExpandLess className="flex-shrink-0 text-2xl" />
+                ) : (
+                  <MdExpandMore className="flex-shrink-0 text-2xl" />
+                )}
               </div>
 
               {!openSections.facilities && (

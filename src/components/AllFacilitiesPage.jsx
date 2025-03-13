@@ -481,8 +481,10 @@ export default function AllFacilitiesPage({
                     className="px-4 py-2 hover:cursor-pointer"
                     onClick={() => addToFavorite(facility)}
                   >
-                    <div className="flex gap-3 items-center">
-                      {facility.name}
+                    <div className="flex gap-3 justify-center">
+                      <p className="pl-1 truncate max-w-[32ch]">
+                        {facility.name}
+                      </p>
                       <FaExternalLinkAlt
                         title={
                           facility.environment === "cia-stg-1.aws."
