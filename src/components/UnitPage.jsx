@@ -741,7 +741,7 @@ export default function UnitPage({
                   </span>
                 )}
               </th>
-              <th
+              {/* <th
                 className="px-4 py-2 hover:cursor-pointer hidden sm:table-cell hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                 onClick={() => {
                   const newDirection = sortDirection === "asc" ? "desc" : "asc";
@@ -794,7 +794,7 @@ export default function UnitPage({
                     {sortDirection === "asc" ? "▲" : "▼"}
                   </span>
                 )}
-              </th>
+              </th> */}
               {smartLocks.length > 0 && (
                 <th
                   className="px-4 py-2 hover:cursor-pointer hidden md:table-cell hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
@@ -860,12 +860,12 @@ export default function UnitPage({
                   </td>
                   <td className="px-4 py-2">{unit.unitNumber}</td>
                   <td className="px-4 py-2">{unit.status}</td>
-                  <td className="px-4 py-2 hidden sm:table-cell">
+                  {/* <td className="px-4 py-2 hidden sm:table-cell">
                     {unit.facilityId}
                   </td>
                   <td className="px-4 py-2 hidden md:table-cell">
                     {unit.propertyNumber}
-                  </td>
+                  </td> */}
                   {smartLocks.length > 0 && (
                     <td
                       className="px-4 py-2 hover:cursor-pointer"

@@ -128,7 +128,7 @@ export default function Navbar({
                 {isDropdownOpen ? <MdExpandLess /> : <MdExpandMore />}
               </h2>
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-1 w-full bg-white dark:bg-darkSecondary border border-gray-200 dark:border-border rounded-lg shadow-lg p-2 z-20 flex flex-col">
+                <div className="absolute right-0 mt-1 w-full bg-white dark:bg-darkSecondary border border-gray-200 dark:border-border rounded-lg shadow-lg p-2 z-50 flex flex-col">
                   <button
                     className="hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-center hover:cursor-pointer"
                     onClick={() =>

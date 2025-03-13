@@ -552,12 +552,12 @@ export default function SmartLockDashboardView({}) {
         <div className="p-5 pt-1 text-left">
           <div className="bg-white shadow-lg rounded-lg p-5 mb-4 border dark:bg-darkSecondary text-black dark:text-white dark:border-border flex justify-center gap-8">
             <div>
-              <h1 className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg hover:cursor-pointer">
+              <h1 className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg">
                 Edge Routers:
               </h1>
               <div className="flex gap-2">
                 <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  className="text-center shadow-md rounded-lg p-3 border"
                   title={
                     Math.round(
                       (edgeRouterOnlineCount / totalEdgeRouters) * 100
@@ -570,7 +570,7 @@ export default function SmartLockDashboardView({}) {
                   <p className="text-sm">Online</p>
                 </div>
                 <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  className="text-center shadow-md rounded-lg p-3 border"
                   title={
                     Math.round(
                       (edgeRouterWarningCount / totalEdgeRouters) * 100
@@ -583,7 +583,7 @@ export default function SmartLockDashboardView({}) {
                   <p className="text-sm">Warning</p>
                 </div>
                 <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  className="text-center shadow-md rounded-lg p-3 border"
                   title={
                     Math.round(
                       (edgeRouterOfflineCount / totalEdgeRouters) * 100
@@ -598,12 +598,12 @@ export default function SmartLockDashboardView({}) {
               </div>
             </div>
             <div>
-              <h1 className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg hover:cursor-pointer">
+              <h1 className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg">
                 Access Points:
               </h1>
               <div className="flex gap-2">
                 <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  className="text-center shadow-md rounded-lg p-3 border"
                   title={
                     Math.round(
                       (accessPointsOnlineCount / totalAccessPoints) * 100
@@ -618,7 +618,7 @@ export default function SmartLockDashboardView({}) {
                   <p className="text-sm">Online</p>
                 </div>
                 <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  className="text-center shadow-md rounded-lg p-3 border"
                   title={
                     Math.round(
                       (accessPointsOfflineCount / totalAccessPoints) * 100
@@ -635,12 +635,12 @@ export default function SmartLockDashboardView({}) {
               </div>
             </div>
             <div>
-              <h1 className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg hover:cursor-pointer">
+              <h1 className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg">
                 SmartLocks:
               </h1>
               <div className="flex gap-2">
                 <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  className="text-center shadow-md rounded-lg p-3 border"
                   title={
                     Math.round((smartlockOkayCount / totalSmartlocks) * 100) +
                     "% Okay Status"
@@ -650,7 +650,7 @@ export default function SmartLockDashboardView({}) {
                   <p className="text-sm">Okay</p>
                 </div>
                 <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  className="text-center shadow-md rounded-lg p-3 border"
                   title={
                     Math.round(
                       (smartlockWarningCount / totalSmartlocks) * 100
@@ -663,7 +663,7 @@ export default function SmartLockDashboardView({}) {
                   <p className="text-sm">Warning</p>
                 </div>
                 <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  className="text-center shadow-md rounded-lg p-3 border"
                   title={
                     Math.round((smartlockErrorCount / totalSmartlocks) * 100) +
                     "% Error Status"
@@ -673,7 +673,7 @@ export default function SmartLockDashboardView({}) {
                   <p className="text-sm">Error</p>
                 </div>
                 <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  className="text-center shadow-md rounded-lg p-3 border"
                   title={
                     Math.round(
                       (smartlockOfflineCount / totalSmartlocks) * 100
@@ -686,7 +686,7 @@ export default function SmartLockDashboardView({}) {
                   <p className="text-sm">Offline</p>
                 </div>
                 <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  className="text-center shadow-md rounded-lg p-3 border"
                   title="Lowest Signal"
                 >
                   <h2 className="text-3xl font-bold">
@@ -695,7 +695,7 @@ export default function SmartLockDashboardView({}) {
                   <p className="text-sm">Lowest Signal</p>
                 </div>
                 <div
-                  className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border"
+                  className="text-center shadow-md rounded-lg p-3 border"
                   title="Lowest Battery"
                 >
                   <h2 className="text-3xl font-bold">

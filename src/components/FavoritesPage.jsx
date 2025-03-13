@@ -181,7 +181,6 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
       });
       setSortedColumn("Facility Id");
       setFacilities(sortedFacilities);
-      setIsLoading(false);
     } catch {
       alert("It broke");
     }
@@ -205,13 +204,7 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
   }, [facilities, searchQuery]);
 
   return (
-    <div
-      className={`relative ${
-        isLoading ? "overflow-hidden min-h-full" : "overflow-auto"
-      } h-full dark:text-white dark:bg-darkPrimary relative`}
-    >
-      {/* Loading Spinner */}
-      {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}
+    <div className="relative overflow-auto h-full dark:text-white dark:bg-darkPrimary">
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <GoStarFill className="text-lg" />

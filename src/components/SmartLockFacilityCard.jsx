@@ -253,10 +253,7 @@ export default function SmartLockFacilityCard({ setFacilitiesInfo, facility }) {
       )}
       {edgeRouter && (
         <div className="break-inside-avoid bg-white shadow-lg rounded-lg p-5 mb-4 border dark:bg-darkSecondary text-black dark:text-white dark:border-border">
-          <h1
-            className="break-all w-full text-2xl"
-            onClick={() => console.log(smartlockSummary)}
-          >
+          <h1 className="break-all w-full text-2xl">
             {facility.name}'s Summary
           </h1>
           {smartlockSummary && (

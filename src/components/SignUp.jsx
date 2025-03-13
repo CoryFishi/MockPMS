@@ -36,12 +36,12 @@ export default function SignUp() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-darkPrimary">
       {error && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
           <div className="bg-white p-4 rounded-sm shadow-lg max-w-sm w-full">
             <h1 className="font-bold text-center text-3xl">Oh no!</h1>
             <p className="text-center text-red-500 mt-3">{error}</p>
             <button
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-sm w-full"
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-sm w-full hover:cursor-pointer"
               onClick={() => setError(null)}
             >
               Close
@@ -51,12 +51,12 @@ export default function SignUp() {
       )}
 
       {message && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
           <div className="bg-white p-4 rounded-sm shadow-lg max-w-sm w-full">
             <h1 className="font-bold text-center text-3xl">Success!</h1>
             <p className="text-center text-blue-500 mt-3">{message}</p>
             <button
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-sm w-full"
+              className="hover:cursor-pointer mt-4 px-4 py-2 bg-blue-500 text-white rounded-sm w-full"
               onClick={() => setMessage(null)}
             >
               Close
