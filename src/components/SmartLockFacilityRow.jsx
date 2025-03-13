@@ -14,9 +14,9 @@ export default function SmartLockFacilityRow({
   expandedRows,
 }) {
   const [smartlocks, setSmartlocks] = useState([]);
-  const [lowestSignal, setLowestSignal] = useState([]);
+  const [lowestSignal, setLowestSignal] = useState(null);
   const [offline, setOffline] = useState([]);
-  const [lowestBattery, setLowestBattery] = useState([]);
+  const [lowestBattery, setLowestBattery] = useState(null);
   const [smartlockSummary, setSmartlockSummary] = useState(null);
   const [edgeRouter, setEdgeRouter] = useState(null);
   const [accessPoints, setAccessPoints] = useState(null);
@@ -430,86 +430,149 @@ export default function SmartLockFacilityRow({
             ? accessPoints.filter((ap) => ap.isDeviceOffline === true).length
             : 0}
         </td>
-
         <td
-          className="px-4 text-center py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
-          onClick={() => openSmartLockModal("good")}
+          className={`px-4 text-center py-2 ${
+            smartlockSummary === null
+              ? "bg-gray-200/50 dark:bg-gray-700/50 cursor-not-allowed"
+              : "hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          }`}
+          onClick={
+            smartlockSummary !== null
+              ? () => openSmartLockModal("good")
+              : undefined
+          }
           title={
-            Math.round(
-              (smartlockSummary?.okCount /
-                (smartlockSummary?.okCount +
-                  smartlockSummary?.warningCount +
-                  smartlockSummary?.errorCount)) *
-                100
-            ) +
-            "%" +
-            " Okay Status"
+            smartlockSummary !== null
+              ? Math.round(
+                  (smartlockSummary?.okCount /
+                    (smartlockSummary?.okCount +
+                      smartlockSummary?.warningCount +
+                      smartlockSummary?.errorCount)) *
+                    100
+                ) +
+                "%" +
+                " Okay Status"
+              : ""
           }
         >
           {smartlockSummary?.okCount}
         </td>
         <td
-          className="px-4 text-center py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
-          onClick={() => openSmartLockModal("warning")}
+          className={`px-4 text-center py-2 ${
+            smartlockSummary === null
+              ? "bg-gray-200/50 dark:bg-gray-700/50 cursor-not-allowed"
+              : "hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          }`}
+          onClick={
+            smartlockSummary !== null
+              ? () => openSmartLockModal("warning")
+              : undefined
+          }
           title={
-            Math.round(
-              (smartlockSummary?.warningCount /
-                (smartlockSummary?.okCount +
-                  smartlockSummary?.warningCount +
-                  smartlockSummary?.errorCount)) *
-                100
-            ) +
-            "%" +
-            " Warning Status"
+            smartlockSummary !== null
+              ? Math.round(
+                  (smartlockSummary?.warningCount /
+                    (smartlockSummary?.okCount +
+                      smartlockSummary?.warningCount +
+                      smartlockSummary?.errorCount)) *
+                    100
+                ) +
+                "%" +
+                " Warning Status"
+              : ""
           }
         >
           {smartlockSummary?.warningCount}
         </td>
         <td
-          className="px-4 text-center py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
-          onClick={() => openSmartLockModal("error")}
+          className={`px-4 text-center py-2 ${
+            smartlockSummary === null
+              ? "bg-gray-200/50 dark:bg-gray-700/50 cursor-not-allowed"
+              : "hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          }`}
+          onClick={
+            smartlockSummary !== null
+              ? () => openSmartLockModal("error")
+              : undefined
+          }
           title={
-            Math.round(
-              (smartlockSummary?.errorCount /
-                (smartlockSummary?.okCount +
-                  smartlockSummary?.warningCount +
-                  smartlockSummary?.errorCount)) *
-                100
-            ) +
-            "%" +
-            " Error Status"
+            smartlockSummary !== null
+              ? Math.round(
+                  (smartlockSummary?.errorCount /
+                    (smartlockSummary?.okCount +
+                      smartlockSummary?.warningCount +
+                      smartlockSummary?.errorCount)) *
+                    100
+                ) +
+                "%" +
+                " Error Status"
+              : ""
           }
         >
           {smartlockSummary?.errorCount}
         </td>
         <td
-          className="px-4 text-center py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
-          onClick={() => openSmartLockModal("offline")}
+          className={`px-4 text-center py-2 ${
+            offline.length === 0
+              ? "bg-gray-200/50 dark:bg-gray-700/50 cursor-not-allowed"
+              : "hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          }`}
+          onClick={
+            smartlockSummary !== null
+              ? () => openSmartLockModal("offline")
+              : undefined
+          }
           title={
-            Math.round(
-              (offline /
-                (smartlockSummary?.okCount +
-                  smartlockSummary?.warningCount +
-                  smartlockSummary?.errorCount)) *
-                100
-            ) +
-            "%" +
-            " Offline"
+            smartlockSummary !== null
+              ? Math.round(
+                  (offline /
+                    (smartlockSummary?.okCount +
+                      smartlockSummary?.warningCount +
+                      smartlockSummary?.errorCount)) *
+                    100
+                ) +
+                "%" +
+                " Offline"
+              : ""
           }
         >
           {offline}
         </td>
         <td
-          className="px-4 text-center py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
-          onClick={() => openSmartLockModal("lowestSignal")}
-          title={"SmartLock " + lowestSignalSmartlock.name}
+          className={`px-4 text-center py-2 ${
+            lowestSignal === null
+              ? "bg-gray-200/50 dark:bg-gray-700/50 cursor-not-allowed"
+              : "hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          }`}
+          onClick={
+            lowestSignal !== null
+              ? () => openSmartLockModal("lowestSignal")
+              : undefined
+          }
+          title={
+            lowestSignal !== null
+              ? "SmartLock " + lowestSignalSmartlock.name
+              : ""
+          }
         >
           {lowestSignal}
         </td>
         <td
-          className="px-4 text-center py-2 hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
-          onClick={() => openSmartLockModal("lowestBattery")}
-          title={"SmartLock " + lowestBatterySmartlock.name}
+          className={`px-4 text-center py-2 ${
+            lowestBattery === null
+              ? "bg-gray-200/50 dark:bg-gray-700/50 cursor-not-allowed"
+              : "hover:bg-gray-300 dark:hover:bg-gray-600 hover:cursor-pointer"
+          }`}
+          onClick={
+            lowestBattery !== null
+              ? () => openSmartLockModal("lowestBattery")
+              : undefined
+          }
+          title={
+            lowestBattery !== null
+              ? "SmartLock " + lowestBatterySmartlock.name
+              : ""
+          }
         >
           {lowestBattery}
         </td>
