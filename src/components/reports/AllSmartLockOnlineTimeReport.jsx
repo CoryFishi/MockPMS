@@ -94,6 +94,10 @@ export default function AllSmartLockOnlineTimeReport({
         }
       );
       const smartLockEvents = await response.data;
+      smartLockEvents.sort(
+        (a, b) => new Date(a.createdUtc) - new Date(b.createdUtc)
+      );
+      console.log(smartLockEvents);
       setSmartLockEvents(response.data);
       return smartLockEvents;
     } catch (error) {
@@ -107,11 +111,9 @@ export default function AllSmartLockOnlineTimeReport({
     events.sort((a, b) => {
       const timeDiff = new Date(a.createdUtc) - new Date(b.createdUtc);
       if (timeDiff === 0) {
-        // Prioritize "Device Online" over "Device Offline" for simultaneous timestamps
-        if (a.eventType === "Device Online" && b.eventType === "Device Offline")
-          return 1;
-        if (a.eventType === "Device Offline" && b.eventType === "Device Online")
-          return -1;
+        // Prioritize "Device Online"/5 over "Device Offline"/6 for simultaneous timestamps
+        if (a.eventTypeEnum === 5 && b.eventTypeEnum === 6) return 1;
+        if (a.eventTypeEnum === 6 && b.eventTypeEnum === 5) return -1;
       }
       return timeDiff;
     });
@@ -119,9 +121,10 @@ export default function AllSmartLockOnlineTimeReport({
 
     // Iterate through events
     events.forEach((event) => {
+      if (event.eventTypeEnum !== 5 && event.eventTypeEnum !== 6) return;
+      if (!event.deviceId) return;
       const { deviceId, deviceName, eventType, createdUtc, facilityName } =
         event;
-
       if (!durationsArray[deviceId]) {
         durationsArray[deviceId] = {
           firstOnlineEvent: null,
@@ -131,6 +134,7 @@ export default function AllSmartLockOnlineTimeReport({
           totalDuration: 0,
           facilityName: facilityName,
           deviceName: deviceName,
+          deviceId: deviceId,
         };
       }
 
@@ -186,6 +190,7 @@ export default function AllSmartLockOnlineTimeReport({
     const flattenedData = allSmartlockData.flat();
     calculateOfflineDurations(flattenedData);
   };
+
   useEffect(() => {
     fetchDataForSelectedFacilities();
   }, [selectedFacilities, dayValue]);
@@ -473,6 +478,12 @@ export default function AllSmartLockOnlineTimeReport({
                           {device.onlineStart
                             ? new Date(device.onlineStart).toISOString()
                             : "Not Online"}
+                        </div>
+                        <div>
+                          <span className="font-bold text-yellow-500">
+                            Device Id:
+                          </span>
+                          {device.deviceId}
                         </div>
                       </div>
                     </div>

@@ -206,7 +206,7 @@ export default function SmartLockReports({}) {
               </div>
               {facilitiesWithBearers.map((facility) => (
                 <label
-                  key={facility.api}
+                  key={facility.name}
                   className="flex text-left gap-2 p-2 hover:cursor-pointer"
                 >
                   <input

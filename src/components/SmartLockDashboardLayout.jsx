@@ -6,6 +6,7 @@ import SmartLockSelectedPage from "./SmartLockSelectedPage";
 import SmartLockDashboardView from "./SmartLockDashboardView";
 import SmartLockReports from "./SmartLockReports";
 import { Link } from "react-router-dom";
+import SmartLockDocumentationPage from "./SmartLockDocumentationPage";
 
 export default function SmartLockDashboardLayout({ dashboardMenu }) {
   // Drop down variables for the left navigation menu
@@ -139,6 +140,15 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                   >
                     Selected Facilities
                   </button>
+                  <button
+                    onClick={() =>
+                      setOpenPage("documentation") &
+                      localStorage.setItem("openPage2", "documentation")
+                    }
+                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary text-left w-full hover:cursor-pointer"
+                  >
+                    Documentation
+                  </button>
                 </div>
               )}
             </div>
@@ -172,6 +182,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
           {openPage === "reports" && <SmartLockReports />}
           {openPage === "allFacilities" && <SmartLockAllFacilitiesPage />}
           {openPage === "selected" && <SmartLockSelectedPage />}
+          {openPage === "documentation" && <SmartLockDocumentationPage />}
         </div>
       </div>
     </div>
