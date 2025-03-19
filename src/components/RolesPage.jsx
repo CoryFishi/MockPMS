@@ -117,7 +117,7 @@ export default function Roles() {
   }, [searchQuery]);
 
   return (
-    <div className="overflow-auto dark:text-white dark:bg-darkPrimary mb-14 h-full">
+    <div className="overflow-auto dark:text-white dark:bg-darkPrimary h-full">
       {isEditRoleModalOpen && (
         <EditRole
           setIsEditRoleModalOpen={setIsEditRoleModalOpen}
