@@ -32,6 +32,56 @@ export default function AllSmartLocksReport({
   const [sortDirection, setSortDirection] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
 
+  const exportSmartLocks = () => {
+    // Convert the data to CSV format
+    const headers = [
+      "Facility",
+      "Device Name",
+      "Unit",
+      "Device Type",
+      "Signal Quality",
+      "Battery Level",
+      "Lock State",
+      "Unit Details",
+      "Lock Status Message(s)",
+      "Last Update",
+    ];
+    // Create rows
+    const csvRows = [
+      headers.join(","), // Add headers to rows
+      ...filteredSmartLocks.map((device) =>
+        [
+          device.facilityName,
+          device.name,
+          device.unitName,
+          device.deviceType,
+          Math.round((device.signalQuality / 255) * 100) + "%",
+          device.batteryLevel + "%",
+          device.lockState,
+          device.unitStatus +
+            (device.visitorName ? " - " + device.visitorName : ""),
+          device.statusMessages[0] != ""
+            ? device.statusMessages.join("; ")
+            : "SmartLock is online",
+          device.lastUpdateTimestampDisplay,
+        ].join(",")
+      ),
+    ];
+
+    // Create a blob from the CSV rows
+    const csvContent = csvRows.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    // Create a link to download the file
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "SmartLock_AllSmartLocks.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const fetchSmartLock = async (facility) => {
     try {
       var tokenStageKey = "";
@@ -80,11 +130,14 @@ export default function AllSmartLocksReport({
 
     // Flatten the array and update state with all smartlocks
     const flattenedData = allSmartlockData.flat();
-    setSmartlocks(flattenedData);
+    var sortedSmartLocks = [...flattenedData].sort((a, b) => {
+      if (a.facilityName.toLowerCase() < b.facilityName.toLowerCase())
+        return -1;
+      if (a.facilityName.toLowerCase() > b.facilityName.toLowerCase()) return 1;
+      return 0;
+    });
+    setSmartlocks(sortedSmartLocks);
   };
-
-  // Pagination logic
-  const pageCount = Math.ceil(filteredSmartLocks.length / rowsPerPage);
 
   useEffect(() => {
     fetchDataForSelectedFacilities();
@@ -92,15 +145,13 @@ export default function AllSmartLocksReport({
 
   useEffect(() => {
     setSortedColumn("Facility");
-    var sortedSmartLocks = [...smartlocks].sort((a, b) => {
-      if (a.facilityName.toLowerCase() < b.facilityName.toLowerCase())
-        return -1;
-      if (a.facilityName.toLowerCase() > b.facilityName.toLowerCase()) return 1;
-      return 0;
-    });
 
-    const filteredSmartLocks = sortedSmartLocks.filter(
-      (smartlock) =>
+    const filteredSmartLocks = smartlocks.filter((smartlock) => {
+      if (searchQuery.toLowerCase() === "online") {
+        return !smartlock.isDeviceOffline; // Show only online devices
+      }
+
+      return (
         (smartlock.facilityName || "")
           .toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
@@ -116,23 +167,36 @@ export default function AllSmartLocksReport({
         (smartlock.deviceType || "")
           .toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
+        (smartlock.visitorName || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
         String(smartlock.batteryLevel || "")
           .toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
-        String(Math.round((smartlock.signalQuality / 255) * 100) || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
+        String(
+          Math.round((smartlock.signalQuality / 255) * 100) || ""
+        ).includes(searchQuery) ||
         (Array.isArray(smartlock.statusMessages) &&
           smartlock.statusMessages.some((message) =>
             (message || "").toLowerCase().includes(searchQuery.toLowerCase())
           ))
-    );
+      );
+    });
     setFilteredSmartLocks(filteredSmartLocks);
     setCurrentPage(1);
   }, [smartlocks, searchQuery]);
 
   return (
     <div className="w-full px-2">
+      <div className="flex justify-end mb-1">
+        <p
+          className="text-black dark:text-white rounded-sm hover:text-gray-400 dark:hover:text-gray-400 hover:cursor-pointer mr-2 right-0"
+          onClick={() => exportSmartLocks()}
+        >
+          Export
+        </p>
+      </div>
+
       <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
         {/* Header */}
         <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
@@ -519,7 +583,7 @@ export default function AllSmartLocksReport({
                 </td>
                 <td
                   className="border-y border-gray-300 dark:border-border px-4 py-2"
-                  title={smartlock.lastEventTimestampDisplay}
+                  title={smartlock.lastUpdateTimestampDisplay}
                 >
                   {smartlock.statusMessages[0] != "" ? (
                     smartlock.overallStatus === "error" ? (
@@ -559,7 +623,7 @@ export default function AllSmartLocksReport({
                 </td>
 
                 <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                  {smartlock.lastUpdateTimestampDisplay}
+                  {smartlock.lastEventTimestampDisplay}
                 </td>
               </tr>
             ))}

@@ -19,7 +19,6 @@ export default function AllSmartLockOnlineTimeReport({
   const currentTime = Math.floor(Date.now() / 1000);
   const pastDayValue = currentTime - dayValue * 24 * 60 * 60;
   const [hoveredRow, setHoveredRow] = useState(null);
-  const [smartLockEvents, setSmartLockEvents] = useState([]);
 
   const exportDurations = () => {
     // Convert the data to CSV format
@@ -98,7 +97,6 @@ export default function AllSmartLockOnlineTimeReport({
         (a, b) => new Date(a.createdUtc) - new Date(b.createdUtc)
       );
       console.log(smartLockEvents);
-      setSmartLockEvents(response.data);
       return smartLockEvents;
     } catch (error) {
       console.error(`Error fetching Events for: ${facility.name}`, error);

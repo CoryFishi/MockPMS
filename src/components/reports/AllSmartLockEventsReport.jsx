@@ -62,7 +62,6 @@ export default function AllSmartLocksEventsReport({
   };
 
   // Pagination logic
-  const pageCount = Math.ceil(filteredSmartLockEvents.length / rowsPerPage);
 
   useEffect(() => {
     fetchDataForSelectedFacilities();
