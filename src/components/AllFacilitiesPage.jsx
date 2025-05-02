@@ -9,6 +9,9 @@ import { supabase } from "../supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import PaginationFooter from "./PaginationFooter";
 import LoadingSpinner from "./LoadingSpinner";
+import { IoKeypad, IoLockOpen, IoNotificationsCircle } from "react-icons/io5";
+import { LuBrainCircuit } from "react-icons/lu";
+import { RiAlarmWarningFill } from "react-icons/ri";
 
 export default function AllFacilitiesPage({
   setOpenPage,
@@ -33,12 +36,40 @@ export default function AllFacilitiesPage({
   const [noFacilities, setNoFacilities] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [currentLoadingText, setCurrentLoadingText] = useState("");
+  const [hoveredRow, setHoveredRow] = useState(null);
+
+  const handleSort = (columnKey, accessor = (a) => a[columnKey]) => {
+    const newDirection = sortDirection === "asc" ? "desc" : "asc";
+    setSortDirection(newDirection);
+    setSortedColumn(columnKey);
+
+    const sorted = [...filteredFacilities].sort((a, b) => {
+      const aVal = accessor(a) ?? "";
+      const bVal = accessor(b) ?? "";
+
+      if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
+      if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    setFilteredFacilities(sorted);
+  };
 
   const handleCurrentFacilityUpdate = async (updatedInfo) => {
     const { data, error } = await supabase.from("user_data").upsert(
       {
         user_id: user.id,
-        current_facility: updatedInfo,
+        current_facility: {
+          id: updatedInfo.facilityId,
+          api: updatedInfo.api,
+          apiSecret: updatedInfo.apiSecret,
+          client: updatedInfo.client,
+          clientSecret: updatedInfo.clientSecret,
+          name: updatedInfo.facilityName,
+          environment: updatedInfo.environment,
+          propertyNumber: updatedInfo.facilityPropertyNumber,
+          token: updatedInfo.token,
+        },
         last_update_at: new Date().toISOString(),
       },
       { onConflict: "user_id" }
@@ -47,7 +78,17 @@ export default function AllFacilitiesPage({
     if (error) {
       console.error("Error saving credentials:", error.message);
     } else {
-      setCurrentFacility(updatedInfo);
+      setCurrentFacility({
+        id: updatedInfo.facilityId,
+        api: updatedInfo.api,
+        apiSecret: updatedInfo.apiSecret,
+        client: updatedInfo.client,
+        clientSecret: updatedInfo.clientSecret,
+        name: updatedInfo.facilityName,
+        environment: updatedInfo.environment,
+        propertyNumber: updatedInfo.facilityPropertyNumber,
+        token: updatedInfo.token,
+      });
     }
   };
   const handleFavoriteFacilitiesUpdate = async (newFacility, isFavorite) => {
@@ -176,7 +217,7 @@ export default function AllFacilitiesPage({
         };
         handleCurrentFacilityUpdate(updatedFacility);
 
-        setCurrentFacilityName(facility.name);
+        setCurrentFacilityName(facility.facilityName);
         return response;
       })
       .catch(function (error) {
@@ -199,7 +240,7 @@ export default function AllFacilitiesPage({
       }
       const config = {
         method: "get",
-        url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities`,
+        url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/statuslist`,
         headers: {
           Authorization: "Bearer " + bearer?.access_token,
           accept: "application/json",
@@ -217,7 +258,6 @@ export default function AllFacilitiesPage({
             client: facility.client,
             clientSecret: facility.clientSecret,
           }));
-
           setFacilities((prevFacilities) => {
             const combinedFacilities = [...prevFacilities, ...newFacilities];
             return combinedFacilities.sort((a, b) => {
@@ -229,7 +269,6 @@ export default function AllFacilitiesPage({
             });
           });
 
-          setSortedColumn("Facility Id");
           if (response.data.length > 0) setNoFacilities(false);
           return response;
         })
@@ -265,8 +304,20 @@ export default function AllFacilitiesPage({
     setOpenPage("units");
   };
   const addToFavorite = async (facility) => {
-    const isFavorite = isFacilityFavorite(facility.id);
-    handleFavoriteFacilitiesUpdate(facility, isFavorite);
+    const isFavorite = isFacilityFavorite(facility.facilityId);
+    handleFavoriteFacilitiesUpdate(
+      {
+        id: facility.facilityId,
+        api: facility.api,
+        apiSecret: facility.apiSecret,
+        client: facility.client,
+        clientSecret: facility.clientSecret,
+        name: facility.facilityName,
+        environment: facility.environment,
+        propertyNumber: facility.facilityPropertyNumber,
+      },
+      isFavorite
+    );
   };
 
   useEffect(() => {
@@ -282,18 +333,54 @@ export default function AllFacilitiesPage({
   };
 
   useEffect(() => {
+    setCurrentPage(1);
     const filtered = facilities.filter(
       (facility) =>
-        (facility.id || "").toString().includes(searchQuery) ||
-        (facility.propertyNumber || "")
+        (facility.facilityId || "").toString().includes(searchQuery) ||
+        (facility.facilityPropertyNumber || "")
           .toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
-        (facility.name || "")
+        (facility.facilityName || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (facility.accountName || "")
           .toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
         (facility.environment || "")
           .toLowerCase()
-          .includes(searchQuery.toLowerCase())
+          .includes(searchQuery.toLowerCase()) ||
+        (facility.gatewayStatus || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (facility.alarmStatus || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (facility.deviceStatus || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (facility.edgeRouterPlatformDeviceStatus || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (facility.pmsInterfaceStatus || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (facility.gatewayStatusMessage || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (facility.alarmStatusMessage || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (facility.deviceStatusMessage || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (facility.edgeRouterPlatformDeviceStatusMessage || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (facility.pmsInterfaceStatusMessage || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (facility.edgeRouterPlatformDeviceStatus != null &&
+          "SmartLock".toLowerCase().includes(searchQuery.toLowerCase()))
     );
     setFilteredFacilities(filtered);
   }, [facilities, searchQuery]);
@@ -307,7 +394,7 @@ export default function AllFacilitiesPage({
       {/* Loading Spinner */}
       {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* Page Header */}
-      <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <FaWarehouse className="text-lg" />
           &ensp; All Facilities
@@ -325,141 +412,121 @@ export default function AllFacilitiesPage({
           />
         </div>
         {/* Facilities Table */}
-        <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
+        <table className="w-full table-auto border-collapse border-zinc-300 dark:border-border">
           {/* Header */}
-          <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
-            <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
-              <th className="px-4 py-2 hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"></th>
+          <thead className="select-none sticky top-[-1px] z-10 bg-zinc-200 dark:bg-darkNavSecondary">
+            <tr className="bg-zinc-200 dark:bg-darkNavSecondary text-center">
+              <th className="px-4 py-2"></th>
+
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Environment");
-                  setFilteredFacilities(
-                    [...filteredFacilities].sort((a, b) => {
-                      if (a.environment < b.environment)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (a.environment > b.environment)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
+                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
+                onClick={() =>
+                  handleSort(
+                    "environment",
+                    (a) => a.environment?.toLowerCase() || ""
+                  )
+                }
               >
                 Environment
-                {sortedColumn === "Environment" && (
+                {sortedColumn === "environment" && (
                   <span className="ml-2">
                     {sortDirection === "asc" ? "▲" : "▼"}
                   </span>
                 )}
               </th>
+
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out min-w-28"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Facility Id");
-                  setFilteredFacilities(
-                    [...filteredFacilities].sort((a, b) => {
-                      if (a.id < b.id) return newDirection === "asc" ? -1 : 1;
-                      if (a.id > b.id) return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
+                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary min-w-28"
+                onClick={() => handleSort("facilityId", (a) => a.facilityId)}
               >
                 Facility Id
-                {sortedColumn === "Facility Id" && (
+                {sortedColumn === "facilityId" && (
                   <span className="ml-2">
                     {sortDirection === "asc" ? "▲" : "▼"}
                   </span>
                 )}
               </th>
+
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Facility Name");
-                  setFilteredFacilities(
-                    [...filteredFacilities].sort((a, b) => {
-                      if (a.name.toLowerCase() < b.name.toLowerCase())
-                        return newDirection === "asc" ? -1 : 1;
-                      if (a.name.toLowerCase() > b.name.toLowerCase())
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
+                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
+                onClick={() =>
+                  handleSort(
+                    "accountName",
+                    (a) => a.accountName?.toLowerCase() || ""
+                  )
+                }
+              >
+                Account Name
+                {sortedColumn === "accountName" && (
+                  <span className="ml-2">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
+              </th>
+
+              <th
+                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
+                onClick={() =>
+                  handleSort(
+                    "facilityName",
+                    (a) => a.facilityName?.toLowerCase() || ""
+                  )
+                }
               >
                 Facility Name
-                {sortedColumn === "Facility Name" && (
+                {sortedColumn === "facilityName" && (
                   <span className="ml-2">
                     {sortDirection === "asc" ? "▲" : "▼"}
                   </span>
                 )}
               </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() =>
-                  setFilteredFacilities(
-                    [...filteredFacilities].sort((a, b) => {
-                      const newDirection =
-                        sortDirection === "asc" ? "desc" : "asc";
-                      setSortDirection(newDirection);
-                      setSortedColumn("Property Number");
-                      const propertyNumberA = a.propertyNumber
-                        ? a.propertyNumber.toLowerCase()
-                        : "";
-                      const propertyNumberB = b.propertyNumber
-                        ? b.propertyNumber.toLowerCase()
-                        : "";
 
-                      if (propertyNumberA < propertyNumberB)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (propertyNumberA > propertyNumberB)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
+              <th
+                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
+                onClick={() =>
+                  handleSort(
+                    "facilityPropertyNumber",
+                    (a) => a.facilityPropertyNumber?.toLowerCase() || ""
                   )
                 }
               >
                 Property Number
-                {sortedColumn === "Property Number" && (
+                {sortedColumn === "facilityPropertyNumber" && (
                   <span className="ml-2">
                     {sortDirection === "asc" ? "▲" : "▼"}
                   </span>
                 )}
               </th>
-              <th className="px-4 py-2 hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                Actions
-              </th>
+
+              <th className="px-4 py-2">Status</th>
+              <th className="px-4 py-2">Actions</th>
             </tr>
           </thead>
+
           <tbody>
             {filteredFacilities
               .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
               .map((facility, index) => (
                 <tr
                   key={index}
-                  className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary border-y border-gray-300 dark:border-border text-center"
+                  className="hover:bg-zinc-100 dark:hover:bg-darkNavSecondary border-y border-zinc-300 dark:border-border text-center relative"
+                  onMouseLeave={() => setHoveredRow(null)}
                 >
                   <td
                     className="px-4 py-2 hover:cursor-pointer"
                     onClick={() => addToFavorite(facility)}
                   >
                     <div className="flex justify-center text-center items-center text-yellow-500">
-                      {isFacilityFavorite(facility.id) ? (
+                      {isFacilityFavorite(facility.facilityId) ? (
                         <GoStarFill />
                       ) : (
-                        <GoStar className="text-slate-400" />
+                        <GoStar className="text-zinc-400" />
                       )}
                     </div>
                   </td>
                   <td
                     className="px-4 py-2 hover:cursor-pointer"
-                    onClick={() => addToFavorite(facility)}
+                    onClick={() => setHoveredRow(index)}
                   >
                     {facility.environment == "-dev"
                       ? "Development"
@@ -470,26 +537,63 @@ export default function AllFacilitiesPage({
                       : facility.environment == "cia-stg-1.aws."
                       ? "Staging"
                       : "N?A"}
+                    {hoveredRow === index && (
+                      <div className="absolute bg-zinc-50 border dark:bg-zinc-700 text-black p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-5/6">
+                        <div className="grid grid-cols-4 gap-1 overflow-hidden">
+                          {Object.entries(facility).map(
+                            ([key, value], index) => (
+                              <div key={index} className="break-words">
+                                <span className="font-bold text-yellow-400">
+                                  {key}:
+                                </span>
+                                <br />
+                                <span className="whitespace-normal break-words">
+                                  {value === null
+                                    ? "null"
+                                    : value === ""
+                                    ? "null"
+                                    : value === true
+                                    ? "true"
+                                    : value === false
+                                    ? "false"
+                                    : value}
+                                </span>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </td>
                   <td
                     className="px-4 py-2 hover:cursor-pointer"
-                    onClick={() => addToFavorite(facility)}
+                    onClick={() => setHoveredRow(index)}
                   >
-                    {facility.id}
+                    {facility.facilityId}
                   </td>
                   <td
                     className="px-4 py-2 hover:cursor-pointer"
-                    onClick={() => addToFavorite(facility)}
+                    onClick={() => setHoveredRow(index)}
+                  >
+                    {facility.accountName.length > 24
+                      ? facility.accountName.slice(0, 24) + "..."
+                      : facility.accountName}
+                  </td>
+                  <td
+                    className="px-4 py-2 hover:cursor-pointer"
+                    onClick={() => setHoveredRow(index)}
                   >
                     <div className="flex gap-3 justify-center">
                       <p className="pl-1 truncate max-w-[32ch]">
-                        {facility.name}
+                        {facility.facilityName.length > 24
+                          ? facility.facilityName.slice(0, 24) + "..."
+                          : facility.facilityName}
                       </p>
                       <FaExternalLinkAlt
                         title={
                           facility.environment === "cia-stg-1.aws."
-                            ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
-                            : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`
+                            ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.facilityId}/dashboard`
+                            : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.facilityId}/dashboard`
                         }
                         className="text-blue-300 group-hover:text-blue-500"
                         onClick={(e) => {
@@ -497,24 +601,157 @@ export default function AllFacilitiesPage({
                           e.stopPropagation();
                           const baseUrl =
                             facility.environment === "cia-stg-1.aws."
-                              ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
-                              : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`;
+                              ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.facilityId}/dashboard`
+                              : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.facilityId}/dashboard`;
                           window.open(baseUrl, "_blank");
                         }}
                       />
                     </div>
                   </td>
                   <td
-                    className=" border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
-                    onClick={() => addToFavorite(facility)}
+                    className=" border-zinc-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                    onClick={() => setHoveredRow(index)}
                   >
-                    {facility.propertyNumber}
+                    {facility.facilityPropertyNumber}
                   </td>
-                  <td className="px-4 py-2">
-                    {currentFacility.id == facility.id &&
+                  <td
+                    className=" border-zinc-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                    onClick={() => setHoveredRow(index)}
+                  >
+                    {facility.gatewayStatus === "ok" ? (
+                      <LuBrainCircuit
+                        className="text-green-500 inline-block"
+                        title={
+                          facility.gatewayStatusMessage || "CIA Operational"
+                        }
+                      />
+                    ) : facility.gatewayStatus === "warning" ? (
+                      <LuBrainCircuit
+                        className="text-yellow-500 inline-block"
+                        title={facility.gatewayStatusMessage || "CIA Warning"}
+                      />
+                    ) : facility.gatewayStatus === "error" ? (
+                      <LuBrainCircuit
+                        className="text-red-500 inline-block"
+                        title={facility.gatewayStatusMessage || "CIA Error"}
+                      />
+                    ) : (
+                      ""
+                    )}
+                    {facility.edgeRouterStatus === "ok" ? (
+                      <IoLockOpen
+                        className="text-green-500 inline-block"
+                        title={
+                          facility.edgeRouterPlatformDeviceStatusMessage ||
+                          "OpenNet Operational"
+                        }
+                      />
+                    ) : facility.edgeRouterStatus === "warning" ? (
+                      <IoLockOpen
+                        className="text-yellow-500 inline-block"
+                        title={
+                          facility.edgeRouterPlatformDeviceStatusMessage ||
+                          "OpenNet Operational"
+                        }
+                      />
+                    ) : facility.edgeRouterStatus === "error" ? (
+                      <IoLockOpen
+                        className="text-red-500 inline-block"
+                        title={
+                          facility.edgeRouterPlatformDeviceStatusMessage ||
+                          "OpenNet Operational"
+                        }
+                      />
+                    ) : (
+                      ""
+                    )}
+                    {facility.deviceStatus === "ok" ? (
+                      <IoKeypad
+                        className="text-green-500 inline-block"
+                        title={
+                          facility.deviceStatusMessage ||
+                          "CIA Devices Operational"
+                        }
+                      />
+                    ) : facility.deviceStatus === "warning" ? (
+                      <IoKeypad
+                        className="text-yellow-500 inline-block"
+                        title={
+                          facility.deviceStatusMessage ||
+                          "CIA Devices Operational"
+                        }
+                      />
+                    ) : facility.deviceStatus === "error" ? (
+                      <IoKeypad
+                        className="text-red-500 inline-block"
+                        title={
+                          facility.deviceStatusMessage ||
+                          "CIA Devices Operational"
+                        }
+                      />
+                    ) : (
+                      ""
+                    )}
+                    {facility.alarmStatus === "ok" ? (
+                      <RiAlarmWarningFill
+                        className="text-green-500 inline-block"
+                        title={
+                          facility.alarmStatusMessage || "Alarms Operational"
+                        }
+                      />
+                    ) : facility.alarmStatus === "warning" ? (
+                      <RiAlarmWarningFill
+                        className="text-yellow-500 inline-block"
+                        title={
+                          facility.alarmStatusMessage || "Alarms Operational"
+                        }
+                      />
+                    ) : facility.alarmStatus === "error" ? (
+                      <RiAlarmWarningFill
+                        className="text-red-500 inline-block"
+                        title={
+                          facility.alarmStatusMessage || "Alarms Operational"
+                        }
+                      />
+                    ) : (
+                      ""
+                    )}
+                    {facility.pmsInterfaceStatus === "ok" ? (
+                      <IoNotificationsCircle
+                        className="text-green-500 inline-block"
+                        title={
+                          facility.pmsInterfaceStatusMessage ||
+                          "PMS Operational"
+                        }
+                      />
+                    ) : facility.pmsInterfaceStatus === "warning" ? (
+                      <IoNotificationsCircle
+                        className="text-yellow-500 inline-block"
+                        title={
+                          facility.pmsInterfaceStatusMessage ||
+                          "PMS Operational"
+                        }
+                      />
+                    ) : facility.pmsInterfaceStatus === "error" ? (
+                      <IoNotificationsCircle
+                        className="text-red-500 inline-block"
+                        title={
+                          facility.pmsInterfaceStatusMessage ||
+                          "PMS Operational"
+                        }
+                      />
+                    ) : (
+                      ""
+                    )}
+                  </td>
+                  <td
+                    className="px-4 py-2"
+                    onClick={() => setHoveredRow(index)}
+                  >
+                    {currentFacility.id == facility.facilityId &&
                     currentFacility.environment == facility.environment ? (
                       <button
-                        className="font-bold hover:cursor-pointer bg-gray-200 text-white px-2 py-1 rounded-sm hover:bg-gray-300 select-none"
+                        className="font-bold hover:cursor-pointer bg-zinc-200 text-white px-2 py-1 rounded-sm hover:bg-zinc-300 select-none"
                         onClick={() =>
                           localStorage.setItem("openPage", "units") &
                           setOpenPage("units")

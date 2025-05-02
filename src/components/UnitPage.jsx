@@ -103,32 +103,6 @@ export default function UnitPage({
         console.log(error);
       });
   };
-  const handleDevices = async () => {
-    var tokenStageKey = "";
-    var tokenEnvKey = "";
-    if (currentFacility.environment === "cia-stg-1.aws.") {
-      tokenStageKey = "cia-stg-1.aws.";
-    } else {
-      tokenEnvKey = currentFacility.environment;
-    }
-    const config = {
-      method: "get",
-      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/edgerouterhardware`,
-      headers: {
-        Authorization: "Bearer " + currentFacility?.token?.access_token,
-        accept: "application/json",
-        "api-version": "3.0",
-      },
-    };
-
-    axios(config)
-      .then(function (response) {
-        console.log(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  };
   const handleUnits = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
@@ -539,7 +513,6 @@ export default function UnitPage({
         handleAccessProfiles(),
         handleTimeProfiles(),
         handleSmartLocks(),
-        handleDevices(),
       ]);
       setUnitsPulled(true);
     };
