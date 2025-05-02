@@ -30,7 +30,7 @@ export default function SmartLockAllFacilitiesPage({}) {
   const [currentLoadingText, setCurrentLoadingText] = useState("");
   const [hoveredRow, setHoveredRow] = useState(null);
 
-  const handleSort = (columnKey, accessor = (a) => a[columnKey]) => {
+  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
     const newDirection = sortDirection === "asc" ? "desc" : "asc";
     setSortDirection(newDirection);
     setSortedColumn(columnKey);
@@ -339,100 +339,60 @@ export default function SmartLockAllFacilitiesPage({}) {
             {/* Header */}
             <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
               <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
-                <th
-                  className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
-                  onClick={() =>
-                    handleSort("isSelected", (a) =>
-                      isFacilitySelected(a.facilityId) ? 1 : 0
-                    )
-                  }
-                >
-                  <RiCheckboxBlankCircleLine className="text-lg text-slate-400" />
-
-                  {sortedColumn === "isSelected" && (
-                    <span className="ml-1">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
-                  onClick={() =>
-                    handleSort(
-                      "environment",
-                      (a) => a.environment?.toLowerCase() || ""
-                    )
-                  }
-                >
-                  Environment
-                  {sortedColumn === "environment" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary min-w-28"
-                  onClick={() => handleSort("facilityId", (a) => a.facilityId)}
-                >
-                  Facility Id
-                  {sortedColumn === "facilityId" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
-                  onClick={() =>
-                    handleSort(
-                      "accountName",
-                      (a) => a.accountName?.toLowerCase() || ""
-                    )
-                  }
-                >
-                  Account Name
-                  {sortedColumn === "accountName" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
-                  onClick={() =>
-                    handleSort(
-                      "facilityName",
-                      (a) => a.facilityName?.toLowerCase() || ""
-                    )
-                  }
-                >
-                  Facility Name
-                  {sortedColumn === "facilityName" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
-                  onClick={() =>
-                    handleSort(
-                      "facilityPropertyNumber",
-                      (a) => a.facilityPropertyNumber?.toLowerCase() || ""
-                    )
-                  }
-                >
-                  Property Number
-                  {sortedColumn === "facilityPropertyNumber" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
+                {[
+                  {
+                    key: "isSelected",
+                    label: (
+                      <RiCheckboxBlankCircleLine className="text-lg text-slate-400" />
+                    ),
+                    accessor: (a) => (isFacilitySelected(a.facilityId) ? 1 : 0),
+                  },
+                  {
+                    key: "environment",
+                    label: "Environment",
+                    accessor: (a) => a.environment?.toLowerCase() || "",
+                  },
+                  {
+                    key: "facilityId",
+                    label: "Facility Id",
+                    accessor: (a) => a.facilityId,
+                  },
+                  {
+                    key: "accountName",
+                    label: "Account Name",
+                    accessor: (a) => a.accountName?.toLowerCase() || "",
+                  },
+                  {
+                    key: "facilityName",
+                    label: "Facility Name",
+                    accessor: (a) => a.facilityName?.toLowerCase() || "",
+                  },
+                  {
+                    key: "facilityPropertyNumber",
+                    label: "Property Number",
+                    accessor: (a) =>
+                      a.facilityPropertyNumber?.toLowerCase() || "",
+                  },
+                ].map(({ key, label, accessor }) => (
+                  <th
+                    key={key}
+                    className={`px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary ${
+                      key === "facilityId" ? "min-w-28" : ""
+                    }`}
+                    onClick={() => handleColumnSort(key, accessor)}
+                  >
+                    {label}
+                    {sortedColumn === key && (
+                      <span className="ml-2">
+                        {sortDirection === "asc" ? "▲" : "▼"}
+                      </span>
+                    )}
+                  </th>
+                ))}
                 <th className="px-4 py-2">Status</th>
               </tr>
             </thead>
+
             <tbody>
               {filteredFacilities
                 .slice(

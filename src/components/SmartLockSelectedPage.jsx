@@ -8,7 +8,6 @@ import PaginationFooter from "./PaginationFooter";
 import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
-import LoadingSpinner from "./LoadingSpinner";
 
 export default function SmartLockSelectedPage() {
   const [facilities, setFacilities] = useState([]);
@@ -20,10 +19,23 @@ export default function SmartLockSelectedPage() {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [selectedTokensLoaded, setSelectedTokensLoaded] = useState(false);
   const [noFacilities, setNoFacilities] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentLoadingText, setCurrentLoadingText] = useState("");
 
   const { user, selectedTokens, setSelectedTokens } = useAuth();
+  const handleSort = (columnKey, accessor = (a) => a[columnKey]) => {
+    const newDirection = sortDirection === "asc" ? "desc" : "asc";
+    setSortDirection(newDirection);
+    setSortedColumn(columnKey);
+
+    const sorted = [...filteredFacilities].sort((a, b) => {
+      const aVal = accessor(a) ?? "";
+      const bVal = accessor(b) ?? "";
+      if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
+      if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    setFilteredFacilities(sorted);
+  };
 
   const handleSelectedFacilitiesUpdate = async (newFacility, isSelected) => {
     // Fetch existing favorite tokens for the user
@@ -113,7 +125,6 @@ export default function SmartLockSelectedPage() {
       });
       setSortedColumn("Facility Id");
       setFacilities(sortedFacilities);
-      setIsLoading(false);
     } catch {
       alert("It broke");
     }
@@ -162,114 +173,54 @@ export default function SmartLockSelectedPage() {
             {/* Header */}
             <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
               <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
-                <th className="px-4 py-2 text-left hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"></th>
-                <th
-                  className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("Environment");
-                    setFilteredFacilities(
-                      [...filteredFacilities].sort((a, b) => {
-                        if (a.environment < b.environment)
-                          return newDirection === "asc" ? -1 : 1;
-                        if (a.environment > b.environment)
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
-                >
-                  Environment
-                  {sortedColumn === "Environment" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("Facility Id");
-                    setFilteredFacilities(
-                      [...filteredFacilities].sort((a, b) => {
-                        if (a.id < b.id) return newDirection === "asc" ? -1 : 1;
-                        if (a.id > b.id) return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
-                >
-                  Facility Id
-                  {sortedColumn === "Facility Id" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("Facility Name");
-                    setFilteredFacilities(
-                      [...filteredFacilities].sort((a, b) => {
-                        if (a.name.toLowerCase() < b.name.toLowerCase())
-                          return newDirection === "asc" ? -1 : 1;
-                        if (a.name.toLowerCase() > b.name.toLowerCase())
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
-                >
-                  Facility Name
-                  {sortedColumn === "Facility Name" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-                <th
-                  className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() =>
-                    setFilteredFacilities(
-                      [...filteredFacilities].sort((a, b) => {
-                        const newDirection =
-                          sortDirection === "asc" ? "desc" : "asc";
-                        setSortDirection(newDirection);
-                        setSortedColumn("Property Number");
-                        const propertyNumberA = a.propertyNumber
-                          ? a.propertyNumber.toLowerCase()
-                          : "";
-                        const propertyNumberB = b.propertyNumber
-                          ? b.propertyNumber.toLowerCase()
-                          : "";
-
-                        if (propertyNumberA < propertyNumberB)
-                          return newDirection === "asc" ? -1 : 1;
-                        if (propertyNumberA > propertyNumberB)
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    )
-                  }
-                >
-                  Property Number
-                  {sortedColumn === "Property Number" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
+                {[
+                  {
+                    key: "isSelected",
+                    label: "",
+                    accessor: (a) => (isFacilitySelected(a.id) ? 1 : 0),
+                    className: "text-left",
+                  },
+                  {
+                    key: "environment",
+                    label: "Environment",
+                    accessor: (a) => a.environment?.toLowerCase() || "",
+                    className: "text-left",
+                  },
+                  {
+                    key: "facilityId",
+                    label: "Facility Id",
+                    accessor: (a) => a.id,
+                    className: "text-left",
+                  },
+                  {
+                    key: "name",
+                    label: "Facility Name",
+                    accessor: (a) => a.name?.toLowerCase() || "",
+                    className: "text-left",
+                  },
+                  {
+                    key: "propertyNumber",
+                    label: "Property Number",
+                    accessor: (a) => a.propertyNumber?.toLowerCase() || "",
+                    className: "text-left",
+                  },
+                ].map(({ key, label, accessor, className }) => (
+                  <th
+                    key={key}
+                    className={`px-4 py-2 ${className} hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out`}
+                    onClick={() => handleSort(key, accessor)}
+                  >
+                    {label}
+                    {sortedColumn === key && (
+                      <span className="ml-2">
+                        {sortDirection === "asc" ? "▲" : "▼"}
+                      </span>
+                    )}
+                  </th>
+                ))}
               </tr>
             </thead>
+
             <tbody>
               {filteredFacilities
                 .slice(

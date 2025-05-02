@@ -450,97 +450,54 @@ export default function AllFacilitiesPage({
           {/* Header */}
           <thead className="select-none sticky top-[-1px] z-10 bg-zinc-200 dark:bg-darkNavSecondary">
             <tr className="bg-zinc-200 dark:bg-darkNavSecondary text-center">
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
-                onClick={() =>
-                  handleSort("isFavorite", (a) =>
-                    isFacilityFavorite(a.facilityId) ? 1 : 0
-                  )
-                }
-              >
-                ★
-                {sortedColumn === "isFavorite" && (
-                  <span className="ml-1">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
-                onClick={() =>
-                  handleSort(
-                    "environment",
-                    (a) => a.environment?.toLowerCase() || ""
-                  )
-                }
-              >
-                Environment
-                {sortedColumn === "environment" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary min-w-28"
-                onClick={() => handleSort("facilityId", (a) => a.facilityId)}
-              >
-                Facility Id
-                {sortedColumn === "facilityId" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
-                onClick={() =>
-                  handleSort(
-                    "accountName",
-                    (a) => a.accountName?.toLowerCase() || ""
-                  )
-                }
-              >
-                Account Name
-                {sortedColumn === "accountName" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
-                onClick={() =>
-                  handleSort(
-                    "facilityName",
-                    (a) => a.facilityName?.toLowerCase() || ""
-                  )
-                }
-              >
-                Facility Name
-                {sortedColumn === "facilityName" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
-                onClick={() =>
-                  handleSort(
-                    "facilityPropertyNumber",
-                    (a) => a.facilityPropertyNumber?.toLowerCase() || ""
-                  )
-                }
-              >
-                Property Number
-                {sortedColumn === "facilityPropertyNumber" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
+              {[
+                {
+                  key: "isFavorite",
+                  label: "★",
+                  accessor: (a) => (isFacilityFavorite(a.facilityId) ? 1 : 0),
+                },
+                {
+                  key: "environment",
+                  label: "Environment",
+                  accessor: (a) => a.environment?.toLowerCase() || "",
+                },
+                {
+                  key: "facilityId",
+                  label: "Facility Id",
+                  accessor: (a) => a.facilityId,
+                },
+                {
+                  key: "accountName",
+                  label: "Account Name",
+                  accessor: (a) => a.accountName?.toLowerCase() || "",
+                },
+                {
+                  key: "facilityName",
+                  label: "Facility Name",
+                  accessor: (a) => a.facilityName?.toLowerCase() || "",
+                },
+                {
+                  key: "facilityPropertyNumber",
+                  label: "Property Number",
+                  accessor: (a) =>
+                    a.facilityPropertyNumber?.toLowerCase() || "",
+                },
+              ].map(({ key, label, accessor }) => (
+                <th
+                  key={key}
+                  className={`px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary ${
+                    key === "facilityId" ? "min-w-28" : ""
+                  }`}
+                  onClick={() => handleSort(key, accessor)}
+                >
+                  {label}
+                  {sortedColumn === key && (
+                    <span className="ml-2">
+                      {sortDirection === "asc" ? "▲" : "▼"}
+                    </span>
+                  )}
+                </th>
+              ))}
               <th className="px-4 py-2">Status</th>
               <th className="px-4 py-2">Actions</th>
             </tr>

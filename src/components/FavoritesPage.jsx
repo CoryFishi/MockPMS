@@ -235,80 +235,52 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
         <table className="w-full table-auto border-collapse pb-96">
           <thead className="select-none sticky top-[-1px] z-10 bg-zinc-200 dark:bg-darkNavSecondary">
             <tr className="bg-zinc-200 dark:bg-darkNavSecondary text-center">
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
-                onClick={() =>
-                  handleSort("isFavorite", (a) =>
-                    isFacilityFavorite(a.id) ? 1 : 0
-                  )
-                }
-              >
-                ★
-                {sortedColumn === "isFavorite" && (
-                  <span className="ml-1">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
-                onClick={() =>
-                  handleSort(
-                    "environment",
-                    (a) => a.environment?.toLowerCase() || ""
-                  )
-                }
-              >
-                Environment
-                {sortedColumn === "environment" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary min-w-28"
-                onClick={() => handleSort("facilityId", (a) => a.id)}
-              >
-                Facility Id
-                {sortedColumn === "facilityId" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
-                onClick={() =>
-                  handleSort("facilityName", (a) => a.name?.toLowerCase() || "")
-                }
-              >
-                Facility Name
-                {sortedColumn === "facilityName" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
-                onClick={() =>
-                  handleSort(
-                    "propertyNumber",
-                    (a) => a.propertyNumber?.toLowerCase() || ""
-                  )
-                }
-              >
-                Property Number
-                {sortedColumn === "propertyNumber" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
+              {[
+                {
+                  key: "isFavorite",
+                  label: "★",
+                  accessor: (a) => (isFacilityFavorite(a.id) ? 1 : 0),
+                },
+                {
+                  key: "environment",
+                  label: "Environment",
+                  accessor: (a) => a.environment?.toLowerCase() || "",
+                },
+                {
+                  key: "facilityId",
+                  label: "Facility Id",
+                  accessor: (a) => a.id,
+                },
+                {
+                  key: "facilityName",
+                  label: "Facility Name",
+                  accessor: (a) => a.name?.toLowerCase() || "",
+                },
+                {
+                  key: "propertyNumber",
+                  label: "Property Number",
+                  accessor: (a) => a.propertyNumber?.toLowerCase() || "",
+                },
+              ].map(({ key, label, accessor }) => (
+                <th
+                  key={key}
+                  className={`px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary ${
+                    key === "facilityId" ? "min-w-28" : ""
+                  }`}
+                  onClick={() => handleSort(key, accessor)}
+                >
+                  {label}
+                  {sortedColumn === key && (
+                    <span className="ml-2">
+                      {sortDirection === "asc" ? "▲" : "▼"}
+                    </span>
+                  )}
+                </th>
+              ))}
               <th className="px-4 py-2">Actions</th>
             </tr>
           </thead>
+
           <tbody>
             {filteredFacilities
               .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)

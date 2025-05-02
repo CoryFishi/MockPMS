@@ -7,7 +7,7 @@ import {
   MdBatteryFull,
   MdBattery0Bar,
 } from "react-icons/md";
-
+import PaginationFooter from "../PaginationFooter";
 import {
   RiSignalWifi1Fill,
   RiSignalWifi2Fill,
@@ -21,13 +21,6 @@ import { FaLock, FaLockOpen, FaCheckCircle } from "react-icons/fa";
 import { BsShieldLockFill } from "react-icons/bs";
 
 import { IoIosWarning } from "react-icons/io";
-
-import {
-  BiChevronLeft,
-  BiChevronRight,
-  BiChevronsLeft,
-  BiChevronsRight,
-} from "react-icons/bi";
 
 export default function SmartLock({
   smartlockModalOption,
@@ -43,6 +36,20 @@ export default function SmartLock({
   const [sortedColumn, setSortedColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const handleColumnSort = (column, accessor) => {
+    const newDirection = sortDirection === "asc" ? "desc" : "asc";
+    setSortDirection(newDirection);
+    setSortedColumn(column);
+    setFilteredSmartLocks(
+      [...filteredSmartLocks].sort((a, b) => {
+        const aVal = accessor(a);
+        const bVal = accessor(b);
+        if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
+        if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
+        return 0;
+      })
+    );
+  };
 
   useEffect(() => {
     setSortedColumn("Name");
@@ -169,236 +176,67 @@ export default function SmartLock({
               {/* Header */}
               <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
                 <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
-                  <th
-                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                    onClick={() => {
-                      const newDirection =
-                        sortDirection === "asc" ? "desc" : "asc";
-                      setSortDirection(newDirection);
-                      setSortedColumn("Name");
-                      setFilteredSmartLocks(
-                        [...filteredSmartLocks].sort((a, b) => {
-                          if (a.name.toLowerCase() < b.name.toLowerCase())
-                            return newDirection === "asc" ? -1 : 1;
-                          if (a.name.toLowerCase() > b.name.toLowerCase())
-                            return newDirection === "asc" ? 1 : -1;
-                          return 0;
-                        })
-                      );
-                    }}
-                  >
-                    Name
-                    {sortedColumn === "Name" && (
-                      <span className="ml-2">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
-                  </th>
-                  <th
-                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                    onClick={() => {
-                      const newDirection =
-                        sortDirection === "asc" ? "desc" : "asc";
-                      setSortDirection(newDirection);
-                      setSortedColumn("Unit");
-                      setFilteredSmartLocks(
-                        [...filteredSmartLocks].sort((a, b) => {
-                          if (
-                            a.unitName.toLowerCase() < b.unitName.toLowerCase()
-                          )
-                            return newDirection === "asc" ? -1 : 1;
-                          if (
-                            a.unitName.toLowerCase() > b.unitName.toLowerCase()
-                          )
-                            return newDirection === "asc" ? 1 : -1;
-                          return 0;
-                        })
-                      );
-                    }}
-                  >
-                    Unit
-                    {sortedColumn === "Unit" && (
-                      <span className="ml-2">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
-                  </th>
-                  <th
-                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                    onClick={() => {
-                      const newDirection =
-                        sortDirection === "asc" ? "desc" : "asc";
-                      setSortDirection(newDirection);
-                      setSortedColumn("Device Type");
-
-                      setFilteredSmartLocks(
-                        [...filteredSmartLocks].sort((a, b) => {
-                          if (a.deviceType < b.deviceType)
-                            return newDirection === "asc" ? -1 : 1;
-                          if (a.deviceType > b.deviceType)
-                            return newDirection === "asc" ? 1 : -1;
-                          return 0;
-                        })
-                      );
-                    }}
-                  >
-                    Device Type
-                    {sortedColumn === "Device Type" && (
-                      <span className="ml-2">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
-                  </th>
-                  <th
-                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                    onClick={() => {
-                      const newDirection =
-                        sortDirection === "asc" ? "desc" : "asc";
-                      setSortDirection(newDirection);
-                      setSortedColumn("Signal Quality");
-                      setFilteredSmartLocks(
-                        [...filteredSmartLocks].sort((a, b) => {
-                          if (a.signalQuality < b.signalQuality)
-                            return newDirection === "asc" ? -1 : 1;
-                          if (a.signalQuality > b.signalQuality)
-                            return newDirection === "asc" ? 1 : -1;
-                          return 0;
-                        })
-                      );
-                    }}
-                  >
-                    Signal Quality
-                    {sortedColumn === "Signal Quality" && (
-                      <span className="ml-2">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
-                  </th>
-                  <th
-                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                    onClick={() => {
-                      const newDirection =
-                        sortDirection === "asc" ? "desc" : "asc";
-                      setSortDirection(newDirection);
-                      setSortedColumn("Battery Level");
-                      setFilteredSmartLocks(
-                        [...filteredSmartLocks].sort((a, b) => {
-                          if (a.batteryLevel < b.batteryLevel)
-                            return newDirection === "asc" ? -1 : 1;
-                          if (a.batteryLevel > b.batteryLevel)
-                            return newDirection === "asc" ? 1 : -1;
-                          return 0;
-                        })
-                      );
-                    }}
-                  >
-                    Battery Level
-                    {sortedColumn === "Battery Level" && (
-                      <span className="ml-2">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
-                  </th>
-                  <th
-                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                    onClick={() => {
-                      const newDirection =
-                        sortDirection === "asc" ? "desc" : "asc";
-                      setSortDirection(newDirection);
-                      setSortedColumn("Lock State");
-                      setFilteredSmartLocks(
-                        [...filteredSmartLocks].sort((a, b) => {
-                          if (a.lockState < b.lockState)
-                            return newDirection === "asc" ? -1 : 1;
-                          if (a.lockState > b.lockState)
-                            return newDirection === "asc" ? 1 : -1;
-                          return 0;
-                        })
-                      );
-                    }}
-                  >
-                    Lock State
-                    {sortedColumn === "Lock State" && (
-                      <span className="ml-2">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
-                  </th>
-                  <th
-                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                    onClick={() => {
-                      const newDirection =
-                        sortDirection === "asc" ? "desc" : "asc";
-                      setSortDirection(newDirection);
-                      setSortedColumn("Unit Details");
-                      setFilteredSmartLocks(
-                        [...filteredSmartLocks].sort((a, b) => {
-                          if (a.unitStatus < b.unitStatus)
-                            return newDirection === "asc" ? -1 : 1;
-                          if (a.unitStatus > b.unitStatus)
-                            return newDirection === "asc" ? 1 : -1;
-                          return 0;
-                        })
-                      );
-                    }}
-                  >
-                    Unit Details
-                    {sortedColumn === "Unit Details" && (
-                      <span className="ml-2">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
-                  </th>
-                  <th
-                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                    onClick={() => {
-                      const newDirection =
-                        sortDirection === "asc" ? "desc" : "asc";
-                      setSortDirection(newDirection);
-                      setSortedColumn("Lock Status Message(s)");
-                      setFilteredSmartLocks(
-                        [...filteredSmartLocks].sort((a, b) => {
-                          if (a.overallStatusMessage < b.overallStatusMessage)
-                            return newDirection === "asc" ? -1 : 1;
-                          if (a.overallStatusMessage > b.overallStatusMessage)
-                            return newDirection === "asc" ? 1 : -1;
-                          return 0;
-                        })
-                      );
-                    }}
-                  >
-                    Lock Status Message(s)
-                    {sortedColumn === "Lock Status Message(s)" && (
-                      <span className="ml-2">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
-                  </th>
-                  <th
-                    className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                    onClick={() => {
-                      const newDirection =
-                        sortDirection === "asc" ? "desc" : "asc";
-                      setSortDirection(newDirection);
-                      setSortedColumn("Last Update");
-                      setFilteredSmartLocks(
-                        [...filteredSmartLocks].sort((a, b) => {
-                          if (a.lastUpdateTimestamp < b.lastUpdateTimestamp)
-                            return newDirection === "asc" ? -1 : 1;
-                          if (a.lastUpdateTimestamp > b.lastUpdateTimestamp)
-                            return newDirection === "asc" ? 1 : -1;
-                          return 0;
-                        })
-                      );
-                    }}
-                  >
-                    Last Update
-                    {sortedColumn === "Last Update" && (
-                      <span className="ml-2">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
-                  </th>
+                  {[
+                    {
+                      key: "Name",
+                      label: "Name",
+                      accessor: (a) => a.name?.toLowerCase() || "",
+                    },
+                    {
+                      key: "Unit",
+                      label: "Unit",
+                      accessor: (a) => a.unitName?.toLowerCase() || "",
+                    },
+                    {
+                      key: "Device Type",
+                      label: "Device Type",
+                      accessor: (a) => a.deviceType?.toLowerCase() || "",
+                    },
+                    {
+                      key: "Signal Quality",
+                      label: "Signal Quality",
+                      accessor: (a) => a.signalQuality,
+                    },
+                    {
+                      key: "Battery Level",
+                      label: "Battery Level",
+                      accessor: (a) => a.batteryLevel,
+                    },
+                    {
+                      key: "Lock State",
+                      label: "Lock State",
+                      accessor: (a) => a.lockState?.toLowerCase() || "",
+                    },
+                    {
+                      key: "Unit Details",
+                      label: "Unit Details",
+                      accessor: (a) => a.unitStatus?.toLowerCase() || "",
+                    },
+                    {
+                      key: "Lock Status Message(s)",
+                      label: "Lock Status Message(s)",
+                      accessor: (a) =>
+                        a.overallStatusMessage?.toLowerCase() || "",
+                    },
+                    {
+                      key: "Last Update",
+                      label: "Last Update",
+                      accessor: (a) => a.lastUpdateTimestamp,
+                    },
+                  ].map(({ key, label, accessor }) => (
+                    <th
+                      key={key}
+                      className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary transition duration-300 ease-in-out"
+                      onClick={() => handleColumnSort(key, accessor)}
+                    >
+                      {label}
+                      {sortedColumn === key && (
+                        <span className="ml-2">
+                          {sortDirection === "asc" ? "▲" : "▼"}
+                        </span>
+                      )}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -589,64 +427,14 @@ export default function SmartLock({
             </table>
           </div>
           {/* Modal footer/pagination */}
-          <div className="flex justify-between items-center m-3 mx-1">
-            <div className="flex gap-3">
-              <div>
-                <select
-                  className="border rounded-sm ml-2 dark:bg-darkSecondary dark:border-border"
-                  id="rowsPerPage"
-                  value={rowsPerPage}
-                  onChange={(e) => {
-                    setRowsPerPage(Number(e.target.value));
-                    setCurrentPage(1); // Reset to first page on rows per page change
-                  }}
-                >
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={100}>100</option>
-                </select>
-              </div>
-              <p className="text-sm">
-                {currentPage === 1 ? 1 : (currentPage - 1) * rowsPerPage + 1} -{" "}
-                {currentPage * rowsPerPage > filteredSmartLocks.length
-                  ? filteredSmartLocks.length
-                  : currentPage * rowsPerPage}{" "}
-                of {filteredSmartLocks.length}
-              </p>
-            </div>
-            <div className="gap-2 flex">
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(1)}
-                className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-              >
-                <BiChevronsLeft />
-              </button>
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((prev) => prev - 1)}
-                className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-              >
-                <BiChevronLeft />
-              </button>
-              <p>
-                {currentPage} of {pageCount}
-              </p>
-              <button
-                disabled={currentPage === pageCount}
-                onClick={() => setCurrentPage((prev) => prev + 1)}
-                className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-              >
-                <BiChevronRight />
-              </button>
-              <button
-                disabled={currentPage === pageCount}
-                onClick={() => setCurrentPage(pageCount)}
-                className="disabled:cursor-not-allowed p-1 disabled:text-slate-500"
-              >
-                <BiChevronsRight />
-              </button>
-            </div>
+          <div className="px-2 py-5 mx-1">
+            <PaginationFooter
+              rowsPerPage={rowsPerPage}
+              setRowsPerPage={setRowsPerPage}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              items={filteredSmartLocks}
+            />
           </div>
         </div>
       </div>
