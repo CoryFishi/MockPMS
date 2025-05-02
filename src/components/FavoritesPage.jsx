@@ -7,7 +7,6 @@ import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import PaginationFooter from "./PaginationFooter";
-import LoadingSpinner from "./LoadingSpinner";
 
 export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
   const [facilities, setFacilities] = useState([]);
@@ -17,7 +16,7 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
   const [sortedColumn, setSortedColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [favoriteTokensLoaded, setFavoriteTokensLoaded] = useState(false);
+  const [hasFavoriteTokensLoaded, setHasFavoriteTokensLoaded] = useState(false);
   const {
     user,
     favoriteTokens,
@@ -26,9 +25,23 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
     setCurrentFacility,
   } = useAuth();
   const [noFacilities, setNoFacilities] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentLoadingText, setCurrentLoadingText] = useState("");
 
+  const handleSort = (columnKey, accessor = (a) => a[columnKey]) => {
+    const newDirection = sortDirection === "asc" ? "desc" : "asc";
+    setSortDirection(newDirection);
+    setSortedColumn(columnKey);
+
+    const sorted = [...filteredFacilities].sort((a, b) => {
+      const aVal = accessor(a) ?? "";
+      const bVal = accessor(b) ?? "";
+
+      if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
+      if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    setFilteredFacilities(sorted);
+  };
   const handleCurrentFacilityUpdate = async (updatedInfo) => {
     const { data, error } = await supabase.from("user_data").upsert(
       {
@@ -156,7 +169,6 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
       }
     }
   };
-
   const isFacilityFavorite = (facilityId) => {
     return favoriteTokens.some((facility) => facility.id === facilityId);
   };
@@ -169,18 +181,10 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
         }
         return;
       }
-      if (favoriteTokensLoaded) return;
-      setFavoriteTokensLoaded(true);
+      if (hasFavoriteTokensLoaded) return;
+      setHasFavoriteTokensLoaded(true);
       setNoFacilities(false);
-      const sortedFacilities = favoriteTokens.sort((a, b) => {
-        if (a.environment < b.environment) return -1;
-        if (a.environment > b.environment) return 1;
-        if (a.id < b.id) return -1;
-        if (a.id > b.id) return 1;
-        return 0;
-      });
-      setSortedColumn("Facility Id");
-      setFacilities(sortedFacilities);
+      setFacilities(favoriteTokens);
     } catch {
       alert("It broke");
     }
@@ -203,6 +207,13 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
     setFilteredFacilities(filtered);
   }, [facilities, searchQuery]);
 
+  const environmentLabel = {
+    "-dev": "Development",
+    "": "Production",
+    "-qa": "QA",
+    "cia-stg-1.aws.": "Staging",
+  };
+
   return (
     <div className="relative overflow-auto h-full dark:text-white dark:bg-darkPrimary">
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
@@ -222,114 +233,80 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
           />
         </div>
         <table className="w-full table-auto border-collapse pb-96">
-          <thead className="sticky top-[-1px] z-10 select-none">
-            <tr className="bg-gray-200 dark:bg-darkNavSecondary">
-              <th className="px-4 py-2 hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"></th>
+          <thead className="select-none sticky top-[-1px] z-10 bg-zinc-200 dark:bg-darkNavSecondary">
+            <tr className="bg-zinc-200 dark:bg-darkNavSecondary text-center">
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Environment");
-                  setFilteredFacilities(
-                    [...filteredFacilities].sort((a, b) => {
-                      if (a.environment < b.environment)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (a.environment > b.environment)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
+                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
+                onClick={() =>
+                  handleSort("isFavorite", (a) =>
+                    isFacilityFavorite(a.id) ? 1 : 0
+                  )
+                }
+              >
+                ★
+                {sortedColumn === "isFavorite" && (
+                  <span className="ml-1">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
+              </th>
+              <th
+                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
+                onClick={() =>
+                  handleSort(
+                    "environment",
+                    (a) => a.environment?.toLowerCase() || ""
+                  )
+                }
               >
                 Environment
-                {sortedColumn === "Environment" && (
+                {sortedColumn === "environment" && (
                   <span className="ml-2">
                     {sortDirection === "asc" ? "▲" : "▼"}
                   </span>
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out min-w-28"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Facility Id");
-                  setFilteredFacilities(
-                    [...filteredFacilities].sort((a, b) => {
-                      if (a.id < b.id) return newDirection === "asc" ? -1 : 1;
-                      if (a.id > b.id) return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
+                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary min-w-28"
+                onClick={() => handleSort("facilityId", (a) => a.id)}
               >
                 Facility Id
-                {sortedColumn === "Facility Id" && (
+                {sortedColumn === "facilityId" && (
                   <span className="ml-2">
                     {sortDirection === "asc" ? "▲" : "▼"}
                   </span>
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Facility Name");
-                  setFilteredFacilities(
-                    [...filteredFacilities].sort((a, b) => {
-                      if (a.name.toLowerCase() < b.name.toLowerCase())
-                        return newDirection === "asc" ? -1 : 1;
-                      if (a.name.toLowerCase() > b.name.toLowerCase())
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
+                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
+                onClick={() =>
+                  handleSort("facilityName", (a) => a.name?.toLowerCase() || "")
+                }
               >
                 Facility Name
-                {sortedColumn === "Facility Name" && (
+                {sortedColumn === "facilityName" && (
                   <span className="ml-2">
                     {sortDirection === "asc" ? "▲" : "▼"}
                   </span>
                 )}
               </th>
               <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
                 onClick={() =>
-                  setFilteredFacilities(
-                    [...filteredFacilities].sort((a, b) => {
-                      const newDirection =
-                        sortDirection === "asc" ? "desc" : "asc";
-                      setSortDirection(newDirection);
-                      setSortedColumn("Property Number");
-                      const propertyNumberA = a.propertyNumber
-                        ? a.propertyNumber.toLowerCase()
-                        : "";
-                      const propertyNumberB = b.propertyNumber
-                        ? b.propertyNumber.toLowerCase()
-                        : "";
-
-                      if (propertyNumberA < propertyNumberB)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (propertyNumberA > propertyNumberB)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
+                  handleSort(
+                    "propertyNumber",
+                    (a) => a.propertyNumber?.toLowerCase() || ""
                   )
                 }
               >
                 Property Number
-                {sortedColumn === "Property Number" && (
+                {sortedColumn === "propertyNumber" && (
                   <span className="ml-2">
                     {sortDirection === "asc" ? "▲" : "▼"}
                   </span>
                 )}
               </th>
-              <th className="px-4 py-2 hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                Actions
-              </th>
+              <th className="px-4 py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -356,15 +333,7 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
                     className="px-4 py-2 hover:cursor-pointer"
                     onClick={() => addToFavorite(facility)}
                   >
-                    {facility.environment == "-dev"
-                      ? "Development"
-                      : facility.environment == ""
-                      ? "Production"
-                      : facility.environment == "-qa"
-                      ? "QA"
-                      : facility.environment == "cia-stg-1.aws."
-                      ? "Staging"
-                      : "N?A"}
+                    {environmentLabel[facility.environment] ?? "N/A"}
                   </td>
                   <td
                     className="px-4 py-2 hover:cursor-pointer"

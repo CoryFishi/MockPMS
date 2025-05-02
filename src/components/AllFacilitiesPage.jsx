@@ -319,6 +319,50 @@ export default function AllFacilitiesPage({
       isFavorite
     );
   };
+  const FacilityStatusIcons = ({ facility }) => {
+    const getStatusIcon = (status, Icon, message) => {
+      if (!status) return null;
+      const color =
+        status === "ok"
+          ? "text-green-500"
+          : status === "warning"
+          ? "text-yellow-500"
+          : status === "error"
+          ? "text-red-500"
+          : "";
+      return <Icon className={`${color} inline-block`} title={message || ""} />;
+    };
+
+    return (
+      <>
+        {getStatusIcon(
+          facility.gatewayStatus,
+          LuBrainCircuit,
+          facility.gatewayStatusMessage
+        )}
+        {getStatusIcon(
+          facility.edgeRouterStatus,
+          IoLockOpen,
+          facility.edgeRouterPlatformDeviceStatusMessage
+        )}
+        {getStatusIcon(
+          facility.deviceStatus,
+          IoKeypad,
+          facility.deviceStatusMessage
+        )}
+        {getStatusIcon(
+          facility.alarmStatus,
+          RiAlarmWarningFill,
+          facility.alarmStatusMessage
+        )}
+        {getStatusIcon(
+          facility.pmsInterfaceStatus,
+          IoNotificationsCircle,
+          facility.pmsInterfaceStatusMessage
+        )}
+      </>
+    );
+  };
 
   useEffect(() => {
     if (isPulled) {
@@ -334,56 +378,46 @@ export default function AllFacilitiesPage({
 
   useEffect(() => {
     setCurrentPage(1);
-    const filtered = facilities.filter(
-      (facility) =>
-        (facility.facilityId || "").toString().includes(searchQuery) ||
-        (facility.facilityPropertyNumber || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (facility.facilityName || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (facility.accountName || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (facility.environment || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (facility.gatewayStatus || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (facility.alarmStatus || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (facility.deviceStatus || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (facility.edgeRouterPlatformDeviceStatus || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (facility.pmsInterfaceStatus || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (facility.gatewayStatusMessage || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (facility.alarmStatusMessage || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (facility.deviceStatusMessage || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (facility.edgeRouterPlatformDeviceStatusMessage || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (facility.pmsInterfaceStatusMessage || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
+    const loweredQuery = searchQuery.toLowerCase();
+
+    const searchableFields = [
+      "facilityId",
+      "facilityPropertyNumber",
+      "facilityName",
+      "accountName",
+      "environment",
+      "gatewayStatus",
+      "alarmStatus",
+      "deviceStatus",
+      "edgeRouterPlatformDeviceStatus",
+      "pmsInterfaceStatus",
+      "gatewayStatusMessage",
+      "alarmStatusMessage",
+      "deviceStatusMessage",
+      "edgeRouterPlatformDeviceStatusMessage",
+      "pmsInterfaceStatusMessage",
+    ];
+
+    const filtered = facilities.filter((facility) => {
+      return (
+        searchableFields.some((field) => {
+          const value = facility[field];
+          return value?.toString().toLowerCase().includes(loweredQuery);
+        }) ||
         (facility.edgeRouterPlatformDeviceStatus != null &&
-          "SmartLock".toLowerCase().includes(searchQuery.toLowerCase()))
-    );
+          "smartlock".includes(loweredQuery))
+      );
+    });
+
     setFilteredFacilities(filtered);
   }, [facilities, searchQuery]);
+
+  const environmentLabel = {
+    "-dev": "Development",
+    "": "Production",
+    "-qa": "QA",
+    "cia-stg-1.aws.": "Staging",
+  };
 
   return (
     <div
@@ -416,7 +450,21 @@ export default function AllFacilitiesPage({
           {/* Header */}
           <thead className="select-none sticky top-[-1px] z-10 bg-zinc-200 dark:bg-darkNavSecondary">
             <tr className="bg-zinc-200 dark:bg-darkNavSecondary text-center">
-              <th className="px-4 py-2"></th>
+              <th
+                className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
+                onClick={() =>
+                  handleSort("isFavorite", (a) =>
+                    isFacilityFavorite(a.facilityId) ? 1 : 0
+                  )
+                }
+              >
+                ★
+                {sortedColumn === "isFavorite" && (
+                  <span className="ml-1">
+                    {sortDirection === "asc" ? "▲" : "▼"}
+                  </span>
+                )}
+              </th>
 
               <th
                 className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
@@ -434,7 +482,6 @@ export default function AllFacilitiesPage({
                   </span>
                 )}
               </th>
-
               <th
                 className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary min-w-28"
                 onClick={() => handleSort("facilityId", (a) => a.facilityId)}
@@ -446,7 +493,6 @@ export default function AllFacilitiesPage({
                   </span>
                 )}
               </th>
-
               <th
                 className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
                 onClick={() =>
@@ -463,7 +509,6 @@ export default function AllFacilitiesPage({
                   </span>
                 )}
               </th>
-
               <th
                 className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
                 onClick={() =>
@@ -480,7 +525,6 @@ export default function AllFacilitiesPage({
                   </span>
                 )}
               </th>
-
               <th
                 className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
                 onClick={() =>
@@ -497,7 +541,6 @@ export default function AllFacilitiesPage({
                   </span>
                 )}
               </th>
-
               <th className="px-4 py-2">Status</th>
               <th className="px-4 py-2">Actions</th>
             </tr>
@@ -528,17 +571,9 @@ export default function AllFacilitiesPage({
                     className="px-4 py-2 hover:cursor-pointer"
                     onClick={() => setHoveredRow(index)}
                   >
-                    {facility.environment == "-dev"
-                      ? "Development"
-                      : facility.environment == ""
-                      ? "Production"
-                      : facility.environment == "-qa"
-                      ? "QA"
-                      : facility.environment == "cia-stg-1.aws."
-                      ? "Staging"
-                      : "N?A"}
+                    {environmentLabel[facility.environment] ?? "N/A"}
                     {hoveredRow === index && (
-                      <div className="absolute bg-zinc-50 border dark:bg-zinc-700 text-black p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-5/6">
+                      <div className="absolute bg-zinc-50 border dark:border-zinc-700 dark:bg-zinc-800 text-black p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-5/6 dark:text-white">
                         <div className="grid grid-cols-4 gap-1 overflow-hidden">
                           {Object.entries(facility).map(
                             ([key, value], index) => (
@@ -615,134 +650,10 @@ export default function AllFacilitiesPage({
                     {facility.facilityPropertyNumber}
                   </td>
                   <td
-                    className=" border-zinc-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                    className="border-zinc-300 dark:border-border px-4 py-2 hover:cursor-pointer"
                     onClick={() => setHoveredRow(index)}
                   >
-                    {facility.gatewayStatus === "ok" ? (
-                      <LuBrainCircuit
-                        className="text-green-500 inline-block"
-                        title={
-                          facility.gatewayStatusMessage || "CIA Operational"
-                        }
-                      />
-                    ) : facility.gatewayStatus === "warning" ? (
-                      <LuBrainCircuit
-                        className="text-yellow-500 inline-block"
-                        title={facility.gatewayStatusMessage || "CIA Warning"}
-                      />
-                    ) : facility.gatewayStatus === "error" ? (
-                      <LuBrainCircuit
-                        className="text-red-500 inline-block"
-                        title={facility.gatewayStatusMessage || "CIA Error"}
-                      />
-                    ) : (
-                      ""
-                    )}
-                    {facility.edgeRouterStatus === "ok" ? (
-                      <IoLockOpen
-                        className="text-green-500 inline-block"
-                        title={
-                          facility.edgeRouterPlatformDeviceStatusMessage ||
-                          "OpenNet Operational"
-                        }
-                      />
-                    ) : facility.edgeRouterStatus === "warning" ? (
-                      <IoLockOpen
-                        className="text-yellow-500 inline-block"
-                        title={
-                          facility.edgeRouterPlatformDeviceStatusMessage ||
-                          "OpenNet Operational"
-                        }
-                      />
-                    ) : facility.edgeRouterStatus === "error" ? (
-                      <IoLockOpen
-                        className="text-red-500 inline-block"
-                        title={
-                          facility.edgeRouterPlatformDeviceStatusMessage ||
-                          "OpenNet Operational"
-                        }
-                      />
-                    ) : (
-                      ""
-                    )}
-                    {facility.deviceStatus === "ok" ? (
-                      <IoKeypad
-                        className="text-green-500 inline-block"
-                        title={
-                          facility.deviceStatusMessage ||
-                          "CIA Devices Operational"
-                        }
-                      />
-                    ) : facility.deviceStatus === "warning" ? (
-                      <IoKeypad
-                        className="text-yellow-500 inline-block"
-                        title={
-                          facility.deviceStatusMessage ||
-                          "CIA Devices Operational"
-                        }
-                      />
-                    ) : facility.deviceStatus === "error" ? (
-                      <IoKeypad
-                        className="text-red-500 inline-block"
-                        title={
-                          facility.deviceStatusMessage ||
-                          "CIA Devices Operational"
-                        }
-                      />
-                    ) : (
-                      ""
-                    )}
-                    {facility.alarmStatus === "ok" ? (
-                      <RiAlarmWarningFill
-                        className="text-green-500 inline-block"
-                        title={
-                          facility.alarmStatusMessage || "Alarms Operational"
-                        }
-                      />
-                    ) : facility.alarmStatus === "warning" ? (
-                      <RiAlarmWarningFill
-                        className="text-yellow-500 inline-block"
-                        title={
-                          facility.alarmStatusMessage || "Alarms Operational"
-                        }
-                      />
-                    ) : facility.alarmStatus === "error" ? (
-                      <RiAlarmWarningFill
-                        className="text-red-500 inline-block"
-                        title={
-                          facility.alarmStatusMessage || "Alarms Operational"
-                        }
-                      />
-                    ) : (
-                      ""
-                    )}
-                    {facility.pmsInterfaceStatus === "ok" ? (
-                      <IoNotificationsCircle
-                        className="text-green-500 inline-block"
-                        title={
-                          facility.pmsInterfaceStatusMessage ||
-                          "PMS Operational"
-                        }
-                      />
-                    ) : facility.pmsInterfaceStatus === "warning" ? (
-                      <IoNotificationsCircle
-                        className="text-yellow-500 inline-block"
-                        title={
-                          facility.pmsInterfaceStatusMessage ||
-                          "PMS Operational"
-                        }
-                      />
-                    ) : facility.pmsInterfaceStatus === "error" ? (
-                      <IoNotificationsCircle
-                        className="text-red-500 inline-block"
-                        title={
-                          facility.pmsInterfaceStatusMessage ||
-                          "PMS Operational"
-                        }
-                      />
-                    ) : (
-                      ""
-                    )}
+                    <FacilityStatusIcons facility={facility} />
                   </td>
                   <td
                     className="px-4 py-2"
