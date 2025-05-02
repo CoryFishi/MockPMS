@@ -12,6 +12,9 @@ import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import LoadingSpinner from "./LoadingSpinner";
+import { IoKeypad, IoLockOpen, IoNotificationsCircle } from "react-icons/io5";
+import { LuBrainCircuit } from "react-icons/lu";
+import { RiAlarmWarningFill } from "react-icons/ri";
 
 export default function SmartLockAllFacilitiesPage({}) {
   const [facilities, setFacilities] = useState([]);
@@ -25,6 +28,24 @@ export default function SmartLockAllFacilitiesPage({}) {
   const { user, tokens, selectedTokens, setSelectedTokens } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [currentLoadingText, setCurrentLoadingText] = useState("");
+  const [hoveredRow, setHoveredRow] = useState(null);
+
+  const handleSort = (columnKey, accessor = (a) => a[columnKey]) => {
+    const newDirection = sortDirection === "asc" ? "desc" : "asc";
+    setSortDirection(newDirection);
+    setSortedColumn(columnKey);
+
+    const sorted = [...filteredFacilities].sort((a, b) => {
+      const aVal = accessor(a) ?? "";
+      const bVal = accessor(b) ?? "";
+
+      if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
+      if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    setFilteredFacilities(sorted);
+  };
 
   const handleLogin = async (facility) => {
     var tokenStageKey = "";
@@ -75,7 +96,7 @@ export default function SmartLockAllFacilitiesPage({}) {
       }
       const config = {
         method: "get",
-        url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities`,
+        url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/statuslist`,
         headers: {
           Authorization: "Bearer " + bearer?.access_token,
           accept: "application/json",
@@ -132,7 +153,6 @@ export default function SmartLockAllFacilitiesPage({}) {
     }
   };
   const handleSelectedFacilitiesUpdate = async (newFacility, isSelected) => {
-    // Fetch existing favorite tokens for the user
     const { data: currentData, error: fetchError } = await supabase
       .from("user_data")
       .select("selected_tokens")
@@ -140,80 +160,155 @@ export default function SmartLockAllFacilitiesPage({}) {
       .single();
 
     if (fetchError) {
-      console.error("Error fetching favorite tokens:", fetchError.message);
-      toast.error("Failed to retrieve favorite credentials.");
+      console.error("Error fetching selected tokens:", fetchError.message);
+      toast.error("Failed to retrieve selected facilities.");
       return;
     }
+
+    const formattedFacility = {
+      id: newFacility.facilityId,
+      api: newFacility.api,
+      apiSecret: newFacility.apiSecret,
+      client: newFacility.client,
+      clientSecret: newFacility.clientSecret,
+      name: newFacility.facilityName,
+      environment: newFacility.environment,
+      propertyNumber: newFacility.facilityPropertyNumber,
+    };
+
+    let updatedTokens;
+
     if (isSelected) {
-      // Filter out the token to remove
-      const updatedTokens = (currentData?.selected_tokens || []).filter(
-        (token) => token.id !== newFacility.id
+      updatedTokens = (currentData?.selected_tokens || []).filter(
+        (token) => token.id !== formattedFacility.id
       );
-
-      // Upsert the updated tokens array back to the database
-      const { data, error } = await supabase.from("user_data").upsert(
-        {
-          user_id: user.id,
-          selected_tokens: updatedTokens,
-          last_update_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" }
-      );
-
-      if (error) {
-        console.error("Error removing favorite token:", error.message);
-      } else {
-        setSelectedTokens(updatedTokens);
-      }
     } else {
-      // Filter in the token to remove
-      const updatedTokens = [
-        ...(currentData?.selected_tokens || []),
-        newFacility,
+      updatedTokens = [
+        ...(currentData?.selected_tokens || []).filter(
+          (token) => token.id !== formattedFacility.id
+        ),
+        formattedFacility,
       ];
-      const { data, error } = await supabase.from("user_data").upsert(
-        {
-          user_id: user.id,
-          selected_tokens: updatedTokens,
-          last_update_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" }
-      );
+    }
 
-      if (error) {
-        console.error("Error saving favorite tokens:", error.message);
-      } else {
-        setSelectedTokens(updatedTokens);
-      }
+    const { error: upsertError } = await supabase.from("user_data").upsert(
+      {
+        user_id: user.id,
+        selected_tokens: updatedTokens,
+        last_update_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" }
+    );
+
+    if (upsertError) {
+      console.error("Error saving selected tokens:", upsertError.message);
+      toast.error("Failed to update selected facilities.");
+    } else {
+      setSelectedTokens(updatedTokens);
     }
   };
+
   const addToSelected = async (facility) => {
-    const isSelected = isFacilitySelected(facility.id);
+    const isSelected = isFacilitySelected(facility.facilityId);
     handleSelectedFacilitiesUpdate(facility, isSelected);
   };
-  const isFacilitySelected = (facilityId) => {
-    return selectedTokens.some((facility) => facility.id === facilityId);
+  const FacilityStatusIcons = ({ facility }) => {
+    const getStatusIcon = (status, Icon, message) => {
+      if (!status) return null;
+      const color =
+        status === "ok"
+          ? "text-green-500"
+          : status === "warning"
+          ? "text-yellow-500"
+          : status === "error"
+          ? "text-red-500"
+          : "";
+      return <Icon className={`${color} inline-block`} title={message || ""} />;
+    };
+
+    return (
+      <>
+        {getStatusIcon(
+          facility.gatewayStatus,
+          LuBrainCircuit,
+          facility.gatewayStatusMessage
+        )}
+        {getStatusIcon(
+          facility.edgeRouterStatus,
+          IoLockOpen,
+          facility.edgeRouterPlatformDeviceStatusMessage
+        )}
+        {getStatusIcon(
+          facility.deviceStatus,
+          IoKeypad,
+          facility.deviceStatusMessage
+        )}
+        {getStatusIcon(
+          facility.alarmStatus,
+          RiAlarmWarningFill,
+          facility.alarmStatusMessage
+        )}
+        {getStatusIcon(
+          facility.pmsInterfaceStatus,
+          IoNotificationsCircle,
+          facility.pmsInterfaceStatusMessage
+        )}
+      </>
+    );
   };
+  const isFacilitySelected = (facilityId) => {
+    return (selectedTokens || []).some(
+      (facility) => facility.id === facilityId
+    );
+  };
+
   useEffect(() => {
     if (!tokens) return;
     handleFacilities(tokens);
   }, [tokens]);
+
   useEffect(() => {
-    const filtered = facilities.filter(
-      (facility) =>
-        (facility.id || "").toString().includes(searchQuery) ||
-        (facility.propertyNumber || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (facility.name || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (facility.environment || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase())
-    );
+    setCurrentPage(1);
+    const loweredQuery = searchQuery.toLowerCase();
+
+    const searchableFields = [
+      "facilityId",
+      "facilityPropertyNumber",
+      "facilityName",
+      "accountName",
+      "environment",
+      "gatewayStatus",
+      "alarmStatus",
+      "deviceStatus",
+      "edgeRouterPlatformDeviceStatus",
+      "pmsInterfaceStatus",
+      "gatewayStatusMessage",
+      "alarmStatusMessage",
+      "deviceStatusMessage",
+      "edgeRouterPlatformDeviceStatusMessage",
+      "pmsInterfaceStatusMessage",
+    ];
+
+    const filtered = facilities.filter((facility) => {
+      return (
+        searchableFields.some((field) => {
+          const value = facility[field];
+          return value?.toString().toLowerCase().includes(loweredQuery);
+        }) ||
+        (facility.edgeRouterPlatformDeviceStatus != null &&
+          "smartlock".includes(loweredQuery))
+      );
+    });
+
     setFilteredFacilities(filtered);
   }, [facilities, searchQuery]);
+
+  const environmentLabel = {
+    "-dev": "Development",
+    "": "Production",
+    "-qa": "QA",
+    "cia-stg-1.aws.": "Staging",
+  };
 
   return (
     <div
@@ -244,112 +339,98 @@ export default function SmartLockAllFacilitiesPage({}) {
             {/* Header */}
             <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
               <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
-                <th className="px-4 py-2 text-left hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"></th>
                 <th
-                  className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("Environment");
-                    setFilteredFacilities(
-                      [...filteredFacilities].sort((a, b) => {
-                        if (a.environment < b.environment)
-                          return newDirection === "asc" ? -1 : 1;
-                        if (a.environment > b.environment)
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
+                  className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
+                  onClick={() =>
+                    handleSort("isSelected", (a) =>
+                      isFacilitySelected(a.facilityId) ? 1 : 0
+                    )
+                  }
+                >
+                  <RiCheckboxBlankCircleLine className="text-lg text-slate-400" />
+
+                  {sortedColumn === "isSelected" && (
+                    <span className="ml-1">
+                      {sortDirection === "asc" ? "▲" : "▼"}
+                    </span>
+                  )}
+                </th>
+                <th
+                  className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
+                  onClick={() =>
+                    handleSort(
+                      "environment",
+                      (a) => a.environment?.toLowerCase() || ""
+                    )
+                  }
                 >
                   Environment
-                  {sortedColumn === "Environment" && (
+                  {sortedColumn === "environment" && (
                     <span className="ml-2">
                       {sortDirection === "asc" ? "▲" : "▼"}
                     </span>
                   )}
                 </th>
                 <th
-                  className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("Facility Id");
-                    setFilteredFacilities(
-                      [...filteredFacilities].sort((a, b) => {
-                        if (a.id < b.id) return newDirection === "asc" ? -1 : 1;
-                        if (a.id > b.id) return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
+                  className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary min-w-28"
+                  onClick={() => handleSort("facilityId", (a) => a.facilityId)}
                 >
                   Facility Id
-                  {sortedColumn === "Facility Id" && (
+                  {sortedColumn === "facilityId" && (
                     <span className="ml-2">
                       {sortDirection === "asc" ? "▲" : "▼"}
                     </span>
                   )}
                 </th>
                 <th
-                  className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("Facility Name");
-                    setFilteredFacilities(
-                      [...filteredFacilities].sort((a, b) => {
-                        if (a.name.toLowerCase() < b.name.toLowerCase())
-                          return newDirection === "asc" ? -1 : 1;
-                        if (a.name.toLowerCase() > b.name.toLowerCase())
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
+                  className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
+                  onClick={() =>
+                    handleSort(
+                      "accountName",
+                      (a) => a.accountName?.toLowerCase() || ""
+                    )
+                  }
+                >
+                  Account Name
+                  {sortedColumn === "accountName" && (
+                    <span className="ml-2">
+                      {sortDirection === "asc" ? "▲" : "▼"}
+                    </span>
+                  )}
+                </th>
+                <th
+                  className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
+                  onClick={() =>
+                    handleSort(
+                      "facilityName",
+                      (a) => a.facilityName?.toLowerCase() || ""
+                    )
+                  }
                 >
                   Facility Name
-                  {sortedColumn === "Facility Name" && (
+                  {sortedColumn === "facilityName" && (
                     <span className="ml-2">
                       {sortDirection === "asc" ? "▲" : "▼"}
                     </span>
                   )}
                 </th>
                 <th
-                  className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+                  className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
                   onClick={() =>
-                    setFilteredFacilities(
-                      [...filteredFacilities].sort((a, b) => {
-                        const newDirection =
-                          sortDirection === "asc" ? "desc" : "asc";
-                        setSortDirection(newDirection);
-                        setSortedColumn("Property Number");
-                        const propertyNumberA = a.propertyNumber
-                          ? a.propertyNumber.toLowerCase()
-                          : "";
-                        const propertyNumberB = b.propertyNumber
-                          ? b.propertyNumber.toLowerCase()
-                          : "";
-
-                        if (propertyNumberA < propertyNumberB)
-                          return newDirection === "asc" ? -1 : 1;
-                        if (propertyNumberA > propertyNumberB)
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
+                    handleSort(
+                      "facilityPropertyNumber",
+                      (a) => a.facilityPropertyNumber?.toLowerCase() || ""
                     )
                   }
                 >
                   Property Number
-                  {sortedColumn === "Property Number" && (
+                  {sortedColumn === "facilityPropertyNumber" && (
                     <span className="ml-2">
                       {sortDirection === "asc" ? "▲" : "▼"}
                     </span>
                   )}
                 </th>
+                <th className="px-4 py-2">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -361,14 +442,15 @@ export default function SmartLockAllFacilitiesPage({}) {
                 .map((facility, index) => (
                   <tr
                     key={index}
-                    className="border-y border-gray-300 dark:border-border hover:bg-gray-100 dark:hover:bg-darkNavSecondary hover:cursor-pointer"
+                    className="hover:bg-zinc-100 dark:hover:bg-darkNavSecondary border-y border-zinc-300 dark:border-border text-center relative"
+                    onMouseLeave={() => setHoveredRow(null)}
                   >
                     <td
-                      className="px-4 py-2"
+                      className="px-4 py-2 hover:cursor-pointer"
                       onClick={() => addToSelected(facility)}
                     >
                       <div className="flex justify-center text-yellow-500">
-                        {isFacilitySelected(facility.id) ? (
+                        {isFacilitySelected(facility.facilityId) ? (
                           <RiCheckboxCircleFill className="text-lg" />
                         ) : (
                           <RiCheckboxBlankCircleLine className="text-lg text-slate-400" />
@@ -377,30 +459,61 @@ export default function SmartLockAllFacilitiesPage({}) {
                     </td>
                     <td
                       className="px-4 py-2 hover:cursor-pointer"
-                      onClick={() => addToSelected(facility)}
+                      onClick={() => setHoveredRow(index)}
                     >
-                      {facility.environment == "-dev"
-                        ? "Development"
-                        : facility.environment == ""
-                        ? "Production"
-                        : facility.environment == "-qa"
-                        ? "QA"
-                        : facility.environment == "cia-stg-1.aws."
-                        ? "Staging"
-                        : "N?A"}
+                      {environmentLabel[facility.environment] ?? "N/A"}{" "}
+                      {hoveredRow === index && (
+                        <div className="absolute bg-zinc-50 border dark:border-zinc-700 dark:bg-zinc-800 text-black p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-5/6 dark:text-white">
+                          <div className="grid grid-cols-4 gap-1 overflow-hidden">
+                            {Object.entries(facility).map(
+                              ([key, value], index) => (
+                                <div key={index} className="break-words">
+                                  <span className="font-bold text-yellow-400">
+                                    {key}:
+                                  </span>
+                                  <br />
+                                  <span className="whitespace-normal break-words">
+                                    {value === null
+                                      ? "null"
+                                      : value === ""
+                                      ? "null"
+                                      : value === true
+                                      ? "true"
+                                      : value === false
+                                      ? "false"
+                                      : value}
+                                  </span>
+                                </div>
+                              )
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </td>
                     <td
                       className="border-y border-gray-300 dark:border-border px-4 py-2"
-                      onClick={() => addToSelected(facility)}
+                      onClick={() => setHoveredRow(index)}
                     >
-                      {facility.id}
+                      {facility.facilityId}
                     </td>
                     <td
                       className="px-4 py-2 hover:cursor-pointer"
-                      onClick={() => addToSelected(facility)}
+                      onClick={() => setHoveredRow(index)}
+                    >
+                      {facility.accountName.length > 24
+                        ? facility.accountName.slice(0, 24) + "..."
+                        : facility.accountName}
+                    </td>
+                    <td
+                      className="px-4 py-2 hover:cursor-pointer"
+                      onClick={() => setHoveredRow(index)}
                     >
                       <div className="flex gap-3 items-center">
-                        {facility.name}
+                        <p className="pl-1 truncate max-w-[32ch]">
+                          {facility.facilityName.length > 24
+                            ? facility.facilityName.slice(0, 24) + "..."
+                            : facility.facilityName}
+                        </p>
                         <FaExternalLinkAlt
                           title={
                             facility.environment === "cia-stg-1.aws."
@@ -422,9 +535,15 @@ export default function SmartLockAllFacilitiesPage({}) {
                     </td>
                     <td
                       className="px-4 py-2 hover:cursor-pointer"
-                      onClick={() => addToSelected(facility)}
+                      onClick={() => setHoveredRow(index)}
                     >
-                      {facility.propertyNumber}
+                      {facility.facilityPropertyNumber}
+                    </td>
+                    <td
+                      className="border-zinc-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+                      onClick={() => setHoveredRow(index)}
+                    >
+                      <FacilityStatusIcons facility={facility} />
                     </td>
                   </tr>
                 ))}
