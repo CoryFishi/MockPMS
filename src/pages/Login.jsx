@@ -23,7 +23,7 @@ export default function Login({ darkMode, toggleDarkMode }) {
         darkMode={darkMode}
         toggleDarkMode={toggleDarkMode}
       />
-      {user ? <p>Welcome, {user.email}. Logout to log back in!</p> : <SignIn />}
+      <SignIn />
     </div>
   );
 }

@@ -162,14 +162,25 @@ export default function Navbar({
               )}
             </div>
           ) : (
-            <Link
-              to="/login"
-              className={`hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-md text-md font-medium ${
-                location.pathname === "/" ? "underline" : ""
-              }`}
-            >
-              Sign In
-            </Link>
+            <>
+              {" "}
+              <Link
+                to="/login"
+                className={`hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-md text-md font-medium ${
+                  location.pathname === "/" ? "underline" : ""
+                }`}
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className={`hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-md text-md font-medium ${
+                  location.pathname === "/" ? "underline" : ""
+                }`}
+              >
+                Register
+              </Link>
+            </>
           )}
         </div>
       </div>

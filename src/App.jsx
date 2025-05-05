@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Admin from "./pages/Admin";
 import UserSettings from "./pages/UserSettings";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -83,6 +84,15 @@ function App() {
           path="/admin"
           element={
             <Admin darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <ResetPassword
+              darkMode={darkMode}
+              toggleDarkMode={toggleDarkMode}
+            />
           }
         />
         <Route
