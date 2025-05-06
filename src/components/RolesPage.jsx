@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import PaginationFooter from "./PaginationFooter";
 import EditRole from "./modals/EditRole";
 import CreateRole from "./modals/CreateRole";
+import DataTable from "./modules/DataTable";
 
 export default function Roles() {
   const { user } = useAuth();
@@ -15,7 +16,7 @@ export default function Roles() {
   const [filteredRoles, setFilteredRoles] = useState([]);
   const [rolesPulled, setRolesPulled] = useState(false);
   const [dropdownIndex, setDropdownIndex] = useState(null);
-  const modalRef = useRef(null);
+  const modalRefs = useRef({});
   const [isEditRoleModalOpen, setIsEditRoleModalOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,6 +24,37 @@ export default function Roles() {
   const [users, setUsers] = useState([]);
   const [sortedColumn, setSortedColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
+
+  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
+    let newDirection;
+
+    if (sortedColumn !== columnKey) {
+      newDirection = "asc";
+    } else if (sortDirection === "asc") {
+      newDirection = "desc";
+    } else if (sortDirection === "desc") {
+      newDirection = null;
+    }
+
+    setSortedColumn(newDirection ? columnKey : null);
+    setSortDirection(newDirection);
+
+    if (!newDirection) {
+      setFilteredRoles([...roles]);
+      return;
+    }
+
+    const sorted = [...filteredRoles].sort((a, b) => {
+      const aVal = accessor(a) ?? "";
+      const bVal = accessor(b) ?? "";
+
+      if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
+      if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    setFilteredRoles(sorted);
+  };
 
   async function getUsers() {
     if (!user) return;
@@ -42,19 +74,17 @@ export default function Roles() {
   // Close modal if clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        setDropdownIndex(null); // Close the modal
+      const isClickInsideAny = Object.values(modalRefs.current).some((ref) =>
+        ref?.contains(event.target)
+      );
+      if (!isClickInsideAny) {
+        setDropdownIndex(null);
       }
     };
 
-    // Add event listener
     document.addEventListener("mousedown", handleClickOutside);
-
-    // Cleanup event listener
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [setDropdownIndex]);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   async function getRoles() {
     if (!user) return;
@@ -90,7 +120,7 @@ export default function Roles() {
   }, [user]);
 
   useEffect(() => {
-    const filteredUsers = roles.sort((a, b) => {
+    const filteredRoles = roles.sort((a, b) => {
       if ((a.role_name || "").toLowerCase() < (b.role_name || "").toLowerCase())
         return -1;
       if ((a.role_name || "").toLowerCase() > (b.role_name || "").toLowerCase())
@@ -98,7 +128,7 @@ export default function Roles() {
       return 0;
     });
     setSortedColumn("Role");
-    setFilteredRoles(filteredUsers);
+    setFilteredRoles(filteredRoles);
   }, [roles]);
 
   useEffect(() => {
@@ -116,8 +146,86 @@ export default function Roles() {
     setFilteredRoles(filteredRoles);
   }, [searchQuery]);
 
+  const columns = [
+    {
+      key: "role_name",
+      label: "Role",
+      accessor: (r) => r.role_name || "",
+    },
+    {
+      key: "role_description",
+      label: "Description",
+      accessor: (r) => r.role_description || "",
+    },
+    {
+      key: "permissions",
+      label: "Permissions",
+      accessor: (r) =>
+        Object.values(r.permissions)?.filter((value) => value === true)
+          ?.length || 0,
+    },
+    {
+      key: "users",
+      label: "Users",
+      accessor: (r) => {
+        return users.filter((user) => user.role === r.role_name).length;
+      },
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      sortable: false,
+      render: (role, index) => (
+        <div className="flex justify-center relative">
+          <button
+            className="dark:bg-darkSecondary border rounded-lg dark:border-border p-2 dark:hover:bg-darkPrimary w-full cursor-pointer"
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              toggleDropdown(index);
+            }}
+          >
+            Actions
+          </button>
+          {dropdownIndex === index && (
+            <div
+              ref={(el) => (modalRefs.current[index] = el)}
+              className="absolute top-full mt-1 right-0 w-full bg-white dark:bg-darkSecondary border border-zinc-200 dark:border-border rounded-lg shadow-lg z-20 flex flex-col"
+            >
+              <button
+                className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md hover:cursor-pointer rounded-b"
+                onClick={() => {
+                  setSelectedRole(role) &
+                    setIsEditRoleModalOpen(true) &
+                    setDropdownIndex(null);
+                }}
+              >
+                Edit
+              </button>
+              {users.filter((user) => user.role === role.role_name).length <
+              1 ? (
+                <button
+                  className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md hover:cursor-pointer rounded-b"
+                  onClick={() =>
+                    toast.promise(deleteRole(role.id), {
+                      loading: `Deleting role...`,
+                      success: <b>Role deleted successfully!</b>,
+                      error: <b>Failed to delete role. Please try again.</b>,
+                    })
+                  }
+                >
+                  Delete
+                </button>
+              ) : null}
+            </div>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="overflow-auto dark:text-white dark:bg-darkPrimary h-full">
+      {/* Edit Role Modal */}
       {isEditRoleModalOpen && (
         <EditRole
           setIsEditRoleModalOpen={setIsEditRoleModalOpen}
@@ -125,251 +233,62 @@ export default function Roles() {
           setRoles={setRoles}
         />
       )}
+      {/* Create Role Modal */}
       {isCreateRoleModalOpen && (
         <CreateRole
           setIsCreateRoleModalOpen={setIsCreateRoleModalOpen}
           setRoles={setRoles}
         />
       )}
-      <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      {/* Header */}
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <FaPerson className="text-lg" />
           &ensp; Roles
         </div>
       </div>
-      <div className="mt-2  flex items-center justify-end text-center px-5">
-        <input
-          type="text"
-          placeholder="Search roles..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
-        />
-        <button
-          onClick={() => setIsCreateRoleModalOpen(true)}
-          className="hover:cursor-pointer bg-green-500 text-white p-1 py-2 rounded-sm hover:bg-green-600 hover:scale-105 ml-3 w-44 font-bold transition duration-300 ease-in-out transform select-none"
-        >
-          Create Role
-        </button>
-      </div>
-      <div className="w-full px-5 py-2">
-        <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
-          {/* Header */}
-          <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
-            <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
-              <th
-                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Role");
-                  setFilteredRoles(
-                    [...roles].sort((a, b) => {
-                      if (
-                        (a.role_name || "").toLowerCase() <
-                        (b.role_name || "").toLowerCase()
-                      )
-                        return newDirection === "asc" ? -1 : 1;
-                      if (
-                        (a.role_name || "").toLowerCase() >
-                        (b.role_name || "").toLowerCase()
-                      )
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Role
-                {sortedColumn === "Role" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Description");
-                  setFilteredRoles(
-                    [...roles].sort((a, b) => {
-                      if (
-                        (a.role_description || "").toLowerCase() <
-                        (b.role_description || "").toLowerCase()
-                      )
-                        return newDirection === "asc" ? -1 : 1;
-                      if (
-                        (a.role_description || "").toLowerCase() >
-                        (b.role_description || "").toLowerCase()
-                      )
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Description
-                {sortedColumn === "Description" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Permissions");
-                  setFilteredRoles(
-                    [...roles].sort((a, b) => {
-                      const permissionA = Object.values(
-                        a.permissions || {}
-                      ).filter((value) => value === true).length;
-                      const permissionB = Object.values(
-                        b.permissions || {}
-                      ).filter((value) => value === true).length;
-
-                      if (permissionA < permissionB)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (permissionA > permissionB)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Permissions
-                {sortedColumn === "Permissions" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Users");
-                  setFilteredRoles(
-                    [...roles].sort((a, b) => {
-                      const userCountA = users.filter(
-                        (user) => user.role === a.role_name
-                      ).length;
-                      const userCountB = users.filter(
-                        (user) => user.role === b.role_name
-                      ).length;
-
-                      if (userCountA < userCountB)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (userCountA > userCountB)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Users
-                {sortedColumn === "Users" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th className="px-4 py-2 hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredRoles
-              .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-              .map((role, index) => (
-                <tr
-                  key={index}
-                  className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
-                >
-                  <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                    {role.role_name}
-                  </td>
-                  <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                    {role.role_description}
-                  </td>
-                  <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                    {Object.values(role.permissions)?.filter(
-                      (value) => value === true
-                    )?.length || 0}
-                  </td>
-                  <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                    {
-                      users.filter((user) => user.role === role.role_name)
-                        .length
-                    }
-                  </td>
-                  <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell relative hover:cursor-pointer">
-                    <button
-                      className=" dark:bg-darkSecondary border hover:cursor-pointer rounded-lg dark:border-border p-2 dark:hover:bg-darkPrimary w-full"
-                      onClick={() => toggleDropdown(index)}
-                    >
-                      Actions
-                    </button>
-                    {dropdownIndex === index && (
-                      <div
-                        ref={modalRef}
-                        className="absolute top-11 right-0 mt-2 w-full bg-white dark:bg-darkSecondary border border-gray-200 dark:border-border rounded-lg shadow-lg z-20 flex flex-col"
-                      >
-                        <button
-                          className="hover:bg-slate-100 dark:hover:bg-gray-700 px-5 py-4 text-md font-medium text-left rounded hover:cursor-pointer"
-                          onClick={() => {
-                            setSelectedRole(role) &
-                              setIsEditRoleModalOpen(true) &
-                              setDropdownIndex(null);
-                          }}
-                        >
-                          Edit
-                        </button>
-                        {users.filter((user) => user.role === role.role_name)
-                          .length < 1 ? (
-                          <button
-                            className="hover:bg-slate-100 dark:hover:bg-gray-700 px-5 py-4 text-md font-medium text-left rounded hover:cursor-pointer"
-                            onClick={() =>
-                              toast.promise(deleteRole(role.id), {
-                                loading: `Deleting role...`,
-                                success: <b>Role deleted successfully!</b>,
-                                error: (
-                                  <b>
-                                    Failed to delete role. Please try again.
-                                  </b>
-                                ),
-                              })
-                            }
-                          >
-                            Delete
-                          </button>
-                        ) : null}
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-        {/* No Roles Notification Text */}
-        {filteredRoles.length < 1 && (
-          <p className="text-center p-4 font-bold text-lg">No roles found.</p>
-        )}
-        {/* Pagination Footer */}
-        <div className="px-2 py-5 mx-1">
-          <PaginationFooter
-            rowsPerPage={rowsPerPage}
-            setRowsPerPage={setRowsPerPage}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            items={filteredRoles}
+      <div className="w-full px-5 flex flex-col rounded-lg h-fit">
+        {/* Search Bar */}
+        <div className="mb-2 mt-5 flex items-center justify-end text-center">
+          <input
+            type="text"
+            placeholder="Search roles..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
+          <button
+            onClick={() => setIsCreateRoleModalOpen(true)}
+            className="hover:cursor-pointer bg-green-500 text-white p-1 py-2 rounded-sm hover:bg-green-600 hover:scale-105 ml-3 w-44 font-bold transition duration-300 ease-in-out transform select-none"
+          >
+            Create Role
+          </button>
+        </div>
+        {/* Table */}
+        <div>
+          <DataTable
+            columns={columns}
+            data={filteredRoles}
+            currentPage={currentPage}
+            rowsPerPage={rowsPerPage}
+            sortDirection={sortDirection}
+            sortedColumn={sortedColumn}
+            onSort={handleColumnSort}
+          />
+          {/* No Roles Notification Text */}
+          {filteredRoles.length < 1 && (
+            <p className="text-center p-4 font-bold text-lg">No roles found.</p>
+          )}
+          {/* Pagination Footer */}
+          <div className="px-2 py-5 mx-1">
+            <PaginationFooter
+              rowsPerPage={rowsPerPage}
+              setRowsPerPage={setRowsPerPage}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              items={filteredRoles}
+            />
+          </div>
         </div>
       </div>
     </div>

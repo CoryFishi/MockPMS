@@ -7,6 +7,7 @@ import { FaPerson } from "react-icons/fa6";
 import PaginationFooter from "./PaginationFooter";
 import { useAuth } from "../context/AuthProvider";
 import LoadingSpinner from "./LoadingSpinner";
+import DataTable from "./modules/DataTable";
 
 export default function VisitorPage({ currentFacilityName }) {
   const [visitors, setVisitors] = useState([]);
@@ -24,9 +25,6 @@ export default function VisitorPage({ currentFacilityName }) {
   const { currentFacility, permissions } = useAuth();
   const [smartLocks, setSmartLocks] = useState([]);
   const [hoveredRow, setHoveredRow] = useState(null);
-  const [pageLoadDateTime, setPageLoadDateTime] = useState(
-    new Date().toLocaleString()
-  );
   const [currentLoadingText, setCurrentLoadingText] = useState(
     "Loading Visitors..."
   );
@@ -40,6 +38,36 @@ export default function VisitorPage({ currentFacilityName }) {
     (visitor) => visitor.isTenant === false && visitor.isPortalVisitor === false
   ).length;
 
+  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
+    let newDirection;
+
+    if (sortedColumn !== columnKey) {
+      newDirection = "asc";
+    } else if (sortDirection === "asc") {
+      newDirection = "desc";
+    } else if (sortDirection === "desc") {
+      newDirection = null;
+    }
+
+    setSortedColumn(newDirection ? columnKey : null);
+    setSortDirection(newDirection);
+
+    if (!newDirection) {
+      setFilteredVisitors([...visitors]);
+      return;
+    }
+
+    const sorted = [...filteredVisitors].sort((a, b) => {
+      const aVal = accessor(a) ?? "";
+      const bVal = accessor(b) ?? "";
+
+      if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
+      if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    setFilteredVisitors(sorted);
+  };
   const handleVisitors = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
@@ -233,8 +261,138 @@ export default function VisitorPage({ currentFacilityName }) {
     setFilteredVisitors(filteredVisitors);
   }, [visitors, searchQuery]);
 
+  const columns = [
+    { key: "id", label: "Visitor Id", accessor: (v) => v.id || "" },
+    {
+      key: "unitNumber",
+      label: "Unit Number",
+      accessor: (v) => v.unitNumber || "",
+    },
+    { key: "name", label: "Name", accessor: (v) => v.name || "" },
+    {
+      key: "type",
+      label: "Visitor Type",
+      accessor: (v) =>
+        v.isTenant
+          ? "Tenant"
+          : v.isPortalVisitor
+          ? "Non-Tenant"
+          : !v.unitNumber
+          ? "Non-Tenant Guest"
+          : "Guest",
+    },
+    {
+      key: "accessProfileName",
+      label: "Access Profile",
+      accessor: (v) => v.accessProfileName || "",
+    },
+    {
+      key: "timeGroupName",
+      label: "Time Profile",
+      accessor: (v) => v.timeGroupName || "",
+    },
+    { key: "code", label: "Gate Code", accessor: (v) => v.code || "" },
+    {
+      key: "mobilePhoneNumber",
+      label: "Phone Number",
+      accessor: (v) => v.mobilePhoneNumber || "",
+    },
+    { key: "email", label: "Email", accessor: (v) => v.email || "" },
+    {
+      key: "smartlock",
+      label: "SmartLock",
+      sortable: true,
+      accessor: (v) => {
+        const lock = smartLocks.find((l) => l.unitId === v.unitId);
+        return lock?.name?.toLowerCase() || "";
+      },
+      render: (v, i) => {
+        const matchingLock = smartLocks.find(
+          (lock) => lock.unitId === v.unitId
+        );
+        if (!matchingLock) return "";
+
+        return (
+          <div
+            className="relative hover:cursor-pointer"
+            onMouseEnter={() => setHoveredRow(i)}
+            onMouseLeave={() => setHoveredRow(null)}
+          >
+            <span>{`${matchingLock.deviceType} - ${matchingLock.name}`}</span>
+            {hoveredRow === i && (
+              <div className="absolute z-10 bg-gray-700 text-white p-2 rounded shadow-lg w-96 top-8 left-1/2 transform -translate-x-1/2">
+                <div className="grid grid-cols-2 gap-2 text-xs max-h-64 overflow-y-auto">
+                  {Object.entries(matchingLock).map(([key, value], idx) => (
+                    <div key={idx}>
+                      <span className="font-bold text-yellow-400">{key}:</span>{" "}
+                      <span className="break-words">
+                        {value === null || value === ""
+                          ? "null"
+                          : value.toString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      sortable: false,
+      render: (v) => (
+        <div className="text-center space-x-1">
+          {permissions.pmsPlatformVisitorEdit && (
+            <button
+              className="bg-green-500 text-white px-2 py-1 rounded font-bold hover:bg-green-600 hover:cursor-pointer"
+              onClick={() => {
+                setIsEditVisitorModalOpen(true);
+                setSelectedVisitor(v);
+              }}
+            >
+              Edit
+            </button>
+          )}
+          {permissions.pmsPlatformVisitorDelete && (
+            <button
+              className="bg-red-500 text-white px-2 py-1 rounded font-bold hover:bg-red-600 hover:cursor-pointer"
+              onClick={() => {
+                v.isTenant ? moveOutVisitor(v) : deleteVisitor(v);
+              }}
+            >
+              {v.isTenant ? "Move Out" : "Delete"}
+            </button>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <div className="overflow-x-auto h-full dark:text-white dark:bg-darkPrimary relative">
+    <div
+      className={`relative ${
+        !visitorsPulled ? "overflow-hidden min-h-full" : "overflow-auto"
+      } h-full dark:text-white dark:bg-darkPrimary relative`}
+    >
+      {/* Create Visitor Modal Popup */}
+      {isCreateVisitorModalOpen && (
+        <CreateVisitorVisitor
+          setIsCreateVisitorModalOpen={setIsCreateVisitorModalOpen}
+          setVisitors={setVisitors}
+        />
+      )}
+
+      {/* Edit Visitor Modal Popup */}
+      {isEditVisitorModalOpen && (
+        <EditVisitor
+          setIsEditVisitorModalOpen={setIsEditVisitorModalOpen}
+          setVisitors={setVisitors}
+          visitor={selectedVisitor}
+        />
+      )}
       {/* Loading Spinner */}
       {!visitorsPulled && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* Page Header */}
@@ -245,10 +403,9 @@ export default function VisitorPage({ currentFacilityName }) {
         </div>
       </div>
       {/* Load Time Label */}
-      <p className="text-sm dark:text-white text-left">{pageLoadDateTime}</p>
-      <div className="w-full px-5 flex flex-col rounded-lg h-full">
+      <div className="w-full px-5 flex flex-col rounded-lg h-fit">
         {/* Totals Header */}
-        <div className="min-h-12 flex justify-center gap-32">
+        <div className="mt-5 min-h-12 flex justify-center gap-32">
           <div className="text-center">
             <div className="font-bold text-2xl">{tenantCount}</div>
             Tenants
@@ -274,511 +431,34 @@ export default function VisitorPage({ currentFacilityName }) {
             type="text"
             placeholder="Search visitors..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value) & setCurrentPage(1)}
             className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
           {/* Create Visitor Button */}
-          <button
-            className={`bg-green-500 text-white p-1 py-2 rounded font-bold ml-3 w-44 transition duration-300 ease-in-out transform ${
-              permissions.pmsPlatformVisitorCreate
-                ? "hover:bg-green-600 hover:scale-105 hover:cursor-pointer"
-                : "opacity-50 cursor-not-allowed"
-            }`}
-            onClick={() => {
-              if (permissions.pmsPlatformVisitorCreate) {
-                setIsCreateVisitorModalOpen(true);
-              }
-            }}
-            disabled={!permissions.pmsPlatformVisitorCreate}
-          >
-            Create Visitor
-          </button>
+          {permissions.pmsPlatformVisitorCreate && (
+            <button
+              className="bg-green-500 text-white p-1 py-2 rounded font-bold ml-3 w-44 transition duration-300 ease-in-out transform hover:bg-green-600 hover:scale-105 hover:cursor-pointer"
+              onClick={() => {
+                if (permissions.pmsPlatformVisitorCreate) {
+                  setIsCreateVisitorModalOpen(true);
+                }
+              }}
+              disabled={!permissions.pmsPlatformVisitorCreate}
+            >
+              Create Visitor
+            </button>
+          )}
         </div>
-
-        {/* Create Visitor Modal Popup */}
-        {isCreateVisitorModalOpen && (
-          <CreateVisitorVisitor
-            setIsCreateVisitorModalOpen={setIsCreateVisitorModalOpen}
-            setVisitors={setVisitors}
-          />
-        )}
-
-        {/* Edit Visitor Modal Popup */}
-        {isEditVisitorModalOpen && (
-          <EditVisitor
-            setIsEditVisitorModalOpen={setIsEditVisitorModalOpen}
-            setVisitors={setVisitors}
-            visitor={selectedVisitor}
-          />
-        )}
-
         {/* Visitor Table */}
-        <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
-          {/* Header */}
-          <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary border-b border-gray-300 dark:border-border">
-            <tr className="dark:border-border bg-gray-200 dark:bg-darkNavSecondary">
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Visitor Id");
-                  setFilteredVisitors(
-                    [...filteredVisitors].sort((a, b) => {
-                      if (a.id < b.id) return newDirection === "asc" ? -1 : 1;
-                      if (a.id > b.id) return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Visitor Id
-                {sortedColumn === "Visitor Id" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Unit Number");
-                  setFilteredVisitors(
-                    [...filteredVisitors].sort((a, b) => {
-                      const unitA = (a.unitNumber || "").toLowerCase();
-                      const unitB = (b.unitNumber || "").toLowerCase();
-
-                      if (unitA < unitB) return newDirection === "asc" ? -1 : 1;
-                      if (unitA > unitB) return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Unit Number
-                {sortedColumn === "Unit Number" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Name");
-                  setFilteredVisitors(
-                    [...filteredVisitors].sort((a, b) => {
-                      if (a.name.toLowerCase() < b.name.toLowerCase())
-                        return newDirection === "asc" ? -1 : 1;
-                      if (a.name.toLowerCase() > b.name.toLowerCase())
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Name
-                {sortedColumn === "Name" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Visitor Type");
-                  setFilteredVisitors(
-                    [...filteredVisitors].sort((a, b) => {
-                      if (a.isTenant < b.isTenant)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (a.isTenant > b.isTenant)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Visitor Type
-                {sortedColumn === "Visitor Type" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hidden sm:table-cell hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Access Profile");
-                  setFilteredVisitors(
-                    [...filteredVisitors].sort((a, b) => {
-                      if (a.accessProfileName < b.accessProfileName)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (a.accessProfileName > b.accessProfileName)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Access Profile
-                {sortedColumn === "Access Profile" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hidden sm:table-cell hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Time Profile");
-                  setFilteredVisitors(
-                    [...filteredVisitors].sort((a, b) => {
-                      if (a.timeGroupName < b.timeGroupName)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (a.timeGroupName > b.timeGroupName)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Time Profile
-                {sortedColumn === "Time Profile" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hidden lg:table-cell hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Gate Code");
-                  setFilteredVisitors(
-                    [...filteredVisitors].sort((a, b) => {
-                      if (a.code < b.code)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (a.code > b.code)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Gate Code
-                {sortedColumn === "Gate Code" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hidden lg:table-cell hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Phone Number");
-                  setFilteredVisitors(
-                    [...filteredVisitors].sort((a, b) => {
-                      const phoneA = (a.mobilePhoneNumber || "").toLowerCase();
-                      const phoneB = (b.mobilePhoneNumber || "").toLowerCase();
-
-                      if (phoneA < phoneB)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (phoneA > phoneB)
-                        return newDirection === "asc" ? 1 : -1;
-
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Phone Number
-                {sortedColumn === "Phone Number" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hidden xl:table-cell hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Email Address");
-                  setFilteredVisitors(
-                    [...filteredVisitors].sort((a, b) => {
-                      const emailA = (a.email || "").toLowerCase();
-                      const emailB = (b.email || "").toLowerCase();
-
-                      if (emailA < emailB)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (emailA > emailB)
-                        return newDirection === "asc" ? 1 : -1;
-
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Email Address
-                {sortedColumn === "Email Address" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              {smartLocks.length > 0 && (
-                <th
-                  className="px-4 py-2 hover:cursor-pointer hidden md:table-cell hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("SmartLock");
-
-                    setFilteredVisitors(
-                      [...filteredVisitors].sort((a, b) => {
-                        const lockA = smartLocks.find(
-                          (lock) => lock.unitId === a.unitId
-                        );
-                        const lockB = smartLocks.find(
-                          (lock) => lock.unitId === b.unitId
-                        );
-
-                        const nameA = lockA?.name?.toLowerCase() ?? "";
-                        const nameB = lockB?.name?.toLowerCase() ?? "";
-
-                        // Compare the names
-                        if (nameA < nameB)
-                          return newDirection === "asc" ? -1 : 1;
-                        if (nameA > nameB)
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
-                >
-                  SmartLock
-                  {sortedColumn === "SmartLock" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-              )}
-
-              <th className="px-4 py-2 hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          {/* Body */}
-          <tbody>
-            {filteredVisitors
-              .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-              .map((visitor, index) => (
-                <tr
-                  key={index}
-                  className="border-y border-gray-300 dark:border-border hover:bg-gray-100 dark:hover:bg-darkNavPrimary text-center relative"
-                >
-                  <td className="px-4 py-2 hidden md:table-cell">
-                    {visitor.id}
-                  </td>
-                  <td className="px-4 py-2">{visitor.unitNumber}</td>
-                  <td className="px-4 py-2">{visitor.name}</td>
-                  <td className="px-4 py-2">
-                    {visitor.isTenant
-                      ? "Tenant"
-                      : visitor.isPortalVisitor
-                      ? "Non-Tenant"
-                      : !visitor.unitNumber
-                      ? "Non-Tenant Guest"
-                      : "Guest"}
-                  </td>
-                  <td className="px-4 py-2 hidden sm:table-cell">
-                    {visitor.accessProfileName}
-                  </td>
-                  <td className="px-4 py-2 hidden sm:table-cell">
-                    {visitor.timeGroupName}
-                  </td>
-                  <td className="px-4 py-2 hidden lg:table-cell">
-                    {visitor.code}
-                  </td>
-                  <td className="px-4 py-2 hidden lg:table-cell">
-                    {visitor.mobilePhoneNumber}
-                  </td>
-                  <td className="px-4 py-2 hidden xl:table-cell">
-                    {visitor.email}
-                  </td>
-                  {smartLocks.length > 0 && (
-                    <td
-                      className="px-4 py-2 hover:cursor-pointer"
-                      onMouseDown={() => setHoveredRow(index)}
-                      onMouseLeave={() => setHoveredRow(null)}
-                    >
-                      {(() => {
-                        const matchingLock = smartLocks.find(
-                          (lock) => lock.unitId === visitor.unitId
-                        );
-                        if (!matchingLock) return "";
-                        return (
-                          <>
-                            <span>{`${matchingLock.deviceType} - ${matchingLock.name}`}</span>
-                            {hoveredRow === index && (
-                              <div className="absolute bg-gray-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-4/5">
-                                <div className="grid grid-cols-4 gap-1 overflow-hidden">
-                                  {Object.entries(matchingLock).map(
-                                    ([key, value], i) => (
-                                      <div key={i} className="break-words">
-                                        <span className="font-bold text-yellow-500">
-                                          {key}:
-                                        </span>
-                                        <br />
-                                        <span className="whitespace-normal break-words">
-                                          {value === null
-                                            ? "null"
-                                            : value === ""
-                                            ? "null"
-                                            : value === true
-                                            ? "true"
-                                            : value === false
-                                            ? "false"
-                                            : value}
-                                        </span>
-                                      </div>
-                                    )
-                                  )}
-                                </div>
-                              </div>
-                            )}
-                          </>
-                        );
-                      })()}
-                    </td>
-                  )}
-                  <td className="px-4 py-2 select-none">
-                    {visitor.isTenant ? (
-                      <div className="text-center space-x-1">
-                        <button
-                          className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
-                            permissions.pmsPlatformVisitorEdit
-                              ? "hover:bg-green-600 hover:cursor-pointer"
-                              : "opacity-50 cursor-not-allowed"
-                          }`}
-                          onClick={() => {
-                            if (permissions.pmsPlatformVisitorEdit) {
-                              setIsEditVisitorModalOpen(true);
-                              setSelectedVisitor(visitor);
-                            }
-                          }}
-                          disabled={!permissions.pmsPlatformVisitorEdit}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
-                            permissions.pmsPlatformVisitorDelete
-                              ? "hover:bg-red-600 hover:cursor-pointer"
-                              : "opacity-50 cursor-not-allowed"
-                          }`}
-                          onClick={() => {
-                            if (permissions.pmsPlatformVisitorDelete) {
-                              moveOutVisitor(visitor);
-                            }
-                          }}
-                          disabled={!permissions.pmsPlatformVisitorDelete}
-                        >
-                          Move Out
-                        </button>
-                      </div>
-                    ) : visitor.isPortalVisitor ? (
-                      <div className="text-center space-x-1">
-                        <button
-                          className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
-                            permissions.pmsPlatformVisitorEdit
-                              ? "hover:bg-green-600 hover:cursor-pointer"
-                              : "opacity-50 cursor-not-allowed"
-                          }`}
-                          onClick={() => {
-                            if (permissions.pmsPlatformVisitorEdit) {
-                              setIsEditVisitorModalOpen(true);
-                              setSelectedVisitor(visitor);
-                            }
-                          }}
-                          disabled={!permissions.pmsPlatformVisitorEdit}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
-                            permissions.pmsPlatformVisitorDelete
-                              ? "hover:bg-red-600 hover:cursor-pointer"
-                              : "opacity-50 cursor-not-allowed"
-                          }`}
-                          onClick={() => {
-                            if (permissions.pmsPlatformVisitorDelete) {
-                              deleteVisitor(visitor);
-                            }
-                          }}
-                          disabled={!permissions.pmsPlatformVisitorDelete}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="text-center space-x-1">
-                        <button
-                          className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
-                            permissions.pmsPlatformVisitorEdit
-                              ? "hover:bg-green-600 hover:cursor-pointer"
-                              : "opacity-50 cursor-not-allowed"
-                          }`}
-                          onClick={() => {
-                            if (permissions.pmsPlatformVisitorEdit) {
-                              setIsEditVisitorModalOpen(true);
-                              setSelectedVisitor(visitor);
-                            }
-                          }}
-                          disabled={!permissions.pmsPlatformVisitorEdit}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
-                            permissions.pmsPlatformVisitorDelete
-                              ? "hover:bg-red-600 hover:cursor-pointer"
-                              : "opacity-50 cursor-not-allowed"
-                          }`}
-                          onClick={() => {
-                            if (permissions.pmsPlatformVisitorDelete) {
-                              deleteVisitor(visitor);
-                            }
-                          }}
-                          disabled={!permissions.pmsPlatformVisitorDelete}
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-
+        <DataTable
+          columns={columns}
+          data={filteredVisitors}
+          currentPage={currentPage}
+          rowsPerPage={rowsPerPage}
+          sortDirection={sortDirection}
+          sortedColumn={sortedColumn}
+          onSort={handleColumnSort}
+        />
         {/* Pagination Footer */}
         <div className="px-2 py-5 mx-1">
           <PaginationFooter

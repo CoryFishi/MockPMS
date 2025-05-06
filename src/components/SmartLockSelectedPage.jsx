@@ -159,7 +159,7 @@ export default function SmartLockSelectedPage() {
   const columns = [
     {
       key: "isSelected",
-      label: <RiCheckboxBlankCircleLine className="text-lg text-slate-400" />,
+      label: "◯",
       accessor: (f) => (isFacilitySelected(f.id) ? 1 : 0),
       render: (f) => (
         <div

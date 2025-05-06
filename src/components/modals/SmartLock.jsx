@@ -247,14 +247,15 @@ export default function SmartLock({
             : r.overallStatus === "warning"
             ? "text-yellow-500"
             : "text-green-500";
+
         return (
           <span className={`inline-flex items-start gap-2 ${color}`}>
             <Icon className="text-xl" />
-            <div>
+            <span className="flex flex-col text-left">
               {r.statusMessages?.some((m) => m.trim() !== "")
-                ? r.statusMessages.map((m, i) => <div key={i}>{m}</div>)
+                ? r.statusMessages.map((m, i) => <span key={i}>{m}</span>)
                 : "SmartLock is online"}
-            </div>
+            </span>
           </span>
         );
       },

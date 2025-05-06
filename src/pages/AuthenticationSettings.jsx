@@ -9,6 +9,9 @@ import { CiExport, CiImport } from "react-icons/ci";
 import { useAuth } from "../context/AuthProvider";
 import NotFound from "../components/NotFound";
 import { supabase } from "../supabaseClient";
+import DataTable from "../components/modules/DataTable";
+import AddAuthenticationModal from "../components/modals/AddAuthenticationModal";
+import PaginationFooter from "../components/PaginationFooter";
 
 export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
   const [api, setApi] = useState("");
@@ -22,6 +25,14 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
   const fileInputRef = useRef(null);
   const { user, tokens, setTokens, permissions } = useAuth();
   const [sortedColumn, setSortedColumn] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const paginatedFacilities = settingsSavedFacilities.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
 
   async function addEvent(eventName, eventDescription, completed) {
     const { data, error } = await supabase.from("user_events").insert([
@@ -55,7 +66,6 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     }
   };
   const fetchTokens = async () => {
-    console.log("Fetching tokens...");
     if (!user) return;
 
     const { data: currentData, error } = await supabase
@@ -221,41 +231,33 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
         console.error(error.message);
       });
   };
-  const handleNewLogin = async (env) => {
-    var tokenStageKey = "";
-    var tokenEnvKey = "";
-    if (env === "cia-stg-1.aws.") {
-      tokenStageKey = "cia-stg-1.aws.";
-    } else {
-      tokenEnvKey = env;
-    }
+  const handleNewLogin = async (env, creds = null) => {
+    const { api: a, apiSecret: s, client: c, clientSecret: cs } = creds || {};
+    const apiVal = a || api;
+    const apiSecretVal = s || apiSecret;
+    const clientVal = c || client;
+    const clientSecretVal = cs || clientSecret;
+
     const data = qs.stringify({
       grant_type: "password",
-      username: api,
-      password: apiSecret,
-      client_id: client,
-      client_secret: clientSecret,
+      username: apiVal,
+      password: apiSecretVal,
+      client_id: clientVal,
+      client_secret: clientSecretVal,
     });
-    const config = {
-      method: "post",
-      url: `https://auth.${tokenStageKey}insomniaccia${tokenEnvKey}.com/auth/token`,
+
+    const url = `https://auth.${
+      env === "cia-stg-1.aws." ? env : ""
+    }insomniaccia${env === "" ? "" : env}.com/auth/token`;
+
+    return axios.post(url, data, {
       headers: {
         accept: "application/json",
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      data: data,
-    };
-    return axios(config)
-      .then(function (response) {
-        setIsAuthenticated(true);
-        return response;
-      })
-      .catch(function (error) {
-        setIsAuthenticated(false);
-        console.error(error.message);
-        throw error;
-      });
+    });
   };
+
   const exportFacilities = () => {
     const userResponse = confirm("Are you sure you want to export the tokens?");
     if (!userResponse) {
@@ -397,400 +399,198 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     });
   }, [user]);
 
+  const columns = [
+    {
+      key: "api",
+      label: "API Key",
+      accessor: (f) =>
+        f.api
+          ? "•".repeat(Math.max(0, f.api.length - 5)) + f.api.slice(-5)
+          : "",
+    },
+    {
+      key: "apiSecret",
+      label: "API Secret",
+      accessor: (f) =>
+        f.apiSecret
+          ? "•".repeat(Math.max(0, f.apiSecret.length - 5)) +
+            f.apiSecret.slice(-5)
+          : "",
+    },
+    {
+      key: "client",
+      label: "Client",
+      accessor: (f) => f.client || "",
+    },
+    {
+      key: "clientSecret",
+      label: "Client Secret",
+      accessor: (f) =>
+        f.clientSecret
+          ? "•".repeat(Math.max(0, f.clientSecret.length - 5)) +
+            f.clientSecret.slice(-5)
+          : "",
+    },
+    {
+      key: "environment",
+      label: "Environment",
+      accessor: (f) => {
+        switch (f.environment) {
+          case "":
+            return "Production";
+          case "-dev":
+            return "Development";
+          case "-qa":
+            return "QA";
+          case "cia-stg-1.aws.":
+            return "Staging";
+          default:
+            return f.environment;
+        }
+      },
+    },
+    {
+      key: "isAuthenticated",
+      label: "Authenticated",
+      sortable: false,
+      render: (f) => (
+        <div className="flex justify-center text-lg">
+          {f.isAuthenticated === true ? (
+            <FaCircleCheck className="text-green-500" />
+          ) : f.isAuthenticated === false ? (
+            <MdOutlineError className="text-red-500" />
+          ) : (
+            <FaSpinner className="animate-spin text-gray-500" />
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      sortable: false,
+      render: (f) => (
+        <button
+          className={`m-1 px-4 py-1 rounded-md text-white transition duration-300 ease-in-out ${
+            permissions.authenticationPlatformDelete
+              ? "bg-red-500 hover:bg-red-600 cursor-pointer"
+              : "bg-red-300 cursor-not-allowed"
+          }`}
+          onClick={() => {
+            if (permissions.authenticationPlatformDelete) {
+              toast.promise(removeToken(f.api), {
+                loading: "Deleting Credentials...",
+                success: <b>Successfully deleted!</b>,
+                error: <b>Failed deletion!</b>,
+              });
+            }
+          }}
+          disabled={!permissions.authenticationPlatformDelete}
+        >
+          Delete
+        </button>
+      ),
+    },
+  ];
+  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
+    const newDirection =
+      sortedColumn !== columnKey
+        ? "asc"
+        : sortDirection === "asc"
+        ? "desc"
+        : null;
+
+    setSortedColumn(newDirection ? columnKey : null);
+    setSortDirection(newDirection);
+
+    if (!newDirection) {
+      setSettingsSavedFacilities([...settingsSavedFacilities]);
+      return;
+    }
+
+    const sorted = [...settingsSavedFacilities].sort((a, b) => {
+      const aVal = accessor(a) ?? "";
+      const bVal = accessor(b) ?? "";
+
+      if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
+      if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    setSettingsSavedFacilities(sorted);
+  };
+
   return (
-    <div className="dark:text-white dark:bg-darkPrimary h-screen w-screen flex flex-col overflow-x-hidden overflow-hidden font-roboto">
+    <div className="dark:text-white dark:bg-darkPrimary h-screen w-screen flex flex-col overflow-hidden font-roboto">
+      {isAddModalOpen && (
+        <AddAuthenticationModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          onSubmit={submitCredentials}
+          handleNewLogin={handleNewLogin}
+        />
+      )}
       {user && permissions.authenticationPlatform ? (
         <div>
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          <div className="w-full h-full px-5 flex flex-col rounded-lg">
+          <div className="w-full h-full px-5 flex flex-col rounded-lg overflow-y-auto">
             <div className="flex justify-between mt-2">
               <div></div>
-              <div className="flex">
-                <button
-                  className={`flex m-1 rounded p-3 text-black dark:text-white transition duration-300 ease-in-out ${
-                    permissions.authenticationPlatformExport
-                      ? "bg-gray-100 dark:bg-darkSecondary hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer"
-                      : "bg-gray-200 dark:bg-darkTertiary text-gray-400 cursor-not-allowed"
-                  }`}
-                  title="Export Tokens"
-                  onClick={() => {
-                    if (permissions.authenticationPlatformExport) {
-                      exportFacilities();
-                    }
-                  }}
-                  disabled={!permissions.authenticationPlatformExport}
-                >
-                  <CiExport className="text-2xl" /> Export
-                </button>
-                <button
-                  className={`flex m-1 rounded p-3 text-black dark:text-white transition duration-300 ease-in-out ${
-                    permissions.authenticationPlatformImport
-                      ? "bg-gray-100 dark:bg-darkSecondary hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer"
-                      : "bg-gray-200 dark:bg-darkTertiary text-gray-400 cursor-not-allowed"
-                  }`}
-                  title="Import Tokens"
-                  onClick={() => {
-                    if (permissions.authenticationPlatformImport) {
-                      triggerFileInput();
-                    }
-                  }}
-                  disabled={!permissions.authenticationPlatformImport}
-                >
-                  <CiImport className="text-2xl" />
-                  Import
-                </button>
-                {/* Hidden File Input */}
-                <input
-                  type="file"
-                  accept=".csv"
-                  ref={fileInputRef}
-                  onChange={handleFileUpload}
-                  style={{ display: "none" }}
-                  disabled={!permissions.authenticationPlatformImport}
-                />
+              <div className="flex flex-wrap gap-2 p-3">
+                {permissions.authenticationPlatformCreate && (
+                  <button
+                    className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded font-semibold cursor-pointer transition duration-300 ease-in-out"
+                    onClick={() => setIsAddModalOpen(true)}
+                  >
+                    Add Authentication
+                  </button>
+                )}
+                {permissions.authenticationPlatformExport && (
+                  <button
+                    className="cursor-pointer rounded px-4 py-2 bg-gray-100 dark:bg-darkSecondary text-black dark:text-white hover:text-slate-400 dark:hover:text-slate-400 transition duration-300 ease-in-out"
+                    title="Export Tokens"
+                    onClick={exportFacilities}
+                  >
+                    Export
+                  </button>
+                )}
+                {permissions.authenticationPlatformImport && (
+                  <>
+                    <button
+                      className="cursor-pointer rounded px-4 py-2 bg-gray-100 dark:bg-darkSecondary text-black dark:text-white hover:text-slate-400 dark:hover:text-slate-400 transition duration-300 ease-in-out"
+                      title="Import Tokens"
+                      onClick={triggerFileInput}
+                    >
+                      Import
+                    </button>
+                    <input
+                      type="file"
+                      accept=".csv"
+                      ref={fileInputRef}
+                      onChange={handleFileUpload}
+                      style={{ display: "none" }}
+                    />
+                  </>
+                )}
               </div>
             </div>
-            <div className="mt-3 overflow-auto max-h-[80vh]">
-              <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
-                {/* Header */}
-                <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
-                  <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
-                    <th
-                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                      onClick={() => {
-                        const newDirection =
-                          sortDirection === "asc" ? "desc" : "asc";
-                        setSortDirection(newDirection);
-                        setSortedColumn("API Key");
-                        setSettingsSavedFacilities(
-                          [...settingsSavedFacilities].sort((a, b) => {
-                            if (a.api < b.api)
-                              return newDirection === "asc" ? -1 : 1;
-                            if (a.api > b.api)
-                              return newDirection === "asc" ? 1 : -1;
-                            return 0;
-                          })
-                        );
-                      }}
-                    >
-                      API Key
-                      {sortedColumn === "API Key" && (
-                        <span className="ml-2">
-                          {sortDirection === "asc" ? "▲" : "▼"}
-                        </span>
-                      )}
-                    </th>
-                    <th
-                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                      onClick={() => {
-                        const newDirection =
-                          sortDirection === "asc" ? "desc" : "asc";
-                        setSortDirection(newDirection);
-                        setSortedColumn("API Secret");
-                        setSettingsSavedFacilities(
-                          [...settingsSavedFacilities].sort((a, b) => {
-                            if (a.apiSecret < b.apiSecret)
-                              return newDirection === "asc" ? -1 : 1;
-                            if (a.apiSecret > b.apiSecret)
-                              return newDirection === "asc" ? 1 : -1;
-                            return 0;
-                          })
-                        );
-                      }}
-                    >
-                      API Secret
-                      {sortedColumn === "API Secret" && (
-                        <span className="ml-2">
-                          {sortDirection === "asc" ? "▲" : "▼"}
-                        </span>
-                      )}
-                    </th>
-                    <th
-                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                      onClick={() => {
-                        const newDirection =
-                          sortDirection === "asc" ? "desc" : "asc";
-                        setSortDirection(newDirection);
-                        setSortedColumn("Client");
-                        setSettingsSavedFacilities(
-                          [...settingsSavedFacilities].sort((a, b) => {
-                            if (a.client < b.client)
-                              return newDirection === "asc" ? -1 : 1;
-                            if (a.client > b.client)
-                              return newDirection === "asc" ? 1 : -1;
-                            return 0;
-                          })
-                        );
-                      }}
-                    >
-                      Client
-                      {sortedColumn === "Client" && (
-                        <span className="ml-2">
-                          {sortDirection === "asc" ? "▲" : "▼"}
-                        </span>
-                      )}
-                    </th>
-                    <th
-                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                      onClick={() => {
-                        const newDirection =
-                          sortDirection === "asc" ? "desc" : "asc";
-                        setSortDirection(newDirection);
-                        setSortedColumn("Client Secret");
-                        setSettingsSavedFacilities(
-                          [...settingsSavedFacilities].sort((a, b) => {
-                            if (a.clientSecret < b.clientSecret)
-                              return newDirection === "asc" ? -1 : 1;
-                            if (a.clientSecret > b.clientSecret)
-                              return newDirection === "asc" ? 1 : -1;
-                            return 0;
-                          })
-                        );
-                      }}
-                    >
-                      Client Secret
-                      {sortedColumn === "Client Secret" && (
-                        <span className="ml-2">
-                          {sortDirection === "asc" ? "▲" : "▼"}
-                        </span>
-                      )}
-                    </th>
-                    <th
-                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                      onClick={() => {
-                        const newDirection =
-                          sortDirection === "asc" ? "desc" : "asc";
-                        setSortDirection(newDirection);
-                        setSortedColumn("Environment");
-                        setSettingsSavedFacilities(
-                          [...settingsSavedFacilities].sort((a, b) => {
-                            if (a.environment < b.environment)
-                              return newDirection === "asc" ? -1 : 1;
-                            if (a.environment > b.environment)
-                              return newDirection === "asc" ? 1 : -1;
-                            return 0;
-                          })
-                        );
-                      }}
-                    >
-                      Environment
-                      {sortedColumn === "Environment" && (
-                        <span className="ml-2">
-                          {sortDirection === "asc" ? "▲" : "▼"}
-                        </span>
-                      )}
-                    </th>
-                    <th className="px-4 py-2 text-left hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                      Authenticated
-                    </th>
-                    <th className="px-4 py-2 text-left hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {settingsSavedFacilities.map((facility, index) => (
-                    <tr
-                      key={index}
-                      className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
-                    >
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                        {facility.api
-                          ? "•".repeat(facility.api.length - 5) +
-                            facility.api.slice(-5)
-                          : ""}
-                      </td>
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                        {facility.apiSecret
-                          ? "•".repeat(facility.apiSecret.length - 5) +
-                            facility.apiSecret.slice(-5)
-                          : ""}
-                      </td>
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                        {facility.client}
-                      </td>
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                        {facility.clientSecret
-                          ? "•".repeat(facility.clientSecret.length - 5) +
-                            facility.clientSecret.slice(-5)
-                          : ""}
-                      </td>
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                        {facility.environment === ""
-                          ? "Production"
-                          : facility.environment === "-dev"
-                          ? "Development"
-                          : facility.environment === "-qa"
-                          ? "QA"
-                          : facility.environment === "cia-stg-1.aws."
-                          ? "Staging"
-                          : facility.environment}
-                      </td>
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                        <div className="flex justify-center text-lg">
-                          {facility.isAuthenticated === true ? (
-                            <FaCircleCheck className="text-green-500" />
-                          ) : facility.isAuthenticated === false ? (
-                            <MdOutlineError className="text-red-500" />
-                          ) : (
-                            <FaSpinner className="animate-spin text-gray-500" />
-                          )}
-                        </div>
-                      </td>
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                        <div className="text-center">
-                          <button
-                            className={`m-1 px-4 py-1 rounded-md text-white transition duration-300 ease-in-out ${
-                              permissions.authenticationPlatformDelete
-                                ? "bg-red-500 hover:bg-red-600 cursor-pointer"
-                                : "bg-red-300 cursor-not-allowed"
-                            }`}
-                            onClick={() => {
-                              if (permissions.authenticationPlatformDelete) {
-                                toast.promise(removeToken(facility.api), {
-                                  loading: "Deleting Credentials...",
-                                  success: <b>Successfully deleted!</b>,
-                                  error: <b>Failed deletion!</b>,
-                                });
-                              }
-                            }}
-                            disabled={!permissions.authenticationPlatformDelete}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {permissions.authenticationPlatformCreate && (
-                    <tr className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary">
-                      <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
-                        <input
-                          type="text"
-                          className="border border-slate-100 shadow-md rounded-sm dark:border-border p-1 w-full"
-                          value={api}
-                          placeholder="API Key"
-                          onChange={(e) => setApi(e.target.value)}
-                        />
-                      </td>
-                      <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
-                        <input
-                          type="text"
-                          className="border border-slate-100 shadow-md rounded-sm dark:border-border p-1 w-full"
-                          value={apiSecret}
-                          placeholder="API Secret"
-                          onChange={(e) => setApiSecret(e.target.value)}
-                        />
-                      </td>
-                      <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
-                        <input
-                          type="text"
-                          className="border border-slate-100 shadow-md rounded-sm dark:border-border p-1 w-full"
-                          value={client}
-                          placeholder="Client"
-                          onChange={(e) => setClient(e.target.value)}
-                        />
-                      </td>
-                      <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
-                        <input
-                          type="text"
-                          className="border border-slate-100 shadow-md rounded-sm dark:border-border p-1 w-full"
-                          value={clientSecret}
-                          placeholder="Client Secret"
-                          onChange={(e) => setClientSecret(e.target.value)}
-                        />
-                      </td>
-                      <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
-                        <select
-                          value={environment}
-                          onChange={(e) =>
-                            setEnvironment(e.target.value) &
-                            handleNewLogin(e.target.value)
-                          }
-                          className="shadow-md border border-slate-100 rounded-sm dark:border-border p-2 w-full hover:cursor-pointer"
-                        >
-                          <option
-                            className="dark:bg-darkNavSecondary"
-                            value="-"
-                          >
-                            --Select an Option--
-                          </option>
-                          {permissions.authenticationPlatformEnvironmentProduction && (
-                            <option
-                              className="dark:bg-darkNavSecondary"
-                              value=""
-                            >
-                              Production
-                            </option>
-                          )}
-                          {permissions.authenticationPlatformEnvironmentDevelopment && (
-                            <option
-                              className="dark:bg-darkNavSecondary"
-                              value="-dev"
-                            >
-                              Development
-                            </option>
-                          )}
-                          {permissions.authenticationPlatformEnvironmentQA && (
-                            <option
-                              className="dark:bg-darkNavSecondary"
-                              value="-qa"
-                            >
-                              QA
-                            </option>
-                          )}
-                          {permissions.authenticationPlatformEnvironmentStaging && (
-                            <option
-                              className="dark:bg-darkNavSecondary"
-                              value="cia-stg-1.aws."
-                            >
-                              Staging
-                            </option>
-                          )}
-                        </select>
-                      </td>
-                      <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
-                        <div className="flex justify-center text-lg">
-                          {isAuthenticated ? (
-                            <FaCircleCheck className="text-green-500" />
-                          ) : (
-                            <MdOutlineError className="text-red-500" />
-                          )}
-                        </div>
-                      </td>
-                      <td className="text-center border-y border-gray-300 dark:border-border px-4 py-2">
-                        {isAuthenticated ? (
-                          <button
-                            className="m-1 px-4 py-1 bg-green-400 rounded-md hover:bg-green-500 text-white hover:cursor-pointer"
-                            onClick={() =>
-                              toast.promise(submitCredentials(), {
-                                loading: "Creating Credentials...",
-                                success: <b>Successfully created!</b>,
-                                error: <b>Failed to create!</b>,
-                              })
-                            }
-                          >
-                            Submit
-                          </button>
-                        ) : (
-                          <button
-                            className="m-1 px-4 py-1 bg-green-400 rounded-md hover:bg-green-500 text-white hover:cursor-pointer"
-                            onClick={() =>
-                              toast.promise(handleNewLogin(environment), {
-                                loading: "Authenticating Credentials...",
-                                success: <b>Successfully authenticated!</b>,
-                                error: <b>Failed to authenticate!</b>,
-                              })
-                            }
-                          >
-                            Authenticate
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+            <div className="mt-3 overflow-y-auto max-h-[75vh]">
+              <DataTable
+                columns={columns}
+                data={paginatedFacilities}
+                sortedColumn={sortedColumn}
+                sortDirection={sortDirection}
+                onSort={handleColumnSort}
+              />
+            </div>
+            <div className="px-2 py-5 mx-1">
+              <PaginationFooter
+                rowsPerPage={rowsPerPage}
+                setRowsPerPage={setRowsPerPage}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                items={settingsSavedFacilities}
+              />
             </div>
           </div>
         </div>

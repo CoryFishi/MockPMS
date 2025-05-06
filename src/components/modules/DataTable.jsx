@@ -66,7 +66,7 @@ export default function DataTable({
                 className="border-y border-zinc-300 dark:border-border px-4 py-2 text-center items-center justify-center"
               >
                 {render
-                  ? render(item)
+                  ? render(item, index)
                   : typeof accessor === "function"
                   ? accessor(item)
                   : item[key]}

@@ -127,7 +127,7 @@ export default function UserEvents() {
       {/* Display date/time of when events were pulled */}
       <p className="text-sm dark:text-white text-left">{pullDate || ""}</p>
       {/* Body */}
-      <div className="w-full px-5 flex flex-col rounded-lg h-full">
+      <div className="w-full px-5 flex flex-col rounded-lg h-fit">
         {/* Search Bar */}
         <div className="mt-5 mb-2 flex items-center justify-end text-center">
           <input

@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import EditUser from "./modals/EditUser";
 import PaginationFooter from "./PaginationFooter";
 import { addEvent } from "../functions/events";
+import DataTable from "./modules/DataTable";
 
 export default function Users() {
   const { user } = useAuth();
@@ -16,33 +17,62 @@ export default function Users() {
   const [usersPulled, setUsersPulled] = useState(false);
   const [dropdownIndex, setDropdownIndex] = useState(null);
   const [selfUser, setSelfUser] = useState(user);
-  const modalRef = useRef(null);
+  const modalRefs = useRef({});
   const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortedColumn, setSortedColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
 
+  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
+    let newDirection;
+
+    if (sortedColumn !== columnKey) {
+      newDirection = "asc";
+    } else if (sortDirection === "asc") {
+      newDirection = "desc";
+    } else if (sortDirection === "desc") {
+      newDirection = null;
+    }
+
+    setSortedColumn(newDirection ? columnKey : null);
+    setSortDirection(newDirection);
+
+    if (!newDirection) {
+      setFilteredUsers([...users]);
+      return;
+    }
+
+    const sorted = [...filteredUsers].sort((a, b) => {
+      const aVal = accessor(a) ?? "";
+      const bVal = accessor(b) ?? "";
+
+      if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
+      if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    setFilteredUsers(sorted);
+  };
+
   const toggleDropdown = (index) => {
-    setDropdownIndex(dropdownIndex === index ? null : index);
+    setDropdownIndex((prevIndex) => (prevIndex === index ? null : index));
   };
 
   // Close modal if clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        setDropdownIndex(null); // Close the modal
+      const isClickInsideAny = Object.values(modalRefs.current).some((ref) =>
+        ref?.contains(event.target)
+      );
+      if (!isClickInsideAny) {
+        setDropdownIndex(null);
       }
     };
 
-    // Add event listener
     document.addEventListener("mousedown", handleClickOutside);
-
-    // Cleanup event listener
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [setDropdownIndex]);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   async function getUsers() {
     if (!user) return;
@@ -131,8 +161,109 @@ export default function Users() {
     setFilteredUsers(filteredUsers);
   }, [searchQuery]);
 
+  const columns = [
+    {
+      key: "user_email",
+      label: "Email",
+      accessor: (e) => e.user_email || "",
+    },
+    {
+      key: "tokens",
+      label: "Tokens",
+      accessor: (e) => e.tokens?.length || 0,
+    },
+    {
+      key: "favorite_tokens",
+      label: "Favorite",
+      accessor: (e) => e.favorite_tokens?.length || 0,
+    },
+    {
+      key: "selected_tokens",
+      label: "Selected",
+      accessor: (e) => e.selected_tokens?.length || 0,
+    },
+    {
+      key: "current_facility",
+      label: "Current Facility",
+      accessor: (e) => e.current_facility.name || "",
+    },
+    {
+      key: "role",
+      label: "Role",
+      accessor: (e) => e.role || "",
+    },
+    {
+      key: "created_at",
+      label: "Created On",
+      accessor: (e) => e.created_at || "",
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      sortable: false,
+      render: (user, index) => (
+        <div className="flex justify-center relative">
+          <button
+            className="dark:bg-darkSecondary border rounded-lg dark:border-border p-2 dark:hover:bg-darkPrimary w-full cursor-pointer"
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              toggleDropdown(index);
+            }}
+          >
+            Actions
+          </button>
+          {dropdownIndex === index && (
+            <div
+              ref={(el) => (modalRefs.current[index] = el)}
+              className="absolute top-full mt-1 right-0 w-full bg-white dark:bg-darkSecondary border border-zinc-200 dark:border-border rounded-lg shadow-lg z-20 flex flex-col"
+            >
+              <button
+                className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md hover:cursor-pointer rounded-t"
+                onClick={() => {
+                  setSelectedUser(user);
+                  setIsEditUserModalOpen(true);
+                  setDropdownIndex(null);
+                }}
+              >
+                Edit
+              </button>
+              <button
+                className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md hover:cursor-pointer rounded-b"
+                onClick={() => {
+                  setDropdownIndex(null);
+                  if (selfUser.id !== user.user_id) {
+                    toast.promise(
+                      deleteUser(user.user_id).then((result) => {
+                        if (result.success) {
+                          setUsers((prevUsers) =>
+                            prevUsers.filter((u) => u.user_id !== user.user_id)
+                          );
+                        }
+                        return result;
+                      }),
+                      {
+                        loading: `Deleting ${user.user_id}...`,
+                        success: <b>{user.user_id} deleted!</b>,
+                        error: <b>Could not delete {user.user_id}.</b>,
+                      }
+                    );
+                  } else {
+                    alert("Can't delete your account!");
+                  }
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="overflow-auto dark:text-white dark:bg-darkPrimary h-full">
+      {/* User Edit Modal */}
       {isEditUserModalOpen && (
         <EditUser
           setIsEditUserModalOpen={setIsEditUserModalOpen}
@@ -141,317 +272,50 @@ export default function Users() {
           users={users}
         />
       )}
-      <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      {/* Header */}
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <FaPerson className="text-lg" />
           &ensp; Users
         </div>
       </div>
-      <div className="mt-2  flex items-center justify-end text-center px-5">
-        <input
-          type="text"
-          placeholder="Search users..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
-        />
-      </div>
-      <div className="w-full px-5 py-2">
-        <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
-          {/* Header */}
-          <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary border-b border-gray-300 dark:border-border">
-            <tr className="dark:border-border bg-gray-200 dark:bg-darkNavSecondary">
-              <th
-                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("User");
-                  setFilteredUsers(
-                    [...users].sort((a, b) => {
-                      const userA = (a.user_email || "").toLowerCase();
-                      const userB = (b.user_email || "").toLowerCase();
-
-                      if (userA < userB) return newDirection === "asc" ? -1 : 1;
-                      if (userA > userB) return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                User
-                {sortedColumn === "User" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Tokens");
-                  setFilteredUsers(
-                    [...users].sort((a, b) => {
-                      const tokenA = a.tokens.length;
-                      const tokenB = b.tokens.length;
-
-                      if (tokenA < tokenB)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (tokenA > tokenB)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Tokens
-                {sortedColumn === "Tokens" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Favorites");
-                  setFilteredUsers(
-                    [...users].sort((a, b) => {
-                      const tokenA = a.favorite_tokens.length;
-                      const tokenB = b.favorite_tokens.length;
-
-                      if (tokenA < tokenB)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (tokenA > tokenB)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Favorites
-                {sortedColumn === "Favorites" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Selected");
-                  setFilteredUsers(
-                    [...users].sort((a, b) => {
-                      const tokenA = a.selected_tokens.length;
-                      const tokenB = b.selected_tokens.length;
-
-                      if (tokenA < tokenB)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (tokenA > tokenB)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Selected
-                {sortedColumn === "Selected" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Current Facility");
-                  setFilteredUsers(
-                    [...users].sort((a, b) => {
-                      const userA = (
-                        a.current_facility.name || ""
-                      ).toLowerCase();
-                      const userB = (
-                        b.current_facility.name || ""
-                      ).toLowerCase();
-
-                      if (userA < userB) return newDirection === "asc" ? -1 : 1;
-                      if (userA > userB) return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Current Facility
-                {sortedColumn === "Current Facility" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Role");
-                  setFilteredUsers(
-                    [...users].sort((a, b) => {
-                      const userA = (a.role || "").toLowerCase();
-                      const userB = (b.role || "").toLowerCase();
-
-                      if (userA < userB) return newDirection === "asc" ? -1 : 1;
-                      if (userA > userB) return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Role
-                {sortedColumn === "Role" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Created On");
-                  setFilteredUsers(
-                    [...users].sort((a, b) => {
-                      if (a.created_at < b.created_at)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (a.created_at > b.created_at)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Created On
-                {sortedColumn === "Created On" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers
-              .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-              .map((user, index) => (
-                <tr
-                  key={index}
-                  className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
-                >
-                  <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                    {user.user_email}
-                  </td>
-                  <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                    {user.tokens.length}
-                  </td>
-                  <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                    {user.favorite_tokens.length}
-                  </td>
-                  <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                    {user.selected_tokens.length}
-                  </td>
-                  <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                    {user.current_facility.name || ""}
-                  </td>
-                  <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
-                    {user.role}
-                  </td>
-                  <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                    {user.created_at}
-                  </td>
-                  <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell relative">
-                    <button
-                      className=" dark:bg-darkSecondary border rounded-lg dark:border-border p-2 dark:hover:bg-darkPrimary w-full hover:cursor-pointer"
-                      onClick={() => toggleDropdown(index)}
-                    >
-                      Actions
-                    </button>
-                    {dropdownIndex === index && (
-                      <div
-                        ref={modalRef}
-                        className="absolute top-11 right-0 mt-2 w-full bg-white dark:bg-darkSecondary border border-gray-200 dark:border-border rounded-lg shadow-lg z-20 flex flex-col"
-                      >
-                        <button
-                          className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-left hover:cursor-pointer rounded-t"
-                          onClick={() => {
-                            setSelectedUser(user) &
-                              setIsEditUserModalOpen(true) &
-                              setDropdownIndex(null);
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="hover:bg-slate-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-left hover:cursor-pointer rounded-b"
-                          onClick={() => {
-                            setDropdownIndex(null);
-                            if (selfUser.id != user.user_id) {
-                              toast.promise(
-                                deleteUser(user.user_id).then((result) => {
-                                  if (result.success) {
-                                    setUsers((prevUsers) =>
-                                      prevUsers.filter(
-                                        (u) => u.user_id !== user.user_id
-                                      )
-                                    );
-                                  }
-                                  return result;
-                                }),
-                                {
-                                  loading: `Deleting ${user.user_id}...`,
-                                  success: <b>{user.user_id} deleted!</b>,
-                                  error: (
-                                    <b>Could not delete {user.user_id}.</b>
-                                  ),
-                                }
-                              );
-                            } else {
-                              alert("Can't delete your account!");
-                            }
-                          }}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-        {/* No Users Notification */}
-        {filteredUsers.length < 1 && (
-          <p className="text-center p-4 font-bold text-lg">No users found.</p>
-        )}
-        {/* Pagination Footer */}
-        <div className="px-2 py-5 mx-1">
-          <PaginationFooter
-            rowsPerPage={rowsPerPage}
-            setRowsPerPage={setRowsPerPage}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            items={filteredUsers}
+      {/* Body */}
+      <div className="w-full px-5 flex flex-col rounded-lg h-fit">
+        {/* Search Bar */}
+        <div className="mt-5 mb-2 flex items-center justify-end text-center">
+          <input
+            type="text"
+            placeholder="Search users..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
+        </div>
+        {/* Table */}
+        <div>
+          <DataTable
+            columns={columns}
+            data={filteredUsers}
+            currentPage={currentPage}
+            rowsPerPage={rowsPerPage}
+            sortDirection={sortDirection}
+            sortedColumn={sortedColumn}
+            onSort={handleColumnSort}
+          />
+          {/* No Users Notification */}
+          {filteredUsers.length < 1 && (
+            <p className="text-center p-4 font-bold text-lg">No users found.</p>
+          )}
+          {/* Pagination Footer */}
+          <div className="px-2 py-5 mx-1">
+            <PaginationFooter
+              rowsPerPage={rowsPerPage}
+              setRowsPerPage={setRowsPerPage}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              items={filteredUsers}
+            />
+          </div>
         </div>
       </div>
     </div>

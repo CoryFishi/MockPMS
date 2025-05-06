@@ -12,12 +12,10 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
 
   // API call handler to create the new unit
   const handleCreateUnit = async () => {
-    // Check to verify unit number is valid
     if (!newUnitNumber) {
       setIsUnitModalOpen(false);
       return;
     }
-    // Environment logic
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "cia-stg-1.aws.") {
@@ -25,11 +23,36 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
     } else {
       tokenEnvKey = currentFacility.environment;
     }
-    // Split unit numbers by comma
-    const unitNumbersArray = newUnitNumber
-      .split(",")
-      .map((unit) => unit.trim());
-    // Send API call for each unit in unitsNumberArray
+    const unitNumbersArray = newUnitNumber.split(",").flatMap((unit) => {
+      unit = unit.trim();
+      if (unit.includes("-")) {
+        const [start, end] = unit.split("-").map((u) => u.trim());
+
+        const prefixStart = start.match(/^[^\d]+/g)?.[0] || "";
+        const prefixEnd = end.match(/^[^\d]+/g)?.[0] || "";
+
+        const numStart = parseInt(start.replace(prefixStart, ""));
+        const numEnd = parseInt(end.replace(prefixEnd, ""));
+
+        if (
+          prefixStart === prefixEnd &&
+          !isNaN(numStart) &&
+          !isNaN(numEnd) &&
+          numStart <= numEnd &&
+          numEnd - numStart < 100
+        ) {
+          return Array.from(
+            { length: numEnd - numStart + 1 },
+            (_, i) => `${prefixStart}${numStart + i}`
+          );
+        }
+
+        return [unit]; // fallback if invalid or over limit
+      }
+
+      return [unit];
+    });
+
     unitNumbersArray.map(async (unitNumber) => {
       const data = {
         unitNumber: unitNumber,
@@ -52,12 +75,10 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
         },
         data: data,
       };
-      // Toast w/ promise
       try {
         toast.promise(
           axios(config)
             .then(function (response) {
-              // Sucessful response, add new unit to unit array
               setUnits((prevUnits) => {
                 const updatedUnits = [...prevUnits, response.data];
                 // Sort unit array by unitNumber before returning
@@ -68,7 +89,6 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
                 });
               });
             })
-            // Error handling
             .catch(function (error) {
               throw error;
             }),
@@ -91,13 +111,11 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
         );
       }
     });
-    // Close modal and clear input after submitting
     setIsUnitModalOpen(false);
     setNewUnitNumber("");
   };
 
   return (
-    // Background Filter
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
       {/* Modal Container */}
       <div className="bg-white rounded-sm shadow-lg dark:bg-darkPrimary">

@@ -34,151 +34,23 @@ export default function SmartLockDashboardView({}) {
   const [expandedRows, setExpandedRows] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentLoadingText, setCurrentLoadingText] = useState("");
-  const [pageLoadDateTime, setPageLoadDateTime] = useState(
-    new Date().toLocaleString()
-  );
-
-  // Send email with facility information
-  const sendEmail = async () => {
-    const rows = facilitiesInfo.map((facility) => ({
-      facilityName: facility.name,
-      edgeRouter: facility.edgeRouterStatus,
-      onlineAPs: facility.onlineAccessPointsCount,
-      offlineAPs: facility.offlineAccessPointsCount,
-      okay: facility.okCount,
-      warning: facility.warningCount,
-      error: facility.errorCount,
-      offline: facility.offlineCount,
-      lowestSignal: facility.lowestSignal,
-      lowestBattery: facility.lowestBattery,
-    }));
-
-    const html = generateHTML(rows);
-
-    try {
-      const response = await fetch("/.netlify/functions/sendEmail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: user.email,
-          subject: "SmartLock Status Report",
-          html,
-        }),
-      });
-
-      // Check if response is JSON
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Email sent:", data);
-      } else {
-        const errorText = await response.text(); // Read error as text
-        console.error("Error:", errorText);
-      }
-    } catch (error) {
-      console.error("Fetch error:", error);
-    }
-  };
-
-  const generateHTML = (rows) => `
-  <div style="width: 100%; padding: 10px; font-family: Arial, sans-serif; color: #333;">
-    <h1 style="text-align: center;">SmartLock Status Report</h1>
-    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-      <thead>
-        <tr style="background-color: #edf2f7; border: 1px solid #e2e8f0;">
-          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;"></th>
-          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;" colspan="3">OpenNet</th>
-          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;" colspan="6">SmartLock</th>
-        </tr>
-        <tr style="background-color: #edf2f7; border: 1px solid #e2e8f0;">
-          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Facility</th>
-          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Edge Router</th>
-          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Online APs</th>
-          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Offline APs</th>
-          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Okay</th>
-          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Warning</th>
-          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Error</th>
-          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Offline</th>
-          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Lowest Signal</th>
-          <th style="padding: 0.5rem; border: 1px solid #e2e8f0;">Lowest Battery</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows
-          .map(
-            (row) => `
-          <tr>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.facilityName}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.edgeRouter}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.onlineAPs}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.offlineAPs}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.okay}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.warning}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.error}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.offline}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.lowestSignal}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${row.lowestBattery}</td>
-          </tr>
-        `
-          )
-          .join("")}
-          <tr>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">Totals:</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${
-              edgeRouterOnlineCount > 0 ? edgeRouterOnlineCount + " Online" : ""
-            }
-                  ${
-                    edgeRouterWarningCount > 0 &&
-                    edgeRouterOnlineCount > 0 && <br />
-                  }
-                  ${
-                    edgeRouterWarningCount > 0
-                      ? edgeRouterWarningCount + " Warning"
-                      : ""
-                  }
-                  ${edgeRouterOfflineCount > 0 && <br />}
-                  ${
-                    edgeRouterOfflineCount > 0
-                      ? edgeRouterOfflineCount + " Offline"
-                      : ""
-                  }
-                    </td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${accessPointsOnlineCount}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${accessPointsOfflineCount}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${smartlockOkayCount}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${smartlockWarningCount}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${smartlockErrorCount}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${smartlockOfflineCount}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${smartlockLowestSignal}</td>
-            <td style="padding: 0.5rem; border: 1px solid #e2e8f0;">${smartlockLowestBattery}</td>
-          </tr>
-      </tbody>
-    </table>
-  </div>
-`;
 
   // Search via search bar and button
   const search = () => {
-    setFilteredFacilities([]);
-    setTimeout(
-      () =>
-        setFilteredFacilities(
-          facilitiesWithBearers.filter(
-            (facility) =>
-              (facility.id || "").toString().includes(searchQuery) ||
-              (facility.propertyNumber || "")
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-              (facility.name || "")
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-              (facility.environment || "")
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase())
-          )
-        ),
-      500
+    setFilteredFacilities(
+      facilitiesWithBearers.filter(
+        (facility) =>
+          (facility.id || "").toString().includes(searchQuery) ||
+          (facility.propertyNumber || "")
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          (facility.name || "")
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          (facility.environment || "")
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase())
+      )
     );
   };
 
@@ -343,8 +215,6 @@ export default function SmartLockDashboardView({}) {
           &ensp; SmartLock Dashboard
         </div>
       </div>
-      {/* Last update date/time */}
-      <p className="text-sm dark:text-white text-left">{pageLoadDateTime}</p>
       <div className="mt-5 mb-2 flex items-center justify-end text-center mx-5">
         {/* Search Bar */}
         <input
@@ -721,15 +591,6 @@ export default function SmartLockDashboardView({}) {
       {/* Export Button */}
       <div className="float-right px-5">
         <SmartLockExport facilitiesInfo={facilitiesInfo} />
-      </div>
-      {/* Email Button */}
-      <div>
-        <p
-          className="text-black dark:text-white p-1 py-2 rounded-sm font-bold hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer mr-5"
-          onClick={() => sendEmail()}
-        >
-          Email Report
-        </p>
       </div>
     </div>
   );

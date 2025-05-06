@@ -7,6 +7,7 @@ import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import PaginationFooter from "./PaginationFooter";
+import DataTable from "./modules/DataTable";
 
 export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
   const [facilities, setFacilities] = useState([]);
@@ -27,9 +28,23 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
   const [noFacilities, setNoFacilities] = useState(false);
 
   const handleSort = (columnKey, accessor = (a) => a[columnKey]) => {
-    const newDirection = sortDirection === "asc" ? "desc" : "asc";
+    let newDirection;
+
+    if (sortedColumn !== columnKey) {
+      newDirection = "asc";
+    } else if (sortDirection === "asc") {
+      newDirection = "desc";
+    } else if (sortDirection === "desc") {
+      newDirection = null;
+    }
+
+    setSortedColumn(newDirection ? columnKey : null);
     setSortDirection(newDirection);
-    setSortedColumn(columnKey);
+
+    if (!newDirection) {
+      setFilteredFacilities([...facilities]);
+      return;
+    }
 
     const sorted = [...filteredFacilities].sort((a, b) => {
       const aVal = accessor(a) ?? "";
@@ -214,6 +229,89 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
     "cia-stg-1.aws.": "Staging",
   };
 
+  const columns = [
+    {
+      key: "isFavorite",
+      label: "★",
+      accessor: (r) => (isFacilityFavorite(r.id) ? 1 : 0),
+      render: (r) => (
+        <div
+          className="flex justify-center text-yellow-500 cursor-pointer"
+          onClick={() => addToFavorite(r)}
+        >
+          {isFacilityFavorite(r.id) ? (
+            <GoStarFill />
+          ) : (
+            <GoStar className="text-slate-400" />
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "environment",
+      label: "Environment",
+      accessor: (r) => r.environment,
+      render: (r) => environmentLabel[r.environment] ?? "N/A",
+    },
+    {
+      key: "id",
+      label: "Facility Id",
+      accessor: (r) => r.id,
+    },
+    {
+      key: "name",
+      label: "Facility Name",
+      accessor: (r) => r.name,
+      render: (r) => (
+        <div className="flex gap-3 items-center justify-center">
+          {r.name}
+          <FaExternalLinkAlt
+            className="text-blue-300 hover:text-blue-500 cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const baseUrl =
+                r.environment === "cia-stg-1.aws."
+                  ? `https://portal.${r.environment}insomniaccia.com/facility/${r.id}/dashboard`
+                  : `https://portal.insomniaccia${r.environment}.com/facility/${r.id}/dashboard`;
+              window.open(baseUrl, "_blank");
+            }}
+          />
+        </div>
+      ),
+    },
+    {
+      key: "propertyNumber",
+      label: "Property Number",
+      accessor: (r) => r.propertyNumber,
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      sortable: false,
+      render: (r) =>
+        currentFacility.id === r.id &&
+        currentFacility.environment === r.environment ? (
+          <button
+            className="font-bold bg-gray-200 text-white px-2 py-1 rounded-sm cursor-pointer"
+            onClick={() => {
+              localStorage.setItem("openPage", "units");
+              setOpenPage("units");
+            }}
+          >
+            Selected
+          </button>
+        ) : (
+          <button
+            className="font-bold bg-green-500 text-white px-2 py-1 rounded-sm hover:bg-green-600 cursor-pointer"
+            onClick={() => handleSelect(r)}
+          >
+            Select
+          </button>
+        ),
+    },
+  ];
+
   return (
     <div className="relative overflow-auto h-full dark:text-white dark:bg-darkPrimary">
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
@@ -222,7 +320,7 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
           &ensp; Favorites
         </div>
       </div>
-      <div className="w-full h-full p-5 flex flex-col rounded-lg pb-10">
+      <div className="w-full h-fit p-5 flex flex-col rounded-lg pb-10">
         <div className=" mb-2 flex items-center justify-end text-center">
           <input
             type="text"
@@ -232,143 +330,16 @@ export default function FavoritesPage({ setOpenPage, setCurrentFacilityName }) {
             className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
         </div>
-        <table className="w-full table-auto border-collapse pb-96">
-          <thead className="select-none sticky top-[-1px] z-10 bg-zinc-200 dark:bg-darkNavSecondary">
-            <tr className="bg-zinc-200 dark:bg-darkNavSecondary text-center">
-              {[
-                {
-                  key: "isFavorite",
-                  label: "★",
-                  accessor: (a) => (isFacilityFavorite(a.id) ? 1 : 0),
-                },
-                {
-                  key: "environment",
-                  label: "Environment",
-                  accessor: (a) => a.environment?.toLowerCase() || "",
-                },
-                {
-                  key: "facilityId",
-                  label: "Facility Id",
-                  accessor: (a) => a.id,
-                },
-                {
-                  key: "facilityName",
-                  label: "Facility Name",
-                  accessor: (a) => a.name?.toLowerCase() || "",
-                },
-                {
-                  key: "propertyNumber",
-                  label: "Property Number",
-                  accessor: (a) => a.propertyNumber?.toLowerCase() || "",
-                },
-              ].map(({ key, label, accessor }) => (
-                <th
-                  key={key}
-                  className={`px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary ${
-                    key === "facilityId" ? "min-w-28" : ""
-                  }`}
-                  onClick={() => handleSort(key, accessor)}
-                >
-                  {label}
-                  {sortedColumn === key && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-              ))}
-              <th className="px-4 py-2">Actions</th>
-            </tr>
-          </thead>
+        <DataTable
+          columns={columns}
+          data={filteredFacilities}
+          currentPage={currentPage}
+          rowsPerPage={rowsPerPage}
+          sortDirection={sortDirection}
+          sortedColumn={sortedColumn}
+          onSort={handleSort}
+        />
 
-          <tbody>
-            {filteredFacilities
-              .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-              .map((facility, index) => (
-                <tr
-                  key={index}
-                  className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary border-y border-gray-300 dark:border-border text-center"
-                >
-                  <td
-                    className="px-4 py-2 hover:cursor-pointer"
-                    onClick={() => addToFavorite(facility)}
-                  >
-                    <div className="flex justify-center text-yellow-500">
-                      {isFacilityFavorite(facility.id) ? (
-                        <GoStarFill />
-                      ) : (
-                        <GoStar className="text-slate-400" />
-                      )}
-                    </div>
-                  </td>
-                  <td
-                    className="px-4 py-2 hover:cursor-pointer"
-                    onClick={() => addToFavorite(facility)}
-                  >
-                    {environmentLabel[facility.environment] ?? "N/A"}
-                  </td>
-                  <td
-                    className="px-4 py-2 hover:cursor-pointer"
-                    onClick={() => addToFavorite(facility)}
-                  >
-                    {facility.id}
-                  </td>
-                  <td
-                    className="px-4 py-2 hover:cursor-pointer"
-                    onClick={() => addToFavorite(facility)}
-                  >
-                    <div className="flex gap-3 items-center text-center justify-center">
-                      {facility.name}
-                      <FaExternalLinkAlt
-                        title={
-                          facility.environment === "cia-stg-1.aws."
-                            ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
-                            : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`
-                        }
-                        className="text-blue-300 group-hover:text-blue-500"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          const baseUrl =
-                            facility.environment === "cia-stg-1.aws."
-                              ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
-                              : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`;
-                          window.open(baseUrl, "_blank");
-                        }}
-                      />
-                    </div>
-                  </td>
-                  <td
-                    className="px-4 py-2 hover:cursor-pointer"
-                    onClick={() => addToFavorite(facility)}
-                  >
-                    {facility.propertyNumber}
-                  </td>
-                  <td className="px-4 py-2">
-                    {currentFacility.id == facility.id &&
-                    currentFacility.environment == facility.environment ? (
-                      <button
-                        className="font-bold hover:cursor-pointer bg-gray-200 text-white px-2 py-1 rounded-sm hover:bg-gray-300 select-none"
-                        onClick={() =>
-                          localStorage.setItem("openPage", "units") &
-                          setOpenPage("units")
-                        }
-                      >
-                        Selected
-                      </button>
-                    ) : (
-                      <button
-                        className="font-bold hover:cursor-pointer bg-green-500 text-white px-2 py-1 rounded-sm hover:bg-green-600 select-none"
-                        onClick={() => handleSelect(facility)}
-                      >
-                        Select
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
         {/* No Facilities Notification Text */}
         {noFacilities && (
           <p className="text-center p-4 font-bold text-lg">

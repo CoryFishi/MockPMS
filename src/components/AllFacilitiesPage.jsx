@@ -12,6 +12,7 @@ import LoadingSpinner from "./LoadingSpinner";
 import { IoKeypad, IoLockOpen, IoNotificationsCircle } from "react-icons/io5";
 import { LuBrainCircuit } from "react-icons/lu";
 import { RiAlarmWarningFill } from "react-icons/ri";
+import DataTable from "./modules/DataTable";
 
 export default function AllFacilitiesPage({
   setOpenPage,
@@ -39,9 +40,23 @@ export default function AllFacilitiesPage({
   const [hoveredRow, setHoveredRow] = useState(null);
 
   const handleSort = (columnKey, accessor = (a) => a[columnKey]) => {
-    const newDirection = sortDirection === "asc" ? "desc" : "asc";
+    let newDirection;
+
+    if (sortedColumn !== columnKey) {
+      newDirection = "asc";
+    } else if (sortDirection === "asc") {
+      newDirection = "desc";
+    } else if (sortDirection === "desc") {
+      newDirection = null;
+    }
+
+    setSortedColumn(newDirection ? columnKey : null);
     setSortDirection(newDirection);
-    setSortedColumn(columnKey);
+
+    if (!newDirection) {
+      setFilteredFacilities([...facilities]);
+      return;
+    }
 
     const sorted = [...filteredFacilities].sort((a, b) => {
       const aVal = accessor(a) ?? "";
@@ -419,6 +434,119 @@ export default function AllFacilitiesPage({
     "cia-stg-1.aws.": "Staging",
   };
 
+  const columns = [
+    {
+      key: "isFavorite",
+      label: "★",
+      accessor: (r) => (isFacilityFavorite(r.facilityId) ? 1 : 0),
+      render: (r) => (
+        <div
+          className="flex justify-center text-yellow-500 cursor-pointer"
+          onClick={() => addToFavorite(r)}
+        >
+          {isFacilityFavorite(r.facilityId) ? (
+            <GoStarFill />
+          ) : (
+            <GoStar className="text-zinc-400" />
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "environment",
+      label: "Environment",
+      accessor: (r) => r.environment,
+      render: (r) => (
+        <span
+          onMouseEnter={() => setHoveredRow(r.facilityId)}
+          className="cursor-pointer"
+        >
+          {environmentLabel[r.environment] ?? "N/A"}
+        </span>
+      ),
+    },
+    {
+      key: "facilityId",
+      label: "Facility Id",
+      accessor: (r) => r.facilityId,
+    },
+    {
+      key: "accountName",
+      label: "Account Name",
+      accessor: (r) => r.accountName,
+      render: (r) => (
+        <span>
+          {r.accountName.length > 24
+            ? r.accountName.slice(0, 24) + "..."
+            : r.accountName}
+        </span>
+      ),
+    },
+    {
+      key: "facilityName",
+      label: "Facility Name",
+      accessor: (r) => r.facilityName,
+      render: (r) => (
+        <div className="flex gap-2 justify-center">
+          <span>
+            {r.facilityName.length > 24
+              ? r.facilityName.slice(0, 24) + "..."
+              : r.facilityName}
+          </span>
+          <FaExternalLinkAlt
+            className="text-blue-300 hover:text-blue-500 cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              const url =
+                r.environment === "cia-stg-1.aws."
+                  ? `https://portal.${r.environment}insomniaccia.com/facility/${r.facilityId}/dashboard`
+                  : `https://portal.insomniaccia${r.environment}.com/facility/${r.facilityId}/dashboard`;
+              window.open(url, "_blank");
+            }}
+          />
+        </div>
+      ),
+    },
+    {
+      key: "facilityPropertyNumber",
+      label: "Property Number",
+      accessor: (r) => r.facilityPropertyNumber,
+    },
+    {
+      sortable: false,
+      key: "status",
+      label: "Status",
+      accessor: () => null,
+      render: (r) => <FacilityStatusIcons facility={r} />,
+    },
+    {
+      sortable: false,
+      key: "actions",
+      label: "Actions",
+      accessor: () => null,
+      render: (r) =>
+        currentFacility.id === r.facilityId &&
+        currentFacility.environment === r.environment ? (
+          <button
+            className="font-bold bg-zinc-200 text-white px-2 py-1 rounded-sm cursor-pointer"
+            onClick={() => {
+              localStorage.setItem("openPage", "units");
+              setOpenPage("units");
+            }}
+          >
+            Selected
+          </button>
+        ) : (
+          <button
+            className="font-bold bg-green-500 text-white px-2 py-1 rounded-sm hover:bg-green-600 cursor-pointer"
+            onClick={() => handleSelect(r)}
+          >
+            Select
+          </button>
+        ),
+    },
+  ];
+
   return (
     <div
       className={`relative ${
@@ -434,7 +562,7 @@ export default function AllFacilitiesPage({
           &ensp; All Facilities
         </div>
       </div>
-      <div className="w-full px-5 flex flex-col rounded-lg h-full">
+      <div className="w-full px-5 flex flex-col rounded-lg h-fit">
         {/* Search Bar */}
         <div className="mt-5 mb-2 flex items-center justify-end text-center">
           <input
@@ -446,200 +574,18 @@ export default function AllFacilitiesPage({
           />
         </div>
         {/* Facilities Table */}
-        <table className="w-full table-auto border-collapse border-zinc-300 dark:border-border">
-          {/* Header */}
-          <thead className="select-none sticky top-[-1px] z-10 bg-zinc-200 dark:bg-darkNavSecondary">
-            <tr className="bg-zinc-200 dark:bg-darkNavSecondary text-center">
-              {[
-                {
-                  key: "isFavorite",
-                  label: "★",
-                  accessor: (a) => (isFacilityFavorite(a.facilityId) ? 1 : 0),
-                },
-                {
-                  key: "environment",
-                  label: "Environment",
-                  accessor: (a) => a.environment?.toLowerCase() || "",
-                },
-                {
-                  key: "facilityId",
-                  label: "Facility Id",
-                  accessor: (a) => a.facilityId,
-                },
-                {
-                  key: "accountName",
-                  label: "Account Name",
-                  accessor: (a) => a.accountName?.toLowerCase() || "",
-                },
-                {
-                  key: "facilityName",
-                  label: "Facility Name",
-                  accessor: (a) => a.facilityName?.toLowerCase() || "",
-                },
-                {
-                  key: "facilityPropertyNumber",
-                  label: "Property Number",
-                  accessor: (a) =>
-                    a.facilityPropertyNumber?.toLowerCase() || "",
-                },
-              ].map(({ key, label, accessor }) => (
-                <th
-                  key={key}
-                  className={`px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary ${
-                    key === "facilityId" ? "min-w-28" : ""
-                  }`}
-                  onClick={() => handleSort(key, accessor)}
-                >
-                  {label}
-                  {sortedColumn === key && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-              ))}
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">Actions</th>
-            </tr>
-          </thead>
+        <DataTable
+          columns={columns}
+          data={filteredFacilities}
+          currentPage={currentPage}
+          rowsPerPage={rowsPerPage}
+          sortDirection={sortDirection}
+          sortedColumn={sortedColumn}
+          onSort={handleSort}
+          hoveredRow={hoveredRow}
+          setHoveredRow={setHoveredRow}
+        />
 
-          <tbody>
-            {filteredFacilities
-              .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-              .map((facility, index) => (
-                <tr
-                  key={index}
-                  className="hover:bg-zinc-100 dark:hover:bg-darkNavSecondary border-y border-zinc-300 dark:border-border text-center relative"
-                  onMouseLeave={() => setHoveredRow(null)}
-                >
-                  <td
-                    className="px-4 py-2 hover:cursor-pointer"
-                    onClick={() => addToFavorite(facility)}
-                  >
-                    <div className="flex justify-center text-center items-center text-yellow-500">
-                      {isFacilityFavorite(facility.facilityId) ? (
-                        <GoStarFill />
-                      ) : (
-                        <GoStar className="text-zinc-400" />
-                      )}
-                    </div>
-                  </td>
-                  <td
-                    className="px-4 py-2 hover:cursor-pointer"
-                    onClick={() => setHoveredRow(index)}
-                  >
-                    {environmentLabel[facility.environment] ?? "N/A"}
-                    {hoveredRow === index && (
-                      <div className="absolute bg-zinc-50 border dark:border-zinc-700 dark:bg-zinc-800 text-black p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-5/6 dark:text-white">
-                        <div className="grid grid-cols-4 gap-1 overflow-hidden">
-                          {Object.entries(facility).map(
-                            ([key, value], index) => (
-                              <div key={index} className="break-words">
-                                <span className="font-bold text-yellow-400">
-                                  {key}:
-                                </span>
-                                <br />
-                                <span className="whitespace-normal break-words">
-                                  {value === null
-                                    ? "null"
-                                    : value === ""
-                                    ? "null"
-                                    : value === true
-                                    ? "true"
-                                    : value === false
-                                    ? "false"
-                                    : value}
-                                </span>
-                              </div>
-                            )
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </td>
-                  <td
-                    className="px-4 py-2 hover:cursor-pointer"
-                    onClick={() => setHoveredRow(index)}
-                  >
-                    {facility.facilityId}
-                  </td>
-                  <td
-                    className="px-4 py-2 hover:cursor-pointer"
-                    onClick={() => setHoveredRow(index)}
-                  >
-                    {facility.accountName.length > 24
-                      ? facility.accountName.slice(0, 24) + "..."
-                      : facility.accountName}
-                  </td>
-                  <td
-                    className="px-4 py-2 hover:cursor-pointer"
-                    onClick={() => setHoveredRow(index)}
-                  >
-                    <div className="flex gap-3 justify-center">
-                      <p className="pl-1 truncate max-w-[32ch]">
-                        {facility.facilityName.length > 24
-                          ? facility.facilityName.slice(0, 24) + "..."
-                          : facility.facilityName}
-                      </p>
-                      <FaExternalLinkAlt
-                        title={
-                          facility.environment === "cia-stg-1.aws."
-                            ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.facilityId}/dashboard`
-                            : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.facilityId}/dashboard`
-                        }
-                        className="text-blue-300 group-hover:text-blue-500"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          const baseUrl =
-                            facility.environment === "cia-stg-1.aws."
-                              ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.facilityId}/dashboard`
-                              : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.facilityId}/dashboard`;
-                          window.open(baseUrl, "_blank");
-                        }}
-                      />
-                    </div>
-                  </td>
-                  <td
-                    className=" border-zinc-300 dark:border-border px-4 py-2 hover:cursor-pointer"
-                    onClick={() => setHoveredRow(index)}
-                  >
-                    {facility.facilityPropertyNumber}
-                  </td>
-                  <td
-                    className="border-zinc-300 dark:border-border px-4 py-2 hover:cursor-pointer"
-                    onClick={() => setHoveredRow(index)}
-                  >
-                    <FacilityStatusIcons facility={facility} />
-                  </td>
-                  <td
-                    className="px-4 py-2"
-                    onClick={() => setHoveredRow(index)}
-                  >
-                    {currentFacility.id == facility.facilityId &&
-                    currentFacility.environment == facility.environment ? (
-                      <button
-                        className="font-bold hover:cursor-pointer bg-zinc-200 text-white px-2 py-1 rounded-sm hover:bg-zinc-300 select-none"
-                        onClick={() =>
-                          localStorage.setItem("openPage", "units") &
-                          setOpenPage("units")
-                        }
-                      >
-                        Selected
-                      </button>
-                    ) : (
-                      <button
-                        className="font-bold hover:cursor-pointer bg-green-500 text-white px-2 py-1 rounded-sm hover:bg-green-600 select-none"
-                        onClick={() => handleSelect(facility)}
-                      >
-                        Select
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
         {/* No Facilities Notification Text */}
         {noFacilities && (
           <p className="text-center p-4 font-bold text-lg">

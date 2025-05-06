@@ -67,7 +67,7 @@ export default function Navbar({
   }, [isDropdownOpen]);
 
   return (
-    <nav className="bg-white dark:bg-darkPrimary p-2 w-full border-gray-200 dark:border-gray-700 border-b select-none relative">
+    <nav className="bg-white dark:bg-darkPrimary p-2 w-full border-zinc-200 dark:border-zinc-700 border-b select-none relative">
       <div className="flex items-center justify-between text-black dark:text-white relative">
         <div className="flex">
           {showSideToggle && (
@@ -87,7 +87,7 @@ export default function Navbar({
           {user && permissions.smartlockPlatform && (
             <Link
               to="/smartlock"
-              className={`hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium ${
+              className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium ${
                 location.pathname === "/smartlock"
                   ? "border-b-2 border-yellow-400"
                   : ""
@@ -99,7 +99,7 @@ export default function Navbar({
           {user && permissions.pmsPlatform && (
             <Link
               to="/"
-              className={`hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium ${
+              className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium ${
                 location.pathname === "/" ? "border-b-2 border-yellow-400" : ""
               }`}
             >
@@ -109,7 +109,7 @@ export default function Navbar({
           {user && role === "admin" && (
             <Link
               to="/admin"
-              className={`hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium ${
+              className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium ${
                 location.pathname === "/admin"
                   ? "border-b-2 border-yellow-400"
                   : ""
@@ -122,15 +122,15 @@ export default function Navbar({
             <div className="relative" ref={userRef}>
               <h2
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="cursor-pointer bg-gray-100 dark:bg-darkSecondary rounded-md p-2 px-4 flex items-center text-center"
+                className="cursor-pointer bg-zinc-100 dark:bg-darkSecondary rounded-md p-2 px-4 flex items-center text-center"
               >
                 {user.email}{" "}
                 {isDropdownOpen ? <MdExpandLess /> : <MdExpandMore />}
               </h2>
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-1 w-full bg-white dark:bg-darkSecondary border border-gray-200 dark:border-border rounded-lg shadow-lg p-2 z-50 flex flex-col">
+                <div className="absolute right-0 mt-1 w-full bg-white dark:bg-darkSecondary border border-zinc-200 dark:border-border rounded-lg shadow-lg z-50 flex flex-col">
                   <button
-                    className="hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-center hover:cursor-pointer"
+                    className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium text-center hover:cursor-pointer rounded-t"
                     onClick={() =>
                       toggleDarkMode() & setIsDropdownOpen(!isDropdownOpen)
                     }
@@ -139,25 +139,24 @@ export default function Navbar({
                   </button>
                   <Link
                     to="/user-settings"
-                    className="hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-center border-t border-t-gray-100 dark:border-t-border"
+                    className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium text-center"
                   >
                     User Settings
                   </Link>
                   {permissions.authenticationPlatform && (
                     <Link
                       to="/authentication-settings"
-                      className="hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 text-md font-medium text-center border-t border-t-gray-100 dark:border-t-border"
+                      className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium text-center"
                     >
                       Authentication
                     </Link>
                   )}
                   <button
-                    className="hover:bg-gray-100 hover:cursor-pointer dark:hover:bg-gray-700 px-3 py-2 text-md font-medium border-opacity-50 border-t border-t-gray-100 dark:border-t-border"
+                    className="hover:bg-zinc-100 hover:cursor-pointer dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium rounded-b"
                     onClick={() => handleLogout()}
                   >
                     Logout
                   </button>
-                  <div className="text-right bottom-0 text-sm">v{version}</div>
                 </div>
               )}
             </div>
@@ -166,7 +165,7 @@ export default function Navbar({
               {" "}
               <Link
                 to="/login"
-                className={`hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-md text-md font-medium ${
+                className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 rounded-md text-md font-medium ${
                   location.pathname === "/" ? "underline" : ""
                 }`}
               >
@@ -174,7 +173,7 @@ export default function Navbar({
               </Link>
               <Link
                 to="/register"
-                className={`hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-md text-md font-medium ${
+                className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 rounded-md text-md font-medium ${
                   location.pathname === "/" ? "underline" : ""
                 }`}
               >

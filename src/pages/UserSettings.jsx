@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
 import PaginationFooter from "../components/PaginationFooter";
 import { BiCheckCircle, BiCircle } from "react-icons/bi";
+import DataTable from "../components/modules/DataTable";
 
 export default function UserSettings({ darkMode, toggleDarkMode }) {
   const [newPassword1, setNewPassword1] = useState("");
@@ -134,13 +135,70 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
     setFilteredEvents(filteredEvents);
   }, [events]);
 
+  const columns = [
+    {
+      key: "created_at",
+      label: "Created On",
+      accessor: (e) => e.created_at || "",
+    },
+    {
+      key: "event_name",
+      label: "Event",
+      accessor: (e) => e.event_name || "",
+    },
+    {
+      key: "event_description",
+      label: "Description",
+      accessor: (e) => e.event_description || "",
+    },
+    {
+      key: "completed",
+      label: "Success",
+      accessor: (e) => (e.completed ? "true" : false || ""),
+    },
+  ];
+
+  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
+    let newDirection;
+
+    if (sortedColumn !== columnKey) {
+      newDirection = "asc";
+    } else if (sortDirection === "asc") {
+      newDirection = "desc";
+    } else if (sortDirection === "desc") {
+      newDirection = null;
+    }
+
+    setSortedColumn(newDirection ? columnKey : null);
+    setSortDirection(newDirection);
+
+    if (!newDirection) {
+      setFilteredEvents([...events]);
+      return;
+    }
+
+    const sorted = [...filteredEvents].sort((a, b) => {
+      const aVal = accessor(a) ?? "";
+      const bVal = accessor(b) ?? "";
+
+      if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
+      if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    setFilteredEvents(sorted);
+  };
+
   return (
     <div className="dark:text-white dark:bg-darkPrimary min-h-screen w-full flex flex-col font-roboto">
       {user ? (
         <div className="flex flex-col h-screen">
+          {/* Navbar */}
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+          {/* Body */}
           <div className="flex-1 overflow-y-auto px-5 flex flex-col items-center">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-2 text-center rounded-sm max-w-7xl mx-auto">
+              {/* Account Information */}
               <div className="dark:bg-darkNavSecondary rounded-sm p-5 border shadow-md dark:border-border">
                 <div className="flex flex-col items-center justify-center text-center gap-5">
                   <h1 className="text-2xl mt-2">Account Information</h1>
@@ -165,6 +223,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                   </button>
                 </div>
               </div>
+              {/* Update Password */}
               <div className="flex flex-col justify-center items-center text-center h-full dark:bg-darkNavSecondary rounded-sm p-5 border shadow-md dark:border-border">
                 <h1 className="text-2xl py-2">Update Password</h1>
                 <input
@@ -188,6 +247,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                   Change Password
                 </button>
               </div>
+              {/* Email Preferences */}
               <div className="flex flex-col h-full dark:bg-darkNavSecondary rounded-sm p-5 border shadow-md dark:border-border">
                 <div className="flex flex-col max-w-5xl">
                   <h1 className="text-2xl py-2">Email Preferences</h1>
@@ -210,156 +270,22 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                 </div>
               </div>
             </div>
+            {/* Table */}
             <div className="w-full mt-2">
               <h1 className="text-2xl text-center">User Events</h1>
-              <table className="w-full table-auto border-collapse pb-96">
-                <thead className="sticky top-[-1px] z-10 select-none">
-                  <tr className="bg-zinc-200 dark:bg-darkNavSecondary">
-                    <th
-                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                      onClick={() => {
-                        const newDirection =
-                          sortDirection === "asc" ? "desc" : "asc";
-                        setSortDirection(newDirection);
-                        setSortedColumn("Created On");
-                        setFilteredEvents(
-                          [...events].sort((a, b) => {
-                            if (a.created_at < b.created_at)
-                              return newDirection === "asc" ? -1 : 1;
-                            if (a.created_at > b.created_at)
-                              return newDirection === "asc" ? 1 : -1;
-                            return 0;
-                          })
-                        );
-                      }}
-                    >
-                      Created On
-                      {sortedColumn === "Created On" && (
-                        <span className="ml-2">
-                          {sortDirection === "asc" ? "▲" : "▼"}
-                        </span>
-                      )}
-                    </th>
-                    <th
-                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                      onClick={() => {
-                        const newDirection =
-                          sortDirection === "asc" ? "desc" : "asc";
-                        setSortDirection(newDirection);
-                        setSortedColumn("Event");
-                        setFilteredEvents(
-                          [...events].sort((a, b) => {
-                            if (
-                              a.event_name.toLowerCase() <
-                              b.event_name.toLowerCase()
-                            )
-                              return newDirection === "asc" ? -1 : 1;
-                            if (
-                              a.event_name.toLowerCase() >
-                              b.event_name.toLowerCase()
-                            )
-                              return newDirection === "asc" ? 1 : -1;
-                            return 0;
-                          })
-                        );
-                      }}
-                    >
-                      Event
-                      {sortedColumn === "Event" && (
-                        <span className="ml-2">
-                          {sortDirection === "asc" ? "▲" : "▼"}
-                        </span>
-                      )}
-                    </th>
-                    <th
-                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                      onClick={() => {
-                        const newDirection =
-                          sortDirection === "asc" ? "desc" : "asc";
-                        setSortDirection(newDirection);
-                        setSortedColumn("Description");
-                        setFilteredEvents(
-                          [...events].sort((a, b) => {
-                            if (
-                              a.event_description.toLowerCase() <
-                              b.event_description.toLowerCase()
-                            )
-                              return newDirection === "asc" ? -1 : 1;
-                            if (
-                              a.event_description.toLowerCase() >
-                              b.event_description.toLowerCase()
-                            )
-                              return newDirection === "asc" ? 1 : -1;
-                            return 0;
-                          })
-                        );
-                      }}
-                    >
-                      Description
-                      {sortedColumn === "Description" && (
-                        <span className="ml-2">
-                          {sortDirection === "asc" ? "▲" : "▼"}
-                        </span>
-                      )}
-                    </th>
-                    <th
-                      className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                      onClick={() => {
-                        const newDirection =
-                          sortDirection === "asc" ? "desc" : "asc";
-                        setSortDirection(newDirection);
-                        setSortedColumn("Success");
-                        setFilteredEvents(
-                          [...events].sort((a, b) => {
-                            if (a.completed < b.completed)
-                              return newDirection === "asc" ? -1 : 1;
-                            if (a.completed > b.completed)
-                              return newDirection === "asc" ? 1 : -1;
-                            return 0;
-                          })
-                        );
-                      }}
-                    >
-                      Success
-                      {sortedColumn === "Success" && (
-                        <span className="ml-2">
-                          {sortDirection === "asc" ? "▲" : "▼"}
-                        </span>
-                      )}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredEvents
-                    .slice(
-                      (currentPage - 1) * rowsPerPage,
-                      currentPage * rowsPerPage
-                    )
-                    .map((event, index) => (
-                      <tr
-                        key={index}
-                        className="hover:bg-zinc-100 dark:hover:bg-darkNavSecondary"
-                      >
-                        <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                          {event.created_at}
-                        </td>
-                        <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                          {event.event_name}
-                        </td>
-                        <td className="border-y border-zinc-300 dark:border-border px-4 py-2 hidden sm:table-cell">
-                          {event.event_description}
-                        </td>
-                        <td className="border-y border-zinc-300 dark:border-border px-4 py-2 hidden sm:table-cell">
-                          {event.completed ? "true" : "false"}
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
+              <DataTable
+                columns={columns}
+                data={filteredEvents}
+                currentPage={currentPage}
+                rowsPerPage={rowsPerPage}
+                sortDirection={sortDirection}
+                sortedColumn={sortedColumn}
+                onSort={handleColumnSort}
+              />
               {events.length < 1 && (
                 <p className="text-center">No events found.</p>
               )}
-              {/* Modal footer/pagination */}
+              {/* Pagination */}
               <div className="px-2 py-5 mx-1">
                 <PaginationFooter
                   rowsPerPage={rowsPerPage}

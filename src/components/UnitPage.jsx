@@ -9,6 +9,7 @@ import { useAuth } from "../context/AuthProvider";
 import { addEvent } from "../functions/events";
 import PaginationFooter from "./PaginationFooter";
 import LoadingSpinner from "./LoadingSpinner";
+import DataTable from "./modules/DataTable";
 
 export default function UnitPage({
   currentFacilityName = { currentFacilityName },
@@ -33,9 +34,6 @@ export default function UnitPage({
   const [unitsPulled, setUnitsPulled] = useState(false);
   const [visitors, setVisitors] = useState([]);
   const { currentFacility, user, permissions } = useAuth();
-  const [pageLoadDateTime, setPageLoadDateTime] = useState(
-    new Date().toLocaleString()
-  );
   const [smartLocks, setSmartLocks] = useState([]);
   const [hoveredRow, setHoveredRow] = useState(null);
   const [currentLoadingText, setCurrentLoadingText] =
@@ -530,12 +528,186 @@ export default function UnitPage({
     setFilteredUnits(filteredUnits);
   }, [units, searchQuery]);
 
+  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
+    let newDirection;
+
+    if (sortedColumn !== columnKey) {
+      newDirection = "asc";
+    } else if (sortDirection === "asc") {
+      newDirection = "desc";
+    } else if (sortDirection === "desc") {
+      newDirection = null;
+    }
+
+    setSortedColumn(newDirection ? columnKey : null);
+    setSortDirection(newDirection);
+
+    if (!newDirection) {
+      setFilteredUnits([...units]);
+      return;
+    }
+
+    const sorted = [...filteredUnits].sort((a, b) => {
+      const aVal = accessor(a) ?? "";
+      const bVal = accessor(b) ?? "";
+
+      if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
+      if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    setFilteredUnits(sorted);
+  };
+
+  const columns = [
+    {
+      key: "id",
+      label: "Unit ID",
+      render: (u) =>
+        u.status === "Rented" || u.status === "Delinquent" ? (
+          <span
+            className="text-blue-500 hover:underline cursor-pointer"
+            title="Edit Tenant"
+            onClick={() => editTenants(u)}
+          >
+            {u.id}
+          </span>
+        ) : (
+          u.id
+        ),
+    },
+    {
+      key: "unitNumber",
+      label: "Unit Number",
+      accessor: (u) => u.unitNumber,
+    },
+    {
+      key: "status",
+      label: "Status",
+      accessor: (u) => u.status,
+    },
+    {
+      key: "smartLock",
+      label: "SmartLock",
+      accessor: (u) => {
+        const lock = smartLocks.find((l) => l.unitId === u.id);
+        return lock?.name?.toLowerCase() || "";
+      },
+      render: (u) => {
+        const lock = smartLocks.find((lock) => lock.unitId === u.id);
+        return lock ? `${lock.deviceType} - ${lock.name}` : "";
+      },
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      render: (unit) => {
+        if (unit.status === "Rented") {
+          return (
+            <div className="space-x-1">
+              {permissions.pmsPlatformVisitorEdit && (
+                <button
+                  className="bg-yellow-500 hover:bg-yellow-600 cursor-pointer text-white px-2 py-1 rounded font-bold"
+                  onClick={() => turnDelinquent(unit)}
+                >
+                  Turn Delinquent
+                </button>
+              )}
+              {permissions.pmsPlatformVisitorDelete && (
+                <button
+                  className="bg-red-500 hover:bg-red-600 cursor-pointer text-white px-2 py-1 rounded font-bold"
+                  onClick={() => moveOut(unit)}
+                >
+                  Move Out
+                </button>
+              )}
+            </div>
+          );
+        }
+        if (unit.status === "Vacant") {
+          return (
+            <div className="space-x-1">
+              {permissions.pmsPlatformVisitorCreate && (
+                <button
+                  className="bg-green-500 hover:bg-green-600 cursor-pointer text-white px-2 py-1 rounded font-bold"
+                  onClick={() => {
+                    moveIn(unit);
+                    setSelectedUnit(unit);
+                  }}
+                >
+                  Move In
+                </button>
+              )}
+              {permissions.pmsPlatformUnitDelete && (
+                <button
+                  className="bg-red-500 hover:bg-red-600 cursor-pointer text-white px-2 py-1 rounded font-bold"
+                  onClick={() => deleteUnit(unit)}
+                >
+                  Delete
+                </button>
+              )}
+            </div>
+          );
+        }
+        if (unit.status === "Delinquent") {
+          return (
+            <div className="space-x-1">
+              {permissions.pmsPlatformVisitorEdit && (
+                <button
+                  className="bg-green-500 hover:bg-green-600 cursor-pointer text-white px-2 py-1 rounded font-bold"
+                  onClick={() => turnRented(unit)}
+                >
+                  Turn Rented
+                </button>
+              )}
+              {permissions.pmsPlatformVisitorDelete && (
+                <button
+                  className="bg-red-500 hover:bg-red-600 cursor-pointer text-white px-2 py-1 rounded font-bold"
+                  onClick={() => moveOut(unit)}
+                >
+                  Move Out
+                </button>
+              )}
+            </div>
+          );
+        }
+
+        return <span>Error</span>;
+      },
+      sortable: false,
+    },
+  ];
+
   return (
     <div
       className={`relative ${
         !unitsPulled ? "overflow-hidden min-h-full" : "overflow-auto"
       } h-full dark:text-white dark:bg-darkPrimary relative`}
     >
+      {/* Create Unit Modal Popup */}
+      {isUnitModalOpen && (
+        <CreateUnit
+          setIsUnitModalOpen={setIsUnitModalOpen}
+          setUnits={setUnits}
+        />
+      )}
+      {/* Create Visitor Modal Popup */}
+      {isCreateVisitorModalOpen && (
+        <CreateVisitor
+          setIsCreateVisitorModalOpen={setIsCreateVisitorModalOpen}
+          setUnits={setUnits}
+          unit={selectedUnit}
+        />
+      )}
+      {/* Multi Visitor Edit Modal */}
+      {isEditVisitorModalOpen && (
+        <EditVisitor
+          setIsEditVisitorModalOpen={setIsEditVisitorModalOpen}
+          currentFacility={currentFacility}
+          visitors={visitors}
+          unit={selectedUnit}
+        />
+      )}
       {/* Loading Spinner */}
       {!unitsPulled && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* Page Header */}
@@ -545,11 +717,9 @@ export default function UnitPage({
           &ensp; Units | {currentFacilityName}
         </div>
       </div>
-      {/* Load Time Label */}
-      <p className="text-sm dark:text-white text-left">{pageLoadDateTime}</p>
       <div className="w-full px-5 flex flex-col rounded-lg h-fit">
         {/* Totals Header */}
-        <div className="min-h-12 flex justify-center gap-32">
+        <div className="mt-5 min-h-12 flex justify-center gap-32">
           <div className="text-center">
             <div className="font-bold text-2xl">{rentedCount}</div>
             Rented
@@ -575,401 +745,52 @@ export default function UnitPage({
             type="text"
             placeholder="Search units..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value) & setCurrentPage(1)}
             className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
           {/* Visitor Autofill Toggle */}
-          <h3 className="mr-2 w-36">Visitor Autofill</h3>
-          <div
-            className={`w-8 h-4 flex items-center rounded-full p-1 cursor-pointer ${
-              visitorAutofill ? "bg-blue-600" : "bg-gray-300"
-            }`}
-            onClick={() => handleVisitorAutofill(visitorAutofill)}
-          >
-            <div
-              className={`bg-white w-3 h-3 rounded-full shadow-md transform transition-transform duration-500 ease-out ${
-                visitorAutofill ? "translate-x-2" : ""
-              }`}
-            ></div>
-          </div>
+          {permissions.pmsPlatformVisitorCreate && (
+            <>
+              <h3 className="mr-2 w-36">Visitor Autofill</h3>
+              <div
+                className={`w-8 h-4 flex items-center rounded-full p-1 cursor-pointer ${
+                  visitorAutofill ? "bg-blue-600" : "bg-gray-300"
+                }`}
+                onClick={() => handleVisitorAutofill(visitorAutofill)}
+              >
+                <div
+                  className={`bg-white w-3 h-3 rounded-full shadow-md transform transition-transform duration-500 ease-out ${
+                    visitorAutofill ? "translate-x-2" : ""
+                  }`}
+                ></div>
+              </div>
+            </>
+          )}
           {/* Create Unit Button */}
-          <button
-            className={`bg-green-500 text-white p-1 py-2 rounded font-bold ml-3 w-44 transition duration-300 ease-in-out transform select-none ${
-              permissions.pmsPlatformUnitCreate
-                ? "hover:bg-green-600 hover:scale-105 hover:cursor-pointer"
-                : "opacity-50 cursor-not-allowed"
-            }`}
-            onClick={() => setIsUnitModalOpen(true)}
-            disabled={!permissions.pmsPlatformUnitCreate}
-          >
-            Create Unit(s)
-          </button>
+          {permissions.pmsPlatformUnitCreate && (
+            <button
+              className={`bg-green-500 text-white p-1 py-2 rounded font-bold ml-3 w-44 transition duration-300 ease-in-out transform select-none ${
+                permissions.pmsPlatformUnitCreate
+                  ? "hover:bg-green-600 hover:scale-105 hover:cursor-pointer"
+                  : "opacity-50 cursor-not-allowed"
+              }`}
+              onClick={() => setIsUnitModalOpen(true)}
+              disabled={!permissions.pmsPlatformUnitCreate}
+            >
+              Create Unit(s)
+            </button>
+          )}
         </div>
-
-        {/* Create Unit Modal Popup */}
-        {isUnitModalOpen && (
-          <CreateUnit
-            setIsUnitModalOpen={setIsUnitModalOpen}
-            setUnits={setUnits}
-          />
-        )}
-
-        {/* Create Visitor Modal Popup */}
-        {isCreateVisitorModalOpen && (
-          <CreateVisitor
-            setIsCreateVisitorModalOpen={setIsCreateVisitorModalOpen}
-            setUnits={setUnits}
-            unit={selectedUnit}
-          />
-        )}
-
-        {/* Multi Visitor Edit Modal */}
-        {isEditVisitorModalOpen && (
-          <EditVisitor
-            setIsEditVisitorModalOpen={setIsEditVisitorModalOpen}
-            currentFacility={currentFacility}
-            visitors={visitors}
-            unit={selectedUnit}
-          />
-        )}
-
         {/* Unit Table */}
-        <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
-          {/* Header */}
-          <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
-            <tr className="dark:border-border bg-gray-200 dark:bg-darkNavSecondary">
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Unit Id");
-
-                  setFilteredUnits(
-                    [...filteredUnits].sort((a, b) => {
-                      if (a.id < b.id) return newDirection === "asc" ? -1 : 1;
-                      if (a.id > b.id) return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Unit Id
-                {sortedColumn === "Unit Id" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Unit Number");
-                  setFilteredUnits(
-                    [...filteredUnits].sort((a, b) => {
-                      if (
-                        a.unitNumber.toLowerCase() < b.unitNumber.toLowerCase()
-                      )
-                        return newDirection === "asc" ? -1 : 1;
-                      if (
-                        a.unitNumber.toLowerCase() > b.unitNumber.toLowerCase()
-                      )
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Unit Number
-                {sortedColumn === "Unit Number" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Status");
-
-                  setFilteredUnits(
-                    [...filteredUnits].sort((a, b) => {
-                      if (a.status < b.status)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (a.status > b.status)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Status
-                {sortedColumn === "Status" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              {/* <th
-                className="px-4 py-2 hover:cursor-pointer hidden sm:table-cell hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Facility ID");
-                  setFilteredUnits(
-                    [...filteredUnits].sort((a, b) => {
-                      if (a.facilityId < b.facilityId)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (a.facilityId > b.facilityId)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Facility ID
-                {sortedColumn === "Facility ID" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 hover:cursor-pointer hidden md:table-cell hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Property Number");
-                  setFilteredUnits(
-                    [...filteredUnits].sort((a, b) => {
-                      const propertyNumberA = (
-                        a.propertyNumber || ""
-                      ).toLowerCase();
-                      const propertyNumberB = (
-                        b.propertyNumber || ""
-                      ).toLowerCase();
-                      if (propertyNumberA < propertyNumberB)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (propertyNumberA > propertyNumberB)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Property Number
-                {sortedColumn === "Property Number" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th> */}
-              {smartLocks.length > 0 && (
-                <th
-                  className="px-4 py-2 hover:cursor-pointer hidden md:table-cell hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                  onClick={() => {
-                    const newDirection =
-                      sortDirection === "asc" ? "desc" : "asc";
-                    setSortDirection(newDirection);
-                    setSortedColumn("SmartLock");
-                    setFilteredUnits(
-                      [...filteredUnits].sort((a, b) => {
-                        const lockA = smartLocks.find(
-                          (lock) => lock.unitId === a.id
-                        );
-                        const lockB = smartLocks.find(
-                          (lock) => lock.unitId === b.id
-                        );
-                        const nameA = lockA?.name?.toLowerCase() ?? "";
-                        const nameB = lockB?.name?.toLowerCase() ?? "";
-
-                        if (nameA < nameB)
-                          return newDirection === "asc" ? -1 : 1;
-                        if (nameA > nameB)
-                          return newDirection === "asc" ? 1 : -1;
-                        return 0;
-                      })
-                    );
-                  }}
-                >
-                  SmartLock
-                  {sortedColumn === "SmartLock" && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
-                </th>
-              )}
-              <th className="px-4 py-2 hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          {/* Body */}
-          <tbody>
-            {filteredUnits
-              .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-              .map((unit, index) => (
-                <tr
-                  key={index}
-                  className="border-y border-gray-300 dark:border-border hover:bg-gray-100 dark:hover:bg-darkNavPrimary text-center relative"
-                >
-                  <td className="px-4 py-2" onClick={() => editTenants(unit)}>
-                    {unit.status === "Rented" ||
-                    unit.status === "Delinquent" ? (
-                      <p
-                        className="text-blue-500  hover:cursor-pointer"
-                        title="edit tenant"
-                      >
-                        {unit.id}
-                      </p>
-                    ) : (
-                      unit.id
-                    )}
-                  </td>
-                  <td className="px-4 py-2">{unit.unitNumber}</td>
-                  <td className="px-4 py-2">{unit.status}</td>
-                  {/* <td className="px-4 py-2 hidden sm:table-cell">
-                    {unit.facilityId}
-                  </td>
-                  <td className="px-4 py-2 hidden md:table-cell">
-                    {unit.propertyNumber}
-                  </td> */}
-                  {smartLocks.length > 0 && (
-                    <td
-                      className="px-4 py-2 hover:cursor-pointer"
-                      onMouseDown={() => setHoveredRow(index)}
-                      onMouseLeave={() => setHoveredRow(null)}
-                    >
-                      {(() => {
-                        const matchingLock = smartLocks.find(
-                          (lock) => lock.unitId === unit.id
-                        );
-                        if (!matchingLock) return "";
-                        return (
-                          <>
-                            <span>{`${matchingLock.deviceType} - ${matchingLock.name}`}</span>
-                            {hoveredRow === index && (
-                              <div className="absolute bg-gray-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-4/5">
-                                <div className="grid grid-cols-4 gap-1 overflow-hidden">
-                                  {Object.entries(matchingLock).map(
-                                    ([key, value], i) => (
-                                      <div key={i} className="break-words">
-                                        <span className="font-bold text-yellow-500">
-                                          {key}:
-                                        </span>
-                                        <br />
-                                        <span className="whitespace-normal break-words">
-                                          {value === null
-                                            ? "null"
-                                            : value === ""
-                                            ? "null"
-                                            : value === true
-                                            ? "true"
-                                            : value === false
-                                            ? "false"
-                                            : value}
-                                        </span>
-                                      </div>
-                                    )
-                                  )}
-                                </div>
-                              </div>
-                            )}
-                          </>
-                        );
-                      })()}
-                    </td>
-                  )}
-                  <td className="px-4 py-2 select-none">
-                    {unit.status === "Rented" ? (
-                      <div className="text-center space-x-1">
-                        <button
-                          className={`bg-yellow-500 text-white px-2 py-1 rounded font-bold ${
-                            permissions.pmsPlatformVisitorEdit
-                              ? "hover:bg-yellow-600 hover:cursor-pointer"
-                              : "opacity-50 cursor-not-allowed"
-                          }`}
-                          onClick={() => turnDelinquent(unit)}
-                          disabled={!permissions.pmsPlatformVisitorEdit}
-                        >
-                          Turn Delinquent
-                        </button>
-                        <button
-                          className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
-                            permissions.pmsPlatformVisitorDelete
-                              ? "hover:bg-red-600 hover:cursor-pointer"
-                              : "opacity-50 cursor-not-allowed"
-                          }`}
-                          onClick={() => moveOut(unit)}
-                          disabled={!permissions.pmsPlatformVisitorDelete}
-                        >
-                          Move Out
-                        </button>
-                      </div>
-                    ) : unit.status === "Vacant" ? (
-                      <div className="text-center space-x-1">
-                        <button
-                          className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
-                            permissions.pmsPlatformVisitorCreate
-                              ? "hover:bg-green-600 hover:cursor-pointer"
-                              : "opacity-50 cursor-not-allowed"
-                          }`}
-                          onClick={() => moveIn(unit) & setSelectedUnit(unit)}
-                          disabled={!permissions.pmsPlatformVisitorCreate}
-                        >
-                          Move In
-                        </button>
-                        <button
-                          className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
-                            permissions.pmsPlatformUnitDelete
-                              ? "hover:bg-red-600 hover:cursor-pointer"
-                              : "opacity-50 cursor-not-allowed"
-                          }`}
-                          onClick={() => deleteUnit(unit)}
-                          disabled={!permissions.pmsPlatformUnitDelete}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    ) : unit.status === "Delinquent" ? (
-                      <div className="text-center space-x-1">
-                        <button
-                          className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
-                            permissions.pmsPlatformVisitorEdit
-                              ? "hover:bg-green-600 hover:cursor-pointer"
-                              : "opacity-50 cursor-not-allowed"
-                          }`}
-                          onClick={() => turnRented(unit)}
-                          disabled={!permissions.pmsPlatformVisitorEdit}
-                        >
-                          Turn Rented
-                        </button>
-                        <button
-                          className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
-                            permissions.pmsPlatformVisitorDelete
-                              ? "hover:bg-red-600 hover:cursor-pointer"
-                              : "opacity-50 cursor-not-allowed"
-                          }`}
-                          onClick={() => moveOut(unit)}
-                          disabled={!permissions.pmsPlatformVisitorDelete}
-                        >
-                          Move Out
-                        </button>
-                      </div>
-                    ) : (
-                      <>error</>
-                    )}
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-
+        <DataTable
+          columns={columns}
+          data={filteredUnits}
+          currentPage={currentPage}
+          rowsPerPage={rowsPerPage}
+          sortedColumn={sortedColumn}
+          sortDirection={sortDirection}
+          onSort={handleColumnSort}
+        />
         {/* Pagination Footer */}
         <div className="px-2 py-5 mx-1">
           <PaginationFooter
