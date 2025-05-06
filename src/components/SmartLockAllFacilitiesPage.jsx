@@ -15,6 +15,7 @@ import LoadingSpinner from "./LoadingSpinner";
 import { IoKeypad, IoLockOpen, IoNotificationsCircle } from "react-icons/io5";
 import { LuBrainCircuit } from "react-icons/lu";
 import { RiAlarmWarningFill } from "react-icons/ri";
+import DataTable from "./modules/DataTable";
 
 export default function SmartLockAllFacilitiesPage({}) {
   const [facilities, setFacilities] = useState([]);
@@ -28,12 +29,25 @@ export default function SmartLockAllFacilitiesPage({}) {
   const { user, tokens, selectedTokens, setSelectedTokens } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [currentLoadingText, setCurrentLoadingText] = useState("");
-  const [hoveredRow, setHoveredRow] = useState(null);
 
   const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
-    const newDirection = sortDirection === "asc" ? "desc" : "asc";
+    let newDirection;
+
+    if (sortedColumn !== columnKey) {
+      newDirection = "asc";
+    } else if (sortDirection === "asc") {
+      newDirection = "desc";
+    } else if (sortDirection === "desc") {
+      newDirection = null;
+    }
+
+    setSortedColumn(newDirection ? columnKey : null);
     setSortDirection(newDirection);
-    setSortedColumn(columnKey);
+
+    if (!newDirection) {
+      setFilteredFacilities([...facilities]);
+      return;
+    }
 
     const sorted = [...filteredFacilities].sort((a, b) => {
       const aVal = accessor(a) ?? "";
@@ -207,7 +221,6 @@ export default function SmartLockAllFacilitiesPage({}) {
       setSelectedTokens(updatedTokens);
     }
   };
-
   const addToSelected = async (facility) => {
     const isSelected = isFacilitySelected(facility.facilityId);
     handleSelectedFacilitiesUpdate(facility, isSelected);
@@ -310,6 +323,91 @@ export default function SmartLockAllFacilitiesPage({}) {
     "cia-stg-1.aws.": "Staging",
   };
 
+  const columns = [
+    {
+      key: "isSelected",
+      label: <RiCheckboxBlankCircleLine className="text-lg text-slate-400" />,
+      accessor: (f) => (isFacilitySelected(f.facilityId) ? 1 : 0),
+      render: (f) => (
+        <div
+          className="flex justify-center text-yellow-500 cursor-pointer items-center"
+          onClick={(e) => {
+            e.stopPropagation();
+            addToSelected(f);
+          }}
+        >
+          {isFacilitySelected(f.facilityId) ? (
+            <RiCheckboxCircleFill className="text-lg" />
+          ) : (
+            <RiCheckboxBlankCircleLine className="text-lg text-slate-400" />
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "environment",
+      label: "Environment",
+      accessor: (f) => f.environment?.toLowerCase() || "",
+      render: (f) => environmentLabel[f.environment] ?? "N/A",
+    },
+    {
+      key: "facilityId",
+      label: "Facility Id",
+      accessor: (f) => f.facilityId,
+    },
+    {
+      key: "accountName",
+      label: "Account Name",
+      accessor: (f) =>
+        f.accountName.length > 24
+          ? f.accountName.slice(0, 24) + "..."
+          : f.accountName || "",
+    },
+    {
+      key: "facilityName",
+      label: "Facility Name",
+      accessor: (f) => f.facilityName?.toLowerCase() || "",
+      render: (f) => (
+        <div className="flex gap-3 items-center justify-center">
+          <p className="pl-1 truncate max-w-[32ch]">
+            {f.facilityName.length > 24
+              ? f.facilityName.slice(0, 24) + "..."
+              : f.facilityName}
+          </p>
+          <FaExternalLinkAlt
+            title={`https://portal.${
+              f.environment === "cia-stg-1.aws."
+                ? f.environment
+                : "insomniaccia" + f.environment
+            }.com/facility/${f.id}/dashboard`}
+            className="text-blue-300 hover:text-blue-500 cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const url =
+                f.environment === "cia-stg-1.aws."
+                  ? `https://portal.${f.environment}insomniaccia.com/facility/${f.id}/dashboard`
+                  : `https://portal.insomniaccia${f.environment}.com/facility/${f.id}/dashboard`;
+              window.open(url, "_blank");
+            }}
+          />
+        </div>
+      ),
+    },
+    {
+      key: "facilityPropertyNumber",
+      label: "Property Number",
+      accessor: (f) => f.facilityPropertyNumber || "",
+    },
+    {
+      key: "status",
+      label: "Status",
+      accessor: () => "",
+      render: (f) => <FacilityStatusIcons facility={f} />,
+      sortable: false,
+    },
+  ];
+
   return (
     <div
       className={`relative ${
@@ -318,13 +416,16 @@ export default function SmartLockAllFacilitiesPage({}) {
     >
       {/* Loading Spinner */}
       {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}
+      {/* Header */}
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <FaWarehouse className="text-lg" />
           &ensp; All Facilities
         </div>
       </div>
+      {/* Body */}
       <div className="w-full px-5 flex flex-col rounded-lg h-full">
+        {/* Search Bar */}
         <div className="mt-5 mb-2 flex items-center justify-end text-center">
           <input
             type="text"
@@ -334,196 +435,33 @@ export default function SmartLockAllFacilitiesPage({}) {
             className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
         </div>
+        {/* Table */}
         <div>
-          <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
-            {/* Header */}
-            <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
-              <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
-                {[
-                  {
-                    key: "isSelected",
-                    label: (
-                      <RiCheckboxBlankCircleLine className="text-lg text-slate-400" />
-                    ),
-                    accessor: (a) => (isFacilitySelected(a.facilityId) ? 1 : 0),
-                  },
-                  {
-                    key: "environment",
-                    label: "Environment",
-                    accessor: (a) => a.environment?.toLowerCase() || "",
-                  },
-                  {
-                    key: "facilityId",
-                    label: "Facility Id",
-                    accessor: (a) => a.facilityId,
-                  },
-                  {
-                    key: "accountName",
-                    label: "Account Name",
-                    accessor: (a) => a.accountName?.toLowerCase() || "",
-                  },
-                  {
-                    key: "facilityName",
-                    label: "Facility Name",
-                    accessor: (a) => a.facilityName?.toLowerCase() || "",
-                  },
-                  {
-                    key: "facilityPropertyNumber",
-                    label: "Property Number",
-                    accessor: (a) =>
-                      a.facilityPropertyNumber?.toLowerCase() || "",
-                  },
-                ].map(({ key, label, accessor }) => (
-                  <th
-                    key={key}
-                    className={`px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary ${
-                      key === "facilityId" ? "min-w-28" : ""
-                    }`}
-                    onClick={() => handleColumnSort(key, accessor)}
-                  >
-                    {label}
-                    {sortedColumn === key && (
-                      <span className="ml-2">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
-                  </th>
-                ))}
-                <th className="px-4 py-2">Status</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredFacilities
-                .slice(
-                  (currentPage - 1) * rowsPerPage,
-                  currentPage * rowsPerPage
-                )
-                .map((facility, index) => (
-                  <tr
-                    key={index}
-                    className="hover:bg-zinc-100 dark:hover:bg-darkNavSecondary border-y border-zinc-300 dark:border-border text-center relative"
-                    onMouseLeave={() => setHoveredRow(null)}
-                  >
-                    <td
-                      className="px-4 py-2 hover:cursor-pointer"
-                      onClick={() => addToSelected(facility)}
-                    >
-                      <div className="flex justify-center text-yellow-500">
-                        {isFacilitySelected(facility.facilityId) ? (
-                          <RiCheckboxCircleFill className="text-lg" />
-                        ) : (
-                          <RiCheckboxBlankCircleLine className="text-lg text-slate-400" />
-                        )}
-                      </div>
-                    </td>
-                    <td
-                      className="px-4 py-2 hover:cursor-pointer"
-                      onClick={() => setHoveredRow(index)}
-                    >
-                      {environmentLabel[facility.environment] ?? "N/A"}{" "}
-                      {hoveredRow === index && (
-                        <div className="absolute bg-zinc-50 border dark:border-zinc-700 dark:bg-zinc-800 text-black p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-5/6 dark:text-white">
-                          <div className="grid grid-cols-4 gap-1 overflow-hidden">
-                            {Object.entries(facility).map(
-                              ([key, value], index) => (
-                                <div key={index} className="break-words">
-                                  <span className="font-bold text-yellow-400">
-                                    {key}:
-                                  </span>
-                                  <br />
-                                  <span className="whitespace-normal break-words">
-                                    {value === null
-                                      ? "null"
-                                      : value === ""
-                                      ? "null"
-                                      : value === true
-                                      ? "true"
-                                      : value === false
-                                      ? "false"
-                                      : value}
-                                  </span>
-                                </div>
-                              )
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </td>
-                    <td
-                      className="border-y border-gray-300 dark:border-border px-4 py-2"
-                      onClick={() => setHoveredRow(index)}
-                    >
-                      {facility.facilityId}
-                    </td>
-                    <td
-                      className="px-4 py-2 hover:cursor-pointer"
-                      onClick={() => setHoveredRow(index)}
-                    >
-                      {facility.accountName.length > 24
-                        ? facility.accountName.slice(0, 24) + "..."
-                        : facility.accountName}
-                    </td>
-                    <td
-                      className="px-4 py-2 hover:cursor-pointer"
-                      onClick={() => setHoveredRow(index)}
-                    >
-                      <div className="flex gap-3 items-center">
-                        <p className="pl-1 truncate max-w-[32ch]">
-                          {facility.facilityName.length > 24
-                            ? facility.facilityName.slice(0, 24) + "..."
-                            : facility.facilityName}
-                        </p>
-                        <FaExternalLinkAlt
-                          title={
-                            facility.environment === "cia-stg-1.aws."
-                              ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
-                              : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`
-                          }
-                          className="text-blue-300 group-hover:text-blue-500"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const baseUrl =
-                              facility.environment === "cia-stg-1.aws."
-                                ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
-                                : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`;
-                            window.open(baseUrl, "_blank");
-                          }}
-                        />
-                      </div>
-                    </td>
-                    <td
-                      className="px-4 py-2 hover:cursor-pointer"
-                      onClick={() => setHoveredRow(index)}
-                    >
-                      {facility.facilityPropertyNumber}
-                    </td>
-                    <td
-                      className="border-zinc-300 dark:border-border px-4 py-2 hover:cursor-pointer"
-                      onClick={() => setHoveredRow(index)}
-                    >
-                      <FacilityStatusIcons facility={facility} />
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+          <DataTable
+            columns={columns}
+            data={filteredFacilities}
+            currentPage={currentPage}
+            rowsPerPage={rowsPerPage}
+            sortDirection={sortDirection}
+            sortedColumn={sortedColumn}
+            onSort={handleColumnSort}
+          />
+          {/* If no facilities display no facilities text */}
           {noFacilities && (
             <div className="w-full text-center mt-5 text-red-500">
               No Authorized Facilities To Choose From...
             </div>
           )}
-        </div>
-        {/* Modal footer/pagination */}
-        <div className="px-2 py-5 mx-1">
-          <PaginationFooter
-            rowsPerPage={rowsPerPage}
-            setRowsPerPage={setRowsPerPage}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            items={filteredFacilities}
-          />
+          {/* Modal footer/pagination */}
+          <div className="px-2 py-5 mx-1">
+            <PaginationFooter
+              rowsPerPage={rowsPerPage}
+              setRowsPerPage={setRowsPerPage}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              items={filteredFacilities}
+            />
+          </div>
         </div>
       </div>
     </div>

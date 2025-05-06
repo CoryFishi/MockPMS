@@ -6,6 +6,7 @@ import { supabase } from "../supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
 import PaginationFooter from "../components/PaginationFooter";
+import { BiCheckCircle, BiCircle } from "react-icons/bi";
 
 export default function UserSettings({ darkMode, toggleDarkMode }) {
   const [newPassword1, setNewPassword1] = useState("");
@@ -19,7 +20,38 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
   const [eventsPulled, setEventsPulled] = useState(false);
   const [sortedColumn, setSortedColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("desc");
+  const [enabled, setEnabled] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (!user) return;
+    const fetchPreference = async () => {
+      const { data, error } = await supabase
+        .from("user_data")
+        .select("automated_reports")
+        .eq("user_email", user.email)
+        .single();
+
+      if (data?.automated_reports?.smartlockOverview) {
+        setEnabled(true);
+      }
+    };
+
+    fetchPreference();
+  }, [user]);
+
+  const toggle = async () => {
+    setLoading(true);
+    const newPref = { smartlockOverview: !enabled };
+
+    const { error } = await supabase
+      .from("user_data")
+      .update({ automated_reports: newPref })
+      .eq("user_email", user.email);
+
+    if (!error) setEnabled(!enabled);
+    setLoading(false);
+  };
   async function addEvent(eventName, eventDescription, completed) {
     const { data, error } = await supabase.from("user_events").insert([
       {
@@ -108,7 +140,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
         <div className="flex flex-col h-screen">
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           <div className="flex-1 overflow-y-auto px-5 flex flex-col items-center">
-            <div className="flex gap-5 mt-2 text-center rounded-sm max-w-2xl justify-evenly">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-2 text-center rounded-sm max-w-7xl mx-auto">
               <div className="dark:bg-darkNavSecondary rounded-sm p-5 border shadow-md dark:border-border">
                 <div className="flex flex-col items-center justify-center text-center gap-5">
                   <h1 className="text-2xl mt-2">Account Information</h1>
@@ -126,7 +158,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                 </div>
                 <div className="w-full mt-5">
                   <button
-                    className="w-96 bg-gray-100 dark:bg-darkPrimary m-1 rounded-sm text-black dark:text-white p-3 hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer"
+                    className="w-full bg-zinc-100 dark:bg-darkPrimary m-1 rounded-sm text-black dark:text-white p-3 hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer"
                     onClick={() => handleLogout()}
                   >
                     Logout
@@ -134,28 +166,47 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                 </div>
               </div>
               <div className="flex flex-col justify-center items-center text-center h-full dark:bg-darkNavSecondary rounded-sm p-5 border shadow-md dark:border-border">
-                <div className="flex flex-col items-center justify-center text-center max-w-5xl">
-                  <h1 className="text-2xl py-2">Update Password</h1>
-                  <input
-                    type="password"
-                    placeholder="New Password"
-                    value={newPassword1}
-                    onChange={(e) => setNewPassword1(e.target.value)}
-                    className="h-11 rounded-sm m-2 border align-middle px-2 dark:border-border dark:bg-darkPrimary"
-                  />
-                  <input
-                    type="password"
-                    placeholder="Confirm New Password"
-                    value={newPassword2}
-                    onChange={(e) => setNewPassword2(e.target.value)}
-                    className="h-11 rounded-sm m-2 border align-middle px-2 dark:border-border dark:bg-darkPrimary"
-                  />
-                  <button
-                    className="bg-gray-100 dark:bg-darkPrimary m-1 rounded-sm text-black dark:text-white p-3 hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer"
-                    onClick={() => handlePasswordChange()}
-                  >
-                    Change Password
-                  </button>
+                <h1 className="text-2xl py-2">Update Password</h1>
+                <input
+                  type="password"
+                  placeholder="New Password"
+                  value={newPassword1}
+                  onChange={(e) => setNewPassword1(e.target.value)}
+                  className="h-11 w-full max-w-64 rounded-sm m-2 border align-middle px-2 dark:border-border dark:bg-darkPrimary"
+                />
+                <input
+                  type="password"
+                  placeholder="Confirm New Password"
+                  value={newPassword2}
+                  onChange={(e) => setNewPassword2(e.target.value)}
+                  className="h-11 w-full max-w-64 rounded-sm m-2 border align-middle px-2 dark:border-border dark:bg-darkPrimary"
+                />
+                <button
+                  className="bg-zinc-100 dark:bg-darkPrimary m-1 rounded-sm text-black dark:text-white p-3 hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer"
+                  onClick={() => handlePasswordChange()}
+                >
+                  Change Password
+                </button>
+              </div>
+              <div className="flex flex-col h-full dark:bg-darkNavSecondary rounded-sm p-5 border shadow-md dark:border-border">
+                <div className="flex flex-col max-w-5xl">
+                  <h1 className="text-2xl py-2">Email Preferences</h1>
+                  <div className="flex-col flex justify-center max-w-5xl gap-2">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={toggle}
+                        disabled={loading}
+                        className={`px-2 py-2 rounded-full text-2xl cursor-pointer ${
+                          enabled
+                            ? "text-green-600 hover:bg-green-200"
+                            : "text-zinc-600 hover:bg-zinc-200"
+                        }`}
+                      >
+                        {enabled ? <BiCheckCircle /> : <BiCircle />}
+                      </button>
+                      <label>SmartLock Overview Emails</label>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -163,7 +214,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
               <h1 className="text-2xl text-center">User Events</h1>
               <table className="w-full table-auto border-collapse pb-96">
                 <thead className="sticky top-[-1px] z-10 select-none">
-                  <tr className="bg-gray-200 dark:bg-darkNavSecondary">
+                  <tr className="bg-zinc-200 dark:bg-darkNavSecondary">
                     <th
                       className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
                       onClick={() => {
@@ -287,18 +338,18 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                     .map((event, index) => (
                       <tr
                         key={index}
-                        className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
+                        className="hover:bg-zinc-100 dark:hover:bg-darkNavSecondary"
                       >
-                        <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                        <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                           {event.created_at}
                         </td>
-                        <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                        <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                           {event.event_name}
                         </td>
-                        <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
+                        <td className="border-y border-zinc-300 dark:border-border px-4 py-2 hidden sm:table-cell">
                           {event.event_description}
                         </td>
-                        <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
+                        <td className="border-y border-zinc-300 dark:border-border px-4 py-2 hidden sm:table-cell">
                           {event.completed ? "true" : "false"}
                         </td>
                       </tr>

@@ -356,7 +356,7 @@ export default function SmartLockDashboardView({}) {
         />
         {/* Search Button */}
         <button
-          className="bg-green-500 text-white p-1 py-2 rounded-sm hover:bg-green-600 ml-3 w-44 font-bold"
+          className="bg-green-500 text-white p-1 py-2 rounded-sm hover:bg-green-600 ml-3 w-44 font-bold cursor-pointer hover:transition hover:duration-300 hover:ease-in-out"
           onClick={() => search()}
           disabled={!searchQuery || searchQuery.length < 2} // Disable if empty or less than 2 characters
           title="Search for facilities by ID, property number, name, or environment"
@@ -365,7 +365,7 @@ export default function SmartLockDashboardView({}) {
         </button>
         {/* Toggle view button */}
         <button
-          className="bg-slate-300 text-white p-1 py-2 rounded-sm hover:bg-slate-400 ml-3 w-44 font-bold"
+          className="bg-slate-300 text-white p-1 py-2 rounded-sm hover:bg-slate-400 ml-3 w-44 font-bold cursor-pointer hover:transition hover:duration-300 hover:ease-in-out"
           onClick={() => toggleListView()}
         >
           {listView ? "Card View" : "List View"}

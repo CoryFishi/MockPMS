@@ -287,26 +287,6 @@ export default function SmartLockFacilityRow({
       return null;
     }
   };
-  const sendEmail = async () => {
-    try {
-      const response = await fetch("/.netlify/functions/sendEmail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: user.email,
-          subject: "Hello from Resend via Netlify Function",
-          html: "<strong>It works!</strong>",
-        }),
-      });
-
-      const data = await response.json();
-      console.log("Email sent:", data);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -661,12 +641,15 @@ export default function SmartLockFacilityRow({
                 </div>
               </div>
               <div className="flex flex-col items-center justify-center space-y-1">
-                <button
-                  className="bg-gray-400 text-white px-2 py-1 rounded-sm font-bold w-2/3 hover:bg-gray-500 hover:cursor-pointer"
-                  onClick={() => openSmartLockModal("")}
-                >
-                  View all SmartLocks
-                </button>
+                {smartlockSummary !== null && (
+                  <button
+                    className="bg-gray-400 text-white px-2 py-1 rounded-sm font-bold w-2/3 hover:bg-gray-500 hover:cursor-pointer"
+                    onClick={() => openSmartLockModal("")}
+                  >
+                    View all SmartLocks
+                  </button>
+                )}
+
                 <button
                   className="bg-gray-400 text-white px-2 py-1 rounded-sm font-bold w-2/3 hover:bg-gray-500 hover:cursor-pointer"
                   onClick={() =>

@@ -3,6 +3,7 @@ import { FaPerson } from "react-icons/fa6";
 import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 import PaginationFooter from "./PaginationFooter";
+import DataTable from "./modules/DataTable";
 
 export default function UserEvents() {
   const { user } = useAuth();
@@ -14,8 +15,39 @@ export default function UserEvents() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortedColumn, setSortedColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("desc");
+  const [pullDate, setPullDate] = useState(null);
+  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
+    let newDirection;
 
+    if (sortedColumn !== columnKey) {
+      newDirection = "asc";
+    } else if (sortDirection === "asc") {
+      newDirection = "desc";
+    } else if (sortDirection === "desc") {
+      newDirection = null;
+    }
+
+    setSortedColumn(newDirection ? columnKey : null);
+    setSortDirection(newDirection);
+
+    if (!newDirection) {
+      setFilteredEvents([...events]);
+      return;
+    }
+
+    const sorted = [...filteredEvents].sort((a, b) => {
+      const aVal = accessor(a) ?? "";
+      const bVal = accessor(b) ?? "";
+
+      if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
+      if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    setFilteredEvents(sorted);
+  };
   async function getAllEvents() {
+    setPullDate(Date());
     if (!user) return;
     const { data, error } = await supabase.from("user_events").select("*");
 
@@ -60,174 +92,79 @@ export default function UserEvents() {
     setFilteredEvents(filteredEvents);
   }, [searchQuery]);
 
+  const columns = [
+    {
+      key: "created_at",
+      label: "Created On",
+      accessor: (e) => e.created_at || "",
+    },
+    {
+      key: "event_name",
+      label: "Event",
+      accessor: (e) => e.event_name || "",
+    },
+    {
+      key: "event_description",
+      label: "Description",
+      accessor: (e) => e.event_description || "",
+    },
+    {
+      key: "completed",
+      label: "Success",
+      accessor: (e) => (e.completed ? "true" : false || ""),
+    },
+  ];
+
   return (
     <div className="overflow-auto dark:text-white dark:bg-darkPrimary">
+      {/* Header */}
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <FaPerson className="text-lg" />
           &ensp; User Events
         </div>
       </div>
-      <p className="text-sm dark:text-white text-left">{Date()}</p>
-      <div className="mt-2  flex items-center justify-end text-center px-5">
-        <input
-          type="text"
-          placeholder="Search events..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
-        />
-      </div>
-      <div className="w-full px-5 py-2">
-        <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
-          {/* Header */}
-          <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary border-b border-gray-300 dark:border-border">
-            <tr className="dark:border-border bg-gray-200 dark:bg-darkNavSecondary">
-              <th
-                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Created On");
-                  setFilteredEvents(
-                    [...events].sort((a, b) => {
-                      if (a.created_at < b.created_at)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (a.created_at > b.created_at)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Created On
-                {sortedColumn === "Created On" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Event");
-                  setFilteredEvents(
-                    [...events].sort((a, b) => {
-                      if (
-                        a.event_name.toLowerCase() < b.event_name.toLowerCase()
-                      )
-                        return newDirection === "asc" ? -1 : 1;
-                      if (
-                        a.event_name.toLowerCase() > b.event_name.toLowerCase()
-                      )
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Event
-                {sortedColumn === "Event" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Description");
-                  setFilteredEvents(
-                    [...events].sort((a, b) => {
-                      if (
-                        a.event_description.toLowerCase() <
-                        b.event_description.toLowerCase()
-                      )
-                        return newDirection === "asc" ? -1 : 1;
-                      if (
-                        a.event_description.toLowerCase() >
-                        b.event_description.toLowerCase()
-                      )
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Description
-                {sortedColumn === "Description" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-              <th
-                className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-                onClick={() => {
-                  const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                  setSortDirection(newDirection);
-                  setSortedColumn("Success");
-                  setFilteredEvents(
-                    [...events].sort((a, b) => {
-                      if (a.completed < b.completed)
-                        return newDirection === "asc" ? -1 : 1;
-                      if (a.completed > b.completed)
-                        return newDirection === "asc" ? 1 : -1;
-                      return 0;
-                    })
-                  );
-                }}
-              >
-                Success
-                {sortedColumn === "Success" && (
-                  <span className="ml-2">
-                    {sortDirection === "asc" ? "▲" : "▼"}
-                  </span>
-                )}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredEvents
-              .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-              .map((event, index) => (
-                <tr
-                  key={index}
-                  className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
-                >
-                  <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                    {event.created_at}
-                  </td>
-                  <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                    {event.event_name}
-                  </td>
-                  <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
-                    {event.event_description}
-                  </td>
-                  <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
-                    {event.completed ? "true" : "false"}
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-        {/* No Events Notification Text */}
-        {filteredEvents.length < 1 && (
-          <p className="text-center p-4 font-bold text-lg">No events found.</p>
-        )}
-        {/* Pagination Footer */}
-        <div className="px-2 py-5 mx-1">
-          <PaginationFooter
-            rowsPerPage={rowsPerPage}
-            setRowsPerPage={setRowsPerPage}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            items={filteredEvents}
+      {/* Display date/time of when events were pulled */}
+      <p className="text-sm dark:text-white text-left">{pullDate || ""}</p>
+      {/* Body */}
+      <div className="w-full px-5 flex flex-col rounded-lg h-full">
+        {/* Search Bar */}
+        <div className="mt-5 mb-2 flex items-center justify-end text-center">
+          <input
+            type="text"
+            placeholder="Search events..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
+        </div>
+        {/* Table */}
+        <div>
+          <DataTable
+            columns={columns}
+            data={filteredEvents}
+            currentPage={currentPage}
+            rowsPerPage={rowsPerPage}
+            sortDirection={sortDirection}
+            sortedColumn={sortedColumn}
+            onSort={handleColumnSort}
+          />
+          {/* No Events Notification Text */}
+          {filteredEvents.length < 1 && (
+            <p className="text-center p-4 font-bold text-lg">
+              No events found.
+            </p>
+          )}
+          {/* Pagination Footer */}
+          <div className="px-2 py-5 mx-1">
+            <PaginationFooter
+              rowsPerPage={rowsPerPage}
+              setRowsPerPage={setRowsPerPage}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              items={filteredEvents}
+            />
+          </div>
         </div>
       </div>
     </div>

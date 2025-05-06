@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaWarehouse } from "react-icons/fa6";
+import { FaWarehouse, FaLock, FaLockOpen, FaCheckCircle } from "react-icons/fa";
 import {
   MdBattery20,
   MdBattery60,
@@ -7,7 +7,6 @@ import {
   MdBatteryFull,
   MdBattery0Bar,
 } from "react-icons/md";
-import PaginationFooter from "../PaginationFooter";
 import {
   RiSignalWifi1Fill,
   RiSignalWifi2Fill,
@@ -15,12 +14,11 @@ import {
   RiSignalWifiFill,
   RiErrorWarningFill,
 } from "react-icons/ri";
-
-import { FaLock, FaLockOpen, FaCheckCircle } from "react-icons/fa";
-
 import { BsShieldLockFill } from "react-icons/bs";
-
 import { IoIosWarning } from "react-icons/io";
+import PaginationFooter from "../PaginationFooter";
+import DataTable from "../modules/DataTable";
+import SmartLockDetailModal from "./SmartLockDetailModal";
 
 export default function SmartLock({
   smartlockModalOption,
@@ -33,124 +31,265 @@ export default function SmartLock({
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredRow, setHoveredRow] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
-  const [sortedColumn, setSortedColumn] = useState(null);
+  const [sortedColumn, setSortedColumn] = useState("Name");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
-  const handleColumnSort = (column, accessor) => {
-    const newDirection = sortDirection === "asc" ? "desc" : "asc";
+  const [selectedLock, setSelectedLock] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
+  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
+    let newDirection;
+
+    if (sortedColumn !== columnKey) {
+      newDirection = "asc";
+    } else if (sortDirection === "asc") {
+      newDirection = "desc";
+    } else if (sortDirection === "desc") {
+      newDirection = null;
+    }
+
+    setSortedColumn(newDirection ? columnKey : null);
     setSortDirection(newDirection);
-    setSortedColumn(column);
+
+    if (!newDirection) {
+      setFilteredSmartLocks([...smartLocks]);
+      return;
+    }
+
     setFilteredSmartLocks(
       [...filteredSmartLocks].sort((a, b) => {
         const aVal = accessor(a);
         const bVal = accessor(b);
-        if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
-        if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
-        return 0;
+        return newDirection === "asc"
+          ? aVal.localeCompare?.(bVal) ?? aVal - bVal
+          : bVal.localeCompare?.(aVal) ?? bVal - aVal;
       })
     );
   };
 
   useEffect(() => {
-    setSortedColumn("Name");
-    var sortedSmartLocks = [...smartLocks].sort((a, b) => {
-      if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-      return 0;
-    });
+    let sorted = [...smartLocks].sort((a, b) => a.name.localeCompare(b.name));
     switch (option) {
       case "good":
-        sortedSmartLocks = sortedSmartLocks.filter(
-          (lock) => lock.overallStatus === "ok"
-        );
+        sorted = sorted.filter((l) => l.overallStatus === "ok");
         break;
       case "warning":
-        sortedSmartLocks = sortedSmartLocks.filter(
-          (lock) => lock.overallStatus === "warning"
-        );
+        sorted = sorted.filter((l) => l.overallStatus === "warning");
         break;
       case "error":
-        sortedSmartLocks = sortedSmartLocks.filter(
-          (lock) => lock.overallStatus === "error"
-        );
+        sorted = sorted.filter((l) => l.overallStatus === "error");
         break;
-      case "lowestSignal":
-        const lowestSignalStrength = sortedSmartLocks.reduce((lowest, lock) => {
-          return lock.signalQuality < lowest && !lock.isDeviceOffline
-            ? lock.signalQuality
-            : lowest;
-        }, sortedSmartLocks[0].signalQuality);
-
-        sortedSmartLocks = sortedSmartLocks.filter(
-          (lock) => lock.signalQuality === lowestSignalStrength
+      case "lowestSignal": {
+        const min = Math.min(
+          ...sorted
+            .filter((l) => !l.isDeviceOffline)
+            .map((l) => l.signalQuality)
         );
+        sorted = sorted.filter((l) => l.signalQuality === min);
         break;
-      case "lowestBattery":
-        const lowestBatteryLevel = sortedSmartLocks.reduce((lowest, lock) => {
-          return lock.batteryLevel < lowest && !lock.isDeviceOffline
-            ? lock.batteryLevel
-            : lowest;
-        }, sortedSmartLocks[0].batteryLevel);
-
-        sortedSmartLocks = sortedSmartLocks.filter(
-          (lock) => lock.batteryLevel === lowestBatteryLevel
+      }
+      case "lowestBattery": {
+        const min = Math.min(
+          ...sorted.filter((l) => !l.isDeviceOffline).map((l) => l.batteryLevel)
         );
+        sorted = sorted.filter((l) => l.batteryLevel === min);
         break;
+      }
       case "offline":
-        sortedSmartLocks = sortedSmartLocks.filter(
-          (lock) => lock.isDeviceOffline === true
-        );
-        break;
-      default:
+        sorted = sorted.filter((l) => l.isDeviceOffline);
         break;
     }
 
-    const filteredSmartLocks = sortedSmartLocks.filter(
-      (smartlock) =>
-        (smartlock.name || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (smartlock.unitName || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (smartlock.overallStatus || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (smartlock.deviceType || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        String(smartlock.batteryLevel || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        String(Math.round((smartlock.signalQuality / 255) * 100) || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (Array.isArray(smartlock.statusMessages) &&
-          smartlock.statusMessages.some((message) =>
-            (message || "").toLowerCase().includes(searchQuery.toLowerCase())
-          ))
+    const filtered = sorted.filter(
+      (l) =>
+        [l.name, l.unitName, l.overallStatus, l.deviceType].some((f) =>
+          (f || "").toLowerCase().includes(searchQuery.toLowerCase())
+        ) ||
+        String(l.batteryLevel).includes(searchQuery) ||
+        String(Math.round((l.signalQuality / 255) * 100)).includes(
+          searchQuery
+        ) ||
+        l.statusMessages?.some((m) =>
+          m?.toLowerCase().includes(searchQuery.toLowerCase())
+        )
     );
-    setFilteredSmartLocks(filteredSmartLocks);
+
+    setFilteredSmartLocks(filtered);
     setCurrentPage(1);
   }, [smartLocks, option, searchQuery]);
 
-  // Pagination logic
-  const pageCount = Math.ceil(filteredSmartLocks.length / rowsPerPage);
+  const columns = [
+    {
+      key: "name",
+      label: "Name",
+      accessor: (r) => r.name,
+      render: (r) => <span>{r.name}</span>,
+    },
+    {
+      key: "unitName",
+      label: "Unit",
+      accessor: (r) => r.unitName,
+    },
+    {
+      key: "deviceType",
+      label: "Device Type",
+      accessor: (r) => r.deviceType,
+    },
+    {
+      key: "signalQuality",
+      label: "Signal Quality",
+      accessor: (r) => r.signalQuality,
+      render: (r) => {
+        const pct = Math.round((r.signalQuality / 255) * 100);
+        const Icon =
+          pct < 24
+            ? RiSignalWifi1Fill
+            : pct < 63
+            ? RiSignalWifi2Fill
+            : pct < 90
+            ? RiSignalWifi3Fill
+            : RiSignalWifiFill;
+        const color =
+          pct < 20
+            ? "text-red-500"
+            : pct < 70
+            ? "text-yellow-500"
+            : "text-green-500";
+        return (
+          <span className="inline-flex items-center gap-1">
+            <Icon className={`${color}`} /> {pct}%
+          </span>
+        );
+      },
+    },
+    {
+      key: "batteryLevel",
+      label: "Battery",
+      accessor: (r) => r.batteryLevel,
+      render: (r) => {
+        const lvl = r.batteryLevel;
+        const Icon =
+          lvl < 20
+            ? MdBattery0Bar
+            : lvl < 50
+            ? MdBattery20
+            : lvl < 75
+            ? MdBattery60
+            : lvl < 99
+            ? MdBattery80
+            : MdBatteryFull;
+        const color =
+          lvl < 30
+            ? "text-red-500"
+            : lvl < 99
+            ? "text-yellow-500"
+            : "text-green-500";
+        return (
+          <span className="inline-flex items-center gap-1">
+            <Icon className={`${color}`} /> {lvl}%
+          </span>
+        );
+      },
+    },
+    {
+      key: "lockState",
+      label: "Lock State",
+      accessor: (r) => r.lockState,
+      render: (r) => {
+        const Icon =
+          r.lockState === "Locked"
+            ? FaLock
+            : r.lockState.includes("Unlocked")
+            ? FaLockOpen
+            : BsShieldLockFill;
+        const color =
+          r.lockState === "Locked"
+            ? "text-green-500"
+            : r.lockState.includes("Unlocked")
+            ? "text-yellow-500"
+            : "text-red-500";
+
+        return (
+          <span className="inline-flex items-center gap-2">
+            <Icon className={`${color}`} /> {r.lockState}
+          </span>
+        );
+      },
+    },
+    {
+      key: "unitStatus",
+      label: "Unit Details",
+      accessor: (r) => r.unitStatus,
+      render: (r) => (
+        <span>
+          {r.unitStatus}
+          {r.visitorName ? " - " + r.visitorName : ""}
+        </span>
+      ),
+    },
+    {
+      key: "statusMessages",
+      label: "Lock Status",
+      accessor: (r) =>
+        r.statusMessages?.some((m) => m.trim() !== "")
+          ? r.statusMessages.join(" | ").toLowerCase()
+          : "SmartLock is online",
+      render: (r) => {
+        const Icon =
+          r.overallStatus === "error"
+            ? RiErrorWarningFill
+            : r.overallStatus === "warning"
+            ? IoIosWarning
+            : FaCheckCircle;
+        const color =
+          r.overallStatus === "error"
+            ? "text-red-500"
+            : r.overallStatus === "warning"
+            ? "text-yellow-500"
+            : "text-green-500";
+        return (
+          <span className={`inline-flex items-start gap-2 ${color}`}>
+            <Icon className="text-xl" />
+            <div>
+              {r.statusMessages?.some((m) => m.trim() !== "")
+                ? r.statusMessages.map((m, i) => <div key={i}>{m}</div>)
+                : "SmartLock is online"}
+            </div>
+          </span>
+        );
+      },
+    },
+    {
+      key: "lastUpdateTimestampDisplay",
+      label: "Last Update",
+      accessor: (r) => r.lastUpdateTimestampDisplay,
+    },
+  ];
+
+  const handleRowClick = (row) => {
+    setSelectedLock(row);
+    setIsDetailModalOpen(true);
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+      {isDetailModalOpen && (
+        <SmartLockDetailModal
+          lock={selectedLock}
+          onClose={() => setIsDetailModalOpen(false)}
+        />
+      )}
       <div className="bg-white rounded-sm shadow-lg text-black relative max-h-[95vh] w-full max-w-[95vw] dark:text-white dark:bg-darkPrimary">
         <div className="pl-5 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
-          <div className="flex text-center items-center">
+          <div className="flex items-center">
             <FaWarehouse />
-            <h2 className="ml-2 text-lg font-bold text-center items-center">
+            <h2 className="ml-2 text-lg font-bold">
               {facilityName}'s SmartLocks
             </h2>
           </div>
-
           <button
-            className="right-0 text-gray-600 hover:cursor-pointer bg-gray-100 hover:bg-gray-300 dark:text-white dark:hover:bg-red-500 h-full px-5 rounded-tr dark:bg-gray-800"
             onClick={() => setIsSmartlockModalOpen(false)}
+            className="bg-gray-100 h-full px-5 cursor-pointer rounded-tr text-gray-600 dark:text-white dark:bg-gray-800 dark:hover:hover:bg-red-500 hover:bg-red-500 transition duration-300 ease-in-out"
           >
             x
           </button>
@@ -158,8 +297,8 @@ export default function SmartLock({
         <div className="pt-5 px-5">
           {option && (
             <p
-              className="text-right text-blue-500 pr-10 hover:cursor-pointer hover:text-blue-900"
               onClick={() => setOption(null)}
+              className="text-right text-blue-500 pr-10 hover:cursor-pointer hover:text-blue-900"
             >
               clear filter
             </p>
@@ -172,261 +311,19 @@ export default function SmartLock({
             className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
           <div className="h-[73vh] overflow-y-auto text-center">
-            <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
-              {/* Header */}
-              <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
-                <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
-                  {[
-                    {
-                      key: "Name",
-                      label: "Name",
-                      accessor: (a) => a.name?.toLowerCase() || "",
-                    },
-                    {
-                      key: "Unit",
-                      label: "Unit",
-                      accessor: (a) => a.unitName?.toLowerCase() || "",
-                    },
-                    {
-                      key: "Device Type",
-                      label: "Device Type",
-                      accessor: (a) => a.deviceType?.toLowerCase() || "",
-                    },
-                    {
-                      key: "Signal Quality",
-                      label: "Signal Quality",
-                      accessor: (a) => a.signalQuality,
-                    },
-                    {
-                      key: "Battery Level",
-                      label: "Battery Level",
-                      accessor: (a) => a.batteryLevel,
-                    },
-                    {
-                      key: "Lock State",
-                      label: "Lock State",
-                      accessor: (a) => a.lockState?.toLowerCase() || "",
-                    },
-                    {
-                      key: "Unit Details",
-                      label: "Unit Details",
-                      accessor: (a) => a.unitStatus?.toLowerCase() || "",
-                    },
-                    {
-                      key: "Lock Status Message(s)",
-                      label: "Lock Status Message(s)",
-                      accessor: (a) =>
-                        a.overallStatusMessage?.toLowerCase() || "",
-                    },
-                    {
-                      key: "Last Update",
-                      label: "Last Update",
-                      accessor: (a) => a.lastUpdateTimestamp,
-                    },
-                  ].map(({ key, label, accessor }) => (
-                    <th
-                      key={key}
-                      className="px-4 py-2 hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary transition duration-300 ease-in-out"
-                      onClick={() => handleColumnSort(key, accessor)}
-                    >
-                      {label}
-                      {sortedColumn === key && (
-                        <span className="ml-2">
-                          {sortDirection === "asc" ? "▲" : "▼"}
-                        </span>
-                      )}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredSmartLocks
-                  .slice(
-                    (currentPage - 1) * rowsPerPage,
-                    currentPage * rowsPerPage
-                  )
-                  .map((smartlock, index) => (
-                    <tr
-                      className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary relative hover:cursor-pointer"
-                      onClick={() => setHoveredRow(index)}
-                      onMouseLeave={() => setHoveredRow(null)}
-                      key={index}
-                    >
-                      <td className="border border-gray-300 dark:border-border px-4 py-2">
-                        {smartlock.name}
-                        {hoveredRow === index && (
-                          <div className="absolute bg-gray-700 dark:bg-slate-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-4/5">
-                            <div className="grid grid-cols-4 gap-1 overflow-hidden">
-                              {Object.entries(smartlock).map(
-                                ([key, value], index) => (
-                                  <div key={index} className="break-words">
-                                    <span className="font-bold text-yellow-500 ">
-                                      {key}:
-                                    </span>
-                                    <br />
-                                    <span className="whitespace-normal break-words">
-                                      {value === null
-                                        ? "null"
-                                        : value === ""
-                                        ? "null"
-                                        : value === true
-                                        ? "true"
-                                        : value === false
-                                        ? "false"
-                                        : value}
-                                    </span>
-                                  </div>
-                                )
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </td>
-                      <td className="border border-gray-300 dark:border-border px-4 py-2">
-                        {smartlock.unitName}
-                      </td>
-                      <td className="border border-gray-300 dark:border-border px-4 py-2">
-                        {smartlock.deviceType}
-                      </td>
-                      <td
-                        className="border border-gray-300 dark:border-border px-4 py-2 text-center"
-                        title={smartlock.signalQualityDisplay}
-                      >
-                        {smartlock.signalQuality < 60 ? (
-                          <div className="inline-flex items-center gap-1">
-                            <RiSignalWifi1Fill className="text-red-500" />
-                            {Math.round((smartlock.signalQuality / 255) * 100)}%
-                          </div>
-                        ) : smartlock.signalQuality < 160 ? (
-                          <div className="inline-flex items-center gap-1">
-                            <RiSignalWifi2Fill className="text-yellow-500" />
-                            {Math.round((smartlock.signalQuality / 255) * 100)}%
-                          </div>
-                        ) : smartlock.signalQuality < 230 ? (
-                          <div className="inline-flex items-center gap-1">
-                            <RiSignalWifi3Fill className="text-green-300" />
-                            {Math.round((smartlock.signalQuality / 255) * 100)}%
-                          </div>
-                        ) : (
-                          <div className="inline-flex items-center gap-1">
-                            <RiSignalWifiFill className="text-green-500" />
-                            {Math.round((smartlock.signalQuality / 255) * 100)}%
-                          </div>
-                        )}
-                      </td>
-                      <td
-                        className="border border-gray-300 dark:border-border px-4 py-2 text-center"
-                        title={smartlock.lastBatteryChangeTimestampDisplay}
-                      >
-                        {smartlock.batteryLevel < 20 ? (
-                          <div className="inline-flex items-center gap-1">
-                            <MdBattery0Bar className="text-red-500" />
-                            {smartlock.batteryLevel}%
-                          </div>
-                        ) : smartlock.batteryLevel < 50 ? (
-                          <div className="inline-flex items-center gap-1">
-                            <MdBattery20 className="text-yellow-500" />
-                            {smartlock.batteryLevel}%
-                          </div>
-                        ) : smartlock.batteryLevel < 75 ? (
-                          <div className="inline-flex items-center gap-1">
-                            <MdBattery60 className="text-yellow-500" />
-                            {smartlock.batteryLevel}%
-                          </div>
-                        ) : smartlock.batteryLevel < 99 ? (
-                          <div className="inline-flex items-center gap-1">
-                            <MdBattery80 className="text-green-300" />
-                            {smartlock.batteryLevel}%
-                          </div>
-                        ) : (
-                          <div className="inline-flex items-center gap-1">
-                            <MdBatteryFull className="text-green-500" />
-                            {smartlock.batteryLevel}%
-                          </div>
-                        )}
-                      </td>
-
-                      <td className="border border-gray-300 dark:border-border px-4 py-2">
-                        {smartlock.lockState === "Locked" ? (
-                          <div className="inline-flex items-center gap-2">
-                            <FaLock />
-                            {smartlock.lockState}
-                          </div>
-                        ) : smartlock.lockState === "Unlocked" ||
-                          smartlock.lockState === "UnlockedLocal" ? (
-                          <div className="inline-flex items-center gap-2">
-                            <FaLockOpen />
-                            {smartlock.lockState}
-                          </div>
-                        ) : (
-                          <div className="inline-flex items-center gap-2">
-                            <BsShieldLockFill className="text-red-500" />
-                            {smartlock.lockState}
-                          </div>
-                        )}
-                      </td>
-                      <td className="border border-gray-300 dark:border-border px-4 py-2">
-                        {smartlock.unitStatus}
-                        {smartlock.visitorName
-                          ? " - " + smartlock.visitorName
-                          : ""}
-                      </td>
-                      <td
-                        className="border border-gray-300 dark:border-border px-4 py-2"
-                        title={smartlock.lastEventTimestampDisplay}
-                      >
-                        {smartlock.statusMessages[0] != "" ? (
-                          smartlock.overallStatus === "error" ? (
-                            <div className="inline-flex items-center gap-2">
-                              <RiErrorWarningFill className="text-red-500 text-2xl" />
-                              <div>
-                                {smartlock.statusMessages.map(
-                                  (message, index) => (
-                                    <div key={index}>{message}</div>
-                                  )
-                                )}
-                              </div>
-                            </div>
-                          ) : smartlock.overallStatus === "warning" ? (
-                            <div className="inline-flex items-center gap-2">
-                              <IoIosWarning className="text-yellow-500 text-2xl" />
-                              <div>
-                                {smartlock.statusMessages.map(
-                                  (message, index) => (
-                                    <div key={index}>{message}</div>
-                                  )
-                                )}
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="inline-flex items-center gap-2">
-                              <FaCheckCircle className="text-green-500" />
-                              <div>
-                                {smartlock.statusMessages.map(
-                                  (message, index) => (
-                                    <div key={index}>{message}</div>
-                                  )
-                                )}
-                              </div>
-                            </div>
-                          )
-                        ) : (
-                          <div className="inline-flex items-center gap-2">
-                            <FaCheckCircle className="text-green-500 text-xl" />{" "}
-                            SmartLock is online
-                          </div>
-                        )}
-                      </td>
-
-                      <td className="border border-gray-300 dark:border-border px-4 py-2">
-                        {smartlock.lastUpdateTimestampDisplay}
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+            <DataTable
+              columns={columns}
+              data={filteredSmartLocks}
+              currentPage={currentPage}
+              rowsPerPage={rowsPerPage}
+              sortDirection={sortDirection}
+              sortedColumn={sortedColumn}
+              onSort={handleColumnSort}
+              hoveredRow={hoveredRow}
+              setHoveredRow={setHoveredRow}
+              onRowClick={handleRowClick}
+            />
           </div>
-          {/* Modal footer/pagination */}
           <div className="px-2 py-5 mx-1">
             <PaginationFooter
               rowsPerPage={rowsPerPage}

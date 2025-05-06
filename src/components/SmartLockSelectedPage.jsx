@@ -8,6 +8,7 @@ import PaginationFooter from "./PaginationFooter";
 import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import DataTable from "./modules/DataTable";
 
 export default function SmartLockSelectedPage() {
   const [facilities, setFacilities] = useState([]);
@@ -19,16 +20,30 @@ export default function SmartLockSelectedPage() {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [selectedTokensLoaded, setSelectedTokensLoaded] = useState(false);
   const [noFacilities, setNoFacilities] = useState(false);
-
   const { user, selectedTokens, setSelectedTokens } = useAuth();
-  const handleSort = (columnKey, accessor = (a) => a[columnKey]) => {
-    const newDirection = sortDirection === "asc" ? "desc" : "asc";
+  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
+    let newDirection;
+
+    if (sortedColumn !== columnKey) {
+      newDirection = "asc";
+    } else if (sortDirection === "asc") {
+      newDirection = "desc";
+    } else if (sortDirection === "desc") {
+      newDirection = null;
+    }
+
+    setSortedColumn(newDirection ? columnKey : null);
     setSortDirection(newDirection);
-    setSortedColumn(columnKey);
+
+    if (!newDirection) {
+      setFilteredFacilities([...facilities]);
+      return;
+    }
 
     const sorted = [...filteredFacilities].sort((a, b) => {
       const aVal = accessor(a) ?? "";
       const bVal = accessor(b) ?? "";
+
       if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
       if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
       return 0;
@@ -36,7 +51,6 @@ export default function SmartLockSelectedPage() {
 
     setFilteredFacilities(sorted);
   };
-
   const handleSelectedFacilitiesUpdate = async (newFacility, isSelected) => {
     // Fetch existing favorite tokens for the user
     const { data: currentData, error: fetchError } = await supabase
@@ -95,16 +109,13 @@ export default function SmartLockSelectedPage() {
       }
     }
   };
-
   const addToSelected = async (facility) => {
     const isSelected = isFacilitySelected(facility.id);
     handleSelectedFacilitiesUpdate(facility, isSelected);
   };
-
   const isFacilitySelected = (facilityId) => {
     return selectedTokens.some((facility) => facility.id === facilityId);
   };
-
   useEffect(() => {
     try {
       if (selectedTokens.length < 1) {
@@ -129,7 +140,6 @@ export default function SmartLockSelectedPage() {
       alert("It broke");
     }
   }, [selectedTokens]);
-
   useEffect(() => {
     const filtered = facilities.filter(
       (facility) =>
@@ -146,19 +156,91 @@ export default function SmartLockSelectedPage() {
     );
     setFilteredFacilities(filtered);
   }, [facilities, searchQuery]);
-
-  // Pagination logic
-  const pageCount = Math.ceil(filteredFacilities.length / rowsPerPage);
-
+  const columns = [
+    {
+      key: "isSelected",
+      label: <RiCheckboxBlankCircleLine className="text-lg text-slate-400" />,
+      accessor: (f) => (isFacilitySelected(f.id) ? 1 : 0),
+      render: (f) => (
+        <div
+          className="flex justify-center text-yellow-500 cursor-pointer items-center"
+          onClick={(e) => {
+            e.stopPropagation();
+            addToSelected(f);
+          }}
+        >
+          {isFacilitySelected(f.id) ? (
+            <RiCheckboxCircleFill className="text-lg" />
+          ) : (
+            <RiCheckboxBlankCircleLine className="text-lg text-slate-400" />
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "environment",
+      label: "Environment",
+      accessor: (f) => f.environment?.toLowerCase() || "",
+      render: (f) => environmentLabel[f.environment] ?? "N/A",
+    },
+    {
+      key: "id",
+      label: "Facility Id",
+      accessor: (f) => f.id,
+    },
+    {
+      key: "name",
+      label: "Facility Name",
+      accessor: (f) => f.name?.toLowerCase() || "",
+      render: (f) => (
+        <div className="flex gap-3 items-center justify-center">
+          <p className="pl-1 truncate max-w-[32ch]">
+            {f.name.length > 24 ? f.name.slice(0, 24) + "..." : f.name}
+          </p>
+          <FaExternalLinkAlt
+            title={`https://portal.${
+              f.environment === "cia-stg-1.aws."
+                ? f.environment
+                : "insomniaccia" + f.environment
+            }.com/facility/${f.id}/dashboard`}
+            className="text-blue-300 hover:text-blue-500 cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const url =
+                f.environment === "cia-stg-1.aws."
+                  ? `https://portal.${f.environment}insomniaccia.com/facility/${f.id}/dashboard`
+                  : `https://portal.insomniaccia${f.environment}.com/facility/${f.id}/dashboard`;
+              window.open(url, "_blank");
+            }}
+          />
+        </div>
+      ),
+    },
+    {
+      key: "propertyNumber",
+      label: "Property Number",
+      accessor: (f) => f.propertyNumber || "",
+    },
+  ];
+  const environmentLabel = {
+    "-dev": "Development",
+    "": "Production",
+    "-qa": "QA",
+    "cia-stg-1.aws.": "Staging",
+  };
   return (
     <div className="relative overflow-auto h-full dark:text-white dark:bg-darkPrimary">
+      {/* Header */}
       <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <RiCheckboxCircleFill className="text-lg" />
           &ensp; Selected Facilities
         </div>
       </div>
+      {/* Body */}
       <div className="w-full px-5 flex flex-col rounded-lg h-full">
+        {/* Seach Bar */}
         <div className="mt-5 mb-2 flex items-center justify-end text-center">
           <input
             type="text"
@@ -168,152 +250,33 @@ export default function SmartLockSelectedPage() {
             className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
         </div>
+        {/* Table */}
         <div>
-          <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
-            {/* Header */}
-            <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
-              <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
-                {[
-                  {
-                    key: "isSelected",
-                    label: "",
-                    accessor: (a) => (isFacilitySelected(a.id) ? 1 : 0),
-                    className: "text-left",
-                  },
-                  {
-                    key: "environment",
-                    label: "Environment",
-                    accessor: (a) => a.environment?.toLowerCase() || "",
-                    className: "text-left",
-                  },
-                  {
-                    key: "facilityId",
-                    label: "Facility Id",
-                    accessor: (a) => a.id,
-                    className: "text-left",
-                  },
-                  {
-                    key: "name",
-                    label: "Facility Name",
-                    accessor: (a) => a.name?.toLowerCase() || "",
-                    className: "text-left",
-                  },
-                  {
-                    key: "propertyNumber",
-                    label: "Property Number",
-                    accessor: (a) => a.propertyNumber?.toLowerCase() || "",
-                    className: "text-left",
-                  },
-                ].map(({ key, label, accessor, className }) => (
-                  <th
-                    key={key}
-                    className={`px-4 py-2 ${className} hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out`}
-                    onClick={() => handleSort(key, accessor)}
-                  >
-                    {label}
-                    {sortedColumn === key && (
-                      <span className="ml-2">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredFacilities
-                .slice(
-                  (currentPage - 1) * rowsPerPage,
-                  currentPage * rowsPerPage
-                )
-                .map((facility, index) => (
-                  <tr
-                    key={index}
-                    className="border-y border-gray-300 dark:border-border hover:bg-gray-100 dark:hover:bg-darkNavSecondary hover:cursor-pointer"
-                  >
-                    <td
-                      className="px-4 py-2"
-                      onClick={() => addToSelected(facility)}
-                    >
-                      <div className="flex justify-center text-yellow-500">
-                        {isFacilitySelected(facility.id) ? (
-                          <RiCheckboxCircleFill className="text-lg" />
-                        ) : (
-                          <RiCheckboxBlankCircleLine className="text-lg text-slate-400" />
-                        )}
-                      </div>
-                    </td>
-                    <td
-                      className="px-4 py-2 hover:cursor-pointer"
-                      onClick={() => addToSelected(facility)}
-                    >
-                      {facility.environment == "-dev"
-                        ? "Development"
-                        : facility.environment == ""
-                        ? "Production"
-                        : facility.environment == "-qa"
-                        ? "QA"
-                        : facility.environment == "cia-stg-1.aws."
-                        ? "Staging"
-                        : "N?A"}
-                    </td>
-                    <td
-                      className="border-y border-gray-300 dark:border-border px-4 py-2"
-                      onClick={() => addToSelected(facility)}
-                    >
-                      {facility.id}
-                    </td>
-                    <td
-                      className="px-4 py-2 hover:cursor-pointer"
-                      onClick={() => addToSelected(facility)}
-                    >
-                      <div className="flex gap-3 items-center">
-                        {facility.name}
-                        <FaExternalLinkAlt
-                          title={
-                            facility.environment === "cia-stg-1.aws."
-                              ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
-                              : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`
-                          }
-                          className="text-blue-300 group-hover:text-blue-500"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const baseUrl =
-                              facility.environment === "cia-stg-1.aws."
-                                ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
-                                : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`;
-                            window.open(baseUrl, "_blank");
-                          }}
-                        />
-                      </div>
-                    </td>
-                    <td
-                      className="px-4 py-2 hover:cursor-pointer"
-                      onClick={() => addToSelected(facility)}
-                    >
-                      {facility.propertyNumber}
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+          <DataTable
+            columns={columns}
+            data={filteredFacilities}
+            currentPage={currentPage}
+            rowsPerPage={rowsPerPage}
+            sortDirection={sortDirection}
+            sortedColumn={sortedColumn}
+            onSort={handleColumnSort}
+          />
+          {/* If no facilities display no facilities text */}
           {noFacilities && (
             <div className="w-full text-center mt-5 text-red-500">
               No Facilities Currently Selected...
             </div>
           )}
-        </div>
-        {/* Modal footer/pagination */}
-        <div className="px-2 py-5 mx-1">
-          <PaginationFooter
-            rowsPerPage={rowsPerPage}
-            setRowsPerPage={setRowsPerPage}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            items={filteredFacilities}
-          />
+          {/* Modal footer/pagination */}
+          <div className="px-2 py-5 mx-1">
+            <PaginationFooter
+              rowsPerPage={rowsPerPage}
+              setRowsPerPage={setRowsPerPage}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              items={filteredFacilities}
+            />
+          </div>
         </div>
       </div>
     </div>

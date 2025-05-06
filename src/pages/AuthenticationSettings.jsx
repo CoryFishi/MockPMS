@@ -38,7 +38,6 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
   }
   const handleFetchTokens = async () => {
     try {
-      // Now fetch the tokens after the delay
       const fetchedTokens = await fetchTokens();
 
       if (!Array.isArray(fetchedTokens)) {
@@ -56,30 +55,38 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     }
   };
   const fetchTokens = async () => {
-    if (!user) {
-      return;
-    }
+    console.log("Fetching tokens...");
+    if (!user) return;
 
-    // Attempt to fetch existing tokens for the user
-    const { data: currentData, error: fetchError } = await supabase
+    const { data: currentData, error } = await supabase
       .from("user_data")
       .select("tokens")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
-    // Handle the case where no data is found
-    let updatedTokens;
-    if (fetchError && fetchError.code === "PGRST116") {
+    if (error) {
+      console.error("Error fetching tokens:", error.message);
+      toast.error("Failed to retrieve user tokens.");
       return [];
-    } else if (fetchError) {
-      console.error("Error fetching current tokens:", fetchError.message);
-      toast.error("Failed to retrieve current credentials.");
-      return;
-    } else {
-      updatedTokens = currentData?.tokens || [];
-      return updatedTokens;
     }
+
+    if (!currentData) {
+      const { error: insertError } = await supabase.from("user_data").insert([
+        {
+          user_id: user.id,
+          tokens: [],
+          last_update_at: new Date().toISOString(),
+        },
+      ]);
+      if (insertError) {
+        console.error("Error initializing user_data:", insertError.message);
+      }
+      return [];
+    }
+
+    return currentData.tokens || [];
   };
+
   const submitCredentials = async () => {
     let updatedTokens = (await fetchTokens()) || [];
     // Add the new set of credentials to the array
@@ -265,7 +272,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     ];
     // Create rows
     const csvRows = [
-      headers.join(","), // Add headers to rows
+      headers.join(","),
       ...settingsSavedFacilities.map((facility) =>
         [
           facility.api,
