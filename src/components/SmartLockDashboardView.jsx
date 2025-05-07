@@ -34,24 +34,58 @@ export default function SmartLockDashboardView({}) {
   const [expandedRows, setExpandedRows] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentLoadingText, setCurrentLoadingText] = useState("");
+  const [sortKey, setSortKey] = useState(null);
+  const [sortDirection, setSortDirection] = useState("asc");
+
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortKey === key && sortDirection === "asc") {
+      direction = "desc";
+    }
+    setSortKey(key);
+    setSortDirection(direction);
+
+    const sorted = [...filteredFacilities].sort((a, b) => {
+      const aVal = a[key] ?? 0;
+      const bVal = b[key] ?? 0;
+
+      if (typeof aVal === "string") {
+        return direction === "asc"
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal);
+      }
+      return direction === "asc" ? aVal - bVal : bVal - aVal;
+    });
+
+    setFilteredFacilities(sorted);
+  };
+  useEffect(() => {
+    if (searchQuery.trim() !== "") {
+      search(searchQuery);
+    } else {
+      setFilteredFacilities(facilitiesWithBearers);
+    }
+  }, [facilitiesWithBearers]);
 
   // Search via search bar and button
-  const search = () => {
-    setFilteredFacilities(
-      facilitiesWithBearers.filter(
-        (facility) =>
-          (facility.id || "").toString().includes(searchQuery) ||
-          (facility.propertyNumber || "")
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-          (facility.name || "")
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-          (facility.environment || "")
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase())
-      )
-    );
+  const search = (query) => {
+    const trimmed = query.trim().toLowerCase();
+    const results = facilitiesWithBearers.filter((facility) => {
+      const searchableFields = [
+        facility.id?.toString(),
+        facility.name,
+        facility.propertyNumber,
+        facility.environment,
+        facility.facilityDetail?.addressLine1,
+        facility.facilityDetail?.city,
+        facility.facilityDetail?.postalCode,
+      ];
+
+      return searchableFields.some((field) =>
+        field?.toString().toLowerCase().includes(trimmed)
+      );
+    });
+    setFilteredFacilities(results);
   };
 
   // Function to get a bearer token for each facility
@@ -182,12 +216,18 @@ export default function SmartLockDashboardView({}) {
             return { ...facility, bearer };
           })
         );
-        setFacilitiesWithBearers(updatedFacilities);
-        setFilteredFacilities(updatedFacilities);
-      } catch (error) {
-        console.error("Error fetching facilities:", error);
+
+        const facilitiesWithStats = await Promise.all(
+          updatedFacilities.map(fetchFacilityData)
+        );
+
+        setFacilitiesWithBearers(facilitiesWithStats);
+        setFilteredFacilities(facilitiesWithStats);
+        setFacilitiesInfo(facilitiesWithStats);
+      } catch (err) {
+        console.error("Failed to fetch facilities:", err);
       } finally {
-        setIsLoading(false); // Set loading to false once all async operations complete
+        setIsLoading(false);
       }
     };
 
@@ -199,6 +239,102 @@ export default function SmartLockDashboardView({}) {
 
     return () => clearInterval(interval);
   }, [selectedTokens]);
+
+  const fetchFacilityData = async (facility) => {
+    const { id, environment, bearer } = facility;
+    const tokenPrefix =
+      environment === "cia-stg-1.aws." ? "cia-stg-1.aws." : "";
+    const tokenSuffix = environment === "cia-stg-1.aws." ? "" : environment;
+
+    const headers = {
+      Authorization: `Bearer ${bearer}`,
+      accept: "application/json",
+      "api-version": "2.0",
+    };
+
+    const [edgeRouter, aps, summary, smartlocks] = await Promise.all([
+      axios
+        .get(
+          `https://accesscontrol.${tokenPrefix}insomniaccia${tokenSuffix}.com/facilities/${id}/edgerouterstatus`,
+          { headers }
+        )
+        .then((res) => res.data)
+        .catch(() => null),
+      axios
+        .get(
+          `https://accesscontrol.${tokenPrefix}insomniaccia${tokenSuffix}.com/facilities/${id}/edgerouterplatformdevicesstatus`,
+          { headers }
+        )
+        .then((res) => res.data)
+        .catch(() => []),
+      axios
+        .get(
+          `https://accesscontrol.${tokenPrefix}insomniaccia${tokenSuffix}.com/facilities/${id}/smartlockstatussummary`,
+          { headers }
+        )
+        .then((res) => res.data)
+        .catch(() => null),
+      axios
+        .get(
+          `https://accesscontrol.${tokenPrefix}insomniaccia${tokenSuffix}.com/facilities/${id}/smartlockstatus`,
+          { headers }
+        )
+        .then((res) => res.data)
+        .catch(() => []),
+    ]);
+
+    const fetchFacilityDetail = async () => {
+      const res = await axios.get(
+        `https://accesscontrol.${tokenPrefix}insomniaccia${tokenSuffix}.com/facilities/${id}`,
+        { headers }
+      );
+      return res.data;
+    };
+
+    const fetchWeather = async (postalCode) => {
+      const weatherKey = import.meta.env.VITE_WEATHER_KEY;
+      const res = await axios.get(
+        `https://api.weatherapi.com/v1/current.json?q=${postalCode}&key=${weatherKey}`
+      );
+      return res.data;
+    };
+
+    const facilityDetail = await fetchFacilityDetail();
+    const weather = await fetchWeather(facilityDetail.postalCode);
+
+    const lowestSignal = Math.min(
+      ...smartlocks
+        .filter((s) => !s.isDeviceOffline)
+        .map((s) => s.signalQuality || 255)
+    );
+    const lowestBattery = Math.min(
+      ...smartlocks
+        .filter((s) => !s.isDeviceOffline)
+        .map((s) => s.batteryLevel || 100)
+    );
+    const offlineCount = smartlocks.filter((s) => s.isDeviceOffline).length;
+
+    return {
+      ...facility,
+      edgeRouterStatus: edgeRouter?.connectionStatus || "error",
+      onlineAccessPointsCount:
+        aps.filter((ap) => !ap.isDeviceOffline).length || 0,
+      offlineAccessPointsCount:
+        aps.filter((ap) => ap.isDeviceOffline).length || 0,
+      okCount: summary?.okCount || 0,
+      warningCount: summary?.warningCount || 0,
+      errorCount: summary?.errorCount || 0,
+      offlineCount,
+      lowestSignal: isFinite(lowestSignal)
+        ? Math.round((lowestSignal / 255) * 100)
+        : 100,
+      lowestBattery: isFinite(lowestBattery) ? lowestBattery : 100,
+      smartLocks: smartlocks || [],
+      edgeRouterName: edgeRouter?.name || "Edge Router",
+      facilityDetail,
+      weather,
+    };
+  };
 
   return (
     <div
@@ -221,18 +357,14 @@ export default function SmartLockDashboardView({}) {
           type="text"
           placeholder="Search facilities..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            setSearchQuery(value);
+            search(value);
+          }}
           className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
         />
-        {/* Search Button */}
-        <button
-          className="bg-green-500 text-white p-1 py-2 rounded-sm hover:bg-green-600 ml-3 w-44 font-bold cursor-pointer hover:transition hover:duration-300 hover:ease-in-out"
-          onClick={() => search()}
-          disabled={!searchQuery || searchQuery.length < 2} // Disable if empty or less than 2 characters
-          title="Search for facilities by ID, property number, name, or environment"
-        >
-          Search
-        </button>
+
         {/* Toggle view button */}
         <button
           className="bg-slate-300 text-white p-1 py-2 rounded-sm hover:bg-slate-400 ml-3 w-44 font-bold cursor-pointer hover:transition hover:duration-300 hover:ease-in-out"
@@ -245,7 +377,7 @@ export default function SmartLockDashboardView({}) {
       {listView ? (
         <div className="w-full px-5">
           <table className="w-full">
-            <thead>
+            <thead className="select-none">
               <tr className="bg-slate-100 dark:bg-darkNavSecondary">
                 <th className="border border-gray-300 dark:border-border px-4 py-2"></th>
                 <th
@@ -262,47 +394,95 @@ export default function SmartLockDashboardView({}) {
                 </th>
               </tr>
               <tr className="bg-slate-100 dark:bg-darkNavSecondary">
-                <th className="border border-gray-300 dark:border-border px-4 py-2">
-                  Facility
+                <th
+                  onClick={() => handleSort("name")}
+                  className="border border-gray-300 dark:border-border px-4 py-2 cursor-pointer"
+                >
+                  Facility{" "}
+                  {sortKey === "name" && (sortDirection === "asc" ? "▲" : "▼")}
                 </th>
-                <th className="border border-gray-300 dark:border-border px-4 py-2">
-                  Edge Router
+                <th
+                  onClick={() => handleSort("edgeRouterStatus")}
+                  className="border border-gray-300 dark:border-border px-4 py-2 cursor-pointer"
+                >
+                  Edge Router{" "}
+                  {sortKey === "edgeRouterStatus" &&
+                    (sortDirection === "asc" ? "▲" : "▼")}
                 </th>
-                <th className="border border-gray-300 dark:border-border px-4 py-2">
-                  Online APs
+                <th
+                  onClick={() => handleSort("onlineAccessPointsCount")}
+                  className="border border-gray-300 dark:border-border px-4 py-2 cursor-pointer"
+                >
+                  Online APs{" "}
+                  {sortKey === "onlineAccessPointsCount" &&
+                    (sortDirection === "asc" ? "▲" : "▼")}
                 </th>
-                <th className="border border-gray-300 dark:border-border px-4 py-2">
-                  Offline APs
+                <th
+                  onClick={() => handleSort("offlineAccessPointsCount")}
+                  className="border border-gray-300 dark:border-border px-4 py-2 cursor-pointer"
+                >
+                  Offline APs{" "}
+                  {sortKey === "offlineAccessPointsCount" &&
+                    (sortDirection === "asc" ? "▲" : "▼")}
                 </th>
-                <th className="border border-gray-300 dark:border-border px-4 py-2">
-                  Okay
+                <th
+                  className="border border-gray-300 dark:border-border px-4 py-2 cursor-pointer"
+                  onClick={() => handleSort("okCount")}
+                >
+                  Okay{" "}
+                  {sortKey === "okCount" &&
+                    (sortDirection === "asc" ? "▲" : "▼")}
                 </th>
-                <th className="border border-gray-300 dark:border-border px-4 py-2">
-                  Warning
+                <th
+                  className="border border-gray-300 dark:border-border px-4 py-2 cursor-pointer"
+                  onClick={() => handleSort("warningCount")}
+                >
+                  Warning{" "}
+                  {sortKey === "warningCount" &&
+                    (sortDirection === "asc" ? "▲" : "▼")}
                 </th>
-                <th className="border border-gray-300 dark:border-border px-4 py-2">
-                  Error
+                <th
+                  className="border border-gray-300 dark:border-border px-4 py-2 cursor-pointer"
+                  onClick={() => handleSort("errorCount")}
+                >
+                  Error{" "}
+                  {sortKey === "errorCount" &&
+                    (sortDirection === "asc" ? "▲" : "▼")}
                 </th>
-                <th className="border border-gray-300 dark:border-border px-4 py-2">
-                  Offline
+                <th
+                  className="border border-gray-300 dark:border-border px-4 py-2 cursor-pointer"
+                  onClick={() => handleSort("offlineCount")}
+                >
+                  Offline{" "}
+                  {sortKey === "offlineCount" &&
+                    (sortDirection === "asc" ? "▲" : "▼")}
                 </th>
-                <th className="border border-gray-300 dark:border-border px-4 py-2">
-                  Lowest Signal Quality
+                <th
+                  onClick={() => handleSort("lowestSignal")}
+                  className="cursor-pointer border border-gray-300 dark:border-border px-4 py-2"
+                >
+                  Lowest Signal{" "}
+                  {sortKey === "lowestSignal" &&
+                    (sortDirection === "asc" ? "▲" : "▼")}
                 </th>
-                <th className="border border-gray-300 dark:border-border px-4 py-2">
-                  Lowest Battery Level
+                <th
+                  onClick={() => handleSort("lowestBattery")}
+                  className="cursor-pointer border border-gray-300 dark:border-border px-4 py-2"
+                >
+                  Lowest Battery{" "}
+                  {sortKey === "lowestBattery" &&
+                    (sortDirection === "asc" ? "▲" : "▼")}
                 </th>
               </tr>
             </thead>
             <tbody>
               {filteredFacilities.map((facility, index) => (
                 <SmartLockFacilityRow
-                  setFacilitiesInfo={setFacilitiesInfo}
-                  key={index}
                   facility={facility}
                   index={index}
                   setExpandedRows={setExpandedRows}
                   expandedRows={expandedRows}
+                  key={index}
                 />
               ))}
               <tr className="bg-slate-100 dark:bg-darkSecondary">

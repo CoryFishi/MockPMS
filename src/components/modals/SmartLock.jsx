@@ -71,7 +71,9 @@ export default function SmartLock({
     let sorted = [...smartLocks].sort((a, b) => a.name.localeCompare(b.name));
     switch (option) {
       case "good":
-        sorted = sorted.filter((l) => l.overallStatus === "ok");
+        sorted = sorted.filter(
+          (l) => l.overallStatus === "ok" || l.overallStatus === "notification"
+        );
         break;
       case "warning":
         sorted = sorted.filter((l) => l.overallStatus === "warning");
