@@ -1,14 +1,14 @@
+import Dashboard from "./pages/PMSDashboard/PMSDashboard";
+import AuthenticationSettings from "./pages/AuthenticationSettings/AuthenticationSettings";
+import SmartLockDashboard from "./pages/SmartLockDashboard/SmartLockDashboard";
+import Login from "./pages/Login/Login";
+import Register from "./pages/Register/Register";
+import Admin from "./pages/AdminDashboard/AdminDashboard";
+import UserSettings from "./pages/UserSettings/UserSettings";
+import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import Dashboard from "./pages/Dashboard";
-import AuthenticationSettings from "./pages/AuthenticationSettings";
 import { useState, useEffect } from "react";
-import SmartLockDashboard from "./pages/SmartLockDashboard";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Admin from "./pages/Admin";
-import UserSettings from "./pages/UserSettings";
-import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
