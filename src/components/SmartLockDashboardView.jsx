@@ -38,27 +38,37 @@ export default function SmartLockDashboardView({}) {
   const [sortDirection, setSortDirection] = useState("asc");
 
   const handleSort = (key) => {
-    let direction = "asc";
-    if (sortKey === key && sortDirection === "asc") {
-      direction = "desc";
+    let nextDirection = "asc";
+
+    if (sortKey === key) {
+      if (sortDirection === "asc") nextDirection = "desc";
+      else if (sortDirection === "desc") nextDirection = null;
     }
-    setSortKey(key);
-    setSortDirection(direction);
+
+    setSortKey(nextDirection ? key : null);
+    setSortDirection(nextDirection);
+
+    if (!nextDirection) {
+      setFilteredFacilities(facilitiesWithBearers);
+      return;
+    }
 
     const sorted = [...filteredFacilities].sort((a, b) => {
       const aVal = a[key] ?? 0;
       const bVal = b[key] ?? 0;
 
       if (typeof aVal === "string") {
-        return direction === "asc"
+        return nextDirection === "asc"
           ? aVal.localeCompare(bVal)
           : bVal.localeCompare(aVal);
       }
-      return direction === "asc" ? aVal - bVal : bVal - aVal;
+
+      return nextDirection === "asc" ? aVal - bVal : bVal - aVal;
     });
 
     setFilteredFacilities(sorted);
   };
+
   useEffect(() => {
     if (searchQuery.trim() !== "") {
       search(searchQuery);
@@ -134,74 +144,92 @@ export default function SmartLockDashboardView({}) {
   // Add totals together from each facility
   useEffect(() => {
     const updateAggregatedCounts = (facilitiesInfo) => {
-      const aggregatedData = facilitiesInfo.reduce(
-        (totals, facility) => {
-          totals.totalSmartlocks +=
-            facility.okCount +
-            facility.warningCount +
-            facility.errorCount +
-            facility.offlineCount;
-          totals.totalEdgeRouters += facility.edgeRouterStatus ? 1 : 1;
-          totals.totalAccessPoints +=
-            facility.onlineAccessPointsCount +
-            facility.offlineAccessPointsCount;
-          totals.edgeRouterOfflineCount +=
-            facility.edgeRouterStatus === "error" ? 1 : 0;
-          totals.edgeRouterOnlineCount +=
-            facility.edgeRouterStatus === "ok" ? 1 : 0;
-          totals.edgeRouterWarningCount +=
-            facility.edgeRouterStatus === "warning" ? 1 : 0;
-          totals.accessPointsOnlineCount += facility.onlineAccessPointsCount;
-          totals.accessPointsOfflineCount += facility.offlineAccessPointsCount;
-          totals.smartlockOkayCount += facility.okCount || 0;
-          totals.smartlockWarningCount += facility.warningCount || 0;
-          totals.smartlockErrorCount += facility.errorCount || 0;
-          totals.smartlockOfflineCount += facility.offlineCount || 0;
-          totals.smartlockLowestSignal =
-            Math.min(
-              parseInt(totals.smartlockLowestSignal),
-              parseInt(facility.lowestSignal)
-            ) + "%";
-          totals.smartlockLowestBattery =
-            Math.min(
-              parseInt(totals.smartlockLowestBattery),
-              parseInt(facility.lowestBattery)
-            ) + "%";
-
-          return totals;
-        },
-        {
-          totalAccessPoints: 0,
-          totalEdgeRouters: 0,
-          totalSmartlocks: 0,
-          edgeRouterOfflineCount: 0,
-          edgeRouterOnlineCount: 0,
-          edgeRouterWarningCount: 0,
-          accessPointsOnlineCount: 0,
-          accessPointsOfflineCount: 0,
-          smartlockOkayCount: 0,
-          smartlockWarningCount: 0,
-          smartlockErrorCount: 0,
-          smartlockOfflineCount: 0,
-          smartlockLowestSignal: "100%",
-          smartlockLowestBattery: "100%",
-        }
+      const facilitiesWithSmartLocks = facilitiesInfo.filter(
+        (f) => Array.isArray(f.smartLocks) && f.smartLocks.length > 0
       );
-      setTotalAccessPoints(aggregatedData.totalAccessPoints);
-      setTotalEdgeRouters(aggregatedData.totalEdgeRouters);
-      setTotalSmartlocks(aggregatedData.totalSmartlocks);
-      setEdgeRouterOfflineCount(aggregatedData.edgeRouterOfflineCount);
-      setEdgeRouterWarningCount(aggregatedData.edgeRouterWarningCount);
-      setEdgeRouterOnlineCount(aggregatedData.edgeRouterOnlineCount);
-      setAccessPointsOnlineCount(aggregatedData.accessPointsOnlineCount);
-      setAccessPointsOfflineCount(aggregatedData.accessPointsOfflineCount);
-      setSmartlockOkayCount(aggregatedData.smartlockOkayCount);
-      setSmartlockWarningCount(aggregatedData.smartlockWarningCount);
-      setSmartlockErrorCount(aggregatedData.smartlockErrorCount);
-      setSmartlockOfflineCount(aggregatedData.smartlockOfflineCount);
-      setSmartlockLowestSignal(aggregatedData.smartlockLowestSignal);
-      setSmartlockLowestBattery(aggregatedData.smartlockLowestBattery);
+
+      const totals = {
+        totalAccessPoints: 0,
+        totalEdgeRouters: 0,
+        totalSmartlocks: 0,
+        edgeRouterOfflineCount: 0,
+        edgeRouterOnlineCount: 0,
+        edgeRouterWarningCount: 0,
+        accessPointsOnlineCount: 0,
+        accessPointsOfflineCount: 0,
+        smartlockOkayCount: 0,
+        smartlockWarningCount: 0,
+        smartlockErrorCount: 0,
+        smartlockOfflineCount: 0,
+        smartlockLowestSignal: "100",
+        smartlockLowestBattery: "100",
+        smartlockLowestSignalFacility: "N/A",
+        smartlockLowestBatteryFacility: "N/A",
+      };
+
+      // Count all edge routers and access points (all facilities)
+      for (const facility of facilitiesInfo) {
+        totals.totalEdgeRouters += facility.edgeRouterStatus ? 1 : 1;
+        totals.edgeRouterOfflineCount +=
+          facility.edgeRouterStatus === "error" ? 1 : 0;
+        totals.edgeRouterOnlineCount +=
+          facility.edgeRouterStatus === "ok" ? 1 : 0;
+        totals.edgeRouterWarningCount +=
+          facility.edgeRouterStatus === "warning" ? 1 : 0;
+
+        totals.accessPointsOnlineCount += facility.onlineAccessPointsCount;
+        totals.accessPointsOfflineCount += facility.offlineAccessPointsCount;
+        totals.totalAccessPoints +=
+          facility.onlineAccessPointsCount + facility.offlineAccessPointsCount;
+      }
+
+      // Count only smartlock stats from facilities with smartlocks
+      for (const facility of facilitiesWithSmartLocks) {
+        totals.totalSmartlocks +=
+          facility.okCount +
+          facility.warningCount +
+          facility.errorCount +
+          facility.offlineCount;
+
+        totals.smartlockOkayCount += facility.okCount || 0;
+        totals.smartlockWarningCount += facility.warningCount || 0;
+        totals.smartlockErrorCount += facility.errorCount || 0;
+        totals.smartlockOfflineCount += facility.offlineCount || 0;
+
+        const signal = parseInt(facility.lowestSignal);
+        const battery = parseInt(facility.lowestBattery);
+        if (signal < parseInt(totals.smartlockLowestSignal)) {
+          totals.smartlockLowestSignal = signal;
+          totals.smartlockLowestSignalFacility = facility.name;
+        }
+        if (battery < parseInt(totals.smartlockLowestBattery)) {
+          totals.smartlockLowestBattery = battery;
+          totals.smartlockLowestBatteryFacility = facility.name;
+        }
+      }
+
+      setTotalAccessPoints(totals.totalAccessPoints);
+      setTotalEdgeRouters(totals.totalEdgeRouters);
+      setTotalSmartlocks(totals.totalSmartlocks);
+      setEdgeRouterOfflineCount(totals.edgeRouterOfflineCount);
+      setEdgeRouterWarningCount(totals.edgeRouterWarningCount);
+      setEdgeRouterOnlineCount(totals.edgeRouterOnlineCount);
+      setAccessPointsOnlineCount(totals.accessPointsOnlineCount);
+      setAccessPointsOfflineCount(totals.accessPointsOfflineCount);
+      setSmartlockOkayCount(totals.smartlockOkayCount);
+      setSmartlockWarningCount(totals.smartlockWarningCount);
+      setSmartlockErrorCount(totals.smartlockErrorCount);
+      setSmartlockOfflineCount(totals.smartlockOfflineCount);
+      setSmartlockLowestSignal({
+        lowestSignal: totals.smartlockLowestSignal,
+        facility: totals.smartlockLowestSignalFacility,
+      });
+      setSmartlockLowestBattery({
+        lowestBattery: totals.smartlockLowestBattery,
+        facility: totals.smartlockLowestBatteryFacility,
+      });
     };
+
     updateAggregatedCounts(facilitiesInfo);
   }, [facilitiesInfo]);
 
@@ -209,21 +237,34 @@ export default function SmartLockDashboardView({}) {
   useEffect(() => {
     const fetchFacilitiesWithBearers = async () => {
       try {
-        const updatedFacilities = await Promise.all(
-          selectedTokens.map(async (facility) => {
-            setCurrentLoadingText(`Loading ${facility.client}...`);
-            const bearer = await fetchBearerToken(facility);
-            return { ...facility, bearer };
+        let currentIndex = 0;
+
+        const fetchFacilityWithBearerAndStats = async (facility) => {
+          setCurrentLoadingText(
+            `Loading ${facility.client} (${currentIndex + 1} of ${
+              selectedTokens.length
+            })...`
+          );
+          const bearer = await fetchBearerToken(facility);
+          if (!bearer) return null;
+
+          const facilityWithBearer = { ...facility, bearer };
+          const stats = await fetchFacilityData(facilityWithBearer);
+          return stats;
+        };
+
+        const results = await Promise.all(
+          selectedTokens.map(async (facility, index) => {
+            currentIndex = index;
+            return await fetchFacilityWithBearerAndStats(facility);
           })
         );
 
-        const facilitiesWithStats = await Promise.all(
-          updatedFacilities.map(fetchFacilityData)
-        );
-
-        setFacilitiesWithBearers(facilitiesWithStats);
-        setFilteredFacilities(facilitiesWithStats);
-        setFacilitiesInfo(facilitiesWithStats);
+        // Filter out any failed/null results
+        const validResults = results.filter(Boolean);
+        setFacilitiesWithBearers(validResults);
+        setFilteredFacilities(validResults);
+        setFacilitiesInfo(validResults);
       } catch (err) {
         console.error("Failed to fetch facilities:", err);
       } finally {
@@ -233,11 +274,6 @@ export default function SmartLockDashboardView({}) {
 
     // Initial fetch
     fetchFacilitiesWithBearers();
-
-    // Set up interval for every 2 minutes
-    const interval = setInterval(fetchFacilitiesWithBearers, 2 * 60 * 1000);
-
-    return () => clearInterval(interval);
   }, [selectedTokens]);
 
   const fetchFacilityData = async (facility) => {
@@ -313,27 +349,49 @@ export default function SmartLockDashboardView({}) {
         .map((s) => s.batteryLevel || 100)
     );
     const offlineCount = smartlocks.filter((s) => s.isDeviceOffline).length;
-
-    return {
-      ...facility,
-      edgeRouterStatus: edgeRouter?.connectionStatus || "error",
-      onlineAccessPointsCount:
-        aps.filter((ap) => !ap.isDeviceOffline).length || 0,
-      offlineAccessPointsCount:
-        aps.filter((ap) => ap.isDeviceOffline).length || 0,
-      okCount: summary?.okCount || 0,
-      warningCount: summary?.warningCount || 0,
-      errorCount: summary?.errorCount || 0,
-      offlineCount,
-      lowestSignal: isFinite(lowestSignal)
-        ? Math.round((lowestSignal / 255) * 100)
-        : 100,
-      lowestBattery: isFinite(lowestBattery) ? lowestBattery : 100,
-      smartLocks: smartlocks || [],
-      edgeRouterName: edgeRouter?.name || "Edge Router",
-      facilityDetail,
-      weather,
-    };
+    if (smartlocks.length > 0) {
+      return {
+        ...facility,
+        edgeRouterStatus: edgeRouter?.connectionStatus || "error",
+        onlineAccessPointsCount:
+          aps.filter((ap) => !ap.isDeviceOffline).length || 0,
+        offlineAccessPointsCount:
+          aps.filter((ap) => ap.isDeviceOffline).length || 0,
+        okCount: summary?.okCount || 0,
+        warningCount: summary?.warningCount || 0,
+        errorCount: summary?.errorCount || 0,
+        offlineCount,
+        lowestSignal: isFinite(lowestSignal)
+          ? Math.round((lowestSignal / 255) * 100)
+          : 100,
+        lowestBattery: isFinite(lowestBattery) ? lowestBattery : 100,
+        smartLocks: smartlocks || [],
+        edgeRouterName: edgeRouter?.name || "Edge Router",
+        facilityDetail,
+        weather,
+      };
+    } else {
+      return {
+        ...facility,
+        edgeRouterStatus: edgeRouter?.connectionStatus || "error",
+        onlineAccessPointsCount:
+          aps.filter((ap) => !ap.isDeviceOffline).length || 0,
+        offlineAccessPointsCount:
+          aps.filter((ap) => ap.isDeviceOffline).length || 0,
+        okCount: -100,
+        warningCount: -100,
+        errorCount: -100,
+        offlineCount: -100,
+        lowestSignal: -100,
+        lowestBattery: -100,
+        smartLocks: [],
+        edgeRouterName: edgeRouter?.name || "Edge Router",
+        facilityDetail,
+        weather,
+        edgeRouter: edgeRouter || {},
+        accessPoints: aps || [],
+      };
+    }
   };
 
   return (
@@ -485,9 +543,9 @@ export default function SmartLockDashboardView({}) {
                   key={index}
                 />
               ))}
-              <tr className="bg-slate-100 dark:bg-darkSecondary">
+              <tr className="bg-slate-100 dark:bg-darkSecondary text-center">
                 <td
-                  className="border border-gray-300 dark:border-border px-4 py-2 font-bold"
+                  className="border border-gray-300 dark:border-border px-4 py-2 font-bold text-left"
                   title={totalSmartlocks + " SmartLocks"}
                 >
                   Totals:
@@ -583,15 +641,15 @@ export default function SmartLockDashboardView({}) {
                 </td>
                 <td
                   className="border border-gray-300 dark:border-border px-4 py-2"
-                  title="Lowest Signal"
+                  title={smartlockLowestSignal.facility}
                 >
-                  {smartlockLowestSignal}
+                  {smartlockLowestSignal.lowestSignal}%
                 </td>
                 <td
                   className="border border-gray-300 dark:border-border px-4 py-2"
-                  title="Lowest Battery"
+                  title={smartlockLowestBattery.facility}
                 >
-                  {smartlockLowestBattery}
+                  {smartlockLowestBattery.lowestBattery}%
                 </td>
               </tr>
             </tbody>
@@ -737,19 +795,19 @@ export default function SmartLockDashboardView({}) {
                 </div>
                 <div
                   className="text-center shadow-md rounded-lg p-3 border"
-                  title="Lowest Signal"
+                  title={smartlockLowestSignal.facility}
                 >
                   <h2 className="text-3xl font-bold">
-                    {smartlockLowestSignal}
+                    {smartlockLowestSignal.lowestSignal}%
                   </h2>
                   <p className="text-sm">Lowest Signal</p>
                 </div>
                 <div
                   className="text-center shadow-md rounded-lg p-3 border"
-                  title="Lowest Battery"
+                  title={smartlockLowestBattery.facility}
                 >
                   <h2 className="text-3xl font-bold">
-                    {smartlockLowestBattery}{" "}
+                    {smartlockLowestBattery.lowestBattery}%
                   </h2>
                   <p className="text-sm">Lowest Battery</p>
                 </div>
@@ -759,10 +817,7 @@ export default function SmartLockDashboardView({}) {
           <div className="columns-1 sm:columns-2 lg:columns-3 gap-4">
             {filteredFacilities.map((facility, index) => (
               <div key={index} className="break-inside-avoid">
-                <SmartLockFacilityCard
-                  setFacilitiesInfo={setFacilitiesInfo}
-                  facility={facility}
-                />
+                <SmartLockFacilityCard facility={facility} />
               </div>
             ))}
           </div>

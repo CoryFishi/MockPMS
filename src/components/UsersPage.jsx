@@ -118,7 +118,7 @@ export default function Users() {
       return `User ${userId} and associated data deleted successfully.`;
     } catch (err) {
       console.error("Unexpected error:", err);
-      throw err; // Re-throw the error to let `toast.promise` handle it
+      throw err;
     }
   };
 

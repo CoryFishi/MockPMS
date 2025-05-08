@@ -264,7 +264,11 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                       >
                         {enabled ? <BiCheckCircle /> : <BiCircle />}
                       </button>
-                      <label>SmartLock Overview Emails</label>
+                      <label
+                        title={`This is sent out every week on Monday,\nand contains a summary of all the SmartLocks in your selected facilities.\nYou must select facilities under the SmartLock tab to receive this email.`}
+                      >
+                        SmartLock Overview Emails
+                      </label>
                     </div>
                   </div>
                 </div>

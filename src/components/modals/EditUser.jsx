@@ -12,7 +12,8 @@ import EditCurrentFacility from "./EditCurrentFacility";
 import AddToken from "./AddToken";
 import AddFavoriteFacility from "./AddFavoriteFacility";
 import AddSelectedFacility from "./AddSelectedFacility";
-
+import { addEvent } from "../../functions/events";
+import { useAuth } from "../../context/AuthProvider";
 export default function EditUser({
   setIsEditUserModalOpen,
   selectedUser,
@@ -29,6 +30,7 @@ export default function EditUser({
   const [isAddSelectedFacilityModalOpen, setIsAddSelectedFacilityModalOpen] =
     useState(false);
   const [roles, setRoles] = useState([]);
+  const { user } = useAuth();
 
   const getRoles = async () => {
     let { data, error } = await supabase.from("roles").select("role_name");
@@ -45,8 +47,18 @@ export default function EditUser({
       if (error) {
         throw error;
       }
+      addEvent(
+        "Update User",
+        `${user.email} updated ${newUserData.user_email}`,
+        true
+      );
       return { success: true, data };
     } catch (error) {
+      addEvent(
+        "Update User",
+        `${user.email} failed to update ${newUserData.user_email}`,
+        false
+      );
       return { success: false, error };
     }
   };

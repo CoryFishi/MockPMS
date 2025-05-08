@@ -240,74 +240,81 @@ export default function AllFacilitiesPage({
         throw error;
       });
   };
+
   const handleFacilities = async (saved) => {
     setFilteredFacilities([]);
     setFacilities([]);
+    setIsLoading(true);
+    setCurrentLoadingText("Loading facilities...");
+
+    // Helper to fetch each facility
     const handleAccount = async (facility) => {
-      setCurrentLoadingText(`Loading ${facility.client}...`);
-      const bearer = await handleLogin(facility);
-      var tokenStageKey = "";
-      var tokenEnvKey = "";
-      if (facility.environment === "cia-stg-1.aws.") {
-        tokenStageKey = "cia-stg-1.aws.";
-      } else {
-        tokenEnvKey = facility.environment;
+      try {
+        const bearer = await handleLogin(facility);
+        const tokenStageKey =
+          facility.environment === "cia-stg-1.aws." ? "cia-stg-1.aws." : "";
+        const tokenEnvKey =
+          facility.environment === "cia-stg-1.aws." ? "" : facility.environment;
+
+        const response = await axios.get(
+          `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/statuslist`,
+          {
+            headers: {
+              Authorization: "Bearer " + bearer?.access_token,
+              accept: "application/json",
+              "api-version": "2.0",
+            },
+          }
+        );
+
+        const enriched = response.data.map((item) => ({
+          ...item,
+          environment: facility.environment,
+          api: facility.api,
+          apiSecret: facility.apiSecret,
+          client: facility.client,
+          clientSecret: facility.clientSecret,
+        }));
+
+        return enriched;
+      } catch (err) {
+        console.error(`Error loading facility ${facility.client}`, err);
+        return [];
       }
-      const config = {
-        method: "get",
-        url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/statuslist`,
-        headers: {
-          Authorization: "Bearer " + bearer?.access_token,
-          accept: "application/json",
-          "api-version": "2.0",
-        },
-      };
-
-      return axios(config)
-        .then(function (response) {
-          const newFacilities = response.data.map((item) => ({
-            ...item,
-            environment: facility.environment,
-            api: facility.api,
-            apiSecret: facility.apiSecret,
-            client: facility.client,
-            clientSecret: facility.clientSecret,
-          }));
-          setFacilities((prevFacilities) => {
-            const combinedFacilities = [...prevFacilities, ...newFacilities];
-            return combinedFacilities.sort((a, b) => {
-              if (a.environment < b.environment) return -1;
-              if (a.environment > b.environment) return 1;
-              if (a.id < b.id) return -1;
-              if (a.id > b.id) return 1;
-              return 0;
-            });
-          });
-
-          if (response.data.length > 0) setNoFacilities(false);
-          return response;
-        })
-        .catch(function (error) {
-          console.error("Error during facility fetching:", error);
-          throw error;
-        });
     };
+
     try {
-      for (let i = 0; i < saved.length; i++) {
-        const facility = saved[i];
-        setCurrentLoadingText(`Loading ${facility.name || facility.id}...`);
-        await handleAccount(facility);
-      }
-      if (saved.length < 1) {
+      const facilityDataChunks = await Promise.all(
+        saved.map(async (facility) => {
+          setCurrentLoadingText(`Loading ${facility.client || facility.id}...`);
+          return await handleAccount(facility);
+        })
+      );
+
+      const flattened = facilityDataChunks.flat();
+
+      if (flattened.length === 0) {
         setNoFacilities(true);
+      } else {
+        const sorted = flattened.sort((a, b) => {
+          if (a.environment < b.environment) return -1;
+          if (a.environment > b.environment) return 1;
+          if (a.id < b.id) return -1;
+          if (a.id > b.id) return 1;
+          return 0;
+        });
+
+        setFacilities(sorted);
+        setFilteredFacilities(sorted);
       }
-    } catch (error) {
+    } catch (err) {
       toast.error("Facilities Failed to Load!");
     } finally {
       setCurrentLoadingText("");
       setIsLoading(false);
     }
   };
+
   const handleSelect = async (facility) => {
     await handleCurrentFacilityUpdate(facility);
     await toast.promise(handleSelectLogin(facility), {

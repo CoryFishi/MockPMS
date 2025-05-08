@@ -15,7 +15,6 @@ export default function AddFavoriteFacility({
   const [clientSecret, setClientSecret] = useState("");
   const [environment, setEnvironment] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [bearer, setBearer] = useState({});
   const [facilityName, setFacilityName] = useState("No facility Authenticated");
   const [propertyNumber, setPropertyNumber] = useState(null);
 
@@ -49,8 +48,8 @@ export default function AddFavoriteFacility({
     return axios(config)
       .then(async function (response) {
         setIsAuthenticated(true);
+        console.log("Facility Info:", response.data);
         toast.success("Successfully Authenticated!");
-        setBearer(response.data);
         await handleFacilityInfo(response.data);
         return response.data;
       })

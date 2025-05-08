@@ -12,6 +12,7 @@ import { useAuth } from "../context/AuthProvider";
 import { supabase } from "../supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { handleSingleLogin } from "../functions/auth";
 
 export default function DashboardLayout({ dashboardMenu }) {
   const {
@@ -71,49 +72,18 @@ export default function DashboardLayout({ dashboardMenu }) {
   };
 
   const handleLogin = async () => {
-    if (Object.keys(currentFacility).length === 0) return;
+    if (!currentFacility || Object.keys(currentFacility).length === 0) return;
 
-    var tokenStageKey = "";
-    var tokenEnvKey = "";
-    if (currentFacility.environment === "cia-stg-1.aws.") {
-      tokenStageKey = "cia-stg-1.aws.";
-    } else {
-      tokenEnvKey = currentFacility.environment;
+    try {
+      const fetchToken = await handleSingleLogin(currentFacility);
+      const updatedFacility = {
+        ...currentFacility,
+        token: fetchToken.token,
+      };
+      handleCurrentFacilityUpdate(updatedFacility);
+    } catch (err) {
+      console.error("Login failed:", err);
     }
-    const data = qs.stringify({
-      grant_type: "password",
-      username: currentFacility.api,
-      password: currentFacility.apiSecret,
-      client_id: currentFacility.client,
-      client_secret: currentFacility.clientSecret,
-    });
-    const config = {
-      method: "post",
-      url: `https://auth.${tokenStageKey}insomniaccia${tokenEnvKey}.com/auth/token`,
-      headers: {
-        accept: "application/json",
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      data: data,
-    };
-
-    axios(config)
-      .then(function (response) {
-        const tokenData = response.data;
-        let facility = currentFacility;
-        const updatedFacility = {
-          ...facility,
-          token: tokenData,
-        };
-        handleCurrentFacilityUpdate(updatedFacility);
-
-        setTimeout(() => {
-          handleLogin();
-        }, (tokenData.expires_in - 60) * 1000);
-      })
-      .catch(function (error) {
-        console.error("Error during login:", error);
-      });
   };
 
   const handleFacilityInfo = async () => {
@@ -125,6 +95,7 @@ export default function DashboardLayout({ dashboardMenu }) {
     } else {
       tokenEnvKey = currentFacility.environment;
     }
+    console.log("Current Facility:", currentFacility);
     const config = {
       method: "get",
       url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}`,
