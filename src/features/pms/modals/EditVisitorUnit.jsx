@@ -1,17 +1,18 @@
 import EditVisitorVisitor from "./EditVisitorVisitor";
-import CreateVisitorUnitModal from "./CreateVisitorUnitModal";
 import PaginationFooter from "@components/shared/PaginationFooter";
+import DataTable from "@components/shared/DataTable";
+import { addEvent } from "@hooks/events";
 import { useAuth } from "@context/AuthProvider";
 import { MdEdit } from "react-icons/md";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import CreateVisitorUnit from "./CreateVisitorUnit";
 
 export default function EditVisitor({
   setIsEditVisitorModalOpen,
   visitors,
   unit,
-  addEvent,
 }) {
   const [timeProfiles, setTimeProfiles] = useState({});
   const [accessProfiles, setAccessProfiles] = useState({});
@@ -25,6 +26,8 @@ export default function EditVisitor({
   const [isEditVisitorModalOpen2, setIsEditVisitorModalOpen2] = useState(false);
   const [selectedVisitor, setSelectedVisitor] = useState({});
   const { currentFacility, user, permissions } = useAuth();
+  const [sortedColumn, setSortedColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState("asc");
 
   const handleTimeProfiles = async () => {
     var tokenStageKey = "";
@@ -122,10 +125,10 @@ export default function EditVisitor({
       };
 
       return axios(config)
-        .then(function (response) {
+        .then(async function (response) {
           const visitor = response.data.visitor;
           setFilteredVisitors((prev) => [...prev, visitor]);
-          addEvent(
+          await addEvent(
             "Add Visitor",
             `${user.email} added visitor ${visitor.id} to unit ${unit.unitNumber} at facility ${currentFacility.name}, ${currentFacility.id}`,
             true
@@ -138,7 +141,7 @@ export default function EditVisitor({
     };
 
     if (visitorAutofill) {
-      toast.promise(handleRent(), {
+      toast.promise(handleRent, {
         loading: "Adding guest to " + unit.unitNumber + "...",
         success: <b>Added guest to {unit.unitNumber}!</b>,
         error: <b>Failed adding guest to{unit.unitNumber}!</b>,
@@ -208,6 +211,101 @@ export default function EditVisitor({
     setFilteredVisitors(filteredVisitors);
   }, [visitors, searchQuery]);
 
+  const columns = [
+    {
+      key: "id",
+      label: "Visitor Id",
+      accessor: (v) => v.id,
+    },
+    {
+      key: "unitNumber",
+      label: "Unit Number",
+      accessor: (v) => v.unitNumber,
+    },
+    {
+      key: "name",
+      label: "Visitor Name",
+      accessor: (v) => v.name,
+    },
+    {
+      key: "isTenant",
+      label: "Is Tenant",
+      accessor: (v) => (v.isTenant ? "True" : "False"),
+    },
+    {
+      key: "timeGroupName",
+      label: "Time Group",
+      accessor: (v) => v.timeGroupName,
+    },
+    {
+      key: "accessProfileName",
+      label: "Access Profile",
+      accessor: (v) => v.accessProfileName,
+    },
+    {
+      key: "code",
+      label: "Gate Code",
+      accessor: (v) => v.code,
+    },
+    {
+      key: "email",
+      label: "Email Address",
+      accessor: (v) => v.email,
+    },
+    {
+      key: "mobilePhoneNumber",
+      label: "Phone Number",
+      accessor: (v) => v.mobilePhoneNumber,
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      sortable: false,
+      accessor: () => null,
+      render: (v) => (
+        <div className="text-center space-x-1">
+          <button
+            className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
+              permissions.pmsPlatformVisitorEdit
+                ? "hover:bg-green-600 hover:cursor-pointer"
+                : "opacity-50 cursor-not-allowed"
+            }`}
+            onClick={() => {
+              if (permissions.pmsPlatformVisitorEdit) {
+                setIsEditVisitorModalOpen2(true);
+                setSelectedVisitor(v);
+              }
+            }}
+            disabled={!permissions.pmsPlatformVisitorEdit}
+          >
+            Edit
+          </button>
+          {!v.isTenant && (
+            <button
+              className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
+                permissions.pmsPlatformVisitorDelete
+                  ? "hover:bg-red-600 hover:cursor-pointer"
+                  : "opacity-50 cursor-not-allowed"
+              }`}
+              onClick={() => {
+                if (permissions.pmsPlatformVisitorDelete) {
+                  toast.promise(removeVisitor(v.id), {
+                    loading: "Removing visitor...",
+                    success: "Visitor removed successfully!",
+                    error: "Failed to remove visitor. Please try again.",
+                  });
+                }
+              }}
+              disabled={!permissions.pmsPlatformVisitorDelete}
+            >
+              Delete
+            </button>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
       {/* Edit Visitor Modal Popup */}
@@ -222,7 +320,7 @@ export default function EditVisitor({
       )}
       {/* Create Visitor Modal Popup */}
       {isCreateVisitorModalOpen && (
-        <CreateVisitorUnitModal
+        <CreateVisitorUnit
           setIsCreateVisitorModalOpen={setIsCreateVisitorModalOpen}
           currentFacility={currentFacility}
           setVisitors={setFilteredVisitors}
@@ -285,125 +383,41 @@ export default function EditVisitor({
             </div>
           </div>
           <div className="overflow-y-auto h-[77vh]">
-            <table className="w-full table-auto">
-              <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
-                <tr className="bg-gray-200 dark:bg-darkNavSecondary">
-                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                    Visitor Id
-                  </th>
-                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                    Unit Number
-                  </th>
-                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                    Visitor Name
-                  </th>
-                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                    isTenant
-                  </th>
-                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                    Time Group
-                  </th>
-                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                    Access Profile
-                  </th>
-                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                    Gate Code
-                  </th>
-                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                    Email Address
-                  </th>
-                  <th className="px-4 py-2 text-left hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                    Phone Number
-                  </th>
-                  <th className="px-4 py-2 text-left hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredVisitors
-                  .slice(
-                    (currentPage - 1) * rowsPerPage,
-                    currentPage * rowsPerPage
-                  )
-                  .map((visitor, index) => (
-                    <tr
-                      key={index}
-                      className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary"
-                    >
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                        {visitor.id}
-                      </td>
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                        {visitor.unitNumber}
-                      </td>
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2">
-                        {visitor.name}
-                      </td>
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden sm:table-cell">
-                        {visitor.isTenant ? "True" : "False"}
-                      </td>
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden md:table-cell">
-                        {visitor.timeGroupName}
-                      </td>
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden md:table-cell">
-                        {visitor.accessProfileName}
-                      </td>
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
-                        {visitor.code}
-                      </td>
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
-                        {visitor.email}
-                      </td>
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2 hidden lg:table-cell">
-                        {visitor.mobilePhoneNumber}
-                      </td>
-                      <td className="border-y border-gray-300 dark:border-border px-4 py-2 select-none">
-                        <div className="text-center space-x-1">
-                          <button
-                            className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
-                              permissions.pmsPlatformVisitorEdit
-                                ? "hover:bg-green-600 hover:cursor-pointer"
-                                : "opacity-50 cursor-not-allowed"
-                            }`}
-                            onClick={() => {
-                              if (permissions.pmsPlatformVisitorEdit) {
-                                setIsEditVisitorModalOpen2(true);
-                                setSelectedVisitor(visitor);
-                              }
-                            }}
-                            disabled={!permissions.pmsPlatformVisitorEdit}
-                          >
-                            Edit
-                          </button>
-                          {!visitor.isTenant && (
-                            <button
-                              className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
-                                permissions.pmsPlatformVisitorDelete
-                                  ? "hover:bg-red-600 hover:cursor-pointer"
-                                  : "opacity-50 cursor-not-allowed"
-                              }`}
-                              onClick={() => {
-                                if (permissions.pmsPlatformVisitorDelete) {
-                                  toast.promise(removeVisitor(visitor.id), {
-                                    loading: "Removing visitor...",
-                                    success: "Visitor removed successfully!",
-                                    error:
-                                      "Failed to remove visitor. Please try again.",
-                                  });
-                                }
-                              }}
-                              disabled={!permissions.pmsPlatformVisitorDelete}
-                            >
-                              Delete
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+            <DataTable
+              columns={columns}
+              data={filteredVisitors}
+              currentPage={currentPage}
+              rowsPerPage={rowsPerPage}
+              sortDirection={sortDirection}
+              sortedColumn={sortedColumn}
+              onSort={(columnKey, accessor) => {
+                const newDirection =
+                  sortedColumn !== columnKey
+                    ? "asc"
+                    : sortDirection === "asc"
+                    ? "desc"
+                    : null;
+
+                setSortedColumn(newDirection ? columnKey : null);
+                setSortDirection(newDirection);
+
+                if (!newDirection) {
+                  setFilteredVisitors([...filteredVisitors]);
+                  return;
+                }
+
+                const sorted = [...filteredVisitors].sort((a, b) => {
+                  const aVal = accessor(a) ?? "";
+                  const bVal = accessor(b) ?? "";
+
+                  if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
+                  if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
+                  return 0;
+                });
+
+                setFilteredVisitors(sorted);
+              }}
+            />
           </div>
           {/* Pagination Footer */}
           <div className="px-2 py-5 mx-1">

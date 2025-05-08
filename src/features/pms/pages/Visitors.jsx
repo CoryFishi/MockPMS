@@ -315,16 +315,18 @@ export default function Visitors({ currentFacilityName }) {
         return (
           <div
             className="relative hover:cursor-pointer"
-            onMouseEnter={() => setHoveredRow(i)}
+            onMouseDown={() => setHoveredRow(i)}
             onMouseLeave={() => setHoveredRow(null)}
           >
             <span>{`${matchingLock.deviceType} - ${matchingLock.name}`}</span>
             {hoveredRow === i && (
-              <div className="absolute z-10 bg-gray-700 text-white p-2 rounded shadow-lg w-96 top-8 left-1/2 transform -translate-x-1/2">
-                <div className="grid grid-cols-2 gap-2 text-xs max-h-64 overflow-y-auto">
+              <div className="absolute z-10 dark:bg-zinc-700 bg-white text-black dark:text-white p-4 rounded shadow-lg w-md left-1/2 transform -translate-x-1/2 shadow-border">
+                <div className="grid grid-cols-2 gap-3 text-xs max-h-64 overflow-y-auto text-left overflow-x-clip p-2">
                   {Object.entries(matchingLock).map(([key, value], idx) => (
                     <div key={idx}>
-                      <span className="font-bold text-yellow-400">{key}:</span>{" "}
+                      <span className="font-bold text-yellow-400 overflow-ellipsis">
+                        {key}:
+                      </span>{" "}
                       <span className="break-words">
                         {value === null || value === ""
                           ? "null"
@@ -396,7 +398,7 @@ export default function Visitors({ currentFacilityName }) {
       {/* Loading Spinner */}
       {!visitorsPulled && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* Page Header */}
-      <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <FaPerson className="text-lg" />
           &ensp; Visitors | {currentFacilityName}

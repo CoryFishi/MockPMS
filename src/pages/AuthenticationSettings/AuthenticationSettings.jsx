@@ -510,7 +510,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
         <>
           {permissions.authenticationPlatformDelete && (
             <button
-              className="m-1 px-4 py-1 rounded-md text-white transition duration-300 ease-in-out bg-yellow-500 hover:bg-yellow-600 cursor-pointer"
+              className="bg-yellow-500 hover:bg-yellow-600 cursor-pointer text-white px-2 py-1 rounded font-bold mx-1"
               onClick={() => handleRename(f)}
             >
               Rename
@@ -518,7 +518,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
           )}
           {permissions.authenticationPlatformDelete && (
             <button
-              className="m-1 px-4 py-1 rounded-md text-white transition duration-300 ease-in-out bg-red-500 hover:bg-red-600 cursor-pointer"
+              className="bg-red-500 hover:bg-red-600 cursor-pointer text-white px-2 py-1 rounded font-bold mx-1"
               onClick={() => {
                 if (permissions.authenticationPlatformDelete) {
                   toast.promise(removeToken(f.api), {

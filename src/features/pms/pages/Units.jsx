@@ -587,15 +587,44 @@ export default function Units({
       accessor: (u) => u.status,
     },
     {
-      key: "smartLock",
+      key: "smartlock",
       label: "SmartLock",
+      sortable: true,
       accessor: (u) => {
         const lock = smartLocks.find((l) => l.unitId === u.id);
         return lock?.name?.toLowerCase() || "";
       },
-      render: (u) => {
-        const lock = smartLocks.find((lock) => lock.unitId === u.id);
-        return lock ? `${lock.deviceType} - ${lock.name}` : "";
+      render: (u, i) => {
+        const matchingLock = smartLocks.find((lock) => lock.unitId === u.id);
+        if (!matchingLock) return "";
+
+        return (
+          <div
+            className="relative hover:cursor-pointer"
+            onMouseDown={() => setHoveredRow(i)}
+            onMouseLeave={() => setHoveredRow(null)}
+          >
+            <span>{`${matchingLock.deviceType} - ${matchingLock.name}`}</span>
+            {hoveredRow === i && (
+              <div className="absolute z-10 dark:bg-zinc-700 bg-white text-black dark:text-white p-4 rounded shadow-lg w-md left-1/2 transform -translate-x-1/2 shadow-border">
+                <div className="grid grid-cols-2 gap-3 text-xs max-h-64 overflow-y-auto text-left overflow-x-clip p-2">
+                  {Object.entries(matchingLock).map(([key, value], idx) => (
+                    <div key={idx}>
+                      <span className="font-bold text-yellow-400 overflow-ellipsis">
+                        {key}:
+                      </span>{" "}
+                      <span className="break-words">
+                        {value === null || value === ""
+                          ? "null"
+                          : value.toString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
       },
     },
     {
