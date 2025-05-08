@@ -1,12 +1,12 @@
-import DataTable from "../../../components/shared/DataTable";
-import LoadingSpinner from "../../../components/shared/LoadingSpinner";
-import PaginationFooter from "../../../components/shared/PaginationFooter";
+import DataTable from "@components/shared/DataTable";
+import LoadingSpinner from "@components/shared/LoadingSpinner";
+import PaginationFooter from "@components/shared/PaginationFooter";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import qs from "qs";
-import { useAuth } from "../../../context/AuthProvider";
-import { supabase } from "../../../supabaseClient";
+import { useAuth } from "@context/AuthProvider";
+import { supabase } from "@app/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import { IoKeypad, IoLockOpen, IoNotificationsCircle } from "react-icons/io5";
 import { LuBrainCircuit } from "react-icons/lu";

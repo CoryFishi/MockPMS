@@ -1,17 +1,17 @@
-import Visitors from "../../features/pms/pages/Visitors";
-import Units from "../../features/pms/pages/Units";
-import AllFacilities from "../../features/pms/pages/AllFacilities";
-import Favorites from "../../features/pms/pages/Favorites";
+import Visitors from "@features/pms/pages/Visitors";
+import Units from "@features/pms/pages/Units";
+import AllFacilities from "@features/pms/pages/AllFacilities";
+import Favorites from "@features/pms/pages/Favorites";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import axios from "axios";
-import { useAuth } from "../../context/AuthProvider";
-import { supabase } from "../../supabaseClient";
+import { useAuth } from "@context/AuthProvider";
+import { supabase } from "../../app/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { handleSingleLogin } from "../../hooks/auth";
+import { handleSingleLogin } from "@hooks/auth";
 
 export default function PMSDashboardLayout({ dashboardMenu }) {
   const {

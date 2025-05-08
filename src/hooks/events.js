@@ -1,4 +1,4 @@
-import { supabase } from "../supabaseClient";
+import { supabase } from "../app/supabaseClient";
 
 export async function addEvent(eventName, eventDescription, completed) {
   try {

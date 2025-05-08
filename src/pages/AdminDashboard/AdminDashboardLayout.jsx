@@ -1,6 +1,6 @@
-import Users from "../../features/admin/pages/Users";
-import UserEvents from "../../features/admin/pages/UserEvents";
-import Roles from "../../features/admin/pages/Roles";
+import Users from "@features/admin/pages/Users";
+import UserEvents from "@features/admin/pages/UserEvents";
+import Roles from "@features/admin/pages/Roles";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { BsBuildingFill } from "react-icons/bs";

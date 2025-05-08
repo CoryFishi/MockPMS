@@ -1,9 +1,7 @@
-import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useState } from "react";
 import { IoIosCreate } from "react-icons/io";
-import { useAuth } from "../../../context/AuthProvider";
-import { supabase } from "../../../supabaseClient";
+import { supabase } from "@app/supabaseClient";
 
 export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
   // Store the unit number to be created

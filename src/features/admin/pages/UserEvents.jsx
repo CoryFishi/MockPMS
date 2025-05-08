@@ -1,9 +1,9 @@
-import PaginationFooter from "../../../components/shared/PaginationFooter";
-import DataTable from "../../../components/shared/DataTable";
+import PaginationFooter from "@components/shared/PaginationFooter";
+import DataTable from "@components/shared/DataTable";
 import React, { useState, useEffect } from "react";
 import { FaPerson } from "react-icons/fa6";
-import { useAuth } from "../../../context/AuthProvider";
-import { supabase } from "../../../supabaseClient";
+import { useAuth } from "@context/AuthProvider";
+import { supabase } from "@app/supabaseClient";
 
 export default function UserEvents() {
   const { user } = useAuth();

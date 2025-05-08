@@ -1,12 +1,12 @@
 import React, { useRef, useState, useEffect } from "react";
 import { FaPerson } from "react-icons/fa6";
-import { useAuth } from "../../../context/AuthProvider";
-import { supabaseAdmin, supabase } from "../../../supabaseClient";
+import { useAuth } from "@context/AuthProvider";
+import { supabaseAdmin } from "@app/supabaseClient";
 import toast from "react-hot-toast";
 import EditUser from "../modals/EditUser";
-import PaginationFooter from "../../../components/shared/PaginationFooter";
-import { addEvent } from "../../../hooks/events";
-import DataTable from "../../../components/shared/DataTable";
+import PaginationFooter from "@components/shared/PaginationFooter";
+import { addEvent } from "@hooks/events";
+import DataTable from "@components/shared/DataTable";
 
 export default function Users() {
   const { user } = useAuth();

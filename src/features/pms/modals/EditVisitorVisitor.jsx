@@ -2,8 +2,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useState, useEffect } from "react";
 import { MdEdit } from "react-icons/md";
-import { useAuth } from "../../../context/AuthProvider";
-import { addEvent } from "../../../hooks/events";
+import { useAuth } from "@context/AuthProvider";
+import { addEvent } from "@hooks/events";
 
 export default function EditVisitor({
   setIsEditVisitorModalOpen,

@@ -1,11 +1,10 @@
 import { Link } from "react-router-dom";
 import { RiMenuFold3Fill, RiMenuFold4Fill } from "react-icons/ri";
-import { useAuth } from "../../context/AuthProvider";
-import { supabase } from "../../supabaseClient";
+import { useAuth } from "@context/AuthProvider";
+import { supabase } from "@app/supabaseClient";
 import { useState, useEffect, useRef } from "react";
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import packageJson from "../../../package.json";
 
 export default function Navbar({
   setDashboardMenu,
@@ -28,7 +27,6 @@ export default function Navbar({
   } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  const [version, setVersion] = useState(packageJson.version);
   const userRef = useRef(null);
 
   const handleLogout = async () => {

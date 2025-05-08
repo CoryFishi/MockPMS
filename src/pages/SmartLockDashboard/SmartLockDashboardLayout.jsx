@@ -1,8 +1,8 @@
-import SmartLockAllFacilitiesPage from "../../features/smartlock/pages/SmartLockAllFacilities";
-import SmartLockSelectedPage from "../../features/smartlock/pages/SmartLockSelected";
-import SmartLockDashboardView from "../../features/smartlock/pages/SmartLockDashboard";
-import SmartLockReports from "../../features/smartlock/pages/SmartLockReports";
-import SmartLockDocumentationPage from "../../features/smartlock/pages/SmartLockDocumentation";
+import SmartLockAllFacilitiesPage from "@features/smartlock/pages/SmartLockAllFacilities";
+import SmartLockSelectedPage from "@features/smartlock/pages/SmartLockSelected";
+import SmartLockDashboardView from "@features/smartlock/pages/SmartLockDashboard";
+import SmartLockReports from "@features/smartlock/pages/SmartLockReports";
+import SmartLockDocumentationPage from "@features/smartlock/pages/SmartLockDocumentation";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";

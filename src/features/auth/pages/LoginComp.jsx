@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { supabase } from "../../../supabaseClient";
-import { useAuth } from "../../../context/AuthProvider";
+import { supabase } from "@app/supabaseClient";
+import { useAuth } from "@context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 
 export default function LoginComp() {

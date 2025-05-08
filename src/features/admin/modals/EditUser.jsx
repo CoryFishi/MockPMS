@@ -1,6 +1,6 @@
 import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
-import { supabase } from "../../../supabaseClient";
+import { supabase } from "@app/supabaseClient";
 import {
   FaTrash,
   FaEye,
@@ -12,8 +12,8 @@ import EditCurrentFacility from "./EditCurrentFacility";
 import AddToken from "./AddToken";
 import AddFavoriteFacility from "./AddFavoriteFacility";
 import AddSelectedFacility from "./AddSelectedFacility";
-import { addEvent } from "../../../hooks/events";
-import { useAuth } from "../../../context/AuthProvider";
+import { addEvent } from "@hooks/events";
+import { useAuth } from "@context/AuthProvider";
 export default function EditUser({
   setIsEditUserModalOpen,
   selectedUser,

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import Navbar from "../../components/shared/Navbar";
-import { useAuth } from "../../context/AuthProvider";
-import NotFound from "../../components/shared/NotFound";
+import Navbar from "@components/shared/Navbar";
+import { useAuth } from "@context/AuthProvider";
+import NotFound from "@components/shared/NotFound";
 import AdminDashboardLayout from "./AdminDashboardLayout";
 
 export default function Admin({ darkMode, toggleDarkMode }) {

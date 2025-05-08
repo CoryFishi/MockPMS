@@ -1,8 +1,8 @@
 import { useState } from "react";
-import Navbar from "../../components/shared/Navbar";
-import SmartLockDashboardLayout from "../../pages/SmartLockDashboard/SmartLockDashboardLayout";
-import { useAuth } from "../../context/AuthProvider";
-import NotFound from "../../components/shared/NotFound";
+import Navbar from "@components/shared/Navbar";
+import SmartLockDashboardLayout from "@pages/SmartLockDashboard/SmartLockDashboardLayout";
+import { useAuth } from "@context/AuthProvider";
+import NotFound from "@components/shared/NotFound";
 
 export default function SmartLockDashboard({ darkMode, toggleDarkMode }) {
   const [dashboardMenu, setDashboardMenu] = useState(true);

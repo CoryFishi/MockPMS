@@ -1,6 +1,6 @@
-import PaginationFooter from "../../../components/shared/PaginationFooter";
-import LoadingSpinner from "../../../components/shared/LoadingSpinner";
-import DataTable from "../../../components/shared/DataTable";
+import PaginationFooter from "@components/shared/PaginationFooter";
+import LoadingSpinner from "@components/shared/LoadingSpinner";
+import DataTable from "@components/shared/DataTable";
 import { IoKeypad, IoLockOpen, IoNotificationsCircle } from "react-icons/io5";
 import { LuBrainCircuit } from "react-icons/lu";
 import { RiAlarmWarningFill } from "react-icons/ri";
@@ -10,8 +10,8 @@ import React, { useEffect, useState } from "react";
 import { GoStar, GoStarFill } from "react-icons/go";
 import qs from "qs";
 import { FaWarehouse } from "react-icons/fa6";
-import { useAuth } from "../../../context/AuthProvider";
-import { supabase } from "../../../supabaseClient";
+import { useAuth } from "@context/AuthProvider";
+import { supabase } from "@app/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 
 export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {

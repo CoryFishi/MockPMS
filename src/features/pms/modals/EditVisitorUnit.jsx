@@ -1,7 +1,7 @@
 import EditVisitorVisitor from "./EditVisitorVisitor";
 import CreateVisitorUnitModal from "./CreateVisitorUnitModal";
-import PaginationFooter from "../../../components/shared/PaginationFooter";
-import { useAuth } from "../../../context/AuthProvider";
+import PaginationFooter from "@components/shared/PaginationFooter";
+import { useAuth } from "@context/AuthProvider";
 import { MdEdit } from "react-icons/md";
 import React, { useState, useEffect } from "react";
 import axios from "axios";

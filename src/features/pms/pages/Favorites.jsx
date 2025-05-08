@@ -1,12 +1,12 @@
-import PaginationFooter from "../../../components/shared/PaginationFooter";
-import DataTable from "../../../components/shared/DataTable";
+import PaginationFooter from "@components/shared/PaginationFooter";
+import DataTable from "@components/shared/DataTable";
 import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
 import { GoStar, GoStarFill } from "react-icons/go";
 import qs from "qs";
-import { useAuth } from "../../../context/AuthProvider";
-import { supabase } from "../../../supabaseClient";
+import { useAuth } from "@context/AuthProvider";
+import { supabase } from "@app/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 
 export default function Favorites({ setOpenPage, setCurrentFacilityName }) {

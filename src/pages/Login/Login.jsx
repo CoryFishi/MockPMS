@@ -1,6 +1,6 @@
-import Navbar from "../../components/shared/Navbar";
-import LoginComp from "../../features/auth/pages/LoginComp";
-import { useAuth } from "../../context/AuthProvider";
+import Navbar from "@components/shared/Navbar";
+import LoginComp from "@features/auth/pages/LoginComp";
+import { useAuth } from "@context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 

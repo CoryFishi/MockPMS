@@ -1,9 +1,9 @@
 import CreateVisitorVisitor from "../modals/CreateVisitorVisitor";
 import EditVisitor from "../modals/EditVisitorVisitor";
-import PaginationFooter from "../../../components/shared/PaginationFooter";
-import LoadingSpinner from "../../../components/shared/LoadingSpinner";
-import DataTable from "../../../components/shared/DataTable";
-import { useAuth } from "../../../context/AuthProvider";
+import PaginationFooter from "@components/shared/PaginationFooter";
+import LoadingSpinner from "@components/shared/LoadingSpinner";
+import DataTable from "@components/shared/DataTable";
+import { useAuth } from "@context/AuthProvider";
 import { FaPerson } from "react-icons/fa6";
 import axios from "axios";
 import toast from "react-hot-toast";

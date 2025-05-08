@@ -1,16 +1,16 @@
-import Navbar from "../../components/shared/Navbar";
-import NotFound from "../../components/shared/NotFound";
-import DataTable from "../../components/shared/DataTable";
-import AddAuthentication from "../../features/facilityAuthentication/modals/AddAuthentication";
-import PaginationFooter from "../../components/shared/PaginationFooter";
-import RenameAuthentication from "../../features/facilityAuthentication/modals/RenameAuthentication";
+import Navbar from "@components/shared/Navbar";
+import NotFound from "@components/shared/NotFound";
+import DataTable from "@components/shared/DataTable";
+import AddAuthentication from "@features/facilityAuthentication/modals/AddAuthentication";
+import PaginationFooter from "@components/shared/PaginationFooter";
+import RenameAuthentication from "@features/facilityAuthentication/modals/RenameAuthentication";
 import axios from "axios";
 import qs from "qs";
 import toast from "react-hot-toast";
-import { supabase } from "../../supabaseClient";
+import { supabase } from "../../app/supabaseClient";
 import { FaCircleCheck, FaSpinner } from "react-icons/fa6";
 import { MdOutlineError } from "react-icons/md";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "@context/AuthProvider";
 import { useRef, useState, useEffect } from "react";
 
 export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {

@@ -5,8 +5,8 @@ import { FaLock } from "react-icons/fa";
 import SmartLockFacilityCard from "../components/SmartLockFacilityCard";
 import SmartLockFacilityRow from "../components/SmartLockFacilityRow";
 import SmartLockExport from "../components/SmartLockExport";
-import { useAuth } from "../../../context/AuthProvider";
-import LoadingSpinner from "../../../components/shared/LoadingSpinner";
+import { useAuth } from "@context/AuthProvider";
+import LoadingSpinner from "@components/shared/LoadingSpinner";
 
 export default function SmartLockDashboardView({}) {
   const [facilitiesWithBearers, setFacilitiesWithBearers] = useState([]);

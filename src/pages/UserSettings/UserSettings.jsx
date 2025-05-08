@@ -1,12 +1,12 @@
-import Navbar from "../../components/shared/Navbar";
-import NotFound from "../../components/shared/NotFound";
-import PaginationFooter from "../../components/shared/PaginationFooter";
-import DataTable from "../../components/shared/DataTable";
+import Navbar from "@components/shared/Navbar";
+import NotFound from "@components/shared/NotFound";
+import PaginationFooter from "@components/shared/PaginationFooter";
+import DataTable from "@components/shared/DataTable";
 import toast from "react-hot-toast";
 import { BiCheckCircle, BiCircle } from "react-icons/bi";
-import { supabase } from "../../supabaseClient";
+import { supabase } from "../../app/supabaseClient";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "@context/AuthProvider";
 import { useState, useEffect } from "react";
 
 export default function UserSettings({ darkMode, toggleDarkMode }) {

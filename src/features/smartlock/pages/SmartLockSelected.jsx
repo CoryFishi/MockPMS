@@ -1,7 +1,7 @@
-import PaginationFooter from "../../../components/shared/PaginationFooter";
-import DataTable from "../../../components/shared/DataTable";
-import { useAuth } from "../../../context/AuthProvider";
-import { supabase } from "../../../supabaseClient";
+import PaginationFooter from "@components/shared/PaginationFooter";
+import DataTable from "@components/shared/DataTable";
+import { useAuth } from "@context/AuthProvider";
+import { supabase } from "@app/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";

@@ -2,8 +2,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useState, useEffect } from "react";
 import { IoIosCreate } from "react-icons/io";
-import { useAuth } from "../../../context/AuthProvider";
-import { addEvent } from "../../../hooks/events";
+import { useAuth } from "@context/AuthProvider";
 
 export default function CreateVisitorVisitor({
   setIsCreateVisitorModalOpen,

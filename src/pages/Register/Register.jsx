@@ -1,7 +1,7 @@
-import Navbar from "../../components/shared/Navbar";
-import RegisterComp from "../../features/auth/pages/RegisterComp";
+import Navbar from "@components/shared/Navbar";
+import RegisterComp from "@features/auth/pages/RegisterComp";
 import { useState, useEffect } from "react";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "@context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 
 export default function Register({ darkMode, toggleDarkMode }) {

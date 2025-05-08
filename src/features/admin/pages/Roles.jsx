@@ -1,11 +1,11 @@
-import PaginationFooter from "../../../components/shared/PaginationFooter";
+import PaginationFooter from "@components/shared/PaginationFooter";
 import EditRole from "../modals/EditRole";
 import CreateRole from "../modals/CreateRole";
-import DataTable from "../../../components/shared/DataTable";
+import DataTable from "@components/shared/DataTable";
 import React, { useRef, useState, useEffect } from "react";
 import { FaPerson } from "react-icons/fa6";
-import { useAuth } from "../../../context/AuthProvider";
-import { supabaseAdmin, supabase } from "../../../supabaseClient";
+import { useAuth } from "@context/AuthProvider";
+import { supabaseAdmin, supabase } from "@app/supabaseClient";
 import toast from "react-hot-toast";
 
 export default function Roles() {

@@ -1,7 +1,7 @@
-import Navbar from "../../components/shared/Navbar";
-import NotFound from "../../components/shared/NotFound";
+import Navbar from "@components/shared/Navbar";
+import NotFound from "@components/shared/NotFound";
 import PMSDashboardLayout from "./PMSDashboardLayout";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "@context/AuthProvider";
 import { useState } from "react";
 
 export default function Dashboard({ darkMode, toggleDarkMode }) {

@@ -1,4 +1,4 @@
-import PaginationFooter from "../../../components/shared/PaginationFooter";
+import PaginationFooter from "@components/shared/PaginationFooter";
 import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
