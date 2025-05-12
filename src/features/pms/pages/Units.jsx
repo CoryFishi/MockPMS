@@ -5,7 +5,7 @@ import PaginationFooter from "@components/shared/PaginationFooter";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
 import DataTable from "@components/shared/DataTable";
 import { useAuth } from "@context/AuthProvider";
-import { addEvent } from "@hooks/events";
+import { addEvent } from "@hooks/supabase";
 import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";

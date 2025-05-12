@@ -29,9 +29,9 @@ export default function AddAuthentication({
     }
   }, [api, apiSecret, client, clientSecret, environment]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (isAuthenticated) {
-      onSubmit({
+      const result = await onSubmit({
         api,
         apiSecret,
         client,
@@ -40,8 +40,9 @@ export default function AddAuthentication({
         name: name.trim() || "",
       });
       onClose();
+      return { message: "Authentication added successfully!" };
     } else {
-      toast.error("Please authenticate before submitting.");
+      throw new Error("Please authenticate before submitting.");
     }
   };
 
@@ -137,7 +138,17 @@ export default function AddAuthentication({
             Cancel
           </button>
           <button
-            onClick={handleSubmit}
+            onClick={() =>
+              toast.promise(handleSubmit, {
+                loading: "Authenticating...",
+                success: (data) => {
+                  return <span>{data.message}</span>;
+                },
+                error: (error) => {
+                  return <span>{error.message}</span>;
+                },
+              })
+            }
             disabled={!isAuthenticated}
             className={`px-4 py-2 rounded-lg text-sm text-white ${
               isAuthenticated

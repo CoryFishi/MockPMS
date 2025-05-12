@@ -12,7 +12,7 @@ import EditCurrentFacility from "./EditCurrentFacility";
 import AddToken from "./AddToken";
 import AddFavoriteFacility from "./AddFavoriteFacility";
 import AddSelectedFacility from "./AddSelectedFacility";
-import { addEvent } from "@hooks/events";
+import { addEvent } from "@hooks/supabase";
 import { useAuth } from "@context/AuthProvider";
 export default function EditUser({
   setIsEditUserModalOpen,

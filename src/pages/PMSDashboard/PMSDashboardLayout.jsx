@@ -11,7 +11,7 @@ import { useAuth } from "@context/AuthProvider";
 import { supabase } from "../../app/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { handleSingleLogin } from "@hooks/auth";
+import { handleSingleLogin } from "@hooks/opentech";
 
 export default function PMSDashboardLayout({ dashboardMenu }) {
   const {

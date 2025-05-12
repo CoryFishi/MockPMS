@@ -4,32 +4,26 @@ import DataTable from "@components/shared/DataTable";
 import AddAuthentication from "@features/facilityAuthentication/modals/AddAuthentication";
 import PaginationFooter from "@components/shared/PaginationFooter";
 import RenameAuthentication from "@features/facilityAuthentication/modals/RenameAuthentication";
-import axios from "axios";
-import qs from "qs";
 import toast from "react-hot-toast";
 import { supabase } from "../../app/supabaseClient";
 import { FaCircleCheck, FaSpinner } from "react-icons/fa6";
 import { MdOutlineError } from "react-icons/md";
 import { useAuth } from "@context/AuthProvider";
 import { useRef, useState, useEffect } from "react";
+import { addEvent } from "@hooks/supabase";
+import { handleSingleLogin } from "@hooks/opentech";
 
 export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
-  const [api, setApi] = useState("");
-  const [apiSecret, setApiSecret] = useState("");
-  const [client, setClient] = useState("");
-  const [clientSecret, setClientSecret] = useState("");
-  const [environment, setEnvironment] = useState("-");
   const [settingsSavedFacilities, setSettingsSavedFacilities] = useState([]);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [sortDirection, setSortDirection] = useState("asc");
-  const fileInputRef = useRef(null);
-  const { user, tokens, setTokens, permissions } = useAuth();
   const [sortedColumn, setSortedColumn] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
   const [selectedToken, setSelectedToken] = useState(null);
+  const fileInputRef = useRef(null);
+  const { user, tokens, setTokens, permissions } = useAuth();
 
   const handleRename = (token) => {
     setSelectedToken(token);
@@ -60,25 +54,10 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       toast.success("Token renamed successfully!");
     }
   };
-
   const paginatedFacilities = settingsSavedFacilities.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
-
-  async function addEvent(eventName, eventDescription, completed) {
-    const { data, error } = await supabase.from("user_events").insert([
-      {
-        event_name: eventName,
-        event_description: eventDescription,
-        completed: completed,
-      },
-    ]);
-
-    if (error) {
-      console.error("Error inserting event:", error);
-    }
-  }
   const handleFetchTokens = async () => {
     try {
       const fetchedTokens = await fetchTokens();
@@ -91,12 +70,13 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       setTokens(fetchedTokens);
 
       fetchedTokens.forEach((facility, index) => {
-        handleOldLogin(facility, index);
+        handleReauthentication(facility, index);
       });
     } catch (error) {
       console.error("Error fetching tokens:", error);
     }
   };
+  // Fetch tokens from the Supabase database
   const fetchTokens = async () => {
     if (!user) return;
 
@@ -128,23 +108,27 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
 
     return currentData.tokens || [];
   };
+  const submitCredentials = async (facility) => {
+    if (!user) return;
+    const newToken = {
+      name: facility.name || "",
+      api: facility.api || "",
+      apiSecret: facility.apiSecret || "",
+      client: facility.client || "",
+      clientSecret: facility.clientSecret || "",
+      environment: facility.environment || "",
+    };
 
-  const submitCredentials = async () => {
-    let updatedTokens = (await fetchTokens()) || [];
-    // Add the new set of credentials to the array
-    updatedTokens.push({
-      api,
-      apiSecret,
-      client,
-      clientSecret,
-      environment,
-    });
+    const dbTokens = [
+      ...settingsSavedFacilities.map(({ isAuthenticated, ...t }) => t),
+      newToken,
+    ];
 
-    // Upsert with the updated tokens array
+    // Upsert to database
     const { data, error } = await supabase.from("user_data").upsert(
       {
         user_id: user.id,
-        tokens: updatedTokens,
+        tokens: dbTokens,
         last_update_at: new Date().toISOString(),
       },
       { onConflict: "user_id" }
@@ -157,27 +141,28 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
         false
       );
       console.error("Error saving credentials:", error.message);
+      return error;
     } else {
+      setSettingsSavedFacilities((prevFacilities) => [
+        ...prevFacilities,
+        { ...newToken, isAuthenticated: true },
+      ]);
+
       await addEvent(
         "Create Authentication",
         `${user.email} created an authentication connection`,
         true
       );
-      setApi("");
-      setApiSecret("");
-      setClient("");
-      setClientSecret("");
-      setIsAuthenticated(false);
-      handleFetchTokens();
+      return data;
     }
   };
-  const removeToken = async (apiToRemove) => {
+
+  const removeToken = async (indexToRemove) => {
     if (!user) {
       toast.error("User not authenticated.");
       return;
     }
 
-    // Fetch existing tokens for the user
     const { data: currentData, error: fetchError } = await supabase
       .from("user_data")
       .select("tokens")
@@ -190,12 +175,10 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       return;
     }
 
-    // Filter out the token to remove
     const updatedTokens = (currentData?.tokens || []).filter(
-      (token) => token.api !== apiToRemove
+      (_, index) => index !== indexToRemove
     );
 
-    // Upsert the updated tokens array back to the database
     const { data, error } = await supabase.from("user_data").upsert(
       {
         user_id: user.id,
@@ -218,78 +201,46 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
         `${user.email} deleted an authentication connection`,
         true
       );
-      await handleFetchTokens();
+      // Update local state (settingsSavedFacilities)
+      setSettingsSavedFacilities((prev) =>
+        prev.filter((_, index) => index !== indexToRemove)
+      );
     }
   };
-  const handleOldLogin = (facility, index) => {
-    var tokenStageKey = "";
-    var tokenEnvKey = "";
-    if (facility.environment === "cia-stg-1.aws.") {
-      tokenStageKey = "cia-stg-1.aws.";
+
+  const handleReauthentication = async (facility, index) => {
+    const result = await handleSingleLogin({
+      api: facility.api,
+      apiSecret: facility.apiSecret,
+      client: facility.client,
+      clientSecret: facility.clientSecret,
+      environment: facility.environment,
+    });
+    if (result.error) {
+      setSettingsSavedFacilities((prevFacilities) =>
+        prevFacilities.map((f, i) =>
+          i === index ? { ...f, isAuthenticated: false } : f
+        )
+      );
     } else {
-      tokenEnvKey = facility.environment;
+      setSettingsSavedFacilities((prevFacilities) =>
+        prevFacilities.map((f, i) =>
+          i === index ? { ...f, isAuthenticated: true } : f
+        )
+      );
     }
-    const data = qs.stringify({
-      grant_type: "password",
-      username: facility.api,
-      password: facility.apiSecret,
-      client_id: facility.client,
-      client_secret: facility.clientSecret,
-    });
-    const config = {
-      method: "post",
-      url: `https://auth.${tokenStageKey}insomniaccia${tokenEnvKey}.com/auth/token`,
-      headers: {
-        accept: "application/json",
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      data: data,
-    };
-    axios(config)
-      .then(function (response) {
-        setSettingsSavedFacilities((prevFacilities) =>
-          prevFacilities.map((f, i) =>
-            i === index ? { ...f, isAuthenticated: true } : f
-          )
-        );
-        return response;
-      })
-      .catch(function (error) {
-        setSettingsSavedFacilities((prevFacilities) =>
-          prevFacilities.map((f, i) =>
-            i === index ? { ...f, isAuthenticated: false } : f
-          )
-        );
-        console.error(error.message);
-      });
   };
-  const handleNewLogin = async (env, creds = null) => {
-    const { api: a, apiSecret: s, client: c, clientSecret: cs } = creds || {};
-    const apiVal = a || api;
-    const apiSecretVal = s || apiSecret;
-    const clientVal = c || client;
-    const clientSecretVal = cs || clientSecret;
-
-    const data = qs.stringify({
-      grant_type: "password",
-      username: apiVal,
-      password: apiSecretVal,
-      client_id: clientVal,
-      client_secret: clientSecretVal,
-    });
-
-    const url = `https://auth.${
-      env === "cia-stg-1.aws." ? env : ""
-    }insomniaccia${env === "" ? "" : env}.com/auth/token`;
-
-    return axios.post(url, data, {
-      headers: {
-        accept: "application/json",
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+  const handleNewAuthenitcation = async (env, creds = null) => {
+    handleSingleLogin({
+      api: creds.api,
+      apiSecret: creds.apiSecret,
+      client: creds.client,
+      clientSecret: creds.clientSecret,
+      environment: env,
     });
   };
 
+  // Export authentication settings to CSV
   const exportFacilities = () => {
     const userResponse = confirm("Are you sure you want to export the tokens?");
     if (!userResponse) {
@@ -298,6 +249,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     }
     // Convert the data to CSV format
     const headers = [
+      "name",
       "api",
       "apiSecret",
       "client",
@@ -309,10 +261,11 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       headers.join(","),
       ...settingsSavedFacilities.map((facility) =>
         [
-          facility.api,
-          facility.apiSecret,
-          facility.client,
-          facility.clientSecret,
+          facility.name || "",
+          facility.api || "",
+          facility.apiSecret || "",
+          facility.client || "",
+          facility.clientSecret || "",
           facility.environment === ""
             ? "Production"
             : facility.environment === "-dev"
@@ -373,7 +326,8 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
   };
   const importFacilities = async (facilities) => {
     const updatedFacilities = facilities.map(
-      ({ api, apiSecret, client, clientSecret, environment }) => ({
+      ({ name, api, apiSecret, client, clientSecret, environment }) => ({
+        name,
         api,
         apiSecret,
         client,
@@ -415,7 +369,6 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     );
     window.location.reload();
   };
-  // Simulate a click on the hidden file input
   const triggerFileInput = () => {
     fileInputRef.current.click();
   };
@@ -427,10 +380,11 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     }
     handleFetchTokens();
     tokens.forEach((facility, index) => {
-      handleOldLogin(facility, index);
+      handleReauthentication(facility, index);
     });
   }, [user]);
 
+  // Table and column definitions
   const columns = [
     {
       key: "name",
@@ -520,13 +474,11 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
             <button
               className="bg-red-500 hover:bg-red-600 cursor-pointer text-white px-2 py-1 rounded font-bold mx-1"
               onClick={() => {
-                if (permissions.authenticationPlatformDelete) {
-                  toast.promise(removeToken(f.api), {
-                    loading: "Deleting Credentials...",
-                    success: <b>Successfully deleted!</b>,
-                    error: <b>Failed deletion!</b>,
-                  });
-                }
+                toast.promise(removeToken(f.index), {
+                  loading: "Deleting Credentials...",
+                  success: <b>Successfully deleted!</b>,
+                  error: <b>Failed deletion!</b>,
+                });
               }}
             >
               Delete
@@ -566,14 +518,16 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
 
   return (
     <div className="dark:text-white dark:bg-darkPrimary h-screen w-screen flex flex-col overflow-hidden font-roboto">
+      {/* Authentication Creation Modal */}
       {isAddModalOpen && (
         <AddAuthentication
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
           onSubmit={submitCredentials}
-          handleNewLogin={handleNewLogin}
+          handleNewLogin={handleNewAuthenitcation}
         />
       )}
+      {/* Authentication Rename Modal */}
       {isRenameModalOpen && (
         <RenameAuthentication
           isOpen={isRenameModalOpen}
@@ -582,13 +536,17 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
           token={selectedToken}
         />
       )}
+      {/* Main Page, check for permissions */}
       {user && permissions.authenticationPlatform ? (
         <div>
+          {/* Navbar */}
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+          {/* Body */}
           <div className="w-full h-full px-5 flex flex-col rounded-lg overflow-y-auto">
             <div className="flex justify-between mt-2">
               <div></div>
               <div className="flex flex-wrap gap-2 p-3">
+                {/* Create Authenitcation Button, check for permissions */}
                 {permissions.authenticationPlatformCreate && (
                   <button
                     className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded font-semibold cursor-pointer transition duration-300 ease-in-out"
@@ -597,6 +555,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                     Add Authentication
                   </button>
                 )}
+                {/* Export Authenitcation Button, check for permissions */}
                 {permissions.authenticationPlatformExport && (
                   <button
                     className="cursor-pointer rounded px-4 py-2 bg-gray-100 dark:bg-darkSecondary text-black dark:text-white hover:text-slate-400 dark:hover:text-slate-400 transition duration-300 ease-in-out"
@@ -606,6 +565,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                     Export
                   </button>
                 )}
+                {/* Import Authenitcation Button, check for permissions */}
                 {permissions.authenticationPlatformImport && (
                   <>
                     <button
@@ -626,10 +586,14 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
                 )}
               </div>
             </div>
+            {/* Table & Pagination */}
             <div className="mt-3 overflow-y-auto max-h-[75vh]">
               <DataTable
                 columns={columns}
-                data={paginatedFacilities}
+                data={paginatedFacilities.map((item, index) => ({
+                  ...item,
+                  index,
+                }))}
                 sortedColumn={sortedColumn}
                 sortDirection={sortDirection}
                 onSort={handleColumnSort}
@@ -647,6 +611,8 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
           </div>
         </div>
       ) : (
+        // If user is not authenticated or doesn't have permission
+        // Show Not Found page
         <NotFound />
       )}
     </div>

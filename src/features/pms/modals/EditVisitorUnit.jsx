@@ -1,7 +1,7 @@
 import EditVisitorVisitor from "./EditVisitorVisitor";
 import PaginationFooter from "@components/shared/PaginationFooter";
 import DataTable from "@components/shared/DataTable";
-import { addEvent } from "@hooks/events";
+import { addEvent } from "@hooks/supabase";
 import { useAuth } from "@context/AuthProvider";
 import { MdEdit } from "react-icons/md";
 import React, { useState, useEffect } from "react";

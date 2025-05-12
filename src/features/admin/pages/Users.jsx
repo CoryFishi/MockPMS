@@ -5,7 +5,7 @@ import { supabaseAdmin } from "@app/supabaseClient";
 import toast from "react-hot-toast";
 import EditUser from "../modals/EditUser";
 import PaginationFooter from "@components/shared/PaginationFooter";
-import { addEvent } from "@hooks/events";
+import { addEvent } from "@hooks/supabase";
 import DataTable from "@components/shared/DataTable";
 
 export default function Users() {

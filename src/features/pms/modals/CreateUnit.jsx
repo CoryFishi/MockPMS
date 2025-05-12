@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import React, { useState } from "react";
 import { IoIosCreate } from "react-icons/io";
 import { useAuth } from "@context/AuthProvider";
-import { addEvent } from "@hooks/events";
+import { addEvent } from "@hooks/supabase";
 
 export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
   // Store the unit number to be created

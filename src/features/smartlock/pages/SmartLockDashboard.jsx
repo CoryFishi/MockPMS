@@ -3,10 +3,10 @@ import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
 import { FaLock } from "react-icons/fa";
 import SmartLockFacilityCard from "../components/SmartLockFacilityCard";
-import SmartLockFacilityRow from "../components/SmartLockFacilityRow";
 import SmartLockExport from "../components/SmartLockExport";
 import { useAuth } from "@context/AuthProvider";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
+import SmartLockDashboardList from "../components/SmartLockDashboardList";
 
 export default function SmartLockDashboardView({}) {
   const [facilitiesWithBearers, setFacilitiesWithBearers] = useState([]);
@@ -31,52 +31,8 @@ export default function SmartLockDashboardView({}) {
   const [totalEdgeRouters, setTotalEdgeRouters] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const { selectedTokens, user } = useAuth();
-  const [expandedRows, setExpandedRows] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentLoadingText, setCurrentLoadingText] = useState("");
-  const [sortKey, setSortKey] = useState(null);
-  const [sortDirection, setSortDirection] = useState("asc");
-
-  const handleSort = (key) => {
-    let nextDirection = "asc";
-
-    if (sortKey === key) {
-      if (sortDirection === "asc") nextDirection = "desc";
-      else if (sortDirection === "desc") nextDirection = null;
-    }
-
-    setSortKey(nextDirection ? key : null);
-    setSortDirection(nextDirection);
-
-    if (!nextDirection) {
-      setFilteredFacilities(facilitiesWithBearers);
-      return;
-    }
-
-    const sorted = [...filteredFacilities].sort((a, b) => {
-      const aVal = a[key] ?? 0;
-      const bVal = b[key] ?? 0;
-
-      if (typeof aVal === "string") {
-        return nextDirection === "asc"
-          ? aVal.localeCompare(bVal)
-          : bVal.localeCompare(aVal);
-      }
-
-      return nextDirection === "asc" ? aVal - bVal : bVal - aVal;
-    });
-
-    setFilteredFacilities(sorted);
-  };
-
-  useEffect(() => {
-    if (searchQuery.trim() !== "") {
-      search(searchQuery);
-    } else {
-      setFilteredFacilities(facilitiesWithBearers);
-    }
-  }, [facilitiesWithBearers]);
-
   // Search via search bar and button
   const search = (query) => {
     const trimmed = query.trim().toLowerCase();
@@ -97,7 +53,6 @@ export default function SmartLockDashboardView({}) {
     });
     setFilteredFacilities(results);
   };
-
   // Function to get a bearer token for each facility
   const fetchBearerToken = async (facility) => {
     try {
@@ -134,13 +89,11 @@ export default function SmartLockDashboardView({}) {
       return null;
     }
   };
-
   // Toggle view - list or card
   const toggleListView = () => {
     setListView(!listView);
     localStorage.setItem("smartlockListView", !listView);
   };
-
   // Add totals together from each facility
   useEffect(() => {
     const updateAggregatedCounts = (facilitiesInfo) => {
@@ -394,6 +347,14 @@ export default function SmartLockDashboardView({}) {
     }
   };
 
+  useEffect(() => {
+    if (searchQuery.trim() !== "") {
+      search(searchQuery);
+    } else {
+      setFilteredFacilities(facilitiesWithBearers);
+    }
+  }, [facilitiesWithBearers]);
+
   return (
     <div
       className={`relative ${
@@ -403,7 +364,7 @@ export default function SmartLockDashboardView({}) {
       {/* Loading Spinner */}
       {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* tab title */}
-      <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <FaLock className="text-lg" />
           &ensp; SmartLock Dashboard
@@ -425,7 +386,7 @@ export default function SmartLockDashboardView({}) {
 
         {/* Toggle view button */}
         <button
-          className="bg-slate-300 text-white p-1 py-2 rounded-sm hover:bg-slate-400 ml-3 w-44 font-bold cursor-pointer hover:transition hover:duration-300 hover:ease-in-out"
+          className="bg-zinc-300 text-white p-1 py-2 rounded-sm hover:bg-zinc-400 ml-3 w-44 font-bold cursor-pointer hover:transition hover:duration-300 hover:ease-in-out"
           onClick={() => toggleListView()}
         >
           {listView ? "Card View" : "List View"}
@@ -434,226 +395,23 @@ export default function SmartLockDashboardView({}) {
       {/* List view */}
       {listView ? (
         <div className="w-full px-5">
-          <table className="w-full">
-            <thead className="select-none">
-              <tr className="bg-slate-100 dark:bg-darkNavSecondary">
-                <th className="border border-gray-300 dark:border-border px-4 py-2"></th>
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2"
-                  colSpan="3"
-                >
-                  OpenNet
-                </th>
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2"
-                  colSpan="6"
-                >
-                  SmartLock
-                </th>
-              </tr>
-              <tr className="bg-slate-100 dark:bg-darkNavSecondary">
-                <th
-                  onClick={() => handleSort("name")}
-                  className="border border-gray-300 dark:border-border px-4 py-2 cursor-pointer"
-                >
-                  Facility{" "}
-                  {sortKey === "name" && (sortDirection === "asc" ? "▲" : "▼")}
-                </th>
-                <th
-                  onClick={() => handleSort("edgeRouterStatus")}
-                  className="border border-gray-300 dark:border-border px-4 py-2 cursor-pointer"
-                >
-                  Edge Router{" "}
-                  {sortKey === "edgeRouterStatus" &&
-                    (sortDirection === "asc" ? "▲" : "▼")}
-                </th>
-                <th
-                  onClick={() => handleSort("onlineAccessPointsCount")}
-                  className="border border-gray-300 dark:border-border px-4 py-2 cursor-pointer"
-                >
-                  Online APs{" "}
-                  {sortKey === "onlineAccessPointsCount" &&
-                    (sortDirection === "asc" ? "▲" : "▼")}
-                </th>
-                <th
-                  onClick={() => handleSort("offlineAccessPointsCount")}
-                  className="border border-gray-300 dark:border-border px-4 py-2 cursor-pointer"
-                >
-                  Offline APs{" "}
-                  {sortKey === "offlineAccessPointsCount" &&
-                    (sortDirection === "asc" ? "▲" : "▼")}
-                </th>
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2 cursor-pointer"
-                  onClick={() => handleSort("okCount")}
-                >
-                  Okay{" "}
-                  {sortKey === "okCount" &&
-                    (sortDirection === "asc" ? "▲" : "▼")}
-                </th>
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2 cursor-pointer"
-                  onClick={() => handleSort("warningCount")}
-                >
-                  Warning{" "}
-                  {sortKey === "warningCount" &&
-                    (sortDirection === "asc" ? "▲" : "▼")}
-                </th>
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2 cursor-pointer"
-                  onClick={() => handleSort("errorCount")}
-                >
-                  Error{" "}
-                  {sortKey === "errorCount" &&
-                    (sortDirection === "asc" ? "▲" : "▼")}
-                </th>
-                <th
-                  className="border border-gray-300 dark:border-border px-4 py-2 cursor-pointer"
-                  onClick={() => handleSort("offlineCount")}
-                >
-                  Offline{" "}
-                  {sortKey === "offlineCount" &&
-                    (sortDirection === "asc" ? "▲" : "▼")}
-                </th>
-                <th
-                  onClick={() => handleSort("lowestSignal")}
-                  className="cursor-pointer border border-gray-300 dark:border-border px-4 py-2"
-                >
-                  Lowest Signal{" "}
-                  {sortKey === "lowestSignal" &&
-                    (sortDirection === "asc" ? "▲" : "▼")}
-                </th>
-                <th
-                  onClick={() => handleSort("lowestBattery")}
-                  className="cursor-pointer border border-gray-300 dark:border-border px-4 py-2"
-                >
-                  Lowest Battery{" "}
-                  {sortKey === "lowestBattery" &&
-                    (sortDirection === "asc" ? "▲" : "▼")}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredFacilities.map((facility, index) => (
-                <SmartLockFacilityRow
-                  facility={facility}
-                  index={index}
-                  setExpandedRows={setExpandedRows}
-                  expandedRows={expandedRows}
-                  key={index}
-                />
-              ))}
-              <tr className="bg-slate-100 dark:bg-darkSecondary text-center">
-                <td
-                  className="border border-gray-300 dark:border-border px-4 py-2 font-bold text-left"
-                  title={totalSmartlocks + " SmartLocks"}
-                >
-                  Totals:
-                </td>
-                <td
-                  className="border border-gray-300 dark:border-border px-4 py-2"
-                  title={
-                    Math.round(
-                      (edgeRouterOnlineCount / totalEdgeRouters) * 100
-                    ) +
-                    "% Online \n" +
-                    Math.round(
-                      (edgeRouterOfflineCount / totalEdgeRouters) * 100
-                    ) +
-                    "% Offline \n" +
-                    Math.round(
-                      (edgeRouterWarningCount / totalEdgeRouters) * 100
-                    ) +
-                    "% Warning"
-                  }
-                >
-                  {edgeRouterOnlineCount > 0
-                    ? edgeRouterOnlineCount + " Online"
-                    : ""}
-                  {edgeRouterWarningCount > 0 && edgeRouterOnlineCount > 0 && (
-                    <br />
-                  )}
-                  {edgeRouterWarningCount > 0
-                    ? edgeRouterWarningCount + " Warning"
-                    : ""}
-                  {edgeRouterOfflineCount > 0 && <br />}
-                  {edgeRouterOfflineCount > 0
-                    ? edgeRouterOfflineCount + " Offline"
-                    : ""}
-                </td>
-                <td
-                  className="border border-gray-300 dark:border-border px-4 py-2"
-                  title={
-                    Math.round(
-                      (accessPointsOnlineCount / totalAccessPoints) * 100
-                    ) + "% Online"
-                  }
-                >
-                  {accessPointsOnlineCount}
-                </td>
-                <td
-                  className="border border-gray-300 dark:border-border px-4 py-2"
-                  title={
-                    Math.round(
-                      (accessPointsOfflineCount / totalAccessPoints) * 100
-                    ) + "% Offline"
-                  }
-                >
-                  {accessPointsOfflineCount}
-                </td>
-                <td
-                  className="border border-gray-300 dark:border-border px-4 py-2"
-                  title={
-                    Math.round((smartlockOkayCount / totalSmartlocks) * 100) +
-                    "% Okay Status"
-                  }
-                >
-                  {smartlockOkayCount}
-                </td>
-                <td
-                  className="border border-gray-300 dark:border-border px-4 py-2"
-                  title={
-                    Math.round(
-                      (smartlockWarningCount / totalSmartlocks) * 100
-                    ) + "% Warning Status"
-                  }
-                >
-                  {smartlockWarningCount}
-                </td>
-                <td
-                  className="border border-gray-300 dark:border-border px-4 py-2"
-                  title={
-                    Math.round((smartlockErrorCount / totalSmartlocks) * 100) +
-                    "% Error Status"
-                  }
-                >
-                  {smartlockErrorCount}
-                </td>
-                <td
-                  className="border border-gray-300 dark:border-border px-4 py-2"
-                  title={
-                    Math.round(
-                      (smartlockOfflineCount / totalSmartlocks) * 100
-                    ) + "% Offline"
-                  }
-                >
-                  {smartlockOfflineCount}
-                </td>
-                <td
-                  className="border border-gray-300 dark:border-border px-4 py-2"
-                  title={smartlockLowestSignal.facility}
-                >
-                  {smartlockLowestSignal.lowestSignal}%
-                </td>
-                <td
-                  className="border border-gray-300 dark:border-border px-4 py-2"
-                  title={smartlockLowestBattery.facility}
-                >
-                  {smartlockLowestBattery.lowestBattery}%
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <SmartLockDashboardList
+            filteredFacilities={filteredFacilities}
+            totalSmartlocks={totalSmartlocks}
+            totalAccessPoints={totalAccessPoints}
+            totalEdgeRouters={totalEdgeRouters}
+            edgeRouterOnlineCount={edgeRouterOnlineCount}
+            edgeRouterWarningCount={edgeRouterWarningCount}
+            edgeRouterOfflineCount={edgeRouterOfflineCount}
+            accessPointsOnlineCount={accessPointsOnlineCount}
+            accessPointsOfflineCount={accessPointsOfflineCount}
+            smartlockOkayCount={smartlockOkayCount}
+            smartlockWarningCount={smartlockWarningCount}
+            smartlockErrorCount={smartlockErrorCount}
+            smartlockOfflineCount={smartlockOfflineCount}
+            smartlockLowestSignal={smartlockLowestSignal}
+            smartlockLowestBattery={smartlockLowestBattery}
+          />
         </div>
       ) : (
         // Card View
