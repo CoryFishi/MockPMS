@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import { useState, useEffect } from "react";
 import SmartLockDashboard from "./pages/SmartLockDashboard";
+import FeaturePopup from "./components/modals/FeaturePopup";
 
 function App() {
   const [currentFacility, setCurrentFacility] = useState(
@@ -45,6 +46,7 @@ function App() {
   return (
     <>
       <Toaster position="bottom-right" toastOptions={{ duration: 2000 }} />
+      <FeaturePopup />
       <Routes>
         <Route
           path="/"
