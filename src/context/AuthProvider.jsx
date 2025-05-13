@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createContext, useContext } from "react";
-import { supabase } from "../supabaseClient";
+import { supabase } from "@app/supabaseClient";
 import toast from "react-hot-toast";
 import { IoWarning } from "react-icons/io5";
 
