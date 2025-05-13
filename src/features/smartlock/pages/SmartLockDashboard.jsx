@@ -411,6 +411,8 @@ export default function SmartLockDashboardView({}) {
             smartlockOfflineCount={smartlockOfflineCount}
             smartlockLowestSignal={smartlockLowestSignal}
             smartlockLowestBattery={smartlockLowestBattery}
+            facilitiesWithBearers={facilitiesWithBearers}
+            setFilteredFacilities={setFilteredFacilities}
           />
         </div>
       ) : (

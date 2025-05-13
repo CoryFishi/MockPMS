@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import SmartLockFacilityRow from "../components/SmartLockFacilityRow";
 
 export default function SmartLockDashboardList({
   filteredFacilities,
+  facilitiesWithBearers,
+  setFilteredFacilities,
   totalSmartlocks,
   totalAccessPoints,
   totalEdgeRouters,
