@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { IoIosCreate } from "react-icons/io";
 import { useAuth } from "@context/AuthProvider";
 import { addEvent } from "@hooks/supabase";
+import ModalButton from "../../../components/UI/ModalButton";
 
 export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
   // Store the unit number to be created
@@ -140,22 +141,22 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
             placeholder="Enter unit number"
           />
           <p className="text-wrap text-xs text-red-400 mt-1">
-            Multiple Units can be created by sperating each unit by a comma
+            Multiple Units can be created by sperating each unit by a comma or
+            <br />
+            by adding a hyphen to create arange of units. <br />
+            Example: 1001,1002,A001-A050 <br />
           </p>
           {/* Button Container */}
           <div className="mt-4 flex justify-end">
-            <button
-              className="bg-gray-400 px-4 py-2 rounded-sm mr-2 hover:cursor-pointer hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
-              onClick={() => setIsUnitModalOpen(false)}
-            >
-              Cancel
-            </button>
-            <button
-              className="bg-green-500 text-white hover:cursor-pointer px-4 py-2 rounded-sm hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
-              onClick={handleCreateUnit}
-            >
-              Submit
-            </button>
+            <ModalButton
+              onclick={() => setIsUnitModalOpen(false)}
+              text="Cancel"
+            />
+            <ModalButton
+              onclick={handleCreateUnit}
+              text="Save"
+              className={"bg-green-500 hover:bg-green-600"}
+            />
           </div>
         </div>
       </div>
