@@ -105,11 +105,7 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
           true
         );
       } catch (error) {
-        await addEvent(
-          "Create Unit",
-          `${user.email} created unit ${unitNumber} at ${currentFacility.name}, facility id ${currentFacility.id}`,
-          false
-        );
+        console.error("Error creating unit:", error);
       }
     });
     setIsUnitModalOpen(false);

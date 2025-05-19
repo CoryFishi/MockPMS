@@ -16,6 +16,7 @@ export default function UserEvents() {
   const [sortedColumn, setSortedColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("desc");
   const [pullDate, setPullDate] = useState(null);
+
   const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
     let newDirection;
 
@@ -49,8 +50,11 @@ export default function UserEvents() {
   async function getAllEvents() {
     setPullDate(Date());
     if (!user) return;
-    const { data, error } = await supabase.from("user_events").select("*");
-
+    const { data, error } = await supabase
+      .from("user_events")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(10000);
     if (error) {
       console.error("Error fetching events:", error);
     } else {

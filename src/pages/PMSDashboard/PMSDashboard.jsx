@@ -18,7 +18,10 @@ export default function Dashboard({ darkMode, toggleDarkMode }) {
             darkMode={darkMode}
             toggleDarkMode={toggleDarkMode}
           />
-          <PMSDashboardLayout dashboardMenu={dashboardMenu} />
+          <PMSDashboardLayout
+            dashboardMenu={dashboardMenu}
+            setDashboardMenu={setDashboardMenu}
+          />
         </div>
       ) : (
         <NotFound />

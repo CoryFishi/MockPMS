@@ -4,11 +4,14 @@ import EditVisitor from "../modals/EditVisitorUnit";
 import PaginationFooter from "@components/shared/PaginationFooter";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
 import DataTable from "@components/shared/DataTable";
+import TableButton from "@components/UI/TableButton";
+import GeneralButton from "@components/UI/GeneralButton";
+import SliderButton from "@components/UI/SliderButton";
 import { useAuth } from "@context/AuthProvider";
 import { addEvent } from "@hooks/supabase";
 import axios from "axios";
 import toast from "react-hot-toast";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { RiDoorLockFill } from "react-icons/ri";
 
 export default function Units({
@@ -635,20 +638,18 @@ export default function Units({
           return (
             <div className="space-x-1">
               {permissions.pmsPlatformVisitorEdit && (
-                <button
-                  className="bg-yellow-500 hover:bg-yellow-600 cursor-pointer text-white px-2 py-1 rounded font-bold"
-                  onClick={() => turnDelinquent(unit)}
-                >
-                  Turn Delinquent
-                </button>
+                <TableButton
+                  onclick={() => turnDelinquent(unit)}
+                  text="Turn Delinquent"
+                  className={"bg-yellow-500 hover:bg-yellow-600"}
+                />
               )}
               {permissions.pmsPlatformVisitorDelete && (
-                <button
-                  className="bg-red-500 hover:bg-red-600 cursor-pointer text-white px-2 py-1 rounded font-bold"
-                  onClick={() => moveOut(unit)}
-                >
-                  Move Out
-                </button>
+                <TableButton
+                  onclick={() => moveOut(unit)}
+                  text="Move Out"
+                  className={"bg-red-500 hover:bg-red-600"}
+                />
               )}
             </div>
           );
@@ -657,23 +658,21 @@ export default function Units({
           return (
             <div className="space-x-1">
               {permissions.pmsPlatformVisitorCreate && (
-                <button
-                  className="bg-green-500 hover:bg-green-600 cursor-pointer text-white px-2 py-1 rounded font-bold"
-                  onClick={() => {
+                <TableButton
+                  onclick={() => {
                     moveIn(unit);
                     setSelectedUnit(unit);
                   }}
-                >
-                  Move In
-                </button>
+                  text="Move In"
+                  className={"bg-green-500 hover:bg-green-600"}
+                />
               )}
               {permissions.pmsPlatformUnitDelete && (
-                <button
-                  className="bg-red-500 hover:bg-red-600 cursor-pointer text-white px-2 py-1 rounded font-bold"
-                  onClick={() => deleteUnit(unit)}
-                >
-                  Delete
-                </button>
+                <TableButton
+                  onclick={() => deleteUnit(unit)}
+                  text="Delete"
+                  className={"bg-red-500 hover:bg-red-600"}
+                />
               )}
             </div>
           );
@@ -682,20 +681,18 @@ export default function Units({
           return (
             <div className="space-x-1">
               {permissions.pmsPlatformVisitorEdit && (
-                <button
-                  className="bg-green-500 hover:bg-green-600 cursor-pointer text-white px-2 py-1 rounded font-bold"
-                  onClick={() => turnRented(unit)}
-                >
-                  Turn Rented
-                </button>
+                <TableButton
+                  onclick={() => turnRented(unit)}
+                  text="Turn Rented"
+                  className={"bg-green-500 hover:bg-green-600"}
+                />
               )}
               {permissions.pmsPlatformVisitorDelete && (
-                <button
-                  className="bg-red-500 hover:bg-red-600 cursor-pointer text-white px-2 py-1 rounded font-bold"
-                  onClick={() => moveOut(unit)}
-                >
-                  Move Out
-                </button>
+                <TableButton
+                  onclick={() => moveOut(unit)}
+                  text="Move Out"
+                  className={"bg-red-500 hover:bg-red-600"}
+                />
               )}
             </div>
           );
@@ -781,33 +778,19 @@ export default function Units({
           {permissions.pmsPlatformVisitorCreate && (
             <>
               <h3 className="mr-2 w-36">Visitor Autofill</h3>
-              <div
-                className={`w-8 h-4 flex items-center rounded-full p-1 cursor-pointer ${
-                  visitorAutofill ? "bg-blue-600" : "bg-gray-300"
-                }`}
-                onClick={() => handleVisitorAutofill(visitorAutofill)}
-              >
-                <div
-                  className={`bg-white w-3 h-3 rounded-full shadow-md transform transition-transform duration-500 ease-out ${
-                    visitorAutofill ? "translate-x-2" : ""
-                  }`}
-                ></div>
-              </div>
+              <SliderButton
+                onclick={() => handleVisitorAutofill(visitorAutofill)}
+                value={visitorAutofill}
+              />
             </>
           )}
           {/* Create Unit Button */}
           {permissions.pmsPlatformUnitCreate && (
-            <button
-              className={`bg-green-500 text-white p-1 py-2 rounded font-bold ml-3 w-44 transition duration-300 ease-in-out transform select-none ${
-                permissions.pmsPlatformUnitCreate
-                  ? "hover:bg-green-600 hover:scale-105 hover:cursor-pointer"
-                  : "opacity-50 cursor-not-allowed"
-              }`}
-              onClick={() => setIsUnitModalOpen(true)}
-              disabled={!permissions.pmsPlatformUnitCreate}
-            >
-              Create Unit(s)
-            </button>
+            <GeneralButton
+              onclick={() => setIsUnitModalOpen(true)}
+              text="Create Unit(s)"
+              className={"bg-green-500 hover:bg-green-600"}
+            />
           )}
         </div>
         {/* Unit Table */}

@@ -13,7 +13,10 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { handleSingleLogin } from "@hooks/opentech";
 
-export default function PMSDashboardLayout({ dashboardMenu }) {
+export default function PMSDashboardLayout({
+  dashboardMenu,
+  setDashboardMenu,
+}) {
   const {
     user,
     currentFacility,
@@ -178,24 +181,26 @@ export default function PMSDashboardLayout({ dashboardMenu }) {
 
                 {!openSections.currentFacility && (
                   <div className="mx-4 mt-4 space-y-2">
-                    <Link
-                      onClick={() =>
-                        setOpenPage("visitors") &
-                        localStorage.setItem("openPage", "visitors")
-                      }
+                    <button
+                      onClick={() => {
+                        setOpenPage("visitors");
+                        localStorage.setItem("openPage", "visitors");
+                        if (window.innerWidth < 768) setDashboardMenu(false);
+                      }}
                       className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                     >
                       Visitors
-                    </Link>
-                    <Link
-                      onClick={() =>
-                        setOpenPage("units") &
-                        localStorage.setItem("openPage", "units")
-                      }
+                    </button>
+                    <button
+                      onClick={() => {
+                        setOpenPage("units");
+                        localStorage.setItem("openPage", "units");
+                        if (window.innerWidth < 768) setDashboardMenu(false);
+                      }}
                       className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                     >
                       Units
-                    </Link>
+                    </button>
                     {currentFacility && currentFacility.id > 0
                       ? (() => {
                           const baseUrl =
@@ -256,24 +261,26 @@ export default function PMSDashboardLayout({ dashboardMenu }) {
 
               {!openSections.facilities && (
                 <div className="mx-4 mt-4 space-y-2">
-                  <Link
-                    onClick={() =>
-                      setOpenPage("allFacilities") &
-                      localStorage.setItem("openPage", "allFacilities")
-                    }
+                  <button
+                    onClick={() => {
+                      setOpenPage("allFacilities");
+                      localStorage.setItem("openPage", "allFacilities");
+                      if (window.innerWidth < 768) setDashboardMenu(false);
+                    }}
                     className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                   >
                     All Facilities
-                  </Link>
-                  <Link
-                    onClick={() =>
-                      setOpenPage("favorites") &
-                      localStorage.setItem("openPage", "favorites")
-                    }
+                  </button>
+                  <button
+                    onClick={() => {
+                      setOpenPage("favorites");
+                      localStorage.setItem("openPage", "favorites");
+                      if (window.innerWidth < 768) setDashboardMenu(false);
+                    }}
                     className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
                   >
                     Favorites
-                  </Link>
+                  </button>
                 </div>
               )}
             </div>
@@ -294,12 +301,12 @@ export default function PMSDashboardLayout({ dashboardMenu }) {
                   Help
                 </a>
               </div>
-              <div
+              <button
                 className="hover:dark:bg-darkNavSecondary w-full p-2"
                 onClick={() => handleLogout()}
               >
                 Logout
-              </div>
+              </button>
             </div>
           </div>
         )}

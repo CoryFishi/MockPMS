@@ -30,7 +30,7 @@ export default function SmartLockDashboardView({}) {
   const [totalAccessPoints, setTotalAccessPoints] = useState(0);
   const [totalEdgeRouters, setTotalEdgeRouters] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
-  const { selectedTokens, user } = useAuth();
+  const { selectedTokens } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [currentLoadingText, setCurrentLoadingText] = useState("");
   // Search via search bar and button
@@ -320,6 +320,8 @@ export default function SmartLockDashboardView({}) {
         lowestBattery: isFinite(lowestBattery) ? lowestBattery : 100,
         smartLocks: smartlocks || [],
         edgeRouterName: edgeRouter?.name || "Edge Router",
+        edgeRouter: edgeRouter || {},
+        accessPoints: aps || [],
         facilityDetail,
         weather,
       };
