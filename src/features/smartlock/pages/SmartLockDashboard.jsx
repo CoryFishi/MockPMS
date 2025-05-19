@@ -215,6 +215,12 @@ export default function SmartLockDashboardView({}) {
 
         // Filter out any failed/null results
         const validResults = results.filter(Boolean);
+
+        // Sort by smartLocks array length descending
+        validResults.sort(
+          (a, b) => (b.smartLocks?.length || 0) - (a.smartLocks?.length || 0)
+        );
+
         setFacilitiesWithBearers(validResults);
         setFilteredFacilities(validResults);
         setFacilitiesInfo(validResults);
