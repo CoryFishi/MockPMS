@@ -89,7 +89,7 @@ export default function DataTable({
                 setHoveredRow ? () => setHoveredRow(null) : undefined
               }
               className={`hover:bg-gray-100 dark:hover:bg-darkNavSecondary ${
-                hoveredRow ? "cursor-pointer" : ""
+                hoveredRow !== null ? "cursor-pointer" : ""
               }`}
             >
               {columns.map(({ key, accessor, render }) => (

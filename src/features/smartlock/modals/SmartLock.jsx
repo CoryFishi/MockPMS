@@ -1,6 +1,6 @@
 import PaginationFooter from "@components/shared/PaginationFooter";
 import DataTable from "@components/shared/DataTable";
-import SmartLockDetailModal from "@components/shared/SmartLockDetailModal";
+import SmartLockDetailModal from "@components/shared/DetailModal";
 import React, { useState, useEffect } from "react";
 import { FaWarehouse, FaLock, FaLockOpen, FaCheckCircle } from "react-icons/fa";
 import {

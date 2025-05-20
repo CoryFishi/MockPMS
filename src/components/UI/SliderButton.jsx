@@ -1,7 +1,7 @@
 export default function SliderButton({ onclick, value, offValue, onValue }) {
   return (
     <div
-      className={`w-12 h-5 flex items-center rounded-full p-1 cursor-pointer ${
+      className={`min-w-9 h-5 flex items-center rounded-full p-1 cursor-pointer ${
         value ? "bg-blue-600" : "bg-gray-300"
       }`}
       onClick={() => onclick()}
@@ -13,6 +13,7 @@ export default function SliderButton({ onclick, value, offValue, onValue }) {
           value ? "translate-x-3" : ""
         }`}
       >
+        {/* On/Off value will give the slider button an icon based off the value */}
         {value ? onValue || "" : offValue || ""}
       </div>
     </div>

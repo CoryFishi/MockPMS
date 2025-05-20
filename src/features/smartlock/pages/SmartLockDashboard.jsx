@@ -428,7 +428,7 @@ export default function SmartLockDashboardView({}) {
         <div className="p-5 pt-1 text-left">
           <div className="bg-white shadow-lg rounded-lg p-5 mb-4 border dark:bg-darkSecondary text-black dark:text-white dark:border-border flex justify-center gap-8">
             <div>
-              <h1 className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg">
+              <h1 className="w-full border-b-2 mb-2 border-yellow-400 text-black dark:text-white text-lg">
                 Edge Routers:
               </h1>
               <div className="flex gap-2">
@@ -474,7 +474,7 @@ export default function SmartLockDashboardView({}) {
               </div>
             </div>
             <div>
-              <h1 className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg">
+              <h1 className="w-full border-b-2 mb-2 border-yellow-400 text-black dark:text-white text-lg">
                 Access Points:
               </h1>
               <div className="flex gap-2">
@@ -511,7 +511,7 @@ export default function SmartLockDashboardView({}) {
               </div>
             </div>
             <div>
-              <h1 className="w-full border-b mb-2 border-yellow-500 text-black dark:text-white text-lg">
+              <h1 className="w-full border-b-2 mb-2 border-yellow-400 text-black dark:text-white text-lg">
                 SmartLocks:
               </h1>
               <div className="flex gap-2">
@@ -578,6 +578,38 @@ export default function SmartLockDashboardView({}) {
                     {smartlockLowestBattery.lowestBattery}%
                   </h2>
                   <p className="text-sm">Lowest Battery</p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h1 className="w-full border-b-2 mb-2 border-yellow-400 text-black dark:text-white text-lg">
+                Totals:
+              </h1>
+              <div className="flex gap-2">
+                <div
+                  className="text-center shadow-md rounded-lg p-3 border"
+                  title={totalEdgeRouters + " Edge Routers"}
+                >
+                  <h2 className="text-3xl font-bold">
+                    {totalEdgeRouters || 0}
+                  </h2>
+                  <p className="text-sm">Edge Routers</p>
+                </div>
+                <div
+                  className="text-center shadow-md rounded-lg p-3 border"
+                  title={totalAccessPoints + " Access Points"}
+                >
+                  <h2 className="text-3xl font-bold">
+                    {totalAccessPoints || 0}
+                  </h2>
+                  <p className="text-sm">Access Points</p>
+                </div>
+                <div
+                  className="text-center shadow-md rounded-lg p-3 border"
+                  title={totalSmartlocks + " SmartLocks"}
+                >
+                  <h2 className="text-3xl font-bold">{totalSmartlocks || 0}</h2>
+                  <p className="text-sm">SmartLocks</p>
                 </div>
               </div>
             </div>

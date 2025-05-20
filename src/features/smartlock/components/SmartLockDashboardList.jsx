@@ -167,7 +167,14 @@ export default function SmartLockDashboardList({
         <tr className="bg-zinc-100 dark:bg-darkSecondary text-center">
           <td
             className="border border-zinc-300 dark:border-border px-4 py-2 font-bold text-left"
-            title={totalSmartlocks + " SmartLocks"}
+            title={
+              totalSmartlocks +
+              " SmartLocks \n" +
+              totalAccessPoints +
+              " Access Points \n" +
+              totalEdgeRouters +
+              " Edge Routers"
+            }
           >
             Totals:
           </td>

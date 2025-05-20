@@ -187,7 +187,7 @@ export default function PMSDashboardLayout({
                         localStorage.setItem("openPage", "visitors");
                         if (window.innerWidth < 768) setDashboardMenu(false);
                       }}
-                      className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                      className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer"
                     >
                       Visitors
                     </button>
@@ -197,7 +197,7 @@ export default function PMSDashboardLayout({
                         localStorage.setItem("openPage", "units");
                         if (window.innerWidth < 768) setDashboardMenu(false);
                       }}
-                      className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                      className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer"
                     >
                       Units
                     </button>
@@ -267,7 +267,7 @@ export default function PMSDashboardLayout({
                       localStorage.setItem("openPage", "allFacilities");
                       if (window.innerWidth < 768) setDashboardMenu(false);
                     }}
-                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer"
                   >
                     All Facilities
                   </button>
@@ -277,7 +277,7 @@ export default function PMSDashboardLayout({
                       localStorage.setItem("openPage", "favorites");
                       if (window.innerWidth < 768) setDashboardMenu(false);
                     }}
-                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer"
                   >
                     Favorites
                   </button>
