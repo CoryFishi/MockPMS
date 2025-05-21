@@ -1,6 +1,6 @@
 import CreateUnit from "../modals/CreateUnit";
-import CreateVisitor from "../modals/CreateVisitorUnit";
-import EditVisitor from "../modals/EditVisitorUnit";
+import CreateVisitor from "../modals/CreateVisitorUnitPage";
+import EditVisitor from "../modals/EditVisitorUnitPage";
 import PaginationFooter from "@components/shared/PaginationFooter";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
 import DataTable from "@components/shared/DataTable";
@@ -13,6 +13,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { RiDoorLockFill } from "react-icons/ri";
+import DeleteModal from "../modals/DeleteModal";
 
 export default function Units({
   currentFacilityName = { currentFacilityName },
@@ -39,6 +40,8 @@ export default function Units({
   const { currentFacility, user, permissions } = useAuth();
   const [smartLocks, setSmartLocks] = useState([]);
   const [hoveredRow, setHoveredRow] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [continousDelete, setContinousDelete] = useState(false);
   const [currentLoadingText, setCurrentLoadingText] =
     useState("Loading Units...");
   const rentedCount = filteredUnits.filter(
@@ -217,7 +220,7 @@ export default function Units({
 
       return axios(config)
         .then(function (response) {
-          setFilteredUnits((prevUnits) =>
+          setUnits((prevUnits) =>
             prevUnits.map((u) =>
               u.id === unit.id ? { ...u, status: "Rented" } : u
             )
@@ -274,7 +277,7 @@ export default function Units({
       };
       return axios(config)
         .then(function (response) {
-          setFilteredUnits((prevUnits) =>
+          setUnits((prevUnits) =>
             prevUnits.map((u) =>
               u.id === unit.id ? { ...u, status: "Rented" } : u
             )
@@ -328,7 +331,7 @@ export default function Units({
 
       return axios(config)
         .then(function (response) {
-          setFilteredUnits((prevUnits) =>
+          setUnits((prevUnits) =>
             prevUnits.map((u) =>
               u.id === unit.id ? { ...u, status: "Vacant" } : u
             )
@@ -380,7 +383,7 @@ export default function Units({
       };
       return axios(config)
         .then(function (response) {
-          setFilteredUnits((prevUnits) =>
+          setUnits((prevUnits) =>
             prevUnits.map((u) =>
               u.id === unit.id ? { ...u, status: "Delinquent" } : u
             )
@@ -434,9 +437,7 @@ export default function Units({
 
       return axios(config)
         .then(function (response) {
-          setFilteredUnits((prevUnits) =>
-            prevUnits.filter((u) => u.id !== unit.id)
-          );
+          setUnits((prevUnits) => prevUnits.filter((u) => u.id !== unit.id));
           return response;
         })
         .catch(function (error) {
@@ -669,7 +670,14 @@ export default function Units({
               )}
               {permissions.pmsPlatformUnitDelete && (
                 <TableButton
-                  onclick={() => deleteUnit(unit)}
+                  onclick={() => {
+                    if (continousDelete) {
+                      deleteUnit(unit);
+                    } else {
+                      setIsDeleteModalOpen(true);
+                      setSelectedUnit(unit);
+                    }
+                  }}
                   text="Delete"
                   className={"bg-red-500 hover:bg-red-600"}
                 />
@@ -723,6 +731,7 @@ export default function Units({
           setIsCreateVisitorModalOpen={setIsCreateVisitorModalOpen}
           setUnits={setUnits}
           unit={selectedUnit}
+          type="new"
         />
       )}
       {/* Multi Visitor Edit Modal */}
@@ -732,6 +741,17 @@ export default function Units({
           currentFacility={currentFacility}
           visitors={visitors}
           unit={selectedUnit}
+        />
+      )}
+      {/* Delete Unit Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <DeleteModal
+          type={"unit"}
+          setIsDeleteModalOpen={setIsDeleteModalOpen}
+          handleDelete={deleteUnit}
+          value={selectedUnit}
+          setContinousDelete={setContinousDelete}
+          continousDelete={continousDelete}
         />
       )}
       {/* Loading Spinner */}

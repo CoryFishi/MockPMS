@@ -4,10 +4,15 @@ import DataTable from "@components/shared/DataTable";
 import { addEvent } from "@hooks/supabase";
 import { useAuth } from "@context/AuthProvider";
 import { MdEdit } from "react-icons/md";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import CreateVisitorUnit from "./CreateVisitorUnit";
+import CreateVisitorUnit from "./CreateVisitorUnitPage";
+import ModalContainer from "@components/UI/ModalContainer";
+import DeleteModal from "./DeleteModal";
+import InputBox from "@components/UI/InputBox";
+import GeneralButton from "@components/UI/GeneralButton";
+import SliderButton from "@components/UI/SliderButton";
 
 export default function EditVisitor({
   setIsEditVisitorModalOpen,
@@ -28,6 +33,8 @@ export default function EditVisitor({
   const { currentFacility, user, permissions } = useAuth();
   const [sortedColumn, setSortedColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [continousDelete, setContinousDelete] = useState(false);
 
   const handleTimeProfiles = async () => {
     var tokenStageKey = "";
@@ -264,39 +271,28 @@ export default function EditVisitor({
       accessor: () => null,
       render: (v) => (
         <div className="text-center space-x-1">
-          <button
-            className={`bg-green-500 text-white px-2 py-1 rounded font-bold ${
-              permissions.pmsPlatformVisitorEdit
-                ? "hover:bg-green-600 hover:cursor-pointer"
-                : "opacity-50 cursor-not-allowed"
-            }`}
-            onClick={() => {
-              if (permissions.pmsPlatformVisitorEdit) {
+          {permissions.pmsPlatformVisitorEdit && (
+            <button
+              className={`bg-green-500 text-white px-2 py-1 rounded font-bold hover:bg-green-600 hover:cursor-pointer`}
+              onClick={() => {
                 setIsEditVisitorModalOpen2(true);
                 setSelectedVisitor(v);
-              }
-            }}
-            disabled={!permissions.pmsPlatformVisitorEdit}
-          >
-            Edit
-          </button>
-          {!v.isTenant && (
+              }}
+            >
+              Edit
+            </button>
+          )}
+          {!v.isTenant && permissions.pmsPlatformVisitorDelete && (
             <button
-              className={`bg-red-500 text-white px-2 py-1 rounded font-bold ${
-                permissions.pmsPlatformVisitorDelete
-                  ? "hover:bg-red-600 hover:cursor-pointer"
-                  : "opacity-50 cursor-not-allowed"
-              }`}
+              className={`bg-red-500 text-white px-2 py-1 rounded font-bold hover:bg-red-600 hover:cursor-pointer`}
               onClick={() => {
-                if (permissions.pmsPlatformVisitorDelete) {
-                  toast.promise(removeVisitor(v.id), {
-                    loading: "Removing visitor...",
-                    success: "Visitor removed successfully!",
-                    error: "Failed to remove visitor. Please try again.",
-                  });
+                if (continousDelete) {
+                  handleDelete(v);
+                } else {
+                  setIsDeleteModalOpen(true);
+                  setSelectedVisitor(v);
                 }
               }}
-              disabled={!permissions.pmsPlatformVisitorDelete}
             >
               Delete
             </button>
@@ -306,131 +302,137 @@ export default function EditVisitor({
     },
   ];
 
-  return (
-    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-      {/* Edit Visitor Modal Popup */}
-      {isEditVisitorModalOpen2 && (
-        <EditVisitorVisitor
-          setIsEditVisitorModalOpen={setIsEditVisitorModalOpen2}
-          currentFacility={currentFacility}
-          setVisitors={setFilteredVisitors}
-          visitor={selectedVisitor}
-          addEvent={addEvent}
-        />
-      )}
-      {/* Create Visitor Modal Popup */}
-      {isCreateVisitorModalOpen && (
-        <CreateVisitorUnit
-          setIsCreateVisitorModalOpen={setIsCreateVisitorModalOpen}
-          currentFacility={currentFacility}
-          setVisitors={setFilteredVisitors}
-          unit={unit}
-          addEvent={addEvent}
-        />
-      )}
-      <div className="bg-white rounded-sm shadow-lg w-[95vw] h-[95vh] dark:bg-darkPrimary">
-        <div className="pl-5 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
-          <div className="flex text-center items-center">
-            <MdEdit />
-            <h2 className="ml-2 text-lg font-bold text-center items-center">
-              Editing Visitors
-            </h2>
-          </div>
+  const handleDelete = (v) => {
+    if (permissions.pmsPlatformVisitorDelete) {
+      toast.promise(removeVisitor(v.id), {
+        loading: "Removing visitor...",
+        success: "Visitor removed successfully!",
+        error: "Failed to remove visitor. Please try again.",
+      });
+    }
+    setIsDeleteModalOpen(false);
+  };
 
-          <button
-            className="hover:cursor-pointer right-0 text-gray-600 bg-gray-100 hover:bg-gray-300 dark:text-white dark:hover:bg-red-500 h-full px-5 rounded-tr dark:bg-gray-800"
-            onClick={() => setIsEditVisitorModalOpen(false)}
-          >
-            x
-          </button>
-        </div>
-        <div className="p-2 w-full h-full">
-          <div className="justify-between flex mb-2">
-            <input
-              type="text"
-              placeholder="Search visitors..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
-            />
-            <div className="flex items-center justify-end text-center">
-              <div className="flex">
-                <h3 className="w-28">Guest Autofill</h3>
-                <div
-                  className={`w-7 h-4 flex items-center rounded-full p-1 mt-1 cursor-pointer ${
-                    visitorAutofill ? "bg-blue-600" : "bg-gray-300"
-                  }`}
-                  onClick={() => setVisitorAutofill(!visitorAutofill)}
-                >
-                  <div
-                    className={`bg-white w-3 h-3 rounded-full shadow-md transform transition-transform duration-500 ease-out ${
-                      visitorAutofill ? "translate-x-2" : ""
-                    }`}
-                  ></div>
-                </div>
+  return (
+    <>
+      <ModalContainer
+        title={"Editing Visitors"}
+        icon={<MdEdit />}
+        onClose={() => setIsEditVisitorModalOpen(false)}
+        mainContent={
+          <div className="justify-between flex mb-2 flex-col">
+            {isDeleteModalOpen && (
+              <DeleteModal
+                continousDelete={continousDelete}
+                setContinousDelete={setContinousDelete}
+                type={"Visitor"}
+                setIsDeleteModalOpen={setIsDeleteModalOpen}
+                handleDelete={() => {
+                  handleDelete(selectedVisitor);
+                }}
+                value={selectedVisitor}
+              />
+            )}
+            {/* Edit Visitor Modal Popup */}
+            {isEditVisitorModalOpen2 && (
+              <EditVisitorVisitor
+                setIsEditVisitorModalOpen={setIsEditVisitorModalOpen2}
+                currentFacility={currentFacility}
+                setVisitors={setFilteredVisitors}
+                visitor={selectedVisitor}
+              />
+            )}
+            {/* Create Visitor Modal Popup */}
+            {isCreateVisitorModalOpen && (
+              <CreateVisitorUnit
+                setIsCreateVisitorModalOpen={setIsCreateVisitorModalOpen}
+                currentFacility={currentFacility}
+                setUnits={setFilteredVisitors}
+                unit={unit}
+                type="visitor"
+              />
+            )}
+            <div className="flex justify-between items-center my-2">
+              <InputBox
+                type="text"
+                value={searchQuery}
+                placeholder="Search visitors..."
+                onchange={(e) => setSearchQuery(e.target.value)}
+              />
+              <div className="flex items-center justify-end text-center">
+                {/* Visitor Autofill Toggle */}
+                {permissions.pmsPlatformVisitorCreate && (
+                  <>
+                    <h3 className="mx-2 w-24">Visitor Autofill</h3>
+                    <SliderButton
+                      onclick={() => setVisitorAutofill(!visitorAutofill)}
+                      value={visitorAutofill}
+                    />
+                  </>
+                )}
+                {permissions.pmsPlatformVisitorCreate && (
+                  <GeneralButton
+                    text={"Create Visitor"}
+                    onclick={() => createTenant()}
+                    className={"bg-green-500 hover:bg-green-600"}
+                  />
+                )}
               </div>
-              <button
-                className={`bg-green-500 text-white p-1 py-2 rounded font-bold ml-3 w-44 transition duration-300 ease-in-out transform select-none ${
-                  permissions.pmsPlatformVisitorCreate
-                    ? "hover:bg-green-600 hover:scale-105 hover:cursor-pointer"
-                    : "opacity-50 cursor-not-allowed"
-                }`}
-                onClick={() => createTenant()}
-                disabled={!permissions.pmsPlatformVisitorCreate}
-              >
-                Add Guest
-              </button>
+            </div>
+            <div className="overflow-y-auto h-[70vh]">
+              <DataTable
+                columns={columns}
+                data={filteredVisitors}
+                currentPage={currentPage}
+                rowsPerPage={rowsPerPage}
+                sortDirection={sortDirection}
+                sortedColumn={sortedColumn}
+                onSort={(columnKey, accessor) => {
+                  const newDirection =
+                    sortedColumn !== columnKey
+                      ? "asc"
+                      : sortDirection === "asc"
+                      ? "desc"
+                      : null;
+
+                  setSortedColumn(newDirection ? columnKey : null);
+                  setSortDirection(newDirection);
+
+                  if (!newDirection) {
+                    setFilteredVisitors([...filteredVisitors]);
+                    return;
+                  }
+
+                  const sorted = [...filteredVisitors].sort((a, b) => {
+                    const aVal = accessor(a) ?? "";
+                    const bVal = accessor(b) ?? "";
+
+                    if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
+                    if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
+                    return 0;
+                  });
+
+                  setFilteredVisitors(sorted);
+                }}
+              />
+              {filteredVisitors.length < 1 && (
+                <p className="w-full text-center p-10 text-red-500">
+                  No Visitors Found...
+                </p>
+              )}
+            </div>
+            <div className="pt-4">
+              <PaginationFooter
+                rowsPerPage={rowsPerPage}
+                setRowsPerPage={setRowsPerPage}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                items={filteredVisitors}
+              />
             </div>
           </div>
-          <div className="overflow-y-auto h-[77vh]">
-            <DataTable
-              columns={columns}
-              data={filteredVisitors}
-              currentPage={currentPage}
-              rowsPerPage={rowsPerPage}
-              sortDirection={sortDirection}
-              sortedColumn={sortedColumn}
-              onSort={(columnKey, accessor) => {
-                const newDirection =
-                  sortedColumn !== columnKey
-                    ? "asc"
-                    : sortDirection === "asc"
-                    ? "desc"
-                    : null;
-
-                setSortedColumn(newDirection ? columnKey : null);
-                setSortDirection(newDirection);
-
-                if (!newDirection) {
-                  setFilteredVisitors([...filteredVisitors]);
-                  return;
-                }
-
-                const sorted = [...filteredVisitors].sort((a, b) => {
-                  const aVal = accessor(a) ?? "";
-                  const bVal = accessor(b) ?? "";
-
-                  if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
-                  if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
-                  return 0;
-                });
-
-                setFilteredVisitors(sorted);
-              }}
-            />
-          </div>
-          {/* Pagination Footer */}
-          <div className="px-2 py-5 mx-1">
-            <PaginationFooter
-              rowsPerPage={rowsPerPage}
-              setRowsPerPage={setRowsPerPage}
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-              items={filteredVisitors}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+        }
+      />
+    </>
   );
 }

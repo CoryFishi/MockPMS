@@ -1,4 +1,4 @@
-import CreateVisitorVisitor from "../modals/CreateVisitorVisitor";
+import CreateVisitorVisitor from "../modals/CreateVisitorVisitorPage";
 import EditVisitor from "../modals/EditVisitorVisitor";
 import PaginationFooter from "@components/shared/PaginationFooter";
 import LoadingSpinner from "@components/shared/LoadingSpinner";

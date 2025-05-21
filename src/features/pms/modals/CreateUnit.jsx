@@ -1,10 +1,12 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import React, { useState } from "react";
+import { useState } from "react";
 import { IoIosCreate } from "react-icons/io";
 import { useAuth } from "@context/AuthProvider";
 import { addEvent } from "@hooks/supabase";
-import ModalButton from "../../../components/UI/ModalButton";
+import ModalButton from "@components/UI/ModalButton";
+import ModalContainer from "@components/UI/ModalContainer";
+import InputBox from "@components/UI/InputBox";
 
 export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
   // Store the unit number to be created
@@ -113,28 +115,17 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-      {/* Modal Container */}
-      <div className="bg-white rounded-sm shadow-lg dark:bg-darkPrimary">
-        {/* Header Container */}
-        <div className="pl-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
-          <div className="flex text-center items-center">
-            <IoIosCreate />
-            <h2 className="ml-2 text-lg font-bold text-center items-center">
-              Create Unit(s)
-            </h2>
-          </div>
-        </div>
-        {/* Content Container */}
-        <div className="px-5 py-3">
+    <ModalContainer
+      title={"Create Unit(s)"}
+      icon={<IoIosCreate />}
+      mainContent={
+        <div className="flex flex-col pt-3">
           {/* Unit Number Input */}
-          <label className="block mb-2">Unit Number(s)</label>
-          <input
+          <InputBox
             type="text"
-            className="border border-gray-300 rounded-sm px-3 py-2 w-full dark:bg-darkSecondary dark:border-border"
             value={newUnitNumber}
-            onChange={(e) => setNewUnitNumber(e.target.value)}
-            placeholder="Enter unit number"
+            onchange={(e) => setNewUnitNumber(e.target.value)}
+            placeholder="Unit Number(s)"
           />
           <p className="text-wrap text-xs text-red-400 mt-1">
             Multiple Units can be created by sperating each unit by a comma or
@@ -142,20 +133,21 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
             by adding a hyphen to create arange of units. <br />
             Example: 1001,1002,A001-A050 <br />
           </p>
-          {/* Button Container */}
-          <div className="mt-4 flex justify-end">
-            <ModalButton
-              onclick={() => setIsUnitModalOpen(false)}
-              text="Cancel"
-            />
-            <ModalButton
-              onclick={handleCreateUnit}
-              text="Save"
-              className={"bg-green-500 hover:bg-green-600"}
-            />
-          </div>
         </div>
-      </div>
-    </div>
+      }
+      responseContent={
+        <div className="flex justify-end">
+          <ModalButton
+            onclick={() => setIsUnitModalOpen(false)}
+            text="Cancel"
+          />
+          <ModalButton
+            onclick={handleCreateUnit}
+            text="Save"
+            className={"bg-green-500 hover:bg-green-600"}
+          />
+        </div>
+      }
+    />
   );
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { FaCircleCheck } from "react-icons/fa6";
 import { MdOutlineError } from "react-icons/md";
 import toast from "react-hot-toast";
+import InputBox from "../../../components/UI/InputBox";
 
 export default function AddAuthentication({
   isOpen,
@@ -63,42 +64,36 @@ export default function AddAuthentication({
           </button>
         </div>
         <div className="grid grid-cols-1 gap-4 p-3">
-          <input
-            type="text"
-            className="rounded-lg border border-zinc-300 dark:border-border dark:bg-darkNavSecondary p-3 text-sm w-full"
-            placeholder="Optional Name"
+          <InputBox
+            onchange={(e) => setName(e.target.value)}
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            placeholder={"Optional Name"}
+            type={"text"}
           />
-          <input
-            type="text"
-            className="rounded-lg border border-zinc-300 dark:border-border dark:bg-darkNavSecondary p-3 text-sm w-full"
-            placeholder="API Key"
+          <InputBox
+            onchange={(e) => setApi(e.target.value)}
             value={api}
-            onChange={(e) => setApi(e.target.value)}
+            placeholder={"API Key"}
+            type={"text"}
           />
-          <input
-            type="text"
-            className="rounded-lg border border-zinc-300 dark:border-border dark:bg-darkNavSecondary p-3 text-sm w-full"
-            placeholder="API Secret"
+          <InputBox
+            onchange={(e) => setApiSecret(e.target.value)}
             value={apiSecret}
-            onChange={(e) => setApiSecret(e.target.value)}
+            placeholder={"API Secret"}
+            type={"text"}
           />
-          <input
-            type="text"
-            className="rounded-lg border border-zinc-300 dark:border-border dark:bg-darkNavSecondary p-3 text-sm w-full"
-            placeholder="Client ID"
+          <InputBox
+            onchange={(e) => setClient(e.target.value)}
             value={client}
-            onChange={(e) => setClient(e.target.value)}
+            placeholder={"Client ID"}
+            type={"text"}
           />
-          <input
-            type="text"
-            className="rounded-lg border border-zinc-300 dark:border-border dark:bg-darkNavSecondary p-3 text-sm w-full"
-            placeholder="Client Secret"
+          <InputBox
+            onchange={(e) => setClientSecret(e.target.value)}
             value={clientSecret}
-            onChange={(e) => setClientSecret(e.target.value)}
+            placeholder={"Client Secret"}
+            type={"text"}
           />
-
           <select
             className="rounded-lg border border-zinc-300 dark:border-border dark:bg-darkNavSecondary p-3 text-sm w-full"
             value={environment}
@@ -111,7 +106,6 @@ export default function AddAuthentication({
             <option value="cia-stg-1.aws.">Staging</option>
           </select>
         </div>
-
         {/* Status */}
         <div className="flex items-center space-x-2 p-3">
           {isAuthenticated === true && (
