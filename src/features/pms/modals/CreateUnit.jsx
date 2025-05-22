@@ -34,8 +34,12 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
         const prefixStart = start.match(/^[^\d]+/g)?.[0] || "";
         const prefixEnd = end.match(/^[^\d]+/g)?.[0] || "";
 
-        const numStart = parseInt(start.replace(prefixStart, ""));
-        const numEnd = parseInt(end.replace(prefixEnd, ""));
+        const numStartStr = start.replace(prefixStart, "");
+        const numEndStr = end.replace(prefixEnd, "");
+
+        const numStart = parseInt(numStartStr);
+        const numEnd = parseInt(numEndStr);
+        const digitCount = numStartStr.length;
 
         if (
           prefixStart === prefixEnd &&
@@ -44,13 +48,13 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
           numStart <= numEnd &&
           numEnd - numStart < 100
         ) {
-          return Array.from(
-            { length: numEnd - numStart + 1 },
-            (_, i) => `${prefixStart}${numStart + i}`
-          );
+          return Array.from({ length: numEnd - numStart + 1 }, (_, i) => {
+            const num = (numStart + i).toString().padStart(digitCount, "0");
+            return `${prefixStart}${num}`;
+          });
         }
 
-        return [unit]; // fallback if invalid or over limit
+        return [unit]; // fallback
       }
 
       return [unit];
