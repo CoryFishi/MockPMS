@@ -1,5 +1,5 @@
 import CreateVisitorVisitor from "../modals/CreateVisitorVisitorPage";
-import EditVisitor from "../modals/EditVisitorVisitor";
+import EditVisitorVisitorPage from "../modals/EditVisitorVisitorPage";
 import PaginationFooter from "@components/shared/PaginationFooter";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
 import DataTable from "@components/shared/DataTable";
@@ -8,6 +8,7 @@ import { FaPerson } from "react-icons/fa6";
 import axios from "axios";
 import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
+import DeleteModal from "../modals/DeleteModal";
 
 export default function Visitors({ currentFacilityName }) {
   const [visitors, setVisitors] = useState([]);
@@ -28,6 +29,8 @@ export default function Visitors({ currentFacilityName }) {
   const [currentLoadingText, setCurrentLoadingText] = useState(
     "Loading Visitors..."
   );
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [continousDelete, setContinousDelete] = useState(false);
   const tenantCount = filteredVisitors.filter(
     (visitor) => visitor.isTenant === true
   ).length;
@@ -219,6 +222,13 @@ export default function Visitors({ currentFacilityName }) {
       error: <b>{visitor.id} failed deletion!</b>,
     });
   };
+  const handleDelete = (v) => {
+    if (v.isTenant) {
+      moveOutVisitor(v);
+    } else {
+      deleteVisitor(v);
+    }
+  };
 
   // Run handleUnits once when the component loads
   useEffect(() => {
@@ -351,8 +361,8 @@ export default function Visitors({ currentFacilityName }) {
             <button
               className="bg-green-500 text-white px-2 py-1 rounded font-bold hover:bg-green-600 hover:cursor-pointer"
               onClick={() => {
-                setIsEditVisitorModalOpen(true);
                 setSelectedVisitor(v);
+                setIsEditVisitorModalOpen(true);
               }}
             >
               Edit
@@ -360,9 +370,18 @@ export default function Visitors({ currentFacilityName }) {
           )}
           {permissions.pmsPlatformVisitorDelete && (
             <button
-              className="bg-red-500 text-white px-2 py-1 rounded font-bold hover:bg-red-600 hover:cursor-pointer"
+              className={`text-white px-2 py-1 rounded font-bold hover:cursor-pointer ${
+                v.isTenant
+                  ? "bg-rose-600 hover:bg-rose-700"
+                  : "bg-red-500 hover:bg-red-600"
+              }`}
               onClick={() => {
-                v.isTenant ? moveOutVisitor(v) : deleteVisitor(v);
+                if (continousDelete) {
+                  handleDelete(v);
+                } else {
+                  setSelectedVisitor(v);
+                  setIsDeleteModalOpen(true);
+                }
               }}
             >
               {v.isTenant ? "Move Out" : "Delete"}
@@ -386,13 +405,24 @@ export default function Visitors({ currentFacilityName }) {
           setVisitors={setVisitors}
         />
       )}
-
       {/* Edit Visitor Modal Popup */}
       {isEditVisitorModalOpen && (
-        <EditVisitor
+        <EditVisitorVisitorPage
           setIsEditVisitorModalOpen={setIsEditVisitorModalOpen}
           setVisitors={setVisitors}
           visitor={selectedVisitor}
+        />
+      )}
+
+      {/* Delete Visitor Modal Popup */}
+      {isDeleteModalOpen && (
+        <DeleteModal
+          type={"visitor"}
+          setIsDeleteModalOpen={setIsDeleteModalOpen}
+          handleDelete={handleDelete}
+          value={selectedVisitor}
+          setContinousDelete={setContinousDelete}
+          continousDelete={continousDelete}
         />
       )}
       {/* Loading Spinner */}

@@ -5,6 +5,7 @@ export default function InputBox({
   onchange,
   placeholder,
   type = "text",
+  required = false,
 }) {
   const [isFocused, setIsFocused] = useState(false);
   const shouldFloat = isFocused || value;
@@ -31,7 +32,7 @@ export default function InputBox({
         }
         pointer-events-none`}
       >
-        {placeholder}
+        {placeholder} {required && <span className="text-red-500">*</span>}
       </label>
     </div>
   );

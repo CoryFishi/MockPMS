@@ -14,6 +14,8 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { RiDoorLockFill } from "react-icons/ri";
 import DeleteModal from "../modals/DeleteModal";
+import CreateVisitorUnitPage from "../modals/CreateVisitorUnitPage";
+import DelinquencyModal from "../modals/DelinquencyModal";
 
 export default function Units({
   currentFacilityName = { currentFacilityName },
@@ -23,7 +25,7 @@ export default function Units({
   const [isCreateVisitorModalOpen, setIsCreateVisitorModalOpen] =
     useState(false);
   const [visitorAutofill, setVisitorAutofill] = useState(
-    localStorage.getItem("visitorAutofill") === "true"
+    localStorage.getItem("visitorAutofill") === "true" || false
   );
   const [selectedUnit, setSelectedUnit] = useState("");
   const [timeProfiles, setTimeProfiles] = useState({});
@@ -41,6 +43,8 @@ export default function Units({
   const [smartLocks, setSmartLocks] = useState([]);
   const [hoveredRow, setHoveredRow] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDelinquencyModalOpen, setIsDelinquencyModalOpen] = useState(false);
+  const [continousDelinquency, setContinousDelinquency] = useState(false);
   const [continousDelete, setContinousDelete] = useState(false);
   const [currentLoadingText, setCurrentLoadingText] =
     useState("Loading Units...");
@@ -640,7 +644,14 @@ export default function Units({
             <div className="space-x-1">
               {permissions.pmsPlatformVisitorEdit && (
                 <TableButton
-                  onclick={() => turnDelinquent(unit)}
+                  onclick={() => {
+                    if (continousDelinquency) {
+                      turnDelinquent(unit);
+                    } else {
+                      setIsDelinquencyModalOpen(true);
+                      setSelectedUnit(unit);
+                    }
+                  }}
                   text="Turn Delinquent"
                   className={"bg-yellow-500 hover:bg-yellow-600"}
                 />
@@ -649,7 +660,7 @@ export default function Units({
                 <TableButton
                   onclick={() => moveOut(unit)}
                   text="Move Out"
-                  className={"bg-red-500 hover:bg-red-600"}
+                  className={"bg-rose-600 hover:bg-rose-700"}
                 />
               )}
             </div>
@@ -690,7 +701,14 @@ export default function Units({
             <div className="space-x-1">
               {permissions.pmsPlatformVisitorEdit && (
                 <TableButton
-                  onclick={() => turnRented(unit)}
+                  onclick={() => {
+                    if (continousDelinquency) {
+                      turnRented(unit);
+                    } else {
+                      setIsDelinquencyModalOpen(true);
+                      setSelectedUnit(unit);
+                    }
+                  }}
                   text="Turn Rented"
                   className={"bg-green-500 hover:bg-green-600"}
                 />
@@ -699,7 +717,7 @@ export default function Units({
                 <TableButton
                   onclick={() => moveOut(unit)}
                   text="Move Out"
-                  className={"bg-red-500 hover:bg-red-600"}
+                  className={"bg-rose-600 hover:bg-rose-700"}
                 />
               )}
             </div>
@@ -711,6 +729,14 @@ export default function Units({
       sortable: false,
     },
   ];
+
+  const handleDelinquency = (u) => {
+    if (u.status == "Rented") {
+      turnDelinquent(u);
+    } else {
+      turnRented(u);
+    }
+  };
 
   return (
     <div
@@ -727,9 +753,9 @@ export default function Units({
       )}
       {/* Create Visitor Modal Popup */}
       {isCreateVisitorModalOpen && (
-        <CreateVisitor
+        <CreateVisitorUnitPage
           setIsCreateVisitorModalOpen={setIsCreateVisitorModalOpen}
-          setUnits={setUnits}
+          setValues={setUnits}
           unit={selectedUnit}
           type="new"
         />
@@ -752,6 +778,16 @@ export default function Units({
           value={selectedUnit}
           setContinousDelete={setContinousDelete}
           continousDelete={continousDelete}
+        />
+      )}
+      {/* Update Unit Delinquency Status Confirmation Modal */}
+      {isDelinquencyModalOpen && (
+        <DelinquencyModal
+          setIsDelinquencyModalOpen={setIsDelinquencyModalOpen}
+          handleDelinquency={handleDelinquency}
+          value={selectedUnit}
+          setContinousDelinquency={setContinousDelinquency}
+          continousDelinquency={continousDelinquency}
         />
       )}
       {/* Loading Spinner */}

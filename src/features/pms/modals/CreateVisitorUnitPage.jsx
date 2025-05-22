@@ -8,7 +8,7 @@ import ModalContainer from "@components/UI/ModalContainer";
 import InputBox from "@components/UI/InputBox";
 import SelectOption from "@components/UI/SelectOption";
 
-export default function CreateVisitorUnit({
+export default function CreateVisitorUnitPage({
   setIsCreateVisitorModalOpen,
   setValues,
   unit,
@@ -51,7 +51,7 @@ export default function CreateVisitorUnit({
         setTimeProfiles(response.data);
       })
       .catch(function (error) {
-        console.log(error);
+        console.error(error);
       });
   };
   // API call handler to get access profiles
@@ -79,7 +79,7 @@ export default function CreateVisitorUnit({
         setAccessProfiles(response.data);
       })
       .catch(function (error) {
-        console.log(error);
+        console.error(error);
       });
   };
   // API call handler to create the new visitor
@@ -161,14 +161,12 @@ export default function CreateVisitorUnit({
             const newVisitorData = response.data.visitor;
             setValues((prevValues) => {
               const updatedVisitors = [...prevValues, newVisitorData];
-              console.log(updatedVisitors);
               return updatedVisitors;
             });
-            return newVisitorData;
           }
         })
         .catch(function (error) {
-          throw error;
+          console.error("Visitor creation error: ", error);
         }),
       {
         loading: `Renting unit ...`,

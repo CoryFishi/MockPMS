@@ -21,7 +21,7 @@ export default function DeleteModal({
       icon={<MdDeleteForever />}
       mainContent={
         <>
-          <p className="text-wrap mt-3" onClick={() => console.log(value)}>
+          <p className="text-wrap mt-3">
             Would you like to delete{" "}
             {type == "unit" ? value.unitNumber : value.name} from this facility?
           </p>

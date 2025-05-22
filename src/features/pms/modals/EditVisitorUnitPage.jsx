@@ -1,4 +1,4 @@
-import EditVisitorVisitor from "./EditVisitorVisitor";
+import EditVisitorVisitorPage from "./EditVisitorVisitorPage";
 import PaginationFooter from "@components/shared/PaginationFooter";
 import DataTable from "@components/shared/DataTable";
 import { addEvent } from "@hooks/supabase";
@@ -7,7 +7,7 @@ import { MdEdit } from "react-icons/md";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import CreateVisitorUnit from "./CreateVisitorUnitPage";
+import CreateVisitorUnitPage from "./CreateVisitorUnitPage";
 import ModalContainer from "@components/UI/ModalContainer";
 import DeleteModal from "./DeleteModal";
 import InputBox from "@components/UI/InputBox";
@@ -19,13 +19,16 @@ export default function EditVisitor({
   visitors,
   unit,
 }) {
+  const [allVisitors, setAllVisitors] = useState(visitors || []);
   const [timeProfiles, setTimeProfiles] = useState({});
   const [accessProfiles, setAccessProfiles] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [filteredVisitors, setFilteredVisitors] = useState(visitors || []);
-  const [visitorAutofill, setVisitorAutofill] = useState(true);
+  const [filteredVisitors, setFilteredVisitors] = useState(allVisitors || []);
+  const [visitorAutofill, setVisitorAutofill] = useState(
+    localStorage.getItem("visitorAutofill") === "true" || false
+  );
   const [isCreateVisitorModalOpen, setIsCreateVisitorModalOpen] =
     useState(false);
   const [isEditVisitorModalOpen2, setIsEditVisitorModalOpen2] = useState(false);
@@ -134,7 +137,7 @@ export default function EditVisitor({
       return axios(config)
         .then(async function (response) {
           const visitor = response.data.visitor;
-          setFilteredVisitors((prev) => [...prev, visitor]);
+          setAllVisitors((prev) => [...prev, visitor]);
           await addEvent(
             "Add Visitor",
             `${user.email} added visitor ${visitor.id} to unit ${unit.unitNumber} at facility ${currentFacility.name}, ${currentFacility.id}`,
@@ -179,7 +182,7 @@ export default function EditVisitor({
 
     return axios(config)
       .then(async function (response) {
-        setFilteredVisitors((prev) => prev.filter((v) => v.id !== visitorId));
+        setAllVisitors((prev) => prev.filter((v) => v.id !== visitorId));
         await addEvent(
           "Remove Guest",
           `${user.email} removed visitor ${visitorId} from unit ${unit.unitNumber} at facility ${currentFacility.name}, ${currentFacility.id}`,
@@ -198,25 +201,25 @@ export default function EditVisitor({
   }, []);
 
   useEffect(() => {
-    const filteredVisitors = visitors.filter(
+    const filteredVisitors = allVisitors.filter(
       (visitor) =>
-        visitor.unitNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        visitor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        visitor.code.toString().includes(searchQuery.toLowerCase()) ||
-        visitor.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        visitor.unitNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        visitor.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        visitor.code?.toString().includes(searchQuery.toLowerCase()) ||
+        visitor.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         visitor.mobilePhoneNumber
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
         visitor.accessProfileName
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
         visitor.timeGroupName
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
-        visitor.id.toString().includes(searchQuery)
+        visitor.id?.toString().includes(searchQuery)
     );
     setFilteredVisitors(filteredVisitors);
-  }, [visitors, searchQuery]);
+  }, [allVisitors, searchQuery]);
 
   const columns = [
     {
@@ -335,7 +338,7 @@ export default function EditVisitor({
             )}
             {/* Edit Visitor Modal Popup */}
             {isEditVisitorModalOpen2 && (
-              <EditVisitorVisitor
+              <EditVisitorVisitorPage
                 setIsEditVisitorModalOpen={setIsEditVisitorModalOpen2}
                 currentFacility={currentFacility}
                 setVisitors={setFilteredVisitors}
@@ -344,10 +347,10 @@ export default function EditVisitor({
             )}
             {/* Create Visitor Modal Popup */}
             {isCreateVisitorModalOpen && (
-              <CreateVisitorUnit
+              <CreateVisitorUnitPage
                 setIsCreateVisitorModalOpen={setIsCreateVisitorModalOpen}
                 currentFacility={currentFacility}
-                setUnits={setFilteredVisitors}
+                setValues={setFilteredVisitors}
                 unit={unit}
                 type="visitor"
               />
@@ -365,7 +368,13 @@ export default function EditVisitor({
                   <>
                     <h3 className="mx-2 w-24">Visitor Autofill</h3>
                     <SliderButton
-                      onclick={() => setVisitorAutofill(!visitorAutofill)}
+                      onclick={() => {
+                        setVisitorAutofill(!visitorAutofill);
+                        localStorage.setItem(
+                          "visitorAutofill",
+                          !visitorAutofill
+                        );
+                      }}
                       value={visitorAutofill}
                     />
                   </>

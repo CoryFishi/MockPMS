@@ -1,11 +1,15 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { MdEdit } from "react-icons/md";
 import { useAuth } from "@context/AuthProvider";
 import { addEvent } from "@hooks/supabase";
+import ModalContainer from "../../../components/UI/ModalContainer";
+import InputBox from "@components/UI/InputBox";
+import SelectOption from "@components/UI/SelectOption";
+import ModalButton from "@components/UI/ModalButton";
 
-export default function EditVisitor({
+export default function EditVisitorVisitorPage({
   setIsEditVisitorModalOpen,
   setVisitors,
   visitor,
@@ -73,8 +77,41 @@ export default function EditVisitor({
         console.log(error);
       });
   };
-  const handleEditVisitor = (e) => {
-    e.preventDefault();
+  const handleEditVisitor = () => {
+    const requiredNames = {
+      firstName: "First name",
+      lastName: "Last name",
+    };
+    const requiredFields = {
+      code: "Gate code",
+      timeGroupId: "Time profile",
+      accessProfileId: "Access profile",
+    };
+    for (const [key, label] of Object.entries(requiredNames)) {
+      if (!newVisitorName[key] || newVisitorName[key].trim() === "") {
+        toast.error(`${label} is required`);
+        return;
+      }
+    }
+    for (const [key, label] of Object.entries(requiredFields)) {
+      if (
+        newVisitorData[key] === undefined ||
+        newVisitorData[key] === null ||
+        newVisitorData[key] === ""
+      ) {
+        toast.error(`${label} is required`);
+        return;
+      }
+    }
+
+    if (newVisitorData.phone && newVisitorData.phone.length < 10) {
+      toast.error("Phone number must be at least 10 digits");
+      return;
+    }
+    if (newVisitorData.email && !/\S+@\S+\.\S+/.test(newVisitorData.email)) {
+      toast.error("Email address is invalid");
+      return;
+    }
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "cia-stg-1.aws.") {
@@ -89,8 +126,8 @@ export default function EditVisitor({
       accessCode: newVisitorData.code,
       lastName: newVisitorName.lastName,
       firstName: newVisitorName.firstName,
-      email: newVisitorData?.email,
-      mobilePhoneNumber: newVisitorData?.mobilePhoneNumber,
+      email: newVisitorData.email || null,
+      mobilePhoneNumber: newVisitorData.mobilePhoneNumber || null,
       suppressCommands: false,
     };
 
@@ -145,168 +182,114 @@ export default function EditVisitor({
     // Close modal and clear input after submitting
     setIsEditVisitorModalOpen(false);
   };
-
   useEffect(() => {
     handleTimeProfiles();
     handleAccessProfiles();
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-sm shadow-lg w-96 dark:bg-darkPrimary">
-        <div className="pl-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
-          <div className="flex text-center items-center">
-            <MdEdit />
-            <h2 className="ml-2 text-lg font-bold text-center items-center">
-              Editing Visitor {visitor.id}
-            </h2>
-          </div>
-        </div>
-
-        <form onSubmit={handleEditVisitor} className="px-5 py-3">
-          <label className="block">
-            First Name<span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitorName.firstName}
-            onChange={(e) =>
+    <ModalContainer
+      title={`Editing Visitor ${visitor.id}`}
+      icon={<MdEdit />}
+      mainContent={
+        <div className="min-w-96 flex flex-col pt-4 gap-3">
+          <InputBox
+            required={true}
+            type={"text"}
+            placeholder={"First Name"}
+            onchange={(e) =>
               setNewVisitorName((prevState) => ({
                 ...prevState,
                 firstName: e.target.value,
               }))
             }
-            placeholder="Enter first name"
-            required
+            value={newVisitorName.firstName || ""}
           />
-          <label className="block">
-            Last Name<span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitorName.lastName}
-            onChange={(e) =>
+          <InputBox
+            required={true}
+            type={"text"}
+            placeholder={"Last Name"}
+            onchange={(e) =>
               setNewVisitorName((prevState) => ({
                 ...prevState,
                 lastName: e.target.value,
               }))
             }
-            placeholder="Enter last name"
-            required
+            value={newVisitorName.lastName || ""}
           />
-          <label className="block">Mobile Phone Number</label>
-          <input
-            type="text"
-            className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitorData.mobilePhoneNumber}
-            onChange={(e) =>
+          <InputBox
+            type={"text"}
+            placeholder={"Mobile Phone Number"}
+            onchange={(e) =>
               setNewVisitorData((prevState) => ({
                 ...prevState,
                 mobilePhoneNumber: e.target.value,
               }))
             }
-            placeholder="Enter mobile phone number"
+            value={newVisitorData.mobilePhoneNumber || ""}
           />
-          <label className="block">Email Address</label>
-          <input
-            type="text"
-            className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitorData.email}
-            onChange={(e) =>
+          <InputBox
+            type={"text"}
+            placeholder={"Email Address"}
+            onchange={(e) =>
               setNewVisitorData((prevState) => ({
                 ...prevState,
                 email: e.target.value,
               }))
             }
-            placeholder="Enter email address"
+            value={newVisitorData.email || ""}
           />
-          <label className="block">
-            Gate Code<span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-            value={newVisitorData.code}
-            onChange={(e) =>
+          <InputBox
+            required={true}
+            type={"text"}
+            placeholder={"Gate Code"}
+            onchange={(e) =>
               setNewVisitorData((prevState) => ({
                 ...prevState,
                 code: e.target.value,
               }))
             }
-            placeholder="Enter gate code"
-            required
+            value={newVisitorData.code || ""}
           />
-          <label className="block">
-            Time Profile<span className="text-red-500">*</span>
-          </label>
-          <select
-            name="timeProfiles"
-            id="timeProfiles"
-            className="border border-gray-300 hover:cursor-pointer rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
+          <SelectOption
+            required={true}
             value={newVisitorData.timeGroupId}
             onChange={(e) =>
-              setNewVisitorData((prevState) => ({
-                ...prevState,
+              setNewVisitorData((prev) => ({
+                ...prev,
                 timeGroupId: e.target.value,
               }))
             }
-            required
-          >
-            {timeProfiles && timeProfiles.length > 0 ? (
-              timeProfiles.map((profile) => (
-                <option key={profile.id} value={profile.id}>
-                  {profile.name}
-                </option>
-              ))
-            ) : (
-              <option value="">Loading...</option>
-            )}
-          </select>
-          <label className="block">
-            Access Profile<span className="text-red-500">*</span>
-          </label>
-          <select
-            name="accessProfiles"
-            id="accessProfiles"
-            className="border border-gray-300 hover:cursor-pointer rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
+            options={Array.isArray(timeProfiles) ? timeProfiles : []}
+            placeholder="Select a Time Profile"
+          />
+          <SelectOption
+            required={true}
             value={newVisitorData.accessProfileId}
             onChange={(e) =>
-              setNewVisitorData((prevState) => ({
-                ...prevState,
+              setNewVisitorData((prev) => ({
+                ...prev,
                 accessProfileId: e.target.value,
               }))
             }
-            required
-          >
-            {accessProfiles && accessProfiles.length > 0 ? (
-              accessProfiles.map((profile) => (
-                <option key={profile.id} value={profile.id}>
-                  {profile.name}
-                </option>
-              ))
-            ) : (
-              <option value="">Loading...</option>
-            )}
-          </select>
-          <div className="mt-4 flex justify-end">
-            <button
-              className="bg-gray-400 hover:cursor-pointer px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
-              onClick={() => setIsEditVisitorModalOpen(false)}
-              type="button"
-            >
-              Cancel
-            </button>
-            <button
-              className="bg-green-500 hover:cursor-pointer text-white px-4 py-2 rounded-sm hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
-              type="submit"
-            >
-              Submit
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+            options={Array.isArray(accessProfiles) ? accessProfiles : []}
+            placeholder="Select a Access Profile"
+          />
+        </div>
+      }
+      responseContent={
+        <div className="flex justify-end">
+          <ModalButton
+            onclick={() => setIsEditVisitorModalOpen(false)}
+            text="Cancel"
+          />
+          <ModalButton
+            onclick={() => handleEditVisitor()}
+            text="Submit"
+            className={"bg-green-500 hover:bg-green-600"}
+          />
+        </div>
+      }
+    />
   );
 }

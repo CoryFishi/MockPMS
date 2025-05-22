@@ -1,8 +1,11 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { IoIosCreate } from "react-icons/io";
 import { useAuth } from "@context/AuthProvider";
+import ModalContainer from "@components/UI/ModalContainer";
+import SelectOption from "@components/UI/SelectOption";
+import InputBox from "@components/UI/InputBox";
 
 export default function CreateVisitorVisitor({
   setIsCreateVisitorModalOpen,
@@ -22,8 +25,13 @@ export default function CreateVisitorVisitor({
   const [timeProfiles, setTimeProfiles] = useState({});
   const [accessProfiles, setAccessProfiles] = useState({});
   const [units, setUnits] = useState({});
-  const [selectedUnit, setSelectedUnit] = useState({});
+  const [selectedUnit, setSelectedUnit] = useState(null);
   const { currentFacility } = useAuth();
+  const visitorTypes = [
+    { id: "Tenant", name: "Tenant" },
+    { id: "Guest", name: "Guest" },
+    { id: "nonTenant", name: "Non-Tenant Guest" },
+  ];
 
   const handleUnits = async () => {
     var tokenStageKey = "";
@@ -112,9 +120,34 @@ export default function CreateVisitorVisitor({
         console.log(error);
       });
   };
-
-  const handleCreateVisitor = (e) => {
-    e.preventDefault();
+  const handleCreateVisitor = () => {
+    const requiredFields = {
+      firstName: "First name",
+      lastName: "Last name",
+      gateCode: "Gate code",
+      timeProfile: "Time profile",
+      accessProfile: "Access profile",
+    };
+    if (newVisitor.type !== "nonTenant") {
+      if (!newVisitor.type || !selectedUnit) {
+        toast.error("Select a visitor type and unit");
+        return;
+      }
+    }
+    for (const [key, label] of Object.entries(requiredFields)) {
+      if (!newVisitor[key] || newVisitor[key].trim() === "") {
+        toast.error(`${label} is required`);
+        return;
+      }
+    }
+    if (newVisitor.phone && newVisitor.phone.length < 10) {
+      toast.error("Phone number must be at least 10 digits");
+      return;
+    }
+    if (newVisitor.email && !/\S+@\S+\.\S+/.test(newVisitor.email)) {
+      toast.error("Email address is invalid");
+      return;
+    }
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "cia-stg-1.aws.") {
@@ -131,15 +164,15 @@ export default function CreateVisitorVisitor({
         accessCode: newVisitor.gateCode,
         lastName: newVisitor.lastName,
         firstName: newVisitor.firstName,
-        email: newVisitor.email,
-        mobilePhoneNumber: newVisitor.phone,
+        email: newVisitor.email || null,
+        mobilePhoneNumber: newVisitor.phone || null,
         isTenant: true,
         extendedData: {
           additionalProp1: null,
           additionalProp2: null,
           additionalProp3: null,
         },
-        suppressCommands: true,
+        suppressCommands: false,
       };
     } else if (newVisitor.type === "nonTenant") {
       data = {
@@ -149,8 +182,8 @@ export default function CreateVisitorVisitor({
         accessCode: newVisitor.gateCode,
         lastName: newVisitor.lastName,
         firstName: newVisitor.firstName,
-        email: newVisitor.email,
-        mobilePhoneNumber: newVisitor.phone,
+        email: newVisitor.email || null,
+        mobilePhoneNumber: newVisitor.phone || null,
         isTenant: false,
         isPortalVisitor: true,
         extendedData: {
@@ -158,7 +191,7 @@ export default function CreateVisitorVisitor({
           additionalProp2: null,
           additionalProp3: null,
         },
-        suppressCommands: true,
+        suppressCommands: false,
       };
     } else {
       data = {
@@ -168,15 +201,15 @@ export default function CreateVisitorVisitor({
         accessCode: newVisitor.gateCode,
         lastName: newVisitor.lastName,
         firstName: newVisitor.firstName,
-        email: newVisitor.email,
-        mobilePhoneNumber: newVisitor.phone,
+        email: newVisitor.email || null,
+        mobilePhoneNumber: newVisitor.phone || null,
         isTenant: false,
         extendedData: {
           additionalProp1: null,
           additionalProp2: null,
           additionalProp3: null,
         },
-        suppressCommands: true,
+        suppressCommands: false,
       };
     }
 
@@ -228,147 +261,110 @@ export default function CreateVisitorVisitor({
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-sm shadow-lg w-96 dark:bg-darkPrimary">
-        <div className="pl-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
-          <div className="flex text-center items-center">
-            <IoIosCreate />
-            <h2 className="ml-2 text-lg font-bold text-center items-center">
-              Creating New Visitor
-            </h2>
-          </div>
-        </div>
-        <form onSubmit={handleCreateVisitor} className="px-5 py-2">
-          <label className="block">Visitor Type</label>
-          <select
-            name="types"
-            id="types"
-            className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border hover:cursor-pointer"
+    <ModalContainer
+      title={`Creating New Visitor`}
+      icon={<IoIosCreate />}
+      mainContent={
+        <div className="min-w-96 flex flex-col pt-4 gap-3">
+          <SelectOption
+            required={true}
+            value={newVisitor.type}
             onChange={(e) =>
               setNewVisitor((prevState) => ({
                 ...prevState,
                 type: e.target.value,
               })) & setSelectedUnit("")
             }
-            required
-          >
-            <option value="">Select a visitor type</option>
-            <option value="Tenant">Tenant</option>
-            <option value="Guest">Guest</option>
-            <option value="nonTenant">Non-Tenant Guest</option>
-          </select>
+            options={Array.isArray(visitorTypes) ? visitorTypes : []}
+            placeholder="Visitor Type"
+          />
           {newVisitor?.type !== "nonTenant" && newVisitor?.type !== "" && (
-            <>
-              <label className="block">Unit</label>
-              <select
-                name="units"
-                id="units"
-                className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border hover:cursor-pointer"
-                onChange={(e) => setSelectedUnit(e.target.value)}
-                required
-              >
-                <option value="">Select a unit</option>
-                {newVisitor?.type === "Tenant" && units && units.length > 0 ? (
-                  units
-                    .filter((unit) => unit.status === "Vacant")
-                    .map((unit) => (
-                      <option key={unit.id} value={unit.id}>
-                        {unit.unitNumber} - {unit.status}
-                      </option>
-                    ))
-                ) : newVisitor?.type === "Guest" &&
-                  units &&
-                  units.length > 0 ? (
-                  units
-                    .filter((unit) => unit.status === "Rented")
-                    .map((unit) => (
-                      <option key={unit.id} value={unit.id}>
-                        {unit.unitNumber} - {unit.status}
-                      </option>
-                    ))
-                ) : (
-                  <option value="">Loading...</option>
-                )}
-              </select>
-            </>
+            <SelectOption
+              required={true}
+              value={selectedUnit}
+              onChange={(e) => setSelectedUnit(parseInt(e.target.value))}
+              options={
+                Array.isArray(units)
+                  ? units
+                      .filter((unit) =>
+                        newVisitor?.type === "Tenant"
+                          ? unit.status === "Vacant"
+                          : newVisitor?.type === "Guest"
+                          ? unit.status === "Rented"
+                          : true
+                      )
+                      .map((unit) => ({
+                        id: unit.id,
+                        name: `${unit.unitNumber} - ${unit.status}`,
+                      }))
+                  : []
+              }
+              placeholder="Select a Unit"
+            />
           )}
+
           {newVisitor.type && (
             <>
-              <label className="block">First Name</label>
-              <input
-                type="text"
-                className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-                value={newVisitor.firstName}
-                onChange={(e) =>
+              <InputBox
+                required={true}
+                type={"text"}
+                placeholder={"First Name"}
+                onchange={(e) =>
                   setNewVisitor((prevState) => ({
                     ...prevState,
                     firstName: e.target.value,
                   }))
                 }
-                placeholder="Enter first name"
-                required
+                value={newVisitor.firstName || ""}
               />
-              <label className="block">Last Name</label>
-              <input
-                type="text"
-                className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-                value={newVisitor.lastName}
-                onChange={(e) =>
+              <InputBox
+                required={true}
+                type={"text"}
+                placeholder={"Last Name"}
+                onchange={(e) =>
                   setNewVisitor((prevState) => ({
                     ...prevState,
                     lastName: e.target.value,
                   }))
                 }
-                placeholder="Enter last name"
-                required
+                value={newVisitor.lastName || ""}
               />
-              <label className="block">Mobile Phone Number</label>
-              <input
-                type="text"
-                className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-                value={newVisitor.phone}
-                onChange={(e) =>
+              <InputBox
+                type={"text"}
+                placeholder={"Mobile Phone Number"}
+                onchange={(e) =>
                   setNewVisitor((prevState) => ({
                     ...prevState,
                     phone: e.target.value,
                   }))
                 }
-                placeholder="Enter mobile phone number"
-                required
+                value={newVisitor.phone || ""}
               />
-              <label className="block">Email Address</label>
-              <input
-                type="text"
-                className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-                value={newVisitor.email}
-                onChange={(e) =>
+              <InputBox
+                type={"text"}
+                placeholder={"Email Address"}
+                onchange={(e) =>
                   setNewVisitor((prevState) => ({
                     ...prevState,
                     email: e.target.value,
                   }))
                 }
-                placeholder="Enter email address"
-                required
+                value={newVisitor.email || ""}
               />
-              <label className="block">Gate Code</label>
-              <input
-                type="text"
-                className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
-                value={newVisitor.gateCode}
-                onChange={(e) =>
+              <InputBox
+                required={true}
+                type={"text"}
+                placeholder={"Gate Code"}
+                onchange={(e) =>
                   setNewVisitor((prevState) => ({
                     ...prevState,
                     gateCode: e.target.value,
                   }))
                 }
-                placeholder="Enter gate code"
-                required
+                value={newVisitor.gateCode || ""}
               />
-              <label className="block">Time Profile</label>
-              <select
-                name="timeProfiles"
-                id="timeProfiles"
-                className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border hover:cursor-pointer"
+              <SelectOption
+                required={true}
                 value={newVisitor.timeProfile}
                 onChange={(e) =>
                   setNewVisitor((prevState) => ({
@@ -376,62 +372,43 @@ export default function CreateVisitorVisitor({
                     timeProfile: e.target.value,
                   }))
                 }
-                required
-              >
-                <option value="">Select a Time Profile</option>
-                {timeProfiles && timeProfiles.length > 0 ? (
-                  timeProfiles.map((profile) => (
-                    <option key={profile.id} value={profile.id}>
-                      {profile.name}
-                    </option>
-                  ))
-                ) : (
-                  <option value="">Loading...</option>
-                )}
-              </select>
-              <label className="block">Access Profile</label>
-              <select
-                name="accessProfiles"
-                id="accessProfiles"
-                className="border border-gray-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border hover:cursor-pointer"
+                options={Array.isArray(timeProfiles) ? timeProfiles : []}
+                placeholder="Select a Time Profile"
+              />
+              <SelectOption
+                required={true}
+                value={newVisitor.accessProfile}
                 onChange={(e) =>
                   setNewVisitor((prevState) => ({
                     ...prevState,
                     accessProfile: e.target.value,
                   }))
                 }
-                required
-              >
-                <option value="">Select an Access Profile</option>
-                {accessProfiles && accessProfiles.length > 0 ? (
-                  accessProfiles.map((profile) => (
-                    <option key={profile.id} value={profile.id}>
-                      {profile.name}
-                    </option>
-                  ))
-                ) : (
-                  <option value="">Loading...</option>
-                )}
-              </select>
+                options={Array.isArray(accessProfiles) ? accessProfiles : []}
+                placeholder="Select a Access Profile"
+              />
             </>
           )}
-
-          <div className="mt-4 flex justify-end">
-            <button
-              className="bg-gray-400 hover:cursor-pointer px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
-              onClick={() => setIsCreateVisitorModalOpen(false)}
-            >
-              Cancel
-            </button>
-            <button
-              className="bg-green-500 hover:cursor-pointer text-white px-4 py-2 rounded-sm hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
-              type="submit"
-            >
-              Submit
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      }
+      responseContent={
+        <div className="mt-4 flex justify-end">
+          <button
+            className="bg-gray-400 hover:cursor-pointer px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
+            onClick={() => setIsCreateVisitorModalOpen(false)}
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            className="bg-green-500 hover:cursor-pointer text-white px-4 py-2 rounded-sm hover:bg-green-600 font-bold transition duration-300 ease-in-out transform hover:scale-105"
+            type="button"
+            onClick={() => handleCreateVisitor()}
+          >
+            Submit
+          </button>
+        </div>
+      }
+    />
   );
 }

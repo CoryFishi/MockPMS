@@ -1,10 +1,11 @@
 import { useState } from "react";
 
-export default function FloatingSelect({
+export default function SelectOption({
   value,
   onChange,
   options = [],
   placeholder = "Select an option",
+  required = false,
 }) {
   const hasValue = value !== "";
   const [isFocused, setIsFocused] = useState(false);
@@ -39,7 +40,7 @@ export default function FloatingSelect({
           }
         `}
       >
-        {placeholder}
+        {placeholder} {required && <span className="text-red-500">*</span>}
       </label>
     </div>
   );
