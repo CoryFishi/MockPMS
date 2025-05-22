@@ -46,7 +46,7 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
           !isNaN(numStart) &&
           !isNaN(numEnd) &&
           numStart <= numEnd &&
-          numEnd - numStart < 100
+          numEnd - numStart < 1000
         ) {
           return Array.from({ length: numEnd - numStart + 1 }, (_, i) => {
             const num = (numStart + i).toString().padStart(digitCount, "0");
