@@ -6,13 +6,15 @@ import { LuBrainCircuit } from "react-icons/lu";
 import { RiAlarmWarningFill } from "react-icons/ri";
 import axios from "axios";
 import toast from "react-hot-toast";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { GoStar, GoStarFill } from "react-icons/go";
 import qs from "qs";
 import { FaWarehouse } from "react-icons/fa6";
 import { useAuth } from "@context/AuthProvider";
 import { supabase } from "@app/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import TableButton from "@components/UI/TableButton";
+import InputBox from "@components/UI/InputBox";
 
 export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
   const {
@@ -531,22 +533,19 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
       render: (r) =>
         currentFacility.id === r.facilityId &&
         currentFacility.environment === r.environment ? (
-          <button
-            className="font-bold bg-zinc-200 text-white px-2 py-1 rounded-sm cursor-pointer"
-            onClick={() => {
+          <TableButton
+            onclick={() => {
               localStorage.setItem("openPage", "units");
               setOpenPage("units");
             }}
-          >
-            Selected
-          </button>
+            text={"Selected"}
+          />
         ) : (
-          <button
-            className="font-bold bg-green-500 text-white px-2 py-1 rounded-sm hover:bg-green-600 cursor-pointer"
-            onClick={() => handleSelect(r)}
-          >
-            Select
-          </button>
+          <TableButton
+            onclick={() => handleSelect(r)}
+            className="bg-green-500 hover:bg-green-600"
+            text={"Select"}
+          />
         ),
     },
   ];
@@ -569,12 +568,11 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
       <div className="w-full px-5 flex flex-col rounded-lg h-fit">
         {/* Search Bar */}
         <div className="mt-5 mb-2 flex items-center justify-end text-center">
-          <input
+          <InputBox
             type="text"
             placeholder="Search facilities..."
+            onchange={(e) => setSearchQuery(e.target.value)}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
         </div>
         {/* Facilities Table */}

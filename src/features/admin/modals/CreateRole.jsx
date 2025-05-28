@@ -18,6 +18,7 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
     authenticationPlatformImport: false,
     authenticationPlatformExport: false,
     pmsPlatform: false,
+    pmsPlatformAdmin: false,
     pmsPlatformUnitCreate: false,
     pmsPlatformUnitEdit: false,
     pmsPlatformUnitDelete: false,
@@ -155,7 +156,7 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
                     >
                       <input
                         type="checkbox"
-                        className="form-checkbox h-5 w-5 text-yellow-500"
+                        className="form-checkbox h-5 w-5 text-yellow-500 hover:cursor-pointer "
                         checked={rolePermissions[key]}
                         onChange={(e) =>
                           setRolePermissions((prev) => ({

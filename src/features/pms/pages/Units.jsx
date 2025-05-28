@@ -1,5 +1,4 @@
 import CreateUnit from "../modals/CreateUnit";
-import CreateVisitor from "../modals/CreateVisitorUnitPage";
 import EditVisitor from "../modals/EditVisitorUnitPage";
 import PaginationFooter from "@components/shared/PaginationFooter";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
@@ -7,6 +6,7 @@ import DataTable from "@components/shared/DataTable";
 import TableButton from "@components/UI/TableButton";
 import GeneralButton from "@components/UI/GeneralButton";
 import SliderButton from "@components/UI/SliderButton";
+import InputBox from "@components/UI/InputBox";
 import { useAuth } from "@context/AuthProvider";
 import { addEvent } from "@hooks/supabase";
 import axios from "axios";
@@ -46,6 +46,7 @@ export default function Units({
   const [isDelinquencyModalOpen, setIsDelinquencyModalOpen] = useState(false);
   const [continousDelinquency, setContinousDelinquency] = useState(false);
   const [continousDelete, setContinousDelete] = useState(false);
+  const [isMoveOutModalOpen, setIsMoveOutModalOpen] = useState(false);
   const [currentLoadingText, setCurrentLoadingText] =
     useState("Loading Units...");
   const rentedCount = filteredUnits.filter(
@@ -323,7 +324,7 @@ export default function Units({
 
       const config = {
         method: "post",
-        url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/units/${unit.id}/vacate?suppressCommands=true`,
+        url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/units/${unit.id}/vacate`,
         headers: {
           Authorization: "Bearer " + currentFacility?.token?.access_token,
           accept: "application/json",
@@ -376,7 +377,7 @@ export default function Units({
       }
       const config = {
         method: "post",
-        url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/units/${unit.id}/disable?suppressCommands=true`,
+        url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/units/${unit.id}/disable`,
         headers: {
           Authorization: "Bearer " + currentFacility?.token?.access_token,
           accept: "application/json",
@@ -429,7 +430,7 @@ export default function Units({
 
       const config = {
         method: "post",
-        url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/units/${unit.id}/delete/vacant?suppressCommands=true`,
+        url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/units/${unit.id}/delete/vacant`,
         headers: {
           Authorization: "Bearer " + currentFacility?.token?.access_token,
           accept: "application/json",
@@ -658,7 +659,14 @@ export default function Units({
               )}
               {permissions.pmsPlatformVisitorDelete && (
                 <TableButton
-                  onclick={() => moveOut(unit)}
+                  onclick={() => {
+                    if (continousDelete) {
+                      moveOut(unit);
+                    } else {
+                      setIsMoveOutModalOpen(true);
+                      setSelectedUnit(unit);
+                    }
+                  }}
                   text="Move Out"
                   className={"bg-rose-600 hover:bg-rose-700"}
                 />
@@ -715,7 +723,14 @@ export default function Units({
               )}
               {permissions.pmsPlatformVisitorDelete && (
                 <TableButton
-                  onclick={() => moveOut(unit)}
+                  onclick={() => {
+                    if (continousDelete) {
+                      moveOut(unit);
+                    } else {
+                      setIsMoveOutModalOpen(true);
+                      setSelectedUnit(unit);
+                    }
+                  }}
                   text="Move Out"
                   className={"bg-rose-600 hover:bg-rose-700"}
                 />
@@ -780,6 +795,17 @@ export default function Units({
           continousDelete={continousDelete}
         />
       )}
+      {/* Delete Unit Confirmation Modal */}
+      {isMoveOutModalOpen && (
+        <DeleteModal
+          type={"uv"}
+          setIsDeleteModalOpen={setIsMoveOutModalOpen}
+          handleDelete={moveOut}
+          value={selectedUnit}
+          setContinousDelete={setContinousDelete}
+          continousDelete={continousDelete}
+        />
+      )}
       {/* Update Unit Delinquency Status Confirmation Modal */}
       {isDelinquencyModalOpen && (
         <DelinquencyModal
@@ -823,12 +849,11 @@ export default function Units({
         </div>
         <div className="mt-5 mb-2 flex items-center justify-end text-center">
           {/* Search Bar */}
-          <input
+          <InputBox
             type="text"
             placeholder="Search units..."
+            onchange={(e) => setSearchQuery(e.target.value) & setCurrentPage(1)}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value) & setCurrentPage(1)}
-            className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
           {/* Visitor Autofill Toggle */}
           {permissions.pmsPlatformVisitorCreate && (

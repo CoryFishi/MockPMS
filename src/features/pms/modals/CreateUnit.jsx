@@ -105,15 +105,24 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
             error: <b>Failed to create unit {unitNumber}.</b>,
           }
         );
-        await addEvent(
-          "Create Unit",
-          `${user.email} created unit ${unitNumber} at ${currentFacility.name}, facility id ${currentFacility.id}`,
-          true
-        );
+        if (unitNumbersArray.length <= 1) {
+          await addEvent(
+            "Create Unit",
+            `${user.email} created unit ${unitNumber} at ${currentFacility.name}, facility id ${currentFacility.id}`,
+            true
+          );
+        }
       } catch (error) {
         console.error("Error creating unit:", error);
       }
     });
+    if (unitNumbersArray.length > 1) {
+      await addEvent(
+        "Create Unit",
+        `${user.email} created unit ${newUnitNumber} at ${currentFacility.name}, ${currentFacility.id}`,
+        true
+      );
+    }
     setIsUnitModalOpen(false);
     setNewUnitNumber("");
   };

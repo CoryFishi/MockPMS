@@ -7,8 +7,11 @@ import { useAuth } from "@context/AuthProvider";
 import { FaPerson } from "react-icons/fa6";
 import axios from "axios";
 import toast from "react-hot-toast";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import DeleteModal from "../modals/DeleteModal";
+import InputBox from "@components/UI/InputBox";
+import GeneralButton from "@components/UI/GeneralButton";
+import TableButton from "@components/UI/TableButton";
 
 export default function Visitors({ currentFacilityName }) {
   const [visitors, setVisitors] = useState([]);
@@ -358,24 +361,24 @@ export default function Visitors({ currentFacilityName }) {
       render: (v) => (
         <div className="text-center space-x-1">
           {permissions.pmsPlatformVisitorEdit && (
-            <button
-              className="bg-green-500 text-white px-2 py-1 rounded font-bold hover:bg-green-600 hover:cursor-pointer"
-              onClick={() => {
+            <TableButton
+              className="bg-green-500 hover:bg-green-600"
+              onclick={() => {
                 setSelectedVisitor(v);
                 setIsEditVisitorModalOpen(true);
               }}
-            >
-              Edit
-            </button>
+              text={"Edit"}
+            />
           )}
           {permissions.pmsPlatformVisitorDelete && (
-            <button
-              className={`text-white px-2 py-1 rounded font-bold hover:cursor-pointer ${
+            <TableButton
+              text={v.isTenant ? "Move Out" : "Delete"}
+              className={`${
                 v.isTenant
                   ? "bg-rose-600 hover:bg-rose-700"
                   : "bg-red-500 hover:bg-red-600"
               }`}
-              onClick={() => {
+              onclick={() => {
                 if (continousDelete) {
                   handleDelete(v);
                 } else {
@@ -383,9 +386,7 @@ export default function Visitors({ currentFacilityName }) {
                   setIsDeleteModalOpen(true);
                 }
               }}
-            >
-              {v.isTenant ? "Move Out" : "Delete"}
-            </button>
+            />
           )}
         </div>
       ),
@@ -413,7 +414,6 @@ export default function Visitors({ currentFacilityName }) {
           visitor={selectedVisitor}
         />
       )}
-
       {/* Delete Visitor Modal Popup */}
       {isDeleteModalOpen && (
         <DeleteModal
@@ -459,26 +459,23 @@ export default function Visitors({ currentFacilityName }) {
         </div>
         <div className="mt-5 mb-2 flex items-center justify-end text-center">
           {/* Search Bar */}
-          <input
+          <InputBox
             type="text"
             placeholder="Search visitors..."
+            onchange={(e) => setSearchQuery(e.target.value) & setCurrentPage(1)}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value) & setCurrentPage(1)}
-            className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
           {/* Create Visitor Button */}
           {permissions.pmsPlatformVisitorCreate && (
-            <button
-              className="bg-green-500 text-white p-1 py-2 rounded font-bold ml-3 w-44 transition duration-300 ease-in-out transform hover:bg-green-600 hover:scale-105 hover:cursor-pointer"
-              onClick={() => {
+            <GeneralButton
+              text={"Create Visitor"}
+              className="bg-green-500 hover:bg-green-600"
+              onclick={() => {
                 if (permissions.pmsPlatformVisitorCreate) {
                   setIsCreateVisitorModalOpen(true);
                 }
               }}
-              disabled={!permissions.pmsPlatformVisitorCreate}
-            >
-              Create Visitor
-            </button>
+            />
           )}
         </div>
         {/* Visitor Table */}

@@ -12,6 +12,8 @@ import { supabase } from "../../app/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { handleSingleLogin } from "@hooks/opentech";
+import Scripts from "../../features/pms/pages/Scripts";
+import { RiAdminFill } from "react-icons/ri";
 
 export default function PMSDashboardLayout({
   dashboardMenu,
@@ -24,6 +26,7 @@ export default function PMSDashboardLayout({
     setTokens,
     setFavoriteTokens,
     setSelectedTokens,
+    role,
   } = useAuth();
   const [isNameGrabbed, setIsNameGrabbed] = useState(false);
   const [openSections, setOpenSections] = useState({
@@ -285,6 +288,53 @@ export default function PMSDashboardLayout({
               )}
             </div>
 
+            {/* Admin Side bar */}
+            {role === "admin" && (
+              <div
+                className={`border-t border-b pl-2 pr-2 border-gray-500 pb-8 ${
+                  openPage === "scripts"
+                    ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
+                    : "dark:bg-darkNavPrimary"
+                }`}
+              >
+                <div
+                  className="flex justify-between items-center cursor-pointer mt-8"
+                  onClick={() => toggleSection("admin")}
+                >
+                  <div className="flex items-center space-x-2">
+                    <RiAdminFill
+                      className={`${
+                        openPage === "scripts" ? "text-yellow-500" : ""
+                      }`}
+                    />
+                    <span className="pl-1 truncate max-w-[18ch]">
+                      Admin Functions
+                    </span>
+                  </div>
+                  {openSections.admin ? (
+                    <MdExpandLess className="flex-shrink-0 text-2xl" />
+                  ) : (
+                    <MdExpandMore className="flex-shrink-0 text-2xl" />
+                  )}
+                </div>
+
+                {!openSections.admin && (
+                  <div className="mx-4 mt-4 space-y-2">
+                    <button
+                      onClick={() => {
+                        setOpenPage("scripts");
+                        localStorage.setItem("openPage", "scripts");
+                        if (window.innerWidth < 768) setDashboardMenu(false);
+                      }}
+                      className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer"
+                    >
+                      Scripts
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="absolute bottom-0 w-full hidden md:flex justify-between text-sm hover:cursor-pointer text-center">
               <Link
                 to="/user-settings"
@@ -310,7 +360,7 @@ export default function PMSDashboardLayout({
             </div>
           </div>
         )}
-        <div className="w-full flex flex-col bg-background-50 h-full">
+        <div className="w-full flex flex-col bg-zinc-50 h-full">
           {openPage === "visitors" && (
             <Visitors currentFacilityName={currentFacilityName} />
           )}
@@ -329,6 +379,7 @@ export default function PMSDashboardLayout({
               setOpenPage={setOpenPage}
             />
           )}
+          {openPage === "scripts" && role === "admin" && <Scripts />}
         </div>
       </div>
     </div>

@@ -2,12 +2,14 @@ import PaginationFooter from "@components/shared/PaginationFooter";
 import DataTable from "@components/shared/DataTable";
 import axios from "axios";
 import toast from "react-hot-toast";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { GoStar, GoStarFill } from "react-icons/go";
 import qs from "qs";
 import { useAuth } from "@context/AuthProvider";
 import { supabase } from "@app/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import TableButton from "@components/UI/TableButton";
+import InputBox from "@components/UI/InputBox";
 
 export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
   const [facilities, setFacilities] = useState([]);
@@ -292,22 +294,19 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
       render: (r) =>
         currentFacility.id === r.id &&
         currentFacility.environment === r.environment ? (
-          <button
-            className="font-bold bg-gray-200 text-white px-2 py-1 rounded-sm cursor-pointer"
-            onClick={() => {
+          <TableButton
+            onclick={() => {
               localStorage.setItem("openPage", "units");
               setOpenPage("units");
             }}
-          >
-            Selected
-          </button>
+            text={"Selected"}
+          />
         ) : (
-          <button
-            className="font-bold bg-green-500 text-white px-2 py-1 rounded-sm hover:bg-green-600 cursor-pointer"
-            onClick={() => handleSelect(r)}
-          >
-            Select
-          </button>
+          <TableButton
+            className="bg-green-500 hover:bg-green-600"
+            onclick={() => handleSelect(r)}
+            text={"Select"}
+          />
         ),
     },
   ];
@@ -322,12 +321,11 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
       </div>
       <div className="w-full h-fit p-5 flex flex-col rounded-lg pb-10">
         <div className=" mb-2 flex items-center justify-end text-center">
-          <input
+          <InputBox
             type="text"
             placeholder="Search facilities..."
+            onchange={(e) => setSearchQuery(e.target.value)}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
           />
         </div>
         <DataTable

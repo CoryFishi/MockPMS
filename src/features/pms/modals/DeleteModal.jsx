@@ -16,14 +16,19 @@ export default function DeleteModal({
   return (
     <ModalContainer
       title={
-        "Delete " + type + ` ${type == "unit" ? value.unitNumber : value.name}`
+        type === "unit"
+          ? `Delete unit ${value.unitNumber}`
+          : type === "uv"
+          ? `Move out visitor from unit ${value.unitNumber}`
+          : `Delete ${type}`
       }
       icon={<MdDeleteForever />}
       mainContent={
         <>
-          <p className="text-wrap mt-3">
-            Would you like to delete{" "}
-            {type == "unit" ? value.unitNumber : value.name} from this facility?
+          <p className="text-wrap mt-3" onClick={() => console.log(type)}>
+            Would you like to {type !== "uv" ? "delete" : "move out the tenant"}{" "}
+            {type == "unit" ? value.unitNumber : value.name} from this{" "}
+            {type !== "uv" ? "facility" : "unit"}?
           </p>
           <p className="text-wrap text-xs text-red-400 mt-1">
             This action cannot be undone.
