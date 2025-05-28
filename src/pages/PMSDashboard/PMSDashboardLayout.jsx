@@ -27,6 +27,7 @@ export default function PMSDashboardLayout({
     setFavoriteTokens,
     setSelectedTokens,
     role,
+    permissions,
   } = useAuth();
   const [isNameGrabbed, setIsNameGrabbed] = useState(false);
   const [openSections, setOpenSections] = useState({
@@ -289,7 +290,7 @@ export default function PMSDashboardLayout({
             </div>
 
             {/* Admin Side bar */}
-            {role === "admin" && (
+            {permissions.pmsPlatformAdmin && (
               <div
                 className={`border-t border-b pl-2 pr-2 border-gray-500 pb-8 ${
                   openPage === "scripts"
