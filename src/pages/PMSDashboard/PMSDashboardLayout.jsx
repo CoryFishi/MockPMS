@@ -361,7 +361,7 @@ export default function PMSDashboardLayout({
             </div>
           </div>
         )}
-        <div className="w-full flex flex-col bg-zinc-50 h-full">
+        <div className="w-full flex flex-col h-full">
           {openPage === "visitors" && (
             <Visitors currentFacilityName={currentFacilityName} />
           )}
