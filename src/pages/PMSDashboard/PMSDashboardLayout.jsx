@@ -2,7 +2,7 @@ import Visitors from "@features/pms/pages/Visitors";
 import Units from "@features/pms/pages/Units";
 import AllFacilities from "@features/pms/pages/AllFacilities";
 import Favorites from "@features/pms/pages/Favorites";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { handleSingleLogin } from "@hooks/opentech";
 import Scripts from "../../features/pms/pages/Scripts";
 import { RiAdminFill } from "react-icons/ri";
+import Overview from "../../features/pms/pages/Overview";
 
 export default function PMSDashboardLayout({
   dashboardMenu,
@@ -155,7 +156,9 @@ export default function PMSDashboardLayout({
             {currentFacility && currentFacility.id > 0 && (
               <div
                 className={`pl-2 pr-2 pb-8 mt-8 ${
-                  openPage === "visitors" || openPage === "units"
+                  openPage === "visitors" ||
+                  openPage === "units" ||
+                  openPage === "dashboard"
                     ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
                     : "dark:bg-darkNavPrimary"
                 }`}
@@ -167,7 +170,9 @@ export default function PMSDashboardLayout({
                   <div className="flex items-center space-x-2">
                     <BsBuildingFill
                       className={`${
-                        openPage === "visitors" || openPage === "units"
+                        openPage === "visitors" ||
+                        openPage === "units" ||
+                        openPage === "dashboard"
                           ? "text-yellow-500"
                           : ""
                       }`}
@@ -185,6 +190,16 @@ export default function PMSDashboardLayout({
 
                 {!openSections.currentFacility && (
                   <div className="mx-4 mt-4 space-y-2">
+                    <button
+                      onClick={() => {
+                        setOpenPage("dashboard");
+                        localStorage.setItem("openPage", "dashboard");
+                        if (window.innerWidth < 768) setDashboardMenu(false);
+                      }}
+                      className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer"
+                    >
+                      Overview
+                    </button>
                     <button
                       onClick={() => {
                         setOpenPage("visitors");
@@ -362,6 +377,9 @@ export default function PMSDashboardLayout({
           </div>
         )}
         <div className="w-full flex flex-col h-full">
+          {openPage === "dashboard" && (
+            <Overview currentFacilityName={currentFacilityName} />
+          )}
           {openPage === "visitors" && (
             <Visitors currentFacilityName={currentFacilityName} />
           )}
