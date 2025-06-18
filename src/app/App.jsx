@@ -9,6 +9,7 @@ import ResetPassword from "@pages/ResetPassword/ResetPassword";
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useState, useEffect } from "react";
+import SensorDashboard from "../pages/SensorDashboard/SensorDashboard";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -48,6 +49,15 @@ function App() {
           path="/smartlock"
           element={
             <SmartLockDashboard
+              darkMode={darkMode}
+              toggleDarkMode={toggleDarkMode}
+            />
+          }
+        />
+        <Route
+          path="/sensor"
+          element={
+            <SensorDashboard
               darkMode={darkMode}
               toggleDarkMode={toggleDarkMode}
             />
