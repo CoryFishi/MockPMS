@@ -30,7 +30,15 @@ export default function SensorDashboard({ darkMode }) {
       try {
         const loginRes = await axios.post(
           `${BASE_URL}/User/login`,
-          new URLSearchParams({ username: USERNAME, password: PASSWORD })
+          new URLSearchParams(
+            { username: USERNAME, password: PASSWORD },
+            {
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                Accept: "application/json, text/plain, */*",
+              },
+            }
+          )
         );
 
         const tok = loginRes.data?.token || loginRes.data;
