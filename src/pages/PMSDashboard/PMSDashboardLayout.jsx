@@ -190,7 +190,7 @@ export default function PMSDashboardLayout({
 
                 {!openSections.currentFacility && (
                   <div className="mx-4 mt-4 space-y-2">
-                    <button
+                    {/* <button
                       onClick={() => {
                         setOpenPage("dashboard");
                         localStorage.setItem("openPage", "dashboard");
@@ -199,7 +199,7 @@ export default function PMSDashboardLayout({
                       className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer"
                     >
                       Overview
-                    </button>
+                    </button> */}
                     <button
                       onClick={() => {
                         setOpenPage("visitors");

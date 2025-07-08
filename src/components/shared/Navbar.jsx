@@ -83,16 +83,6 @@ export default function Navbar({
           )}
         </div>
         <div className="flex space-x-4 items-center mr-5">
-          <Link
-            to="/sensor"
-            className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium ${
-              location.pathname === "/sensor"
-                ? "border-b-2 border-yellow-400"
-                : ""
-            }`}
-          >
-            Sensor
-          </Link>
           {user && permissions.smartlockPlatform && (
             <Link
               to="/smartlock"
