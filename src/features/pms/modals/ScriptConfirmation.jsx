@@ -1,6 +1,14 @@
 import { IoIosCreate } from "react-icons/io";
 import ModalButton from "@components/UI/ModalButton";
 import ModalContainer from "@components/UI/ModalContainer";
+import PropTypes from "prop-types";
+
+ScriptConfirmation.propTypes = {
+  title: PropTypes.string.isRequired, // Title of the modal
+  message: PropTypes.string.isRequired, // Message to display in the modal
+  handleSubmit: PropTypes.func.isRequired, // Function to call on submit
+  setIsModalOpen: PropTypes.func.isRequired, // Function to close the modal
+};
 
 export default function ScriptConfirmation({
   title,

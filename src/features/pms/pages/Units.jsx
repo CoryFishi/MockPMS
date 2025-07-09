@@ -17,9 +17,7 @@ import DeleteModal from "../modals/DeleteModal";
 import CreateVisitorUnitPage from "../modals/CreateVisitorUnitPage";
 import DelinquencyModal from "../modals/DelinquencyModal";
 
-export default function Units({
-  currentFacilityName = { currentFacilityName },
-}) {
+export default function Units({ currentFacilityName }) {
   const [units, setUnits] = useState([]);
   const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
   const [isCreateVisitorModalOpen, setIsCreateVisitorModalOpen] =
@@ -364,6 +362,7 @@ export default function Units({
         `${user.email} moved out ${unit.unitNumber} at ${currentFacilityName}, facility id ${currentFacility.id}`,
         false
       );
+      console.error("Error moving out tenant:", error);
     }
   };
   const turnDelinquent = async (unit) => {

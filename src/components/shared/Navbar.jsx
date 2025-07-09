@@ -5,6 +5,14 @@ import { supabase } from "@app/supabaseClient";
 import { useState, useEffect, useRef } from "react";
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
+
+Navbar.propTypes = {
+  setDashboardMenu: PropTypes.func.isRequired, // Function to toggle dashboard menu
+  dashboardMenu: PropTypes.bool.isRequired, // Current state of the dashboard menu
+  darkMode: PropTypes.bool.isRequired, // Current state of dark mode
+  toggleDarkMode: PropTypes.func.isRequired, // Function to toggle dark mode
+};
 
 export default function Navbar({
   setDashboardMenu,

@@ -1,7 +1,13 @@
 import toast from "react-hot-toast";
-import React, { useState } from "react";
+import { useState } from "react";
 import { IoIosCreate } from "react-icons/io";
 import { supabase } from "@app/supabaseClient";
+import PropTypes from "prop-types";
+
+CreateRole.propTypes = {
+  setIsCreateRoleModalOpen: PropTypes.func.isRequired, // Function to close the modal
+  setRoles: PropTypes.func.isRequired, // Function to update the roles list in the parent component
+};
 
 export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
   // Store the unit number to be created

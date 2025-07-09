@@ -4,6 +4,16 @@ import {
   BiChevronsLeft,
   BiChevronsRight,
 } from "react-icons/bi";
+import PropTypes from "prop-types";
+
+PaginationFooter.propTypes = {
+  rowsPerPage: PropTypes.number.isRequired,
+  setRowsPerPage: PropTypes.func.isRequired,
+  currentPage: PropTypes.number.isRequired,
+  setCurrentPage: PropTypes.func.isRequired,
+  items: PropTypes.array.isRequired,
+};
+
 export default function PaginationFooter({
   rowsPerPage,
   setRowsPerPage,

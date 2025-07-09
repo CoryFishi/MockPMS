@@ -1,5 +1,14 @@
 import { useState } from "react";
 import { IoCloseCircle } from "react-icons/io5";
+import PropTypes from "prop-types";
+
+InputBox.propTypes = {
+  value: PropTypes.string.isRequired,
+  onchange: PropTypes.func.isRequired,
+  placeholder: PropTypes.string,
+  type: PropTypes.string,
+  required: PropTypes.bool,
+};
 
 export default function InputBox({
   value,

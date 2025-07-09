@@ -1,3 +1,13 @@
+import PropTypes from "prop-types";
+
+ModalContainer.propTypes = {
+  title: PropTypes.string,
+  icon: PropTypes.node,
+  mainContent: PropTypes.node,
+  responseContent: PropTypes.node,
+  onClose: PropTypes.func.isRequired,
+};
+
 export default function ModalContainer({
   title,
   icon,
@@ -31,7 +41,7 @@ export default function ModalContainer({
         {/* Content Container */}
         <div className="px-8 pb-4 max-h-[90vh] overflow-y-auto">
           {mainContent || (
-            <p>No content provided. Please check the component's props.</p>
+            <p>No content provided. Please check the component&apos;s props.</p>
           )}
           {/* Response Container */}
           <div className="mt-4 flex justify-end">{responseContent || ""}</div>

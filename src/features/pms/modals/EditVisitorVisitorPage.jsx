@@ -8,6 +8,13 @@ import ModalContainer from "../../../components/UI/ModalContainer";
 import InputBox from "@components/UI/InputBox";
 import SelectOption from "@components/UI/SelectOption";
 import ModalButton from "@components/UI/ModalButton";
+import PropTypes from "prop-types";
+
+EditVisitorVisitorPage.propTypes = {
+  setIsEditVisitorModalOpen: PropTypes.func.isRequired, // Function to close the modal
+  setVisitors: PropTypes.func, // Function to update the visitors list
+  visitor: PropTypes.object.isRequired, // Visitor object to edit
+};
 
 export default function EditVisitorVisitorPage({
   setIsEditVisitorModalOpen,

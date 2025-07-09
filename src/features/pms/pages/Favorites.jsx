@@ -60,7 +60,7 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
     setFilteredFacilities(sorted);
   };
   const handleCurrentFacilityUpdate = async (updatedInfo) => {
-    const { data, error } = await supabase.from("user_data").upsert(
+    const { error } = await supabase.from("user_data").upsert(
       {
         user_id: user.id,
         current_facility: updatedInfo,
@@ -152,7 +152,7 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
       );
 
       // Upsert the updated tokens array back to the database
-      const { data, error } = await supabase.from("user_data").upsert(
+      const { error } = await supabase.from("user_data").upsert(
         {
           user_id: user.id,
           favorite_tokens: updatedTokens,
@@ -171,7 +171,7 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
         ...(currentData?.favorite_tokens || []),
         newFacility,
       ];
-      const { data, error } = await supabase.from("user_data").upsert(
+      const { error } = await supabase.from("user_data").upsert(
         {
           user_id: user.id,
           favorite_tokens: updatedTokens,

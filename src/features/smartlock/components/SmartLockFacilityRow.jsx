@@ -1,7 +1,25 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaCheckCircle, FaExternalLinkAlt } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
 import SmartLock from "../modals/SmartLock";
+import PropTypes from "prop-types";
+
+SmartLockFacilityRow.propTypes = {
+  facility: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    edgeRouterStatus: PropTypes.string.isRequired,
+    edgeRouterName: PropTypes.string.isRequired,
+    onlineAccessPointsCount: PropTypes.number.isRequired,
+    offlineAccessPointsCount: PropTypes.number.isRequired,
+    smartLocks: PropTypes.arrayOf(PropTypes.object).isRequired,
+    okCount: PropTypes.number.isRequired,
+    warningCount: PropTypes.number.isRequired,
+    errorCount: PropTypes.number.isRequired,
+  }).isRequired,
+  setExpandedRows: PropTypes.func.isRequired,
+  expandedRows: PropTypes.arrayOf(PropTypes.string).isRequired,
+};
 
 export default function SmartLockFacilityRow({
   facility,

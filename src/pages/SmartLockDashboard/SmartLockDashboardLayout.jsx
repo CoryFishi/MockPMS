@@ -7,6 +7,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
+import PropTypes from "prop-types";
+
+SmartLockDashboardLayout.propTypes = {
+  dashboardMenu: PropTypes.bool, // Boolean to determine if the dashboard menu should be displayed
+};
 
 export default function SmartLockDashboardLayout({ dashboardMenu }) {
   // Drop down variables for the left navigation menu
@@ -170,7 +175,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
               </div>
               <div
                 className="hover:dark:bg-darkNavSecondary w-full p-2"
-                onClick={() => handleLogout()}
+                // onClick={() => handleLogout()}
               >
                 Logout
               </div>

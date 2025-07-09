@@ -1,8 +1,14 @@
 import axios from "axios";
-import React, { useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { FaEdit } from "react-icons/fa";
 import qs from "qs";
+import PropTypes from "prop-types";
+
+AddSelectedFacility.propTypes = {
+  setIsAddSelectedFacilityModalOpen: PropTypes.func.isRequired,
+  setNewUserData: PropTypes.func.isRequired,
+};
 
 export default function AddSelectedFacility({
   setIsAddSelectedFacilityModalOpen,
@@ -15,7 +21,6 @@ export default function AddSelectedFacility({
   const [clientSecret, setClientSecret] = useState("");
   const [environment, setEnvironment] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [bearer, setBearer] = useState({});
   const [facilityName, setFacilityName] = useState("No facility Authenticated");
   const [propertyNumber, setPropertyNumber] = useState(null);
 
@@ -50,7 +55,6 @@ export default function AddSelectedFacility({
       .then(async function (response) {
         setIsAuthenticated(true);
         toast.success("Successfully Authenticated!");
-        setBearer(response.data);
         await handleFacilityInfo(response.data);
         return response.data;
       })

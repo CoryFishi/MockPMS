@@ -1,8 +1,14 @@
 import axios from "axios";
-import React, { useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { FaEdit } from "react-icons/fa";
 import qs from "qs";
+import PropTypes from "prop-types";
+
+AddToken.propTypes = {
+  setIsAddTokenFacilityModalOpen: PropTypes.func.isRequired,
+  setNewUserData: PropTypes.func.isRequired,
+};
 
 export default function AddToken({
   setIsAddTokenFacilityModalOpen,

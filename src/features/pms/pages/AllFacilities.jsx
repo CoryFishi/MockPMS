@@ -15,6 +15,12 @@ import { supabase } from "@app/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import TableButton from "@components/UI/TableButton";
 import InputBox from "@components/UI/InputBox";
+import PropTypes from "prop-types";
+
+AllFacilities.propTypes = {
+  setOpenPage: PropTypes.func.isRequired,
+  setCurrentFacilityName: PropTypes.func.isRequired,
+};
 
 export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
   const {

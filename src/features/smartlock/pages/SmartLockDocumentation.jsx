@@ -4,7 +4,7 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 import { useState } from "react";
 export default function SmartLockDocumentationPage() {
   const [selectedPDF, setSelectedPDF] = useState("");
-  const [documents, setDocuments] = useState([
+  const [documents] = useState([
     {
       section: "Documents",
       subSection: "OpenNet",

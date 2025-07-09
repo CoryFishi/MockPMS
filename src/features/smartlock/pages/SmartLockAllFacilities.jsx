@@ -17,7 +17,7 @@ import {
   RiCheckboxBlankCircleLine,
 } from "react-icons/ri";
 
-export default function SmartLockAllFacilitiesPage({}) {
+export default function SmartLockAllFacilitiesPage() {
   const [facilities, setFacilities] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredFacilities, setFilteredFacilities] = useState([]);
@@ -164,7 +164,7 @@ export default function SmartLockAllFacilitiesPage({}) {
         setFilteredFacilities(sorted);
       }
     } catch (err) {
-      toast.error("Facilities Failed to Load!");
+      toast.error("Facilities Failed to Load!:", err.message);
     } finally {
       setCurrentLoadingText("");
       setIsLoading(false);

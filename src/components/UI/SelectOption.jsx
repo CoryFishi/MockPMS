@@ -1,4 +1,18 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
+
+SelectOption.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  placeholder: PropTypes.string,
+  required: PropTypes.bool,
+};
 
 export default function SelectOption({
   value,

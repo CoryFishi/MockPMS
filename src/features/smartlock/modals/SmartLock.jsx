@@ -1,7 +1,7 @@
 import PaginationFooter from "@components/shared/PaginationFooter";
 import DataTable from "@components/shared/DataTable";
 import SmartLockDetailModal from "@components/shared/DetailModal";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FaWarehouse, FaLock, FaLockOpen, FaCheckCircle } from "react-icons/fa";
 import {
   MdBattery20,
@@ -19,6 +19,14 @@ import {
 } from "react-icons/ri";
 import { BsShieldLockFill } from "react-icons/bs";
 import { IoIosWarning } from "react-icons/io";
+import PropTypes from "prop-types";
+
+SmartLock.propTypes = {
+  smartlockModalOption: PropTypes.string, // Filter option for the modal
+  smartLocks: PropTypes.array.isRequired, // Array of smart locks
+  facilityName: PropTypes.string.isRequired, // Name of the facility
+  setIsSmartlockModalOpen: PropTypes.func.isRequired, // Function to close the modal
+};
 
 export default function SmartLock({
   smartlockModalOption,
@@ -287,7 +295,7 @@ export default function SmartLock({
           <div className="flex items-center">
             <FaWarehouse />
             <h2 className="ml-2 text-lg font-bold">
-              {facilityName}'s SmartLocks
+              {facilityName}&apos;s SmartLocks
             </h2>
           </div>
           <button

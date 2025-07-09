@@ -8,6 +8,12 @@ import { supabase } from "../../app/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@context/AuthProvider";
 import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+
+UserSettings.propTypes = {
+  darkMode: PropTypes.bool.isRequired, // Boolean to determine if dark mode is enabled
+  toggleDarkMode: PropTypes.func.isRequired, // Function to toggle dark mode
+};
 
 export default function UserSettings({ darkMode, toggleDarkMode }) {
   const [newPassword1, setNewPassword1] = useState("");
@@ -27,7 +33,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
   useEffect(() => {
     if (!user) return;
     const fetchPreference = async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("user_data")
         .select("automated_reports")
         .eq("user_email", user.email)
@@ -90,10 +96,6 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
     } else {
       await addEvent("User Logout", `${user.email} Logged Out`, true);
       navigate("/login");
-      setTokens([]);
-      setCurrentFacility({});
-      setFavoriteTokens([]);
-      setSelectedTokens([]);
     }
   };
   const handlePasswordChange = async () => {
@@ -101,7 +103,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
       toast.error("Passwords do not match...");
       return;
     }
-    const { data, error } = await supabase.auth.updateUser({
+    const { error } = await supabase.auth.updateUser({
       password: newPassword1,
     });
 
@@ -133,7 +135,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
       return 0;
     });
     setFilteredEvents(filteredEvents);
-  }, [events]);
+  }, [events, getAllEvents, eventsPulled]);
 
   const columns = [
     {

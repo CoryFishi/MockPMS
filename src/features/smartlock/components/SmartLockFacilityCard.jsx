@@ -3,6 +3,25 @@ import SmartLock from "../modals/SmartLock";
 import { RiRouterFill } from "react-icons/ri";
 import SmartLockDetailModal from "@components/shared/DetailModal";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
+import PropTypes from "prop-types";
+
+SmartLockFacilityCard.propTypes = {
+  facility: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    smartLocks: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        status: PropTypes.string.isRequired,
+        batteryLevel: PropTypes.number,
+        signalStrength: PropTypes.number,
+        lastUpdateTimestamp: PropTypes.string,
+        connectionStatusMessage: PropTypes.string,
+      })
+    ).isRequired,
+  }).isRequired,
+};
 
 export default function SmartLockFacilityCard({ facility }) {
   const [isSmartlockModalOpen, setIsSmartlockModalOpen] = useState(false);

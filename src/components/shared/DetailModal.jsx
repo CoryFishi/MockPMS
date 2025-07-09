@@ -1,4 +1,10 @@
 import { FaLock } from "react-icons/fa";
+import PropTypes from "prop-types";
+
+SmartLockDetailModal.propTypes = {
+  lock: PropTypes.object, // The lock object to display details for
+  onClose: PropTypes.func.isRequired, // Function to close the modal
+};
 
 export default function SmartLockDetailModal({ lock, onClose }) {
   if (!lock) return null;

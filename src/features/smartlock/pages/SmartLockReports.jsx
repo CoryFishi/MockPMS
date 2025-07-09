@@ -8,25 +8,21 @@ import LoadingSpinner from "@components/shared/LoadingSpinner";
 import { useAuth } from "@context/AuthProvider";
 import axios from "axios";
 import toast from "react-hot-toast";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaLock } from "react-icons/fa";
 
-export default function SmartLockReports({}) {
+export default function SmartLockReports() {
   const [searchQuery, setSearchQuery] = useState("");
   const [newSelectedFacilities, setNewSelectedFacilities] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [facilitiesWithBearers, setFacilitiesWithBearers] = useState([]);
-  const [filteredFacilities, setFilteredFacilities] = useState([]);
   const [openPage, setOpenPage] = useState("AllSmartLocksReport");
   const [reportSearch, setReportSearch] = useState(false);
   const { selectedTokens } = useAuth();
   const modalRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentLoadingText, setCurrentLoadingText] = useState("");
-
-  const [pageLoadDateTime, setPageLoadDateTime] = useState(
-    new Date().toLocaleString()
-  );
+  const [currentLoadingText] = useState("");
+  const [pageLoadDateTime] = useState(new Date().toLocaleString());
 
   // Close modal if clicking outside of it
   useEffect(() => {
@@ -122,7 +118,6 @@ export default function SmartLockReports({}) {
           })
         );
         setFacilitiesWithBearers(updatedFacilities);
-        setFilteredFacilities(updatedFacilities);
       } catch (error) {
         console.error("Error fetching facilities:", error);
       } finally {

@@ -3,6 +3,12 @@ import LoginComp from "@features/auth/pages/LoginComp";
 import { useAuth } from "@context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+
+Login.propTypes = {
+  darkMode: PropTypes.bool.isRequired, // Boolean to determine if dark mode is enabled
+  toggleDarkMode: PropTypes.func.isRequired, // Function to toggle dark mode
+};
 
 export default function Login({ darkMode, toggleDarkMode }) {
   const [dashboardMenu, setDashboardMenu] = useState(true);

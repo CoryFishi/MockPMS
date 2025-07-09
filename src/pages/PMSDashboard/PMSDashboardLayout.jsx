@@ -15,6 +15,12 @@ import { handleSingleLogin } from "@hooks/opentech";
 import Scripts from "../../features/pms/pages/Scripts";
 import { RiAdminFill } from "react-icons/ri";
 import Overview from "../../features/pms/pages/Overview";
+import PropTypes from "prop-types";
+
+PMSDashboardLayout.propTypes = {
+  dashboardMenu: PropTypes.bool, // Boolean to determine if the dashboard menu should be displayed
+  setDashboardMenu: PropTypes.func.isRequired, // Function to set the dashboard menu state
+};
 
 export default function PMSDashboardLayout({
   dashboardMenu,
@@ -43,7 +49,7 @@ export default function PMSDashboardLayout({
     useState("Select a Facility");
 
   const handleCurrentFacilityUpdate = async (updatedInfo) => {
-    const { data, error } = await supabase.from("user_data").upsert(
+    const { error } = await supabase.from("user_data").upsert(
       {
         user_id: user.id,
         current_facility: updatedInfo,

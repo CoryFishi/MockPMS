@@ -13,6 +13,13 @@ import DeleteModal from "./DeleteModal";
 import InputBox from "@components/UI/InputBox";
 import GeneralButton from "@components/UI/GeneralButton";
 import SliderButton from "@components/UI/SliderButton";
+import PropTypes from "prop-types";
+
+EditVisitor.propTypes = {
+  setIsEditVisitorModalOpen: PropTypes.func.isRequired, // Function to close the modal
+  visitors: PropTypes.array, // Array of visitors to display
+  unit: PropTypes.object.isRequired, // Unit object to edit
+};
 
 export default function EditVisitor({
   setIsEditVisitorModalOpen,

@@ -1,8 +1,14 @@
 import PaginationFooter from "@components/shared/PaginationFooter";
 import axios from "axios";
 import toast from "react-hot-toast";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
+import PropTypes from "prop-types";
+
+AllAccessPointsReport.propTypes = {
+  selectedFacilities: PropTypes.array.isRequired, // Array of selected facilities
+  searchQuery: PropTypes.string.isRequired, // Search query string
+};
 
 export default function AllAccessPointsReport({
   selectedFacilities,
@@ -69,9 +75,6 @@ export default function AllAccessPointsReport({
     const flattenedData = allAccessPointData.flat();
     setAccessPoints(flattenedData);
   };
-
-  // Pagination logic
-  const pageCount = Math.ceil(filteredAccessPoints.length / rowsPerPage);
 
   useEffect(() => {
     fetchDataForSelectedFacilities();

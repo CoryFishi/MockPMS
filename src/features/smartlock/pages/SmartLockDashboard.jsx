@@ -1,6 +1,6 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaLock } from "react-icons/fa";
 import SmartLockFacilityCard from "../components/SmartLockFacilityCard";
 import SmartLockExport from "../components/SmartLockExport";
@@ -8,7 +8,7 @@ import { useAuth } from "@context/AuthProvider";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
 import SmartLockDashboardList from "../components/SmartLockDashboardList";
 
-export default function SmartLockDashboardView({}) {
+export default function SmartLockDashboardView() {
   const [facilitiesWithBearers, setFacilitiesWithBearers] = useState([]);
   const [filteredFacilities, setFilteredFacilities] = useState([]);
   const [listView, setListView] = useState(
@@ -361,7 +361,7 @@ export default function SmartLockDashboardView({}) {
     } else {
       setFilteredFacilities(facilitiesWithBearers);
     }
-  }, [facilitiesWithBearers]);
+  }, [facilitiesWithBearers, searchQuery, search]);
 
   return (
     <div

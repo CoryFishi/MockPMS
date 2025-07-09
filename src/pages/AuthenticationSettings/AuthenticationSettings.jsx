@@ -12,6 +12,12 @@ import { useAuth } from "@context/AuthProvider";
 import { useRef, useState, useEffect } from "react";
 import { addEvent } from "@hooks/supabase";
 import { handleSingleLogin } from "@hooks/opentech";
+import PropTypes from "prop-types";
+
+AuthenticationSettings.propTypes = {
+  darkMode: PropTypes.bool.isRequired, // Boolean to determine if dark mode is enabled
+  toggleDarkMode: PropTypes.func.isRequired, // Function to toggle dark mode
+};
 
 export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
   const [settingsSavedFacilities, setSettingsSavedFacilities] = useState([]);
@@ -179,7 +185,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       (_, index) => index !== indexToRemove
     );
 
-    const { data, error } = await supabase.from("user_data").upsert(
+    const { error } = await supabase.from("user_data").upsert(
       {
         user_id: user.id,
         tokens: updatedTokens,
@@ -345,7 +351,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       })
     );
     const allTokens = [...(tokens || []), ...updatedFacilities];
-    const { data, error } = await supabase.from("user_data").upsert(
+    const { error } = await supabase.from("user_data").upsert(
       {
         user_id: user.id,
         tokens: allTokens,

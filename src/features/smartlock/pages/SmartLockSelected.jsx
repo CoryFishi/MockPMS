@@ -4,7 +4,7 @@ import { useAuth } from "@context/AuthProvider";
 import { supabase } from "@app/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import toast from "react-hot-toast";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   RiCheckboxCircleFill,
   RiCheckboxBlankCircleLine,
@@ -72,7 +72,7 @@ export default function SmartLockSelectedPage() {
       );
 
       // Upsert the updated tokens array back to the database
-      const { data, error } = await supabase.from("user_data").upsert(
+      const { error } = await supabase.from("user_data").upsert(
         {
           user_id: user.id,
           selected_tokens: updatedTokens,
@@ -93,7 +93,7 @@ export default function SmartLockSelectedPage() {
         ...(currentData?.selected_tokens || []),
         newFacility,
       ];
-      const { data, error } = await supabase.from("user_data").upsert(
+      const { error } = await supabase.from("user_data").upsert(
         {
           user_id: user.id,
           selected_tokens: updatedTokens,
@@ -140,6 +140,7 @@ export default function SmartLockSelectedPage() {
       alert("It broke");
     }
   }, [selectedTokens]);
+
   useEffect(() => {
     const filtered = facilities.filter(
       (facility) =>

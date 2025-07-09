@@ -1,8 +1,15 @@
 import axios from "axios";
-import React, { useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { FaEdit } from "react-icons/fa";
 import qs from "qs";
+import PropTypes from "prop-types";
+
+EditCurrentFacility.propTypes = {
+  setIsEditCurrentFacilityModalOpen: PropTypes.func.isRequired, // Function to close the modal
+  newUserData: PropTypes.object.isRequired, // The current user data to be edited
+  setNewUserData: PropTypes.func.isRequired, // Function to update the user data in the parent component
+};
 
 export default function EditCurrentFacility({
   setIsEditCurrentFacilityModalOpen,
@@ -24,7 +31,6 @@ export default function EditCurrentFacility({
     newUserData.current_facility.environment || ""
   );
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [bearer, setBearer] = useState({});
   const [facilityName, setFacilityName] = useState(
     newUserData.current_facility.name || ""
   );
@@ -60,7 +66,6 @@ export default function EditCurrentFacility({
       .then(async function (response) {
         setIsAuthenticated(true);
         toast.success("Successfully Authenticated!");
-        setBearer(response.data);
         await handleFacilityInfo(response.data);
         return response.data;
       })

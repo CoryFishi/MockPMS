@@ -2,7 +2,7 @@ import PaginationFooter from "@components/shared/PaginationFooter";
 import EditRole from "../modals/EditRole";
 import CreateRole from "../modals/CreateRole";
 import DataTable from "@components/shared/DataTable";
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { FaPerson } from "react-icons/fa6";
 import { useAuth } from "@context/AuthProvider";
 import { supabaseAdmin, supabase } from "@app/supabaseClient";
@@ -56,17 +56,6 @@ export default function Roles() {
     setFilteredRoles(sorted);
   };
 
-  async function getUsers() {
-    if (!user) return;
-    const { data, error } = await supabaseAdmin.from("user_data").select("*");
-
-    if (error) {
-      console.error("Error fetching events:", error);
-    } else {
-      setUsers(data);
-    }
-  }
-
   const toggleDropdown = (index) => {
     setDropdownIndex(dropdownIndex === index ? null : index);
   };
@@ -86,24 +75,12 @@ export default function Roles() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  async function getRoles() {
-    if (!user) return;
-    const { data, error } = await supabaseAdmin.from("roles").select("*");
-
-    if (error) {
-      console.error("Error fetching events:", error);
-    } else {
-      setRolesPulled(true);
-      setRoles(data);
-    }
-  }
-
   const deleteRole = async (roleId) => {
     try {
       // Delete the role
       const { error } = await supabase.from("roles").delete().eq("id", roleId);
       if (error) {
-        console.error("Error deleting the role:", authError);
+        console.error("Error deleting the role:", error);
         throw new Error("Failed to delete role.");
       }
       // Success
@@ -116,7 +93,33 @@ export default function Roles() {
   };
 
   useEffect(() => {
-    if (!rolesPulled) getRoles() & getUsers();
+    if (!rolesPulled) {
+      async function getRoles() {
+        if (!user) return;
+        const { data, error } = await supabaseAdmin.from("roles").select("*");
+
+        if (error) {
+          console.error("Error fetching events:", error);
+        } else {
+          setRolesPulled(true);
+          setRoles(data);
+        }
+      }
+      getRoles();
+      async function getUsers() {
+        if (!user) return;
+        const { data, error } = await supabaseAdmin
+          .from("user_data")
+          .select("*");
+
+        if (error) {
+          console.error("Error fetching events:", error);
+        } else {
+          setUsers(data);
+        }
+      }
+      getUsers();
+    }
   }, [user]);
 
   useEffect(() => {

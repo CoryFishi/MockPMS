@@ -1,12 +1,18 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BiChevronLeft,
   BiChevronRight,
   BiChevronsLeft,
   BiChevronsRight,
 } from "react-icons/bi";
+import PropTypes from "prop-types";
+
+ExtendedHistoryReport.propTypes = {
+  selectedFacilities: PropTypes.array.isRequired, // Array of selected facilities
+  searchQuery: PropTypes.string.isRequired, // Search query string
+};
 
 export default function ExtendedHistoryReport({
   selectedFacilities,

@@ -1,3 +1,11 @@
+import PropTypes from "prop-types";
+
+GeneralButton.propTypes = {
+  onclick: PropTypes.func.isRequired,
+  text: PropTypes.string,
+  className: PropTypes.string,
+};
+
 export default function GeneralButton({
   onclick,
   text,

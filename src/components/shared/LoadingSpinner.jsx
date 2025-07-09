@@ -1,3 +1,9 @@
+import PropTypes from "prop-types";
+
+LoadingSpinner.propTypes = {
+  loadingText: PropTypes.string, // Optional text to display below the spinner
+};
+
 export default function LoadingSpinner({ loadingText }) {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 z-30 min-h-auto">

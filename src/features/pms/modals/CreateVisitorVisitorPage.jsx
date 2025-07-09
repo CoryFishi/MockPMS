@@ -6,6 +6,12 @@ import { useAuth } from "@context/AuthProvider";
 import ModalContainer from "@components/UI/ModalContainer";
 import SelectOption from "@components/UI/SelectOption";
 import InputBox from "@components/UI/InputBox";
+import PropTypes from "prop-types";
+
+CreateVisitorVisitor.propTypes = {
+  setIsCreateVisitorModalOpen: PropTypes.func.isRequired, // Function to close the modal
+  setVisitors: PropTypes.func.isRequired, // Function to update the visitors list
+};
 
 export default function CreateVisitorVisitor({
   setIsCreateVisitorModalOpen,

@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@app/supabaseClient";
 import {
   FaTrash,
@@ -14,6 +14,14 @@ import AddFavoriteFacility from "./AddFavoriteFacility";
 import AddSelectedFacility from "./AddSelectedFacility";
 import { addEvent } from "@hooks/supabase";
 import { useAuth } from "@context/AuthProvider";
+import PropTypes from "prop-types";
+
+EditUser.propTypes = {
+  setIsEditUserModalOpen: PropTypes.func.isRequired, // Function to close the modal
+  selectedUser: PropTypes.object.isRequired, // The user data to be edited
+  setUsers: PropTypes.func.isRequired, // Function to update the users list in the parent component
+};
+
 export default function EditUser({
   setIsEditUserModalOpen,
   selectedUser,
@@ -33,7 +41,7 @@ export default function EditUser({
   const { user } = useAuth();
 
   const getRoles = async () => {
-    let { data, error } = await supabase.from("roles").select("role_name");
+    let { data } = await supabase.from("roles").select("role_name");
     setRoles(data);
   };
 
