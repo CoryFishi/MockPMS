@@ -216,7 +216,7 @@ export default function Overview({ currentFacilityName }) {
       },
     };
     axios(config)
-      .then(function (response) {
+      .then(function () {
         toast.success(a.name + " initiated open!");
       })
       .catch(function (error) {
@@ -243,7 +243,7 @@ export default function Overview({ currentFacilityName }) {
       },
     };
     axios(config)
-      .then(function (response) {
+      .then(function () {
         toast.success(a.name + " initiated hold!");
       })
       .catch(function (error) {
@@ -270,7 +270,7 @@ export default function Overview({ currentFacilityName }) {
       },
     };
     axios(config)
-      .then(function (response) {
+      .then(function () {
         toast.success(a.name + " initiated close!");
       })
       .catch(function (error) {

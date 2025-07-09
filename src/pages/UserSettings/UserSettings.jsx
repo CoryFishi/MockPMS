@@ -7,7 +7,7 @@ import { BiCheckCircle, BiCircle } from "react-icons/bi";
 import { supabase } from "../../app/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@context/AuthProvider";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 
 UserSettings.propTypes = {
@@ -74,7 +74,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
       console.log("Inserted event:", data);
     }
   }
-  async function getAllEvents() {
+  const getAllEvents = useCallback(async () => {
     if (!user) return;
     const { data, error } = await supabase
       .from("user_events")
@@ -87,7 +87,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
       setEventsPulled(true);
       setEvents(data);
     }
-  }
+  }, [user]);
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -127,7 +127,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
   };
   useEffect(() => {
     if (!eventsPulled) getAllEvents();
-  }, [user]);
+  }, [user, eventsPulled, getAllEvents]);
   useEffect(() => {
     const filteredEvents = events.sort((a, b) => {
       if (a.created_at > b.created_at) return -1;
@@ -156,7 +156,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
     {
       key: "completed",
       label: "Success",
-      accessor: (e) => (e.completed ? "true" : false || ""),
+      accessor: (e) => (e.completed || "" ? "true" : "false"),
     },
   ];
 

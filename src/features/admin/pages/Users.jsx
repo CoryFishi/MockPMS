@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { FaPerson } from "react-icons/fa6";
 import { useAuth } from "@context/AuthProvider";
 import { supabaseAdmin } from "@app/supabaseClient";
@@ -16,7 +16,7 @@ export default function Users() {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [usersPulled, setUsersPulled] = useState(false);
   const [dropdownIndex, setDropdownIndex] = useState(null);
-  const [selfUser, setSelfUser] = useState(user);
+  const [selfUser] = useState(user);
   const modalRefs = useRef({});
   const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);

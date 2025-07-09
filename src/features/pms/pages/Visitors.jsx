@@ -12,6 +12,11 @@ import DeleteModal from "../modals/DeleteModal";
 import InputBox from "@components/UI/InputBox";
 import GeneralButton from "@components/UI/GeneralButton";
 import TableButton from "@components/UI/TableButton";
+import PropTypes from "prop-types";
+
+Visitors.propTypes = {
+  currentFacilityName: PropTypes.string.isRequired,
+};
 
 export default function Visitors({ currentFacilityName }) {
   const [visitors, setVisitors] = useState([]);
@@ -29,9 +34,7 @@ export default function Visitors({ currentFacilityName }) {
   const { currentFacility, permissions } = useAuth();
   const [smartLocks, setSmartLocks] = useState([]);
   const [hoveredRow, setHoveredRow] = useState(null);
-  const [currentLoadingText, setCurrentLoadingText] = useState(
-    "Loading Visitors..."
-  );
+  const [currentLoadingText] = useState("Loading Visitors...");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [continousDelete, setContinousDelete] = useState(false);
   const tenantCount = filteredVisitors.filter(

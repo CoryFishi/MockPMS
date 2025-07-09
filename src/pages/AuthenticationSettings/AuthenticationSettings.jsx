@@ -126,7 +126,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     };
 
     const dbTokens = [
-      ...settingsSavedFacilities.map(({ isAuthenticated, ...t }) => t),
+      ...settingsSavedFacilities.map(({ ...t }) => t),
       newToken,
     ];
 
@@ -388,7 +388,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     tokens.forEach((facility, index) => {
       handleReauthentication(facility, index);
     });
-  }, [user]);
+  }, [user, tokens, handleFetchTokens]);
 
   // Table and column definitions
   const columns = [

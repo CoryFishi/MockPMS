@@ -71,9 +71,6 @@ export default function AllEdgeRoutersReport({
     setEdgeRouters(flattenedData);
   };
 
-  // Pagination logic
-  const pageCount = Math.ceil(filteredEdgeRouters.length / rowsPerPage);
-
   useEffect(() => {
     fetchDataForSelectedFacilities();
   }, [selectedFacilities]);

@@ -76,7 +76,7 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
   };
 
   const handleCurrentFacilityUpdate = async (updatedInfo) => {
-    const { data, error } = await supabase.from("user_data").upsert(
+    const { error } = await supabase.from("user_data").upsert(
       {
         user_id: user.id,
         current_facility: {
@@ -131,7 +131,7 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
       );
 
       // Upsert the updated tokens array back to the database
-      const { data, error } = await supabase.from("user_data").upsert(
+      const { error } = await supabase.from("user_data").upsert(
         {
           user_id: user.id,
           favorite_tokens: updatedTokens,
@@ -151,7 +151,7 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
         ...(currentData?.favorite_tokens || []),
         newFacility,
       ];
-      const { data, error } = await supabase.from("user_data").upsert(
+      const { error } = await supabase.from("user_data").upsert(
         {
           user_id: user.id,
           favorite_tokens: updatedTokens,
@@ -314,6 +314,7 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
       }
     } catch (err) {
       toast.error("Facilities Failed to Load!");
+      console.error("Error loading facilities:", err);
     } finally {
       setCurrentLoadingText("");
       setIsLoading(false);
@@ -345,6 +346,29 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
       },
       isFavorite
     );
+  };
+  FacilityStatusIcons.propTypes = {
+    facility: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      environment: PropTypes.string.isRequired,
+      gatewayStatus: PropTypes.string,
+      edgeRouterStatus: PropTypes.string,
+      deviceStatus: PropTypes.string,
+      alarmStatus: PropTypes.string,
+      pmsInterfaceStatus: PropTypes.string,
+      gatewayStatusMessage: PropTypes.string,
+      edgeRouterPlatformDeviceStatusMessage: PropTypes.string,
+      deviceStatusMessage: PropTypes.string,
+      alarmStatusMessage: PropTypes.string,
+      pmsInterfaceStatusMessage: PropTypes.string,
+      edgeRouterPlatformDeviceStatus: PropTypes.string,
+      facilityId: PropTypes.string,
+      facilityPropertyNumber: PropTypes.string,
+      accountName: PropTypes.string,
+      facilityName: PropTypes.string,
+      api: PropTypes.string,
+    }).isRequired,
   };
   const FacilityStatusIcons = ({ facility }) => {
     const getStatusIcon = (status, Icon, message) => {

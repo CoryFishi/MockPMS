@@ -16,6 +16,11 @@ import { RiDoorLockFill } from "react-icons/ri";
 import DeleteModal from "../modals/DeleteModal";
 import CreateVisitorUnitPage from "../modals/CreateVisitorUnitPage";
 import DelinquencyModal from "../modals/DelinquencyModal";
+import PropTypes from "prop-types";
+
+Units.propTypes = {
+  currentFacilityName: PropTypes.string.isRequired,
+};
 
 export default function Units({ currentFacilityName }) {
   const [units, setUnits] = useState([]);
@@ -45,8 +50,7 @@ export default function Units({ currentFacilityName }) {
   const [continousDelinquency, setContinousDelinquency] = useState(false);
   const [continousDelete, setContinousDelete] = useState(false);
   const [isMoveOutModalOpen, setIsMoveOutModalOpen] = useState(false);
-  const [currentLoadingText, setCurrentLoadingText] =
-    useState("Loading Units...");
+  const [currentLoadingText] = useState("Loading Units...");
   const rentedCount = filteredUnits.filter(
     (unit) => unit.status === "Rented"
   ).length;
@@ -253,6 +257,7 @@ export default function Units({ currentFacilityName }) {
           `${user.email} rented unit ${unit.unitNumber} to Tenant Temporary at facility ${currentFacility.name}, ${currentFacility.id}`,
           false
         );
+        console.error("Error renting unit:", error);
       }
     } else {
       setIsCreateVisitorModalOpen(true);
@@ -308,6 +313,7 @@ export default function Units({ currentFacilityName }) {
         `${user.email} set ${unit.unitNumber} as rented at ${currentFacilityName}, facility id ${currentFacility.id}`,
         false
       );
+      console.error("Error changing unit status to rented:", error);
     }
   };
   const moveOut = async (unit) => {
@@ -415,6 +421,7 @@ export default function Units({ currentFacilityName }) {
         `${user.email} set ${unit.unitNumber} as delinquent at ${currentFacilityName}, facility id ${currentFacility.id}`,
         false
       );
+      console.error("Error changing unit status to delinquent:", error);
     }
   };
   const deleteUnit = async (unit) => {
@@ -465,6 +472,7 @@ export default function Units({ currentFacilityName }) {
         `${user.email} deleted ${unit.unitNumber} at ${currentFacilityName}, facility id ${currentFacility.id}`,
         false
       );
+      console.error("Error deleting unit:", error);
     }
   };
   const editTenants = async (unit) => {

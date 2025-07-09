@@ -1,6 +1,6 @@
 import PaginationFooter from "@components/shared/PaginationFooter";
 import DataTable from "@components/shared/DataTable";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { FaPerson } from "react-icons/fa6";
 import { useAuth } from "@context/AuthProvider";
 import { supabase } from "@app/supabaseClient";
@@ -47,7 +47,7 @@ export default function UserEvents() {
 
     setFilteredEvents(sorted);
   };
-  async function getAllEvents() {
+  const getAllEvents = useCallback(async () => {
     setPullDate(Date());
     if (!user) return;
     const { data, error } = await supabase
@@ -61,10 +61,10 @@ export default function UserEvents() {
       setEventsPulled(true);
       setEvents(data);
     }
-  }
+  }, [user]);
   useEffect(() => {
     if (!eventsPulled) getAllEvents();
-  }, [user]);
+  }, [user, eventsPulled, getAllEvents]);
   useEffect(() => {
     const filteredEvents = events.sort((a, b) => {
       if (a.created_at > b.created_at) return -1;
@@ -115,7 +115,7 @@ export default function UserEvents() {
     {
       key: "completed",
       label: "Success",
-      accessor: (e) => (e.completed ? "true" : false || ""),
+      accessor: (e) => (e.completed || "" ? "true" : "false"),
     },
   ];
 

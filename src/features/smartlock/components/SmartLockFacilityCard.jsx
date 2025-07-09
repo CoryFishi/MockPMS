@@ -7,8 +7,33 @@ import PropTypes from "prop-types";
 
 SmartLockFacilityCard.propTypes = {
   facility: PropTypes.shape({
-    id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    okCount: PropTypes.number.isRequired,
+    warningCount: PropTypes.number.isRequired,
+    errorCount: PropTypes.number.isRequired,
+    lowestBattery: PropTypes.number.isRequired,
+    lowestSignal: PropTypes.number.isRequired,
+    offlineCount: PropTypes.number.isRequired,
+    edgeRouter: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      connectionStatusMessage: PropTypes.string,
+      eventLastReceivedOn: PropTypes.string,
+    }).isRequired,
+    edgeRouterStatus: PropTypes.string.isRequired,
+    edgeRouterName: PropTypes.string.isRequired,
+    eventLastReceivedOn: PropTypes.string,
+    accessPoints: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        isDevicePaired: PropTypes.bool.isRequired,
+        isDeviceOffline: PropTypes.bool.isRequired,
+        lastUpdateTimestamp: PropTypes.string,
+        connectionStatusMessage: PropTypes.string,
+      })
+    ),
     smartLocks: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string.isRequired,

@@ -3,6 +3,14 @@ import { FaCircleCheck } from "react-icons/fa6";
 import { MdOutlineError } from "react-icons/md";
 import toast from "react-hot-toast";
 import InputBox from "../../../components/UI/InputBox";
+import PropTypes from "prop-types";
+
+AddAuthentication.propTypes = {
+  isOpen: PropTypes.bool.isRequired, // Controls modal visibility
+  onClose: PropTypes.func.isRequired, // Function to close the modal
+  onSubmit: PropTypes.func.isRequired, // Function to submit the new authentication
+  handleNewLogin: PropTypes.func.isRequired, // Function to validate credentials
+};
 
 export default function AddAuthentication({
   isOpen,
@@ -32,7 +40,7 @@ export default function AddAuthentication({
 
   const handleSubmit = async () => {
     if (isAuthenticated) {
-      const result = await onSubmit({
+      await onSubmit({
         api,
         apiSecret,
         client,

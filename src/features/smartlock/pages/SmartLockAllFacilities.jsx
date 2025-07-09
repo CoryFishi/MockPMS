@@ -16,6 +16,7 @@ import {
   RiCheckboxCircleFill,
   RiCheckboxBlankCircleLine,
 } from "react-icons/ri";
+import PropTypes from "prop-types";
 
 export default function SmartLockAllFacilitiesPage() {
   const [facilities, setFacilities] = useState([]);
@@ -230,6 +231,24 @@ export default function SmartLockAllFacilitiesPage() {
     const isSelected = isFacilitySelected(facility.facilityId);
     handleSelectedFacilitiesUpdate(facility, isSelected);
   };
+  FacilityStatusIcons.propTypes = {
+    facility: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      environment: PropTypes.string.isRequired,
+      gatewayStatus: PropTypes.string,
+      edgeRouterStatus: PropTypes.string,
+      deviceStatus: PropTypes.string,
+      alarmStatus: PropTypes.string,
+      pmsInterfaceStatus: PropTypes.string,
+      gatewayStatusMessage: PropTypes.string,
+      edgeRouterPlatformDeviceStatusMessage: PropTypes.string,
+      deviceStatusMessage: PropTypes.string,
+      alarmStatusMessage: PropTypes.string,
+      pmsInterfaceStatusMessage: PropTypes.string,
+    }).isRequired,
+  };
+
   const FacilityStatusIcons = ({ facility }) => {
     const getStatusIcon = (status, Icon, message) => {
       if (!status) return null;

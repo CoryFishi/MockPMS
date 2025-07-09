@@ -146,7 +146,7 @@ export default function PMSDashboardLayout({
     if (!isNameGrabbed) {
       handleFacilityHandles();
     }
-  }, [currentFacility]);
+  }, [currentFacility, isNameGrabbed, handleFacilityHandles]);
 
   return (
     <div className="flex flex-col w-full h-screen overflow-y-auto overflow-hidden">

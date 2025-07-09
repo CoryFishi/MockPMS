@@ -120,7 +120,7 @@ export default function Roles() {
       }
       getUsers();
     }
-  }, [user]);
+  }, [user, rolesPulled, roles]);
 
   useEffect(() => {
     const filteredRoles = roles.sort((a, b) => {
@@ -147,7 +147,7 @@ export default function Roles() {
         )
     );
     setFilteredRoles(filteredRoles);
-  }, [searchQuery]);
+  }, [searchQuery, roles]);
 
   const columns = [
     {

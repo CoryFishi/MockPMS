@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { supabase } from "@app/supabaseClient";
 import { useNavigate } from "react-router-dom";
 
@@ -16,7 +16,7 @@ export default function RegisterComp() {
       return;
     }
 
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
 

@@ -6,6 +6,7 @@ import PropTypes from "prop-types";
 
 SmartLockFacilityRow.propTypes = {
   facility: PropTypes.shape({
+    environment: PropTypes.string.isRequired,
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     edgeRouterStatus: PropTypes.string.isRequired,
@@ -16,7 +17,38 @@ SmartLockFacilityRow.propTypes = {
     okCount: PropTypes.number.isRequired,
     warningCount: PropTypes.number.isRequired,
     errorCount: PropTypes.number.isRequired,
-  }).isRequired,
+    offlineCount: PropTypes.number.isRequired,
+    lowestSignal: PropTypes.number.isRequired,
+    lowestBattery: PropTypes.number.isRequired,
+    weather: PropTypes.shape({
+      temperature: PropTypes.number.isRequired,
+      humidity: PropTypes.number.isRequired,
+      conditions: PropTypes.string.isRequired,
+      icon: PropTypes.string.isRequired,
+      current: PropTypes.shape({
+        temp_f: PropTypes.number.isRequired,
+        humidity: PropTypes.number.isRequired,
+        wind_mph: PropTypes.number.isRequired,
+        precip_in: PropTypes.number.isRequired,
+        last_updated: PropTypes.string.isRequired,
+        condition: PropTypes.shape({
+          text: PropTypes.string.isRequired,
+          icon: PropTypes.string.isRequired,
+        }).isRequired,
+      }).isRequired,
+    }).isRequired,
+    facilityDetail: PropTypes.shape({
+      name: PropTypes.string,
+      propertyNumber: PropTypes.string,
+      id: PropTypes.string,
+      addressLine1: PropTypes.string,
+      addressLine2: PropTypes.string,
+      city: PropTypes.string,
+      state: PropTypes.string,
+      postalCode: PropTypes.string,
+      country: PropTypes.string,
+    }).isRequired,
+  }),
   setExpandedRows: PropTypes.func.isRequired,
   expandedRows: PropTypes.arrayOf(PropTypes.string).isRequired,
 };

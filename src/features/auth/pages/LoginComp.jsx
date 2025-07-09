@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { supabase } from "@app/supabaseClient";
 import { useAuth } from "@context/AuthProvider";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +16,7 @@ export default function LoginComp() {
       return;
     }
 
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
 
@@ -86,7 +86,7 @@ export default function LoginComp() {
           Sign In
         </button>
         <p className="text-center dark:text-white">
-          Don't have an account? Register{" "}
+          Don&apos;t have an account? Register{" "}
           <span
             className="text-blue-400 hover:cursor-pointer"
             onClick={() => navigate("/register")}
