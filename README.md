@@ -2,6 +2,8 @@
 
 This project is a web-based dashboard for managing property facilities and smart locks. It is built with **React** using **Vite** and **Tailwind CSS** and relies on **Supabase** for authentication and data storage.
 
+#### Authentication Branch is current, main is behind 100+ commits
+
 ## Features
 
 - Property management dashboard with facility, unit and visitor management
