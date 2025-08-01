@@ -12,12 +12,6 @@ import { useAuth } from "@context/AuthProvider";
 import { useRef, useState, useEffect } from "react";
 import { addEvent } from "@hooks/supabase";
 import { handleSingleLogin } from "@hooks/opentech";
-import PropTypes from "prop-types";
-
-AuthenticationSettings.propTypes = {
-  darkMode: PropTypes.bool.isRequired, // Boolean to determine if dark mode is enabled
-  toggleDarkMode: PropTypes.func.isRequired, // Function to toggle dark mode
-};
 
 export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
   const [settingsSavedFacilities, setSettingsSavedFacilities] = useState([]);
@@ -388,7 +382,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     tokens.forEach((facility, index) => {
       handleReauthentication(facility, index);
     });
-  }, [user, tokens, handleFetchTokens]);
+  }, [user]);
 
   // Table and column definitions
   const columns = [

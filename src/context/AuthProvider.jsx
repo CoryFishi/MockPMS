@@ -1,14 +1,15 @@
-import { useState, useEffect, createContext } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import { supabase } from "@app/supabaseClient";
 import toast from "react-hot-toast";
 import { IoWarning } from "react-icons/io5";
-import PropTypes from "prop-types";
 
 const AuthContext = createContext();
 
-AuthProvider.propTypes = {
-  children: PropTypes.node.isRequired, // Children components to be wrapped by the provider
-};
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  return context;
+}
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
