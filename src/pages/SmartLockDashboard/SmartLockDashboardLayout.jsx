@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import PropTypes from "prop-types";
+import SmartLockMapping from "../../features/smartlock/pages/SmartLockMapping";
 
 SmartLockDashboardLayout.propTypes = {
   dashboardMenu: PropTypes.bool, // Boolean to determine if the dashboard menu should be displayed
@@ -44,7 +45,9 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
             {/* Current Facility Side Bar */}
             <div
               className={`pl-2 pr-2 pb-8 mt-8 ${
-                openPage === "dashboard" || openPage === "reports"
+                openPage === "dashboard" ||
+                openPage === "reports" ||
+                openPage === "mapping"
                   ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
                   : ""
               }`}
@@ -56,7 +59,9 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                 <div className="flex items-center space-x-2">
                   <BsBuildingFill
                     className={`${
-                      openPage === "dashboard" || openPage === "reports"
+                      openPage === "dashboard" ||
+                      openPage === "reports" ||
+                      openPage === "mapping"
                         ? "text-yellow-500"
                         : ""
                     }`}
@@ -90,11 +95,20 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                   >
                     Reports
                   </Link>
+                  <Link
+                    onClick={() =>
+                      setOpenPage("mapping") &
+                      localStorage.setItem("openPage2", "mapping")
+                    }
+                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                  >
+                    Mapping
+                  </Link>
                 </div>
               )}
             </div>
 
-            {/* Facilities Side Bar */}
+            {/* Other Options */}
             <div
               className={`border-t border-b pl-2 pr-2 border-gray-500 pb-8 ${
                 openPage === "allFacilities" || openPage === "selected"
@@ -157,6 +171,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                 </div>
               )}
             </div>
+
             <div className="absolute bottom-0 w-full hidden md:flex justify-between text-sm hover:cursor-pointer text-center">
               <Link
                 to="/user-settings"
@@ -188,6 +203,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
           {openPage === "allFacilities" && <SmartLockAllFacilitiesPage />}
           {openPage === "selected" && <SmartLockSelectedPage />}
           {openPage === "documentation" && <SmartLockDocumentationPage />}
+          {openPage === "mapping" && <SmartLockMapping />}
         </div>
       </div>
     </div>
