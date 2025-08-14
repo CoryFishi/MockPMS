@@ -110,7 +110,7 @@ export const AuthProvider = ({ children }) => {
                       onClick={() => {
                         toast.dismiss(t.id);
                         window.location.href =
-                          "https://propertymanager.netlify.app/authentication-settings";
+                          "https://propertymanager-dev.netlify.app/authentication-settings";
                       }}
                     >
                       <div className="shrink-0 flex items-center justify-center">
@@ -168,7 +168,7 @@ export const AuthProvider = ({ children }) => {
                     onClick={() => {
                       toast.dismiss(t.id);
                       window.location.href =
-                        "https://propertymanager.netlify.app/authentication-settings";
+                        "https://propertymanager-dev.netlify.app/authentication-settings";
                     }}
                   >
                     <div className="shrink-0 flex items-center justify-center">

@@ -15,12 +15,6 @@ import { handleSingleLogin } from "@hooks/opentech";
 import Scripts from "../../features/pms/pages/Scripts";
 import { RiAdminFill } from "react-icons/ri";
 import Overview from "../../features/pms/pages/Overview";
-import PropTypes from "prop-types";
-
-PMSDashboardLayout.propTypes = {
-  dashboardMenu: PropTypes.bool, // Boolean to determine if the dashboard menu should be displayed
-  setDashboardMenu: PropTypes.func.isRequired, // Function to set the dashboard menu state
-};
 
 export default function PMSDashboardLayout({
   dashboardMenu,
@@ -141,11 +135,17 @@ export default function PMSDashboardLayout({
     }));
   };
 
-  // Run handleLogin once when the component loads
   useEffect(() => {
     if (!isNameGrabbed) {
       handleFacilityHandles();
     }
+
+    // Run every 3600 seconds (1 hour) to refresh token
+    const interval = setInterval(() => {
+      handleFacilityHandles();
+    }, 3600 * 1000);
+
+    return () => clearInterval(interval); // Cleanup on unmount
   }, [currentFacility, isNameGrabbed, handleFacilityHandles]);
 
   return (
