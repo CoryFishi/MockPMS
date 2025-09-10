@@ -60,6 +60,23 @@ export default function PMSDashboardLayout({
     }
   };
 
+  const handleCurrentFacilityDelete = async () => {
+    const { error } = await supabase.from("user_data").upsert(
+      {
+        user_id: user.id,
+        current_facility: {},
+      },
+      { onConflict: "user_id" }
+    );
+
+    if (error) {
+      console.error("Error saving credentials:", error.message);
+    } else {
+      setCurrentFacility({});
+      setCurrentFacilityName("Select a Facility");
+    }
+  };
+
   const handleFacilityHandles = async () => {
     await handleLogin();
     await handleFacilityInfo();
@@ -248,6 +265,17 @@ export default function PMSDashboardLayout({
                           );
                         })()
                       : null}
+                    <button
+                      onClick={() => {
+                        setOpenPage("allFacilities");
+                        localStorage.setItem("openPage", "allFacilities");
+                        handleCurrentFacilityDelete();
+                        if (window.innerWidth < 768) setDashboardMenu(false);
+                      }}
+                      className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer"
+                    >
+                      Clear Facility
+                    </button>
                   </div>
                 )}
               </div>
@@ -311,7 +339,7 @@ export default function PMSDashboardLayout({
             </div>
 
             {/* Admin Side bar */}
-            {permissions.pmsPlatformAdmin && (
+            {permissions.pmsPlatformAdmin && currentFacility && (
               <div
                 className={`border-t border-b pl-2 pr-2 border-gray-500 pb-8 ${
                   openPage === "scripts"
