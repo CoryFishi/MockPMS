@@ -4,15 +4,6 @@ import {
   BiChevronsLeft,
   BiChevronsRight,
 } from "react-icons/bi";
-import PropTypes from "prop-types";
-
-PaginationFooter.propTypes = {
-  rowsPerPage: PropTypes.number.isRequired,
-  setRowsPerPage: PropTypes.func.isRequired,
-  currentPage: PropTypes.number.isRequired,
-  setCurrentPage: PropTypes.func.isRequired,
-  items: PropTypes.array.isRequired,
-};
 
 export default function PaginationFooter({
   rowsPerPage,
@@ -24,7 +15,7 @@ export default function PaginationFooter({
   const pageCount = Math.ceil(items.length / rowsPerPage);
 
   return (
-    <div className="flex justify-between items-center">
+    <div className="flex justify-between items-center select-none">
       <div className="flex gap-3">
         <div>
           <select

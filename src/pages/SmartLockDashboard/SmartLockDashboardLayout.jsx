@@ -159,7 +159,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                   >
                     Selected Facilities
                   </button>
-                  <button
+                  {/* <button
                     onClick={() =>
                       setOpenPage("documentation") &
                       localStorage.setItem("openPage2", "documentation")
@@ -167,7 +167,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                     className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary text-left w-full hover:cursor-pointer"
                   >
                     Documentation
-                  </button>
+                  </button> */}
                 </div>
               )}
             </div>

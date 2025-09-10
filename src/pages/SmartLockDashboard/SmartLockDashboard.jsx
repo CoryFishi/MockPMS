@@ -3,12 +3,6 @@ import Navbar from "@components/shared/Navbar";
 import SmartLockDashboardLayout from "@pages/SmartLockDashboard/SmartLockDashboardLayout";
 import { useAuth } from "@context/AuthProvider";
 import NotFound from "@components/shared/NotFound";
-import PropTypes from "prop-types";
-
-SmartLockDashboard.propTypes = {
-  darkMode: PropTypes.bool.isRequired, // Boolean to determine if dark mode is enabled
-  toggleDarkMode: PropTypes.func.isRequired, // Function to toggle dark mode
-};
 
 export default function SmartLockDashboard({ darkMode, toggleDarkMode }) {
   const [dashboardMenu, setDashboardMenu] = useState(true);

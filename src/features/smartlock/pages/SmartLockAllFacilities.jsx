@@ -105,6 +105,8 @@ export default function SmartLockAllFacilitiesPage() {
 
     const handleAccount = async (facility) => {
       try {
+        setCurrentLoadingText(`Loading ${facility.client}...`);
+
         const bearer = await handleLogin(facility);
 
         const tokenStageKey =
@@ -142,7 +144,6 @@ export default function SmartLockAllFacilitiesPage() {
     try {
       const chunks = await Promise.all(
         saved.map(async (facility) => {
-          setCurrentLoadingText(`Loading ${facility.client || facility.id}...`);
           return await handleAccount(facility);
         })
       );

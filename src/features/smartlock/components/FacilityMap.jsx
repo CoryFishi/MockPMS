@@ -888,9 +888,13 @@ export default function FacilityMap({
                 const quality = Math.min(distScore, obsScore); // conservative
 
                 let color;
-                if (quality > 0.75) color = "green";
-                else if (quality > 0.4) color = "orange";
-                else color = "red";
+                if (quality > 0.75) {
+                  color = "green";
+                } else if (quality > 0.4) {
+                  color = "orange";
+                } else {
+                  color = "red";
+                }
 
                 return { lock, dist, quality, color, crosses };
               })

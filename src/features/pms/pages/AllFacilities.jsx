@@ -285,8 +285,7 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
     try {
       const facilityDataChunks = await Promise.all(
         saved.map(async (facility) => {
-          setCurrentLoadingText(`Loading ${facility.client || facility.id}...`);
-          return await handleAccount(facility);
+          return handleAccount(facility);
         })
       );
 

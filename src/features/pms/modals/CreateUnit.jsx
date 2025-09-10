@@ -149,7 +149,7 @@ export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
           <p className="text-wrap text-xs text-red-400 mt-1">
             Multiple Units can be created by sperating each unit by a comma or
             <br />
-            by adding a hyphen to create arange of units. <br />
+            by adding a hyphen to create a range of units. <br />
             Example: 1001,1002,A001-A050 <br />
           </p>
         </div>

@@ -2,18 +2,14 @@ import Navbar from "@components/shared/Navbar";
 import NotFound from "@components/shared/NotFound";
 import PaginationFooter from "@components/shared/PaginationFooter";
 import DataTable from "@components/shared/DataTable";
+import GeneralButton from "@components/UI/GeneralButton";
+import { useAuth } from "@context/AuthProvider";
+import InputBox from "@components/UI/InputBox";
 import toast from "react-hot-toast";
 import { BiCheckCircle, BiCircle } from "react-icons/bi";
 import { supabase } from "../../app/supabaseClient";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@context/AuthProvider";
 import { useState, useEffect, useCallback } from "react";
-import PropTypes from "prop-types";
-
-UserSettings.propTypes = {
-  darkMode: PropTypes.bool.isRequired, // Boolean to determine if dark mode is enabled
-  toggleDarkMode: PropTypes.func.isRequired, // Function to toggle dark mode
-};
 
 export default function UserSettings({ darkMode, toggleDarkMode }) {
   const [newPassword1, setNewPassword1] = useState("");
@@ -203,7 +199,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
               {/* Account Information */}
               <div className="dark:bg-darkNavSecondary rounded-sm p-5 border shadow-md dark:border-border">
                 <div className="flex flex-col items-center justify-center text-center gap-5">
-                  <h1 className="text-2xl mt-2">Account Information</h1>
+                  <h1 className="text-2xl py-2">Account Information</h1>
                   <div>
                     <span className="font-bold">Email:</span>{" "}
                     {user?.email || "null"}
@@ -215,39 +211,30 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                     <span className="font-bold">Last Sign-In:</span>{" "}
                     {user.last_sign_in_at || "null"}
                   </div>
-                </div>
-                <div className="w-full mt-5">
-                  <button
-                    className="w-full bg-zinc-100 dark:bg-darkPrimary m-1 rounded-sm text-black dark:text-white p-3 hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer"
-                    onClick={() => handleLogout()}
-                  >
-                    Logout
-                  </button>
+                  <GeneralButton text="Logout" onclick={() => handleLogout()} />
                 </div>
               </div>
               {/* Update Password */}
-              <div className="flex flex-col justify-center items-center text-center h-full dark:bg-darkNavSecondary rounded-sm p-5 border shadow-md dark:border-border">
+              <div className="flex flex-col  items-center text-center h-full dark:bg-darkNavSecondary rounded-sm p-5 border shadow-md dark:border-border gap-5">
                 <h1 className="text-2xl py-2">Update Password</h1>
-                <input
+                <InputBox
+                  label="New Password"
                   type="password"
-                  placeholder="New Password"
                   value={newPassword1}
-                  onChange={(e) => setNewPassword1(e.target.value)}
-                  className="h-11 w-full max-w-64 rounded-sm m-2 border align-middle px-2 dark:border-border dark:bg-darkPrimary"
+                  onchange={(e) => setNewPassword1(e.target.value)}
+                  placeholder="New Password"
                 />
-                <input
+                <InputBox
+                  label="Confirm Password"
                   type="password"
-                  placeholder="Confirm New Password"
                   value={newPassword2}
-                  onChange={(e) => setNewPassword2(e.target.value)}
-                  className="h-11 w-full max-w-64 rounded-sm m-2 border align-middle px-2 dark:border-border dark:bg-darkPrimary"
+                  onchange={(e) => setNewPassword2(e.target.value)}
+                  placeholder="Confirm Password"
                 />
-                <button
-                  className="bg-zinc-100 dark:bg-darkPrimary m-1 rounded-sm text-black dark:text-white p-3 hover:text-slate-400 dark:hover:text-slate-400 hover:cursor-pointer"
+                <GeneralButton
+                  text="Change Password"
                   onClick={() => handlePasswordChange()}
-                >
-                  Change Password
-                </button>
+                />
               </div>
               {/* Email Preferences */}
               <div className="flex flex-col h-full dark:bg-darkNavSecondary rounded-sm p-5 border shadow-md dark:border-border">
