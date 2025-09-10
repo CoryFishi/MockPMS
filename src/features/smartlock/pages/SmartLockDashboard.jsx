@@ -193,11 +193,6 @@ export default function SmartLockDashboardView() {
         let currentIndex = 0;
 
         const fetchFacilityWithBearerAndStats = async (facility) => {
-          setCurrentLoadingText(
-            `Loading ${facility.client} (${currentIndex + 1} of ${
-              selectedTokens.length
-            })...`
-          );
           const bearer = await fetchBearerToken(facility);
           if (!bearer) return null;
 
@@ -236,6 +231,7 @@ export default function SmartLockDashboardView() {
   }, [selectedTokens]);
 
   const fetchFacilityData = async (facility) => {
+    setCurrentLoadingText(`Loading ${facility.name}...`);
     const { id, environment, bearer } = facility;
     const tokenPrefix =
       environment === "cia-stg-1.aws." ? "cia-stg-1.aws." : "";
@@ -286,16 +282,17 @@ export default function SmartLockDashboardView() {
       return res.data;
     };
 
-    const fetchWeather = async (postalCode) => {
+    const fetchWeather = async (facilityDetail) => {
       const weatherKey = import.meta.env.VITE_WEATHER_KEY;
+      const city = facilityDetail.city;
       const res = await axios.get(
-        `https://api.weatherapi.com/v1/current.json?q=${postalCode}&key=${weatherKey}`
+        `https://api.weatherapi.com/v1/current.json?q=${city}&key=${weatherKey}`
       );
       return res.data;
     };
 
     const facilityDetail = await fetchFacilityDetail();
-    const weather = await fetchWeather(facilityDetail.postalCode);
+    const weather = await fetchWeather(facilityDetail);
 
     const lowestSignal = Math.min(
       ...smartlocks
@@ -329,7 +326,7 @@ export default function SmartLockDashboardView() {
         edgeRouter: edgeRouter || {},
         accessPoints: aps || [],
         facilityDetail,
-        weather,
+        weather: weather || [],
       };
     } else {
       return {
