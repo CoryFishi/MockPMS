@@ -1,11 +1,3 @@
-import PropTypes from "prop-types";
-
-ModalButton.propTypes = {
-  onclick: PropTypes.func.isRequired,
-  text: PropTypes.string,
-  className: PropTypes.string,
-};
-
 export default function ModalButton({
   onclick,
   text,

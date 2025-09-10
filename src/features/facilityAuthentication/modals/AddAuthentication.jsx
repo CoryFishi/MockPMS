@@ -2,15 +2,10 @@ import { useState, useEffect } from "react";
 import { FaCircleCheck } from "react-icons/fa6";
 import { MdOutlineError } from "react-icons/md";
 import toast from "react-hot-toast";
-import InputBox from "../../../components/UI/InputBox";
-import PropTypes from "prop-types";
-
-AddAuthentication.propTypes = {
-  isOpen: PropTypes.bool.isRequired, // Controls modal visibility
-  onClose: PropTypes.func.isRequired, // Function to close the modal
-  onSubmit: PropTypes.func.isRequired, // Function to submit the new authentication
-  handleNewLogin: PropTypes.func.isRequired, // Function to validate credentials
-};
+import InputBox from "@components/UI/InputBox";
+import ModalButton from "@components/UI/ModalButton";
+import ModalContainer from "../../../components/UI/ModalContainer";
+import SelectOption from "../../../components/UI/SelectOption";
 
 export default function AddAuthentication({
   isOpen,
@@ -23,20 +18,38 @@ export default function AddAuthentication({
   const [apiSecret, setApiSecret] = useState("");
   const [client, setClient] = useState("");
   const [clientSecret, setClientSecret] = useState("");
-  const [environment, setEnvironment] = useState("-");
+  const [environment, setEnvironment] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const allFilled =
-      api && apiSecret && client && clientSecret && environment !== "-";
-    if (allFilled) {
-      handleNewLogin(environment, { api, apiSecret, client, clientSecret })
-        .then(() => setIsAuthenticated(true))
-        .catch(() => setIsAuthenticated(false));
+    var allFilled = false;
+    if (api && apiSecret && client && clientSecret && environment) {
+      allFilled = true;
     } else {
-      setIsAuthenticated(null);
+      allFilled = false;
+    }
+    if (allFilled === true) {
+      handleAuthRequest(environment, {
+        api,
+        apiSecret,
+        client,
+        clientSecret,
+      });
     }
   }, [api, apiSecret, client, clientSecret, environment]);
+
+  const handleAuthRequest = (environment, creds) => {
+    setLoading(true);
+    handleNewLogin(environment, creds).then((data) => {
+      if (data.message) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+      setLoading(false);
+    });
+  };
 
   const handleSubmit = async () => {
     if (isAuthenticated) {
@@ -45,102 +58,99 @@ export default function AddAuthentication({
         apiSecret,
         client,
         clientSecret,
-        environment,
+        environment: environment === "prod" ? "" : environment,
         name: name.trim() || "",
       });
       onClose();
       return { message: "Authentication added successfully!" };
     } else {
-      throw new Error("Please authenticate before submitting.");
+      throw new Error("Please provide valid credentials.");
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-darkSecondary w-full max-w-lg rounded shadow-lg relative">
-        <div className="pl-5 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
-          <div className="flex items-center">
-            <h2 className="ml-2 text-lg font-bold">Add Authentication</h2>
+    <ModalContainer
+      title="Add Authentication"
+      onClose={onClose}
+      mainContent={
+        <>
+          <div className="grid grid-cols-1 gap-4 p-3 min-w-96">
+            <InputBox
+              onchange={(e) => setName(e.target.value)}
+              value={name}
+              placeholder={"Optional Name"}
+              type={"text"}
+            />
+            <InputBox
+              onchange={(e) => setApi(e.target.value)}
+              value={api}
+              placeholder={"API Key"}
+              type={"text"}
+              required={true}
+            />
+            <InputBox
+              onchange={(e) => setApiSecret(e.target.value)}
+              value={apiSecret}
+              placeholder={"API Secret"}
+              type={"text"}
+              required={true}
+            />
+            <InputBox
+              onchange={(e) => setClient(e.target.value)}
+              value={client}
+              placeholder={"Client ID"}
+              type={"text"}
+              required={true}
+            />
+            <InputBox
+              onchange={(e) => setClientSecret(e.target.value)}
+              value={clientSecret}
+              placeholder={"Client Secret"}
+              type={"text"}
+              required={true}
+            />
+            <SelectOption
+              value={environment}
+              onChange={(e) => setEnvironment(e.target.value)}
+              options={[
+                { id: "prod", name: "Production" },
+                { id: "dev", name: "Development" },
+                { id: "qa", name: "QA" },
+                { id: "staging", name: "Staging" },
+              ]}
+              placeholder="Select an option"
+              required={true}
+            />
           </div>
-          <button
-            onClick={onClose}
-            className="bg-gray-100 h-full px-5 cursor-pointer rounded-tr text-gray-600 dark:text-white dark:bg-gray-800 dark:hover:hover:bg-red-500 hover:bg-red-500 transition duration-300 ease-in-out"
-          >
-            x
-          </button>
-        </div>
-        <div className="grid grid-cols-1 gap-4 p-3">
-          <InputBox
-            onchange={(e) => setName(e.target.value)}
-            value={name}
-            placeholder={"Optional Name"}
-            type={"text"}
-          />
-          <InputBox
-            onchange={(e) => setApi(e.target.value)}
-            value={api}
-            placeholder={"API Key"}
-            type={"text"}
-          />
-          <InputBox
-            onchange={(e) => setApiSecret(e.target.value)}
-            value={apiSecret}
-            placeholder={"API Secret"}
-            type={"text"}
-          />
-          <InputBox
-            onchange={(e) => setClient(e.target.value)}
-            value={client}
-            placeholder={"Client ID"}
-            type={"text"}
-          />
-          <InputBox
-            onchange={(e) => setClientSecret(e.target.value)}
-            value={clientSecret}
-            placeholder={"Client Secret"}
-            type={"text"}
-          />
-          <select
-            className="rounded-lg border border-zinc-300 dark:border-border dark:bg-darkNavSecondary p-3 text-sm w-full"
-            value={environment}
-            onChange={(e) => setEnvironment(e.target.value)}
-          >
-            <option value="-">-- Select Environment --</option>
-            <option value="">Production</option>
-            <option value="-dev">Development</option>
-            <option value="-qa">QA</option>
-            <option value="cia-stg-1.aws.">Staging</option>
-          </select>
-        </div>
-        {/* Status */}
-        <div className="flex items-center space-x-2 p-3">
-          {isAuthenticated === true && (
-            <FaCircleCheck className="text-green-500" />
-          )}
-          {isAuthenticated === false && (
-            <MdOutlineError className="text-red-500" />
-          )}
-          <span className="text-sm text-gray-700 dark:text-gray-300">
-            {isAuthenticated === true
-              ? "Credentials are valid"
-              : isAuthenticated === false
-              ? "Invalid credentials"
-              : "Enter credentials to continue..."}
-          </span>
-        </div>
-
-        {/* Buttons */}
+          {/* Status */}
+          <div className="flex items-center space-x-2 p-3">
+            {loading ? (
+              <div className="w-5 h-5 border-4 border-blue-500 border-t-transparent border-solid rounded-full animate-spin"></div>
+            ) : isAuthenticated === true ? (
+              <FaCircleCheck className="text-green-500" />
+            ) : (
+              <MdOutlineError className="text-red-500" />
+            )}
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              {loading
+                ? " Authenticating..."
+                : isAuthenticated === true
+                ? "Credentials are valid"
+                : isAuthenticated === false
+                ? "Invalid credentials"
+                : "Enter credentials to continue..."}
+            </span>
+          </div>
+        </>
+      }
+      responseContent={
         <div className="p-3 flex justify-end space-x-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100 dark:bg-darkNavSecondary dark:hover:bg-darkPrimary text-sm cursor-pointer"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={() =>
+          <ModalButton text="Cancel" onclick={() => onClose()} />
+          <ModalButton
+            text="Add"
+            onclick={() =>
               toast.promise(handleSubmit, {
                 loading: "Authenticating...",
                 success: (data) => {
@@ -157,11 +167,9 @@ export default function AddAuthentication({
                 ? "bg-green-500 hover:bg-green-600 cursor-pointer"
                 : "bg-green-300 cursor-not-allowed"
             }`}
-          >
-            Submit
-          </button>
+          />
         </div>
-      </div>
-    </div>
+      }
+    />
   );
 }

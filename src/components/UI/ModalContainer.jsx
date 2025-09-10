@@ -1,13 +1,3 @@
-import PropTypes from "prop-types";
-
-ModalContainer.propTypes = {
-  title: PropTypes.string,
-  icon: PropTypes.node,
-  mainContent: PropTypes.node,
-  responseContent: PropTypes.node,
-  onClose: PropTypes.func.isRequired,
-};
-
 export default function ModalContainer({
   title,
   icon,

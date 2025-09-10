@@ -192,6 +192,7 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
         return response.data;
       })
       .catch(function (error) {
+        console.log(facility);
         console.error("Error during login:", error);
         throw error;
       });

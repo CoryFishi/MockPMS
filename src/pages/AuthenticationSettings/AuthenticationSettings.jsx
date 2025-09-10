@@ -231,13 +231,15 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     }
   };
   const handleNewAuthenitcation = async (env, creds = null) => {
-    handleSingleLogin({
+    if (env === "prod") env = "";
+    const res = await handleSingleLogin({
       api: creds.api,
       apiSecret: creds.apiSecret,
       client: creds.client,
       clientSecret: creds.clientSecret,
       environment: env,
     });
+    return res;
   };
 
   // Export authentication settings to CSV

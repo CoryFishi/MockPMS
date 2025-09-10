@@ -1,18 +1,4 @@
 import { useState } from "react";
-import PropTypes from "prop-types";
-
-SelectOption.propTypes = {
-  value: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  options: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-  placeholder: PropTypes.string,
-  required: PropTypes.bool,
-};
 
 export default function SelectOption({
   value,
@@ -38,7 +24,7 @@ export default function SelectOption({
       >
         <option value="" disabled hidden></option>
         {options.map((opt) => (
-          <option key={opt.id} value={opt.id}>
+          <option key={opt.id || opt.name} value={opt.id}>
             {opt.name}
           </option>
         ))}
