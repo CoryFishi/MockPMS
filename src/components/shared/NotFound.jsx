@@ -5,16 +5,6 @@ export default function NotFound() {
   const navigate = useNavigate();
   const [show404, setShow404] = useState(false);
 
-  useEffect(() => {
-    // Show the 404 content after 1 second
-    const timer = setTimeout(() => {
-      setShow404(true);
-    }, 1000);
-
-    // Cleanup the timer
-    return () => clearTimeout(timer);
-  }, []);
-
   const handleRedirect = () => {
     navigate("/login");
   };
