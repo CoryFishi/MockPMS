@@ -284,7 +284,7 @@ export default function Visitors({ currentFacilityName }) {
       label: "Unit Number",
       accessor: (v) => v.unitNumber || "",
     },
-    { key: "name", label: "Name", accessor: (v) => v.name || "" },
+    { key: "name", label: "Tenant Name", accessor: (v) => v.name || "" },
     {
       key: "type",
       label: "Visitor Type",
@@ -336,7 +336,7 @@ export default function Visitors({ currentFacilityName }) {
           >
             <span>{`${matchingLock.deviceType} - ${matchingLock.name}`}</span>
             {hoveredRow === i && (
-              <div className="absolute z-10 dark:bg-zinc-700 bg-white text-black dark:text-white p-4 rounded shadow-lg w-md left-1/2 transform -translate-x-1/2 shadow-border">
+              <div className="absolute z-10 dark:bg-zinc-800 bg-white text-black dark:text-white p-4 rounded shadow-lg w-md left-1/2 transform -translate-x-1/2 shadow-zinc-300 dark:shadow-zinc-900">
                 <div className="grid grid-cols-2 gap-3 text-xs max-h-64 overflow-y-auto text-left overflow-x-clip p-2">
                   {Object.entries(matchingLock).map(([key, value], idx) => (
                     <div key={idx}>
@@ -362,7 +362,7 @@ export default function Visitors({ currentFacilityName }) {
       label: "Actions",
       sortable: false,
       render: (v) => (
-        <div className="text-center space-x-1">
+        <div className="text-center flex gap-1">
           {permissions.pmsPlatformVisitorEdit && (
             <TableButton
               className="bg-green-500 hover:bg-green-600"

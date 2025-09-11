@@ -213,23 +213,17 @@ export default function PMSDashboardLayout({
 
                 {!openSections.currentFacility && (
                   <div className="mx-4 mt-4 space-y-2">
-                    {/* <button
-                      onClick={() => {
-                        setOpenPage("dashboard");
-                        localStorage.setItem("openPage", "dashboard");
-                        if (window.innerWidth < 768) setDashboardMenu(false);
-                      }}
-                      className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer"
-                    >
-                      Overview
-                    </button> */}
                     <button
                       onClick={() => {
                         setOpenPage("visitors");
                         localStorage.setItem("openPage", "visitors");
                         if (window.innerWidth < 768) setDashboardMenu(false);
                       }}
-                      className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer"
+                      className={`px-2 block hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer ${
+                        openPage === "visitors"
+                          ? "border-b-2 border-yellow-500"
+                          : ""
+                      }`}
                     >
                       Visitors
                     </button>
@@ -239,7 +233,11 @@ export default function PMSDashboardLayout({
                         localStorage.setItem("openPage", "units");
                         if (window.innerWidth < 768) setDashboardMenu(false);
                       }}
-                      className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer"
+                      className={`px-2 block hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer ${
+                        openPage === "units"
+                          ? "border-b-2 border-yellow-500"
+                          : ""
+                      }`}
                     >
                       Units
                     </button>
@@ -257,7 +255,7 @@ export default function PMSDashboardLayout({
                                 window.open(baseUrl, "_blank");
                               }}
                               title={baseUrl}
-                              className="px-2 rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary flex items-center gap-2"
+                              className="px-2 hover:bg-darkNavSecondary dark:hover:bg-darkPrimary flex items-center gap-2"
                             >
                               <FaExternalLinkAlt />
                               Control Center
@@ -272,7 +270,7 @@ export default function PMSDashboardLayout({
                         handleCurrentFacilityDelete();
                         if (window.innerWidth < 768) setDashboardMenu(false);
                       }}
-                      className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer"
+                      className="px-2 block hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer"
                     >
                       Clear Facility
                     </button>
@@ -320,7 +318,11 @@ export default function PMSDashboardLayout({
                       localStorage.setItem("openPage", "allFacilities");
                       if (window.innerWidth < 768) setDashboardMenu(false);
                     }}
-                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer"
+                    className={`px-2 block hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer ${
+                      openPage === "allFacilities"
+                        ? "border-b-2 border-yellow-500"
+                        : ""
+                    }`}
                   >
                     All Facilities
                   </button>
@@ -330,7 +332,11 @@ export default function PMSDashboardLayout({
                       localStorage.setItem("openPage", "favorites");
                       if (window.innerWidth < 768) setDashboardMenu(false);
                     }}
-                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer"
+                    className={`px-2 block hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer ${
+                      openPage === "favorites"
+                        ? "border-b-2 border-yellow-500"
+                        : ""
+                    }`}
                   >
                     Favorites
                   </button>
@@ -376,7 +382,11 @@ export default function PMSDashboardLayout({
                         localStorage.setItem("openPage", "scripts");
                         if (window.innerWidth < 768) setDashboardMenu(false);
                       }}
-                      className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer"
+                      className={`px-2 block hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer ${
+                        openPage === "scripts"
+                          ? "border-b-2 border-yellow-500"
+                          : ""
+                      }`}
                     >
                       Scripts
                     </button>

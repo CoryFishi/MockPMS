@@ -214,6 +214,7 @@ export default function CreateVisitorUnitPage({
               }))
             }
             value={newVisitor.firstName}
+            required={true}
           />
           <InputBox
             type={"text"}
@@ -225,6 +226,7 @@ export default function CreateVisitorUnitPage({
               }))
             }
             value={newVisitor.lastName}
+            required={true}
           />
           <InputBox
             type={"phone"}
@@ -258,6 +260,7 @@ export default function CreateVisitorUnitPage({
               }))
             }
             value={newVisitor.gateCode}
+            required={true}
           />
           <SelectOption
             value={newVisitor.timeProfile}
@@ -269,6 +272,7 @@ export default function CreateVisitorUnitPage({
             }
             options={Array.isArray(timeProfiles) ? timeProfiles : []}
             placeholder="Select a Time Profile"
+            required={true}
           />
           <SelectOption
             value={newVisitor.accessProfile}
@@ -280,6 +284,7 @@ export default function CreateVisitorUnitPage({
             }
             options={Array.isArray(accessProfiles) ? accessProfiles : []}
             placeholder="Select an Access Profile"
+            required={true}
           />
         </div>
       }

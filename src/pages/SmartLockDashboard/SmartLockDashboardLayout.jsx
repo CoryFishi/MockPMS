@@ -82,7 +82,11 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                       setOpenPage("dashboard") &
                       localStorage.setItem("openPage2", "dashboard")
                     }
-                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    className={`px-2 block hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer ${
+                      openPage === "dashboard"
+                        ? "border-b-2 border-yellow-500"
+                        : ""
+                    }`}
                   >
                     SmartLock
                   </Link>
@@ -91,7 +95,11 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                       setOpenPage("reports") &
                       localStorage.setItem("openPage2", "reports")
                     }
-                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    className={`px-2 block hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer ${
+                      openPage === "reports"
+                        ? "border-b-2 border-yellow-500"
+                        : ""
+                    }`}
                   >
                     Reports
                   </Link>
@@ -100,7 +108,11 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                       setOpenPage("mapping") &
                       localStorage.setItem("openPage2", "mapping")
                     }
-                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    className={`px-2 block hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer ${
+                      openPage === "mapping"
+                        ? "border-b-2 border-yellow-500"
+                        : ""
+                    }`}
                   >
                     Mapping
                   </Link>
@@ -146,7 +158,11 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                       setOpenPage("allFacilities") &
                       localStorage.setItem("openPage2", "allFacilities")
                     }
-                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left hover:cursor-pointer"
+                    className={`px-2 block hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer ${
+                      openPage === "allFacilities"
+                        ? "border-b-2 border-yellow-500"
+                        : ""
+                    }`}
                   >
                     All Facilities
                   </button>
@@ -155,7 +171,11 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                       setOpenPage("selected") &
                       localStorage.setItem("openPage2", "selected")
                     }
-                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary text-left w-full hover:cursor-pointer"
+                    className={`px-2 block hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer ${
+                      openPage === "selected"
+                        ? "border-b-2 border-yellow-500"
+                        : ""
+                    }`}
                   >
                     Selected Facilities
                   </button>

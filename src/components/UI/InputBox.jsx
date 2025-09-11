@@ -30,16 +30,15 @@ export default function InputBox({
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         placeholder=""
-        className="w-full px-3 py-3 pr-8 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-darkPrimary dark:border-border"
+        className="w-full px-3 py-3 pr-8 border border-zinc-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 dark:bg-darkPrimary dark:border-border"
       />
-
       {/* Floating label */}
       <label
         className={`absolute left-3 px-1 transition-all duration-200 bg-white dark:bg-darkPrimary
         ${
           shouldFloat
-            ? "text-xs -top-2 text-blue-600"
-            : "text-base top-3 text-gray-500"
+            ? "text-xs -top-2 text-yellow-400"
+            : "text-base top-3 text-zinc-500"
         }
         pointer-events-none`}
       >
@@ -50,7 +49,7 @@ export default function InputBox({
       {value && (
         <button
           type="button"
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 cursor-pointer"
           onClick={() => onchange({ target: { value: "" } })}
         >
           <IoCloseCircle size={18} />

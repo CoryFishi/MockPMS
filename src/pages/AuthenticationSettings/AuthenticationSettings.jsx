@@ -12,6 +12,7 @@ import { useAuth } from "@context/AuthProvider";
 import { useRef, useState, useEffect } from "react";
 import { addEvent } from "@hooks/supabase";
 import { handleSingleLogin } from "@hooks/opentech";
+import GeneralButton from "@components/UI/GeneralButton";
 
 export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
   const [settingsSavedFacilities, setSettingsSavedFacilities] = useState([]);
@@ -147,7 +148,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
         ...prevFacilities,
         { ...newToken, isAuthenticated: true },
       ]);
-
+      setTokens(dbTokens);
       await addEvent(
         "Create Authentication",
         `${user.email} created an authentication connection`,
@@ -157,7 +158,8 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     }
   };
 
-  const removeToken = async (indexToRemove) => {
+  const removeToken = async (facility) => {
+    console.log("Removing facility:", facility);
     if (!user) {
       toast.error("User not authenticated.");
       return;
@@ -175,9 +177,9 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       return;
     }
 
-    const updatedTokens = (currentData?.tokens || []).filter(
-      (_, index) => index !== indexToRemove
-    );
+    const updatedTokens = (currentData?.tokens || []).filter((token) => {
+      return token.api !== facility.api;
+    });
 
     const { error } = await supabase.from("user_data").upsert(
       {
@@ -202,9 +204,8 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
         true
       );
       // Update local state (settingsSavedFacilities)
-      setSettingsSavedFacilities((prev) =>
-        prev.filter((_, index) => index !== indexToRemove)
-      );
+      setSettingsSavedFacilities(updatedTokens);
+      setTokens(updatedTokens);
     }
   };
 
@@ -463,10 +464,10 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       label: "Actions",
       sortable: false,
       render: (f) => (
-        <>
+        <div className="flex justify-center gap-1">
           {permissions.authenticationPlatformDelete && (
             <button
-              className="bg-yellow-500 hover:bg-yellow-600 cursor-pointer text-white px-2 py-1 rounded font-bold mx-1"
+              className="bg-yellow-500 hover:bg-yellow-600 cursor-pointer text-white px-2 py-1 rounded font-bold"
               onClick={() => handleRename(f)}
             >
               Rename
@@ -474,9 +475,9 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
           )}
           {permissions.authenticationPlatformDelete && (
             <button
-              className="bg-red-500 hover:bg-red-600 cursor-pointer text-white px-2 py-1 rounded font-bold mx-1"
+              className="bg-red-500 hover:bg-red-600 cursor-pointer text-white px-2 py-1 rounded font-bold"
               onClick={() => {
-                toast.promise(removeToken(f.index), {
+                toast.promise(removeToken(f), {
                   loading: "Deleting Credentials...",
                   success: <b>Successfully deleted!</b>,
                   error: <b>Failed deletion!</b>,
@@ -486,7 +487,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
               Delete
             </button>
           )}
-        </>
+        </div>
       ),
     },
   ];
@@ -550,33 +551,28 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
               <div className="flex flex-wrap gap-2 p-3">
                 {/* Create Authenitcation Button, check for permissions */}
                 {permissions.authenticationPlatformCreate && (
-                  <button
-                    className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded font-semibold cursor-pointer transition duration-300 ease-in-out"
-                    onClick={() => setIsAddModalOpen(true)}
-                  >
-                    Add Authentication
-                  </button>
+                  <GeneralButton
+                    className="bg-green-500 hover:bg-green-600"
+                    onclick={() => setIsAddModalOpen(true)}
+                    text={"Add Authentication"}
+                  />
                 )}
                 {/* Export Authenitcation Button, check for permissions */}
                 {permissions.authenticationPlatformExport && (
-                  <button
-                    className="cursor-pointer rounded px-4 py-2 bg-gray-100 dark:bg-darkSecondary text-black dark:text-white hover:text-slate-400 dark:hover:text-slate-400 transition duration-300 ease-in-out"
+                  <GeneralButton
                     title="Export Tokens"
-                    onClick={exportFacilities}
-                  >
-                    Export
-                  </button>
+                    onclick={exportFacilities}
+                    text={"Export Tokens"}
+                  />
                 )}
                 {/* Import Authenitcation Button, check for permissions */}
                 {permissions.authenticationPlatformImport && (
                   <>
-                    <button
-                      className="cursor-pointer rounded px-4 py-2 bg-gray-100 dark:bg-darkSecondary text-black dark:text-white hover:text-slate-400 dark:hover:text-slate-400 transition duration-300 ease-in-out"
+                    <GeneralButton
                       title="Import Tokens"
-                      onClick={triggerFileInput}
-                    >
-                      Import
-                    </button>
+                      onclick={triggerFileInput}
+                      text={"Import Tokens"}
+                    />
                     <input
                       type="file"
                       accept=".csv"

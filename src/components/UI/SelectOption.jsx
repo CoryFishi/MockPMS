@@ -20,9 +20,9 @@ export default function SelectOption({
         onChange={onChange}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        className={`cursor-pointer peer w-full p-3 pb-2 bg-transparent border border-gray-400 rounded-md appearance-none focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-darkPrimary dark:border-border`}
+        className={`cursor-pointer peer w-full p-3 pb-2 bg-transparent border border-gray-400 rounded-md appearance-none focus:outline-none focus:ring-2 focus:ring-yellow-400 dark:bg-darkPrimary dark:border-border`}
       >
-        <option value="" disabled hidden></option>
+        <option value=""></option>
         {options.map((opt) => (
           <option key={opt.id || opt.name} value={opt.id}>
             {opt.name}
@@ -35,8 +35,8 @@ export default function SelectOption({
         className={`absolute left-3 px-1 transition-all duration-200 bg-white dark:bg-darkPrimary pointer-events-none
           ${
             shouldFloat
-              ? "-top-2 text-xs text-blue-600"
-              : "top-3 text-base text-gray-500"
+              ? "-top-2 text-xs text-yellow-400"
+              : "top-3 text-base text-zinc-500"
           }
         `}
       >
