@@ -9,6 +9,16 @@ export default function NotFound() {
     navigate("/login");
   };
 
+  useEffect(() => {
+    // Show the 404 content after 1 second
+    const timer = setTimeout(() => {
+      setShow404(true);
+    }, 500);
+
+    // Cleanup the timer
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-darkPrimary text-gray-900 dark:text-gray-100">
       {show404 ? (
