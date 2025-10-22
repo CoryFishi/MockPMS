@@ -622,7 +622,7 @@ export default function Units({ currentFacilityName }) {
               <div
                 key={lock.id ?? `${u.id}-${idx}`}
                 className="relative hover:cursor-pointer"
-                onMouseEnter={() => {
+                onMouseDown={() => {
                   setHoveredRow(i);
                   setHoveredLock(idx);
                 }}
