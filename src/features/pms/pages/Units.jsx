@@ -45,6 +45,7 @@ export default function Units({ currentFacilityName }) {
   const { currentFacility, user, permissions } = useAuth();
   const [smartLocks, setSmartLocks] = useState([]);
   const [hoveredRow, setHoveredRow] = useState(null);
+  const [hoveredLock, setHoveredLock] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDelinquencyModalOpen, setIsDelinquencyModalOpen] = useState(false);
   const [continousDelinquency, setContinousDelinquency] = useState(false);
@@ -171,6 +172,7 @@ export default function Units({ currentFacilityName }) {
       const smartLocks = response.data;
       if (smartLocks.length > 0) {
         setSmartLocks(smartLocks);
+        console.log(response.data);
         return smartLocks;
       } else {
         return false;
@@ -607,38 +609,52 @@ export default function Units({ currentFacilityName }) {
       label: "SmartLock",
       sortable: true,
       accessor: (u) => {
-        const lock = smartLocks.find((l) => l.unitId === u.id);
-        return lock?.name?.toLowerCase() || "";
+        const locks = smartLocks.filter((l) => l.unitId === u.id);
+        return locks.map((l) => l.name?.toLowerCase() || "").join(", ");
       },
       render: (u, i) => {
-        const matchingLock = smartLocks.find((lock) => lock.unitId === u.id);
-        if (!matchingLock) return "";
+        const matchingLocks = smartLocks.filter((lock) => lock.unitId === u.id);
+        if (matchingLocks.length === 0) return "";
 
         return (
-          <div
-            className="relative hover:cursor-pointer"
-            onMouseDown={() => setHoveredRow(i)}
-            onMouseLeave={() => setHoveredRow(null)}
-          >
-            <span>{`${matchingLock.deviceType} - ${matchingLock.name}`}</span>
-            {hoveredRow === i && (
-              <div className="absolute z-10 dark:bg-zinc-700 bg-white text-black dark:text-white p-4 rounded shadow-lg w-md left-1/2 transform -translate-x-1/2 shadow-border">
-                <div className="grid grid-cols-2 gap-3 text-xs max-h-64 overflow-y-auto text-left overflow-x-clip p-2">
-                  {Object.entries(matchingLock).map(([key, value], idx) => (
-                    <div key={idx}>
-                      <span className="font-bold text-yellow-400 overflow-ellipsis">
-                        {key}:
-                      </span>{" "}
-                      <span className="break-words">
-                        {value === null || value === ""
-                          ? "null"
-                          : value.toString()}
-                      </span>
+          <div className="flex flex-col gap-1">
+            {matchingLocks.map((lock, idx) => (
+              <div
+                key={lock.id ?? `${u.id}-${idx}`}
+                className="relative hover:cursor-pointer"
+                onMouseEnter={() => {
+                  setHoveredRow(i);
+                  setHoveredLock(idx);
+                }}
+                onMouseLeave={() => {
+                  setHoveredRow(null);
+                  setHoveredLock(null);
+                }}
+              >
+                <span>{`${lock.deviceType} - ${lock.name}`}</span>
+
+                {hoveredRow === i && hoveredLock === idx && (
+                  <div className="absolute z-10 dark:bg-zinc-700 bg-white text-black dark:text-white p-4 rounded shadow-lg w-md left-1/2 -translate-x-1/2 shadow-border">
+                    <div className="grid grid-cols-2 gap-3 text-xs max-h-64 overflow-y-auto text-left overflow-x-clip p-2">
+                      {Object.entries(lock).map(([key, value]) => (
+                        <div key={key}>
+                          <span className="font-bold text-yellow-400 overflow-ellipsis">
+                            {key}:
+                          </span>{" "}
+                          <span className="break-words">
+                            {value == null || value === ""
+                              ? "null"
+                              : typeof value === "object"
+                              ? JSON.stringify(value)
+                              : String(value)}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                )}
               </div>
-            )}
+            ))}
           </div>
         );
       },

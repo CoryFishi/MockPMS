@@ -239,6 +239,8 @@ export default function AllSmartLockOnlineTimeReport({
               setDayValue(Number(e.target.value));
             }}
           >
+            <option value={1}>1</option>
+            <option value={3}>3</option>
             <option value={7}>7</option>
             <option value={30}>30</option>
             <option value={90}>90</option>
