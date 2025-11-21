@@ -6,12 +6,7 @@ import { useAuth } from "@context/AuthProvider";
 import ModalContainer from "@components/UI/ModalContainer";
 import SelectOption from "@components/UI/SelectOption";
 import InputBox from "@components/UI/InputBox";
-import PropTypes from "prop-types";
-
-CreateVisitorVisitor.propTypes = {
-  setIsCreateVisitorModalOpen: PropTypes.func.isRequired, // Function to close the modal
-  setVisitors: PropTypes.func.isRequired, // Function to update the visitors list
-};
+import { addEvent } from "@hooks/supabase";
 
 export default function CreateVisitorVisitor({
   setIsCreateVisitorModalOpen,
@@ -32,7 +27,7 @@ export default function CreateVisitorVisitor({
   const [accessProfiles, setAccessProfiles] = useState({});
   const [units, setUnits] = useState({});
   const [selectedUnit, setSelectedUnit] = useState(null);
-  const { currentFacility } = useAuth();
+  const { currentFacility, user } = useAuth();
   const visitorTypes = [
     { id: "Tenant", name: "Tenant" },
     { id: "Guest", name: "Guest" },
@@ -232,8 +227,21 @@ export default function CreateVisitorVisitor({
     };
     toast.promise(
       axios(config)
-        .then(function (response) {
+        .then(async function (response) {
           const newVisitorData = [response.data.visitor];
+
+          await addEvent(
+            "Add Tenant",
+            `${user.email} rented  ${
+              newVisitorData[0].unitNumber
+                ? "unit " + newVisitorData[0].unitNumber
+                : ""
+            } to ${newVisitorData[0].name} at facility ${
+              currentFacility.name
+            }, ${currentFacility.id}`,
+            true
+          );
+
           setVisitors((prevVisitors) => {
             const updatedVisitors = [...prevVisitors, ...newVisitorData];
             updatedVisitors.sort((a, b) => {
@@ -244,8 +252,13 @@ export default function CreateVisitorVisitor({
             return updatedVisitors;
           });
         })
-        .catch(function (error) {
-          console.log(error);
+        .catch(async function (error) {
+          await addEvent(
+            "Add Tenant",
+            `${user.email} rented unit at facility ${currentFacility.name}, ${currentFacility.id}`,
+            false
+          );
+          console.error(error);
           throw error;
         }),
       {

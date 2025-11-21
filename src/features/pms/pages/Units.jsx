@@ -16,11 +16,6 @@ import { RiDoorLockFill } from "react-icons/ri";
 import DeleteModal from "../modals/DeleteModal";
 import CreateVisitorUnitPage from "../modals/CreateVisitorUnitPage";
 import DelinquencyModal from "../modals/DelinquencyModal";
-import PropTypes from "prop-types";
-
-Units.propTypes = {
-  currentFacilityName: PropTypes.string.isRequired,
-};
 
 export default function Units({ currentFacilityName }) {
   const [units, setUnits] = useState([]);
@@ -85,7 +80,7 @@ export default function Units({ currentFacilityName }) {
         setTimeProfiles(response.data);
       })
       .catch(function (error) {
-        console.log(error);
+        console.error(error);
       });
   };
   const handleAccessProfiles = async () => {
@@ -112,7 +107,7 @@ export default function Units({ currentFacilityName }) {
         setAccessProfiles(response.data);
       })
       .catch(function (error) {
-        console.log(error);
+        console.error(error);
       });
   };
   const handleUnits = async () => {
@@ -172,7 +167,6 @@ export default function Units({ currentFacilityName }) {
       const smartLocks = response.data;
       if (smartLocks.length > 0) {
         setSmartLocks(smartLocks);
-        console.log(response.data);
         return smartLocks;
       } else {
         return false;

@@ -345,13 +345,14 @@ export default function PMSDashboardLayout({
             </div>
 
             {/* Admin Side bar */}
-            {permissions.pmsPlatformAdmin && currentFacility && (
+            {permissions.pmsPlatformAdmin && currentFacility.id > 0 && (
               <div
                 className={`border-t border-b pl-2 pr-2 border-gray-500 pb-8 ${
                   openPage === "scripts"
                     ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
                     : "dark:bg-darkNavPrimary"
                 }`}
+                onClick={() => console.log(currentFacility)}
               >
                 <div
                   className="flex justify-between items-center cursor-pointer mt-8"
@@ -442,7 +443,7 @@ export default function PMSDashboardLayout({
               setOpenPage={setOpenPage}
             />
           )}
-          {openPage === "scripts" && role === "admin" && <Scripts />}
+          {openPage === "scripts" && <Scripts />}
         </div>
       </div>
     </div>

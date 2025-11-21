@@ -4,9 +4,10 @@ import axios from "axios";
 import { useState } from "react";
 import ScriptConfirmation from "../modals/ScriptConfirmation";
 import GeneralButton from "@components/UI/GeneralButton";
+import { addEvent } from "@hooks/supabase";
 
 export default function Scripts() {
-  const { currentFacility } = useAuth();
+  const { currentFacility, user } = useAuth();
   const [logs, setLogs] = useState([]);
   const [message, setMessage] = useState("");
   const [units, setUnits] = useState("");
@@ -99,6 +100,11 @@ export default function Scripts() {
         });
     });
 
+    await addEvent(
+      "Import Units",
+      `${user.email} imported units at facility ${currentFacility.name}, ${currentFacility.id}`,
+      true
+    );
     setIsUnitModalOpen(false);
   };
 
@@ -243,6 +249,12 @@ export default function Scripts() {
           throw error;
         });
     });
+
+    await addEvent(
+      "Import Units",
+      `${user.email} imported units with tenants at facility ${currentFacility.name}, ${currentFacility.id}`,
+      true
+    );
 
     setIsTenantModalOpen(false);
   };

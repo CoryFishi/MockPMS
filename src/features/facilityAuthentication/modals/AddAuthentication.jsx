@@ -120,7 +120,7 @@ export default function AddAuthentication({
                 { id: "qa", name: "QA" },
                 { id: "staging", name: "Staging" },
               ]}
-              placeholder="Select an option"
+              placeholder="Environment"
               required={true}
             />
           </div>

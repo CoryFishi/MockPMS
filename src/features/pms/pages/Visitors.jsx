@@ -12,11 +12,7 @@ import DeleteModal from "../modals/DeleteModal";
 import InputBox from "@components/UI/InputBox";
 import GeneralButton from "@components/UI/GeneralButton";
 import TableButton from "@components/UI/TableButton";
-import PropTypes from "prop-types";
-
-Visitors.propTypes = {
-  currentFacilityName: PropTypes.string.isRequired,
-};
+import { addEvent } from "@hooks/supabase";
 
 export default function Visitors({ currentFacilityName }) {
   const [visitors, setVisitors] = useState([]);
@@ -37,6 +33,7 @@ export default function Visitors({ currentFacilityName }) {
   const [currentLoadingText] = useState("Loading Visitors...");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [continousDelete, setContinousDelete] = useState(false);
+  const { user } = useAuth();
   const tenantCount = filteredVisitors.filter(
     (visitor) => visitor.isTenant === true
   ).length;
@@ -147,7 +144,7 @@ export default function Visitors({ currentFacilityName }) {
       return null;
     }
   };
-  const moveOutVisitor = (visitor) => {
+  const moveOutVisitor = async (visitor) => {
     const handleDelete = async () => {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -177,7 +174,12 @@ export default function Visitors({ currentFacilityName }) {
           );
           return response;
         })
-        .catch(function (error) {
+        .catch(async function (error) {
+          await addEvent(
+            "Remove Tenant",
+            `${user.email} moved out ${visitor.unitNumber} at ${currentFacilityName}, facility id ${currentFacility.id}`,
+            false
+          );
           throw error;
         });
     };
@@ -186,8 +188,13 @@ export default function Visitors({ currentFacilityName }) {
       success: <b>{visitor.unitNumber} successfully moved out!</b>,
       error: <b>{visitor.unitNumber} failed move out!</b>,
     });
+    await addEvent(
+      "Remove Tenant",
+      `${user.email} moved out ${visitor.unitNumber} at ${currentFacilityName}, facility id ${currentFacility.id}`,
+      true
+    );
   };
-  const deleteVisitor = (visitor) => {
+  const deleteVisitor = async (visitor) => {
     const handleDelete = async () => {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -199,7 +206,7 @@ export default function Visitors({ currentFacilityName }) {
 
       const config = {
         method: "post",
-        url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/visitors/${visitor.id}/remove?suppressCommands=false`,
+        url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/visitors/${visitor.id}/remove`,
 
         headers: {
           Authorization: "Bearer " + currentFacility?.token?.access_token,
@@ -217,17 +224,28 @@ export default function Visitors({ currentFacilityName }) {
           );
           return response;
         })
-        .catch(function (error) {
+        .catch(async function (error) {
+          await addEvent(
+            "Remove Tenant",
+            `${user.email} moved out ${visitor.unitNumber} at ${currentFacilityName}, facility id ${currentFacility.id}`,
+            false
+          );
           throw error;
         });
     };
-    console.log(visitor);
+
     toast.promise(handleDelete(), {
-      loading: "Deleting Unit " + visitor.unitNumber + "...",
-      success: <b>{visitor.id} successfully deleted!</b>,
-      error: <b>{visitor.id} failed deletion!</b>,
+      loading: "Deleting Visitor " + visitor.name + "...",
+      success: <b>{visitor.name} successfully deleted!</b>,
+      error: <b>{visitor.name} failed deletion!</b>,
     });
+    await addEvent(
+      "Remove Tenant",
+      `${user.email} moved out ${visitor.unitNumber} at ${currentFacilityName}, facility id ${currentFacility.id}`,
+      true
+    );
   };
+
   const handleDelete = (v) => {
     if (v.isTenant) {
       moveOutVisitor(v);
