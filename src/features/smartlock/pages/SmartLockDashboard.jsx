@@ -358,7 +358,7 @@ export default function SmartLockDashboardView() {
     } else {
       setFilteredFacilities(facilitiesWithBearers);
     }
-  }, [facilitiesWithBearers, searchQuery, search]);
+  }, [searchQuery]);
 
   return (
     <div

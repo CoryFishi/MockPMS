@@ -1,23 +1,3 @@
-import PropTypes from "prop-types";
-
-SmartLockExport.propTypes = {
-  facilitiesInfo: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      edgeRouterStatus: PropTypes.bool.isRequired,
-      onlineAccessPointsCount: PropTypes.number.isRequired,
-      offlineAccessPointsCount: PropTypes.number.isRequired,
-      okCount: PropTypes.number.isRequired,
-      warningCount: PropTypes.number.isRequired,
-      errorCount: PropTypes.number.isRequired,
-      offlineCount: PropTypes.number.isRequired,
-      lowestBattery: PropTypes.number.isRequired,
-      lowestSignal: PropTypes.number.isRequired,
-    })
-  ).isRequired,
-};
-
 export default function SmartLockExport({ facilitiesInfo }) {
   // Export function
   const exportTable = () => {

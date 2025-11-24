@@ -1,26 +1,5 @@
 import { useState } from "react";
 import SmartLockFacilityRow from "../components/SmartLockFacilityRow";
-import PropTypes from "prop-types";
-
-SmartLockDashboardList.propTypes = {
-  filteredFacilities: PropTypes.array.isRequired, // List of facilities to display
-  facilitiesWithBearers: PropTypes.array.isRequired,
-  setFilteredFacilities: PropTypes.func.isRequired,
-  totalSmartlocks: PropTypes.number.isRequired, // Total number of SmartLocks
-  totalAccessPoints: PropTypes.number.isRequired, // Total number of Access Points
-  totalEdgeRouters: PropTypes.number.isRequired, // Total number of Edge Routers
-  edgeRouterOnlineCount: PropTypes.number.isRequired, // Count of online Edge Routers
-  edgeRouterWarningCount: PropTypes.number.isRequired, // Count of Edge Routers with warnings
-  edgeRouterOfflineCount: PropTypes.number.isRequired, // Count of offline Edge Routers
-  accessPointsOnlineCount: PropTypes.number.isRequired, // Count of online Access Points
-  accessPointsOfflineCount: PropTypes.number.isRequired, // Count of offline Access Points
-  smartlockOkayCount: PropTypes.number.isRequired, // Count of SmartLocks with okay status
-  smartlockWarningCount: PropTypes.number.isRequired, // Count of SmartLocks with warning
-  smartlockErrorCount: PropTypes.number.isRequired, // Count of SmartLocks with error status
-  smartlockOfflineCount: PropTypes.number.isRequired, // Count of offline SmartLocks
-  smartlockLowestSignal: PropTypes.number.isRequired, // Count of SmartLocks with lowest signal
-  smartlockLowestBattery: PropTypes.number.isRequired, // Count of SmartLocks with lowest battery
-};
 
 export default function SmartLockDashboardList({
   filteredFacilities,
@@ -73,7 +52,7 @@ export default function SmartLockDashboardList({
 
       return nextDirection === "asc" ? aVal - bVal : bVal - aVal;
     });
-
+    console.log("Sorted:", sorted);
     setFilteredFacilities(sorted);
   };
 

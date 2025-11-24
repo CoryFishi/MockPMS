@@ -10,6 +10,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useRef, useState } from "react";
 import { FaLock } from "react-icons/fa";
+import AllSmartLockOfflineEventsReport from "../reports/AllSmartLockOfflineEventsReport";
 
 export default function SmartLockReports() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,7 +22,7 @@ export default function SmartLockReports() {
   const { selectedTokens } = useAuth();
   const modalRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentLoadingText] = useState("");
+  const [currentLoadingText, setCurrentLoadingText] = useState("");
   const [pageLoadDateTime] = useState(new Date().toLocaleString());
 
   // Close modal if clicking outside of it
@@ -107,12 +108,14 @@ export default function SmartLockReports() {
       );
     }
   };
+
   // Get bearer tokens prior to creating rows/cards
   useEffect(() => {
     const fetchFacilitiesWithBearers = async () => {
       try {
         const updatedFacilities = await Promise.all(
           selectedTokens.map(async (facility) => {
+            setCurrentLoadingText(`Fetching token for ${facility.name}...`);
             const bearer = await fetchBearerToken(facility);
             return { ...facility, bearer };
           })
@@ -144,14 +147,16 @@ export default function SmartLockReports() {
       {/* Loading Spinner */}
       {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}{" "}
       {/* tab title */}
-      <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-zinc-900 border-b border-zinc-300 text-lg font-bold">
         <div className="ml-5 flex items-center text-sm">
           <FaLock className="text-lg" />
           &ensp; SmartLock Reports
         </div>
       </div>
-      <p className="text-sm dark:text-white text-left">{pageLoadDateTime}</p>
-      <div className="mt-5 mb-2 flex items-center justify-end text-center mx-5">
+      <p className="text-sm dark:text-white text-left pt-1 pl-1">
+        {pageLoadDateTime}
+      </p>
+      <div className="mt-3 mb-2 flex items-center justify-end text-center mx-5">
         {/* Search Bar */}
         <input
           type="text"
@@ -174,6 +179,7 @@ export default function SmartLockReports() {
             SmartLock Online Time
           </option>
           <option value="ExtendedReport">Extended Report</option>
+          <option value="OfflineEvents">SmartLock Offline Events</option>
         </select>
         <div className="ml-2 relative inline-block w-96" ref={modalRef}>
           <button
@@ -219,45 +225,55 @@ export default function SmartLockReports() {
         </div>
         {/* Search Button */}
         <button
-          className="bg-green-500 text-white p-1 py-2 rounded-sm hover:bg-green-600 ml-3 w-44 font-bold hover:cursor-pointer"
+          className="bg-green-500 text-white p-1 py-2 rounded-sm hover:bg-green-600 hover:scale-105 duration-300 ml-3 w-44 font-bold hover:cursor-pointer"
           onClick={() => setReportSearch(true)}
         >
           Search
         </button>
       </div>
-      {reportSearch === false && <div>Choose and search a report...</div>}
-      {openPage === "AllSmartLocksReport" && reportSearch === true && (
+      {reportSearch === false && (
+        <div className="w-full text-center mt-5">
+          Choose and search a report...
+        </div>
+      )}
+      {openPage === "AllSmartLocksReport" && reportSearch && (
         <AllSmartLocksReport
           selectedFacilities={newSelectedFacilities}
           searchQuery={searchQuery}
         />
       )}
-      {openPage === "AllEdgeRoutersReport" && reportSearch === true && (
+      {openPage === "AllEdgeRoutersReport" && reportSearch && (
         <AllEdgeRoutersReport
           selectedFacilities={newSelectedFacilities}
           searchQuery={searchQuery}
         />
       )}
-      {openPage === "AllAccessPointsReport" && reportSearch === true && (
+      {openPage === "AllAccessPointsReport" && reportSearch && (
         <AllAccessPointsReport
           selectedFacilities={newSelectedFacilities}
           searchQuery={searchQuery}
         />
       )}
-      {openPage === "AllSmartLockEventsReport" && reportSearch === true && (
+      {openPage === "AllSmartLockEventsReport" && reportSearch && (
         <AllSmartLocksEventsReport
           selectedFacilities={newSelectedFacilities}
           searchQuery={searchQuery}
         />
       )}
-      {openPage === "AllSmartLockOnlineTimeReport" && reportSearch === true && (
+      {openPage === "AllSmartLockOnlineTimeReport" && reportSearch && (
         <AllSmartLockOnlineTimeReport
           selectedFacilities={newSelectedFacilities}
           searchQuery={searchQuery}
         />
       )}
-      {openPage === "ExtendedReport" && reportSearch === true && (
+      {openPage === "ExtendedReport" && reportSearch && (
         <ExtendedHistoryReport
+          selectedFacilities={newSelectedFacilities}
+          searchQuery={searchQuery}
+        />
+      )}
+      {openPage === "OfflineEvents" && reportSearch && (
+        <AllSmartLockOfflineEventsReport
           selectedFacilities={newSelectedFacilities}
           searchQuery={searchQuery}
         />
