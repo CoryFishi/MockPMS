@@ -117,7 +117,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
 
             {/* Other Options */}
             <div
-              className={`border-t border-b pl-2 pr-2 border-gray-500 pb-8 ${
+              className={`border-t border-b pl-2 pr-2 border-zinc-500 pb-8 ${
                 openPage === "allFacilities" || openPage === "selected"
                   ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
                   : ""

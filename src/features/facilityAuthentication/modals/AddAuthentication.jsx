@@ -133,7 +133,7 @@ export default function AddAuthentication({
             ) : (
               <MdOutlineError className="text-red-500" />
             )}
-            <span className="text-sm text-gray-700 dark:text-gray-300">
+            <span className="text-sm text-zinc-700 dark:text-zinc-300">
               {loading
                 ? " Authenticating..."
                 : isAuthenticated === true

@@ -86,7 +86,7 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
           <label className="block">Role Name</label>
           <input
             type="text"
-            className="border border-gray-300 rounded-sm px-3 py-2 w-full dark:bg-darkSecondary dark:border-border"
+            className="border border-zinc-300 rounded-sm px-3 py-2 w-full dark:bg-darkSecondary dark:border-border"
             value={roleName}
             onChange={(e) => setRoleName(e.target.value)}
             placeholder="Enter role name..."
@@ -95,7 +95,7 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
           <label className="block mt-2">Role Description</label>
           <input
             type="text"
-            className="border border-gray-300 rounded-sm px-3 py-2 w-full dark:bg-darkSecondary dark:border-border"
+            className="border border-zinc-300 rounded-sm px-3 py-2 w-full dark:bg-darkSecondary dark:border-border"
             value={roleDesc}
             onChange={(e) => setRoleDesc(e.target.value)}
             placeholder="Enter role description..."
@@ -322,7 +322,7 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
           {/* Button Container */}
           <div className="mt-4 flex justify-end">
             <button
-              className="hover:cursor-pointer bg-gray-400 px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
+              className="hover:cursor-pointer bg-zinc-400 px-4 py-2 rounded-sm mr-2 hover:bg-zinc-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
               onClick={() => setIsCreateRoleModalOpen(false)}
             >
               Cancel

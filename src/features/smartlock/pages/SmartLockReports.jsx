@@ -147,7 +147,7 @@ export default function SmartLockReports() {
       {/* Loading Spinner */}
       {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}{" "}
       {/* tab title */}
-      <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-zinc-900 border-b border-zinc-300 text-lg font-bold">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-zinc-900 border-b border-zinc-300 text-lg font-bold">
         <div className="ml-5 flex items-center text-sm">
           <FaLock className="text-lg" />
           &ensp; SmartLock Reports
@@ -190,7 +190,7 @@ export default function SmartLockReports() {
           </button>
 
           {isOpen && (
-            <div className="absolute mt-1 w-full bg-white dark:bg-darkNavSecondary border border-gray-300 dark:border-border rounded-lg shadow-lg p-2 z-50 max-h-60 overflow-y-auto">
+            <div className="absolute mt-1 w-full bg-white dark:bg-darkNavSecondary border border-zinc-300 dark:border-border rounded-lg shadow-lg p-2 z-50 max-h-60 overflow-y-auto">
               <div className="w-full text-white text-left px-1 justify-between flex">
                 <button
                   className="text-green-400 hover:cursor-pointer"

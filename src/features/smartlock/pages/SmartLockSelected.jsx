@@ -233,7 +233,7 @@ export default function SmartLockSelectedPage() {
   return (
     <div className="relative overflow-auto h-full dark:text-white dark:bg-darkPrimary">
       {/* Header */}
-      <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <RiCheckboxCircleFill className="text-lg" />
           &ensp; Selected Facilities

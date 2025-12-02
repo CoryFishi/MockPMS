@@ -122,12 +122,12 @@ export default function AllSmartLocksEventsReport({
         </select>
         days
       </p>
-      <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
+      <table className="w-full table-auto border-collapse border-zinc-300 dark:border-border">
         {/* Header */}
-        <thead className="select-none sticky -top-px z-10 bg-gray-200 dark:bg-darkNavSecondary">
-          <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
+        <thead className="select-none sticky -top-px z-10 bg-zinc-200 dark:bg-darkNavSecondary">
+          <tr className="bg-zinc-200 dark:bg-darkNavSecondary text-center">
             <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -157,7 +157,7 @@ export default function AllSmartLocksEventsReport({
               )}
             </th>
             <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -181,7 +181,7 @@ export default function AllSmartLocksEventsReport({
               )}
             </th>
             <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -211,7 +211,7 @@ export default function AllSmartLocksEventsReport({
               )}
             </th>
             <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -236,7 +236,7 @@ export default function AllSmartLocksEventsReport({
               )}
             </th>
             <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -266,7 +266,7 @@ export default function AllSmartLocksEventsReport({
               )}
             </th>
             <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -297,14 +297,14 @@ export default function AllSmartLocksEventsReport({
             .map((smartlock, index) => (
               <tr
                 key={index}
-                className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary relative hover:cursor-pointer"
+                className="hover:bg-zinc-100 dark:hover:bg-darkNavSecondary relative hover:cursor-pointer"
                 onClick={() => setHoveredRow(index)}
                 onMouseLeave={() => setHoveredRow(null)}
               >
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.facilityName}
                   {hoveredRow === index && (
-                    <div className="absolute bg-gray-700 dark:bg-gray-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-4/5">
+                    <div className="absolute bg-zinc-700 dark:bg-zinc-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-4/5">
                       <div className="grid grid-cols-4 gap-1 overflow-hidden">
                         {Object.entries(smartlock).map(
                           ([key, value], index) => (
@@ -331,19 +331,19 @@ export default function AllSmartLocksEventsReport({
                     </div>
                   )}
                 </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.deviceName}
                 </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.eventCategory}
                 </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.eventType}
                 </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.eventDetails}
                 </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.createdOn}
                 </td>
               </tr>

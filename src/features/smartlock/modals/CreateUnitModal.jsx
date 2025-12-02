@@ -311,7 +311,7 @@ export default function CreateUnitModal({
                     className={`px-3 py-1 border rounded text-sm ${
                       active
                         ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-gray-700"
+                        : "bg-zinc-200 text-zinc-700"
                     }`}
                   >
                     {side.charAt(0).toUpperCase() + side.slice(1)}
@@ -339,7 +339,7 @@ export default function CreateUnitModal({
                     className={`px-3 py-1 border rounded text-sm ${
                       active
                         ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-gray-700"
+                        : "bg-zinc-200 text-zinc-700"
                     }`}
                   >
                     {door.side.charAt(0).toUpperCase() + door.side.slice(1)}

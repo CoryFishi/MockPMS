@@ -190,19 +190,19 @@ export default function AllSmartLocksReport({
     <div className="w-full px-2">
       <div className="flex justify-end mb-1">
         <p
-          className="text-black dark:text-white rounded-sm hover:text-gray-400 dark:hover:text-gray-400 hover:cursor-pointer mr-2 right-0"
+          className="text-black dark:text-white rounded-sm hover:text-zinc-400 dark:hover:text-zinc-400 hover:cursor-pointer mr-2 right-0"
           onClick={() => exportSmartLocks()}
         >
           Export
         </p>
       </div>
 
-      <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
+      <table className="w-full table-auto border-collapse border-zinc-300 dark:border-border">
         {/* Header */}
-        <thead className="select-none sticky -top-px z-10 bg-gray-200 dark:bg-darkNavSecondary">
-          <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
+        <thead className="select-none sticky -top-px z-10 bg-zinc-200 dark:bg-darkNavSecondary">
+          <tr className="bg-zinc-200 dark:bg-darkNavSecondary text-center">
             <th
-              className="px-4 py-2  hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2  hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -232,7 +232,7 @@ export default function AllSmartLocksReport({
               )}
             </th>
             <th
-              className="px-4 py-2  hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2  hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -256,7 +256,7 @@ export default function AllSmartLocksReport({
               )}
             </th>
             <th
-              className="px-4 py-2  hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2  hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -280,7 +280,7 @@ export default function AllSmartLocksReport({
               )}
             </th>
             <th
-              className="px-4 py-2  hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2  hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -305,7 +305,7 @@ export default function AllSmartLocksReport({
               )}
             </th>
             <th
-              className="px-4 py-2  hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2  hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -329,7 +329,7 @@ export default function AllSmartLocksReport({
               )}
             </th>
             <th
-              className="px-4 py-2  hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2  hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -353,7 +353,7 @@ export default function AllSmartLocksReport({
               )}
             </th>
             <th
-              className="px-4 py-2  hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2  hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -377,7 +377,7 @@ export default function AllSmartLocksReport({
               )}
             </th>
             <th
-              className="px-4 py-2  hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2  hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -401,7 +401,7 @@ export default function AllSmartLocksReport({
               )}
             </th>
             <th
-              className="px-4 py-2  hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2  hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -425,7 +425,7 @@ export default function AllSmartLocksReport({
               )}
             </th>
             <th
-              className="px-4 py-2  hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2  hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -456,14 +456,14 @@ export default function AllSmartLocksReport({
             .map((smartlock, index) => (
               <tr
                 key={index}
-                className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary relative hover:cursor-pointer"
+                className="hover:bg-zinc-100 dark:hover:bg-darkNavSecondary relative hover:cursor-pointer"
                 onClick={() => setHoveredRow(index)}
                 onMouseLeave={() => setHoveredRow(null)}
               >
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.facilityName}
                   {hoveredRow === index && (
-                    <div className="absolute bg-gray-700 dark:bg-gray-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-4/5">
+                    <div className="absolute bg-zinc-700 dark:bg-zinc-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-4/5">
                       <div className="grid grid-cols-4 gap-1 overflow-hidden">
                         {Object.entries(smartlock).map(
                           ([key, value], index) => (
@@ -490,18 +490,18 @@ export default function AllSmartLocksReport({
                     </div>
                   )}
                 </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.name}
                 </td>
 
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.unitName}
                 </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.deviceType}
                 </td>
                 <td
-                  className="border-y border-gray-300 dark:border-border px-4 py-2 text-center"
+                  className="border-y border-zinc-300 dark:border-border px-4 py-2 text-center"
                   title={smartlock.signalQualityDisplay}
                 >
                   {smartlock.signalQuality < 60 ? (
@@ -527,7 +527,7 @@ export default function AllSmartLocksReport({
                   )}
                 </td>
                 <td
-                  className="border-y border-gray-300 dark:border-border px-4 py-2 text-center"
+                  className="border-y border-zinc-300 dark:border-border px-4 py-2 text-center"
                   title={smartlock.lastBatteryChangeTimestampDisplay}
                 >
                   {smartlock.batteryLevel < 20 ? (
@@ -558,7 +558,7 @@ export default function AllSmartLocksReport({
                   )}
                 </td>
 
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.lockState === "Locked" ? (
                     <div className="inline-flex items-center gap-2">
                       <FaLock />
@@ -577,12 +577,12 @@ export default function AllSmartLocksReport({
                     </div>
                   )}
                 </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.unitStatus}
                   {smartlock.visitorName ? " - " + smartlock.visitorName : ""}
                 </td>
                 <td
-                  className="border-y border-gray-300 dark:border-border px-4 py-2"
+                  className="border-y border-zinc-300 dark:border-border px-4 py-2"
                   title={smartlock.lastUpdateTimestampDisplay}
                 >
                   {smartlock.statusMessages[0] != "" ? (
@@ -622,7 +622,7 @@ export default function AllSmartLocksReport({
                   )}
                 </td>
 
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.lastEventTimestampDisplay}
                 </td>
               </tr>

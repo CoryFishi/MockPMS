@@ -20,7 +20,7 @@ export default function SelectOption({
         onChange={onChange}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        className={`cursor-pointer peer w-full p-3 pb-2 bg-transparent border border-gray-400 rounded-md appearance-none focus:outline-none focus:ring-2 focus:ring-yellow-400 dark:bg-darkPrimary dark:border-border`}
+        className={`cursor-pointer peer w-full p-3 pb-2 bg-transparent border border-zinc-400 rounded-md appearance-none focus:outline-none focus:ring-2 focus:ring-yellow-400 dark:bg-darkPrimary dark:border-border`}
       >
         <option value=""></option>
         {options.map((opt) => (

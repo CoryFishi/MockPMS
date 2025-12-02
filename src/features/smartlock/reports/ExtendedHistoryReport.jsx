@@ -128,14 +128,14 @@ export default function ExtendedHistoryReport({
         </select>
         days
       </p>
-      <table className="w-full table-auto border-collapse border border-gray-300 dark:border-border">
+      <table className="w-full table-auto border-collapse border border-zinc-300 dark:border-border">
         <thead
           className="select-none"
           onClick={() => console.log(filteredSmartLockEvents)}
         >
-          <tr className="bg-gray-200 dark:bg-darkNavSecondary sticky -top-px z-10">
+          <tr className="bg-zinc-200 dark:bg-darkNavSecondary sticky -top-px z-10">
             <th
-              className="border border-gray-300 dark:border-border px-4 py-2  hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="border border-zinc-300 dark:border-border px-4 py-2  hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -165,7 +165,7 @@ export default function ExtendedHistoryReport({
               )}
             </th>
             <th
-              className="border border-gray-300 dark:border-border px-4 py-2  hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="border border-zinc-300 dark:border-border px-4 py-2  hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -189,7 +189,7 @@ export default function ExtendedHistoryReport({
               )}
             </th>
             <th
-              className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+              className="border border-zinc-300 dark:border-border px-4 py-2 hover:cursor-pointer"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -219,7 +219,7 @@ export default function ExtendedHistoryReport({
               )}
             </th>
             <th
-              className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+              className="border border-zinc-300 dark:border-border px-4 py-2 hover:cursor-pointer"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -244,7 +244,7 @@ export default function ExtendedHistoryReport({
               )}
             </th>
             <th
-              className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+              className="border border-zinc-300 dark:border-border px-4 py-2 hover:cursor-pointer"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -274,7 +274,7 @@ export default function ExtendedHistoryReport({
               )}
             </th>
             <th
-              className="border border-gray-300 dark:border-border px-4 py-2 hover:cursor-pointer"
+              className="border border-zinc-300 dark:border-border px-4 py-2 hover:cursor-pointer"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -305,14 +305,14 @@ export default function ExtendedHistoryReport({
             .map((smartlock, index) => (
               <tr
                 key={index}
-                className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary relative"
+                className="hover:bg-zinc-100 dark:hover:bg-darkNavSecondary relative"
                 onClick={() => setHoveredRow(index)}
                 onMouseLeave={() => setHoveredRow(null)}
               >
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.facilityName}
                   {hoveredRow === index && (
-                    <div className="absolute bg-gray-700 dark:bg-slate-700 text-white p-2 rounded-sm shadow-lg z-10 top-1 left-2/4 transform -translate-x-1/2 text-left w-4/5">
+                    <div className="absolute bg-zinc-700 dark:bg-slate-700 text-white p-2 rounded-sm shadow-lg z-10 top-1 left-2/4 transform -translate-x-1/2 text-left w-4/5">
                       <div className="grid grid-cols-4 gap-1 overflow-hidden">
                         {Object.entries(smartlock).map(
                           ([key, value], index) => (
@@ -339,19 +339,19 @@ export default function ExtendedHistoryReport({
                     </div>
                   )}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.deviceName}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.eventCategory}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.eventType}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.eventDetails}
                 </td>
-                <td className="border border-gray-300 dark:border-border px-4 py-2">
+                <td className="border border-zinc-300 dark:border-border px-4 py-2">
                   {smartlock.createdOn}
                 </td>
               </tr>

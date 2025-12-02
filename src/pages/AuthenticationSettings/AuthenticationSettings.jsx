@@ -454,7 +454,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
           ) : f.isAuthenticated === false ? (
             <MdOutlineError className="text-red-500" />
           ) : (
-            <FaSpinner className="animate-spin text-gray-500" />
+            <FaSpinner className="animate-spin text-zinc-500" />
           )}
         </div>
       ),

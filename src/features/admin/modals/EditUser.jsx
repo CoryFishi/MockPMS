@@ -155,7 +155,7 @@ export default function EditUser({
           <label className="block my-2 font-bold">Role:</label>
           <select
             value={newUserData.role}
-            className="border border-gray-300 rounded-sm px-3 py-2 w-full dark:bg-darkSecondary dark:border-border hover:cursor-pointer"
+            className="border border-zinc-300 rounded-sm px-3 py-2 w-full dark:bg-darkSecondary dark:border-border hover:cursor-pointer"
             onChange={(e) =>
               setNewUserData((prevData) => ({
                 ...prevData,
@@ -177,18 +177,18 @@ export default function EditUser({
             </h1>
             <div className="flex gap-1">
               <button
-                className="hover:bg-gray-200 rounded-sm px-1 hover:cursor-pointer"
+                className="hover:bg-zinc-200 rounded-sm px-1 hover:cursor-pointer"
                 onClick={() => setIsEditCurrentFacilityModalOpen(true)}
               >
                 {newUserData.current_facility.name ? (
-                  <FaEdit className="text-gray-500" />
+                  <FaEdit className="text-zinc-500" />
                 ) : (
-                  <FaPlusCircle className="text-gray-500" />
+                  <FaPlusCircle className="text-zinc-500" />
                 )}
               </button>
               {newUserData.current_facility.name && (
                 <button
-                  className="hover:bg-gray-200 rounded-sm px-1 hover:cursor-pointer"
+                  className="hover:bg-zinc-200 rounded-sm px-1 hover:cursor-pointer"
                   onClick={() =>
                     setNewUserData((prevData) => ({
                       ...prevData,
@@ -196,7 +196,7 @@ export default function EditUser({
                     }))
                   }
                 >
-                  <FaTrash className="text-gray-500" />
+                  <FaTrash className="text-zinc-500" />
                 </button>
               )}
             </div>
@@ -205,10 +205,10 @@ export default function EditUser({
           <div className="flex justify-between mt-4 mb-2">
             <label className="block font-bold">Tokens:</label>
             <button
-              className="hover:bg-gray-200 rounded-sm px-1 hover:cursor-pointer"
+              className="hover:bg-zinc-200 rounded-sm px-1 hover:cursor-pointer"
               onClick={() => setIsAddTokenFacilityModalOpen(true)}
             >
-              <FaPlusCircle className="text-gray-500" />
+              <FaPlusCircle className="text-zinc-500" />
             </button>
           </div>
           <div className="min-h-10 max-h-24 overflow-y-auto">
@@ -232,20 +232,20 @@ export default function EditUser({
                   </p>
                   <div className="flex gap-2">
                     <button
-                      className="hover:bg-gray-200 rounded-sm px-1 hover:cursor-pointer"
+                      className="hover:bg-zinc-200 rounded-sm px-1 hover:cursor-pointer"
                       onClick={() => handleTokenView(token.api)}
                     >
                       {viewKey === token.api ? (
-                        <FaEyeSlash className="text-gray-500" />
+                        <FaEyeSlash className="text-zinc-500" />
                       ) : (
-                        <FaEye className="text-gray-500" />
+                        <FaEye className="text-zinc-500" />
                       )}
                     </button>
                     <button
-                      className="hover:bg-gray-200 rounded-sm px-1 hover:cursor-pointer"
+                      className="hover:bg-zinc-200 rounded-sm px-1 hover:cursor-pointer"
                       onClick={() => handleDeleteToken(token.api)}
                     >
-                      <FaTrash className="text-gray-500" />
+                      <FaTrash className="text-zinc-500" />
                     </button>
                   </div>
                 </div>
@@ -292,10 +292,10 @@ export default function EditUser({
           <div className="flex justify-between my-2">
             <label className="block font-bold">Favorite Facilities:</label>
             <button
-              className="hover:bg-gray-200 rounded-sm px-1 hover:cursor-pointer"
+              className="hover:bg-zinc-200 rounded-sm px-1 hover:cursor-pointer"
               onClick={() => setIsAddFavoriteFacilityModalOpen(true)}
             >
-              <FaPlusCircle className="text-gray-500" />
+              <FaPlusCircle className="text-zinc-500" />
             </button>
           </div>
           <div className="min-h-10 max-h-24 overflow-y-auto">
@@ -306,10 +306,10 @@ export default function EditUser({
               >
                 <p>{token.name}</p>
                 <button
-                  className="hover:bg-gray-200 rounded-sm px-1 hover:cursor-pointer"
+                  className="hover:bg-zinc-200 rounded-sm px-1 hover:cursor-pointer"
                   onClick={() => handleDeleteFavoriteToken(token.id)}
                 >
-                  <FaTrash className="text-gray-500" />
+                  <FaTrash className="text-zinc-500" />
                 </button>
               </div>
             ))}
@@ -323,10 +323,10 @@ export default function EditUser({
           <div className="flex justify-between my-2">
             <label className="block font-bold">Selected Facilities:</label>
             <button
-              className="hover:bg-gray-200 rounded-sm px-1 hover:cursor-pointer"
+              className="hover:bg-zinc-200 rounded-sm px-1 hover:cursor-pointer"
               onClick={() => setIsAddSelectedFacilityModalOpen(true)}
             >
-              <FaPlusCircle className="text-gray-500" />
+              <FaPlusCircle className="text-zinc-500" />
             </button>
           </div>
           <div className="min-h-10 max-h-24 overflow-y-auto">
@@ -337,10 +337,10 @@ export default function EditUser({
               >
                 <p>{token.name}</p>
                 <button
-                  className="hover:bg-gray-200 rounded-sm px-1 hover:cursor-pointer"
+                  className="hover:bg-zinc-200 rounded-sm px-1 hover:cursor-pointer"
                   onClick={() => handleDeleteSelectedToken(token.id)}
                 >
-                  <FaTrash className="text-gray-500" />
+                  <FaTrash className="text-zinc-500" />
                 </button>
               </div>
             ))}
@@ -353,7 +353,7 @@ export default function EditUser({
           {/* Button Container */}
           <div className="mt-4 flex justify-end">
             <button
-              className="hover:cursor-pointer bg-gray-400 px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
+              className="hover:cursor-pointer bg-zinc-400 px-4 py-2 rounded-sm mr-2 hover:bg-zinc-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
               onClick={() => setIsEditUserModalOpen(false)}
             >
               Cancel

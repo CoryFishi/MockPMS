@@ -244,19 +244,19 @@ export default function AllSmartLockOnlineTimeReport({
           days
         </p>
         <p
-          className="text-black dark:text-white rounded-sm hover:text-gray-400 dark:hover:text-gray-400 hover:cursor-pointer mr-2"
+          className="text-black dark:text-white rounded-sm hover:text-zinc-400 dark:hover:text-zinc-400 hover:cursor-pointer mr-2"
           onClick={() => exportDurations()}
         >
           Export
         </p>
       </div>
-      <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
+      <table className="w-full table-auto border-collapse border-zinc-300 dark:border-border">
         {/* Header */}
-        <thead className="select-none sticky -top-px z-10 bg-gray-200 dark:bg-darkNavSecondary">
-          <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
+        <thead className="select-none sticky -top-px z-10 bg-zinc-200 dark:bg-darkNavSecondary">
+          <tr className="bg-zinc-200 dark:bg-darkNavSecondary text-center">
             {/* Facility Column */}
             <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -291,7 +291,7 @@ export default function AllSmartLockOnlineTimeReport({
 
             {/* Device Name Column */}
             <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -320,7 +320,7 @@ export default function AllSmartLockOnlineTimeReport({
 
             {/* Offline Time Column */}
             <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -347,7 +347,7 @@ export default function AllSmartLockOnlineTimeReport({
 
             {/* Online Time Percentage Column */}
             <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -374,7 +374,7 @@ export default function AllSmartLockOnlineTimeReport({
 
             {/* Status Column */}
             <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
@@ -407,15 +407,15 @@ export default function AllSmartLockOnlineTimeReport({
             .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
             .map((device, index) => (
               <tr
-                className="hover:bg-gray-100 dark:hover:bg-darkNavSecondary relative hover:cursor-pointer"
+                className="hover:bg-zinc-100 dark:hover:bg-darkNavSecondary relative hover:cursor-pointer"
                 key={index}
                 onClick={() => setHoveredRow(index)}
                 onMouseLeave={() => setHoveredRow(null)}
               >
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {device.facilityName}
                   {hoveredRow === index && (
-                    <div className="absolute bg-gray-700 dark:bg-gray-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-5/6">
+                    <div className="absolute bg-zinc-700 dark:bg-zinc-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-5/6">
                       <div className="grid grid-cols-4 gap-1 overflow-hidden">
                         <div>
                           <span className="font-bold text-yellow-500">
@@ -489,14 +489,14 @@ export default function AllSmartLockOnlineTimeReport({
                     </div>
                   )}
                 </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {device.deviceName}
                 </td>
 
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {Math.round(device.totalDuration / 60)}
                 </td>
-                <td className="border-y border-gray-300 dark:border-border px-4 py-2">
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {(
                     ((currentTime - pastDayValue - device.totalDuration) /
                       (currentTime - pastDayValue)) *
@@ -505,7 +505,7 @@ export default function AllSmartLockOnlineTimeReport({
                   %
                 </td>
                 <td
-                  className="border-y border-gray-300 dark:border-border px-4 py-2"
+                  className="border-y border-zinc-300 dark:border-border px-4 py-2"
                   title={
                     device.offlineStart
                       ? device.offlineStart.toISOString()

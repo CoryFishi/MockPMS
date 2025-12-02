@@ -117,10 +117,10 @@ export const AuthProvider = ({ children }) => {
                         <IoWarning className="text-4xl" />
                       </div>
                       <div className="ml-3 flex-1">
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-zinc-900">
                           Management Dashboard
                         </p>
-                        <p className="mt-1 text-sm text-gray-500">
+                        <p className="mt-1 text-sm text-zinc-500">
                           Looks like you have yet to authenticate any
                           facilities. Click{" "}
                           <span className="text-blue-500">here</span> to
@@ -129,7 +129,7 @@ export const AuthProvider = ({ children }) => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex border-l border-gray-200">
+                  <div className="flex border-l border-zinc-200">
                     <button
                       onClick={() => toast.dismiss(t.id)}
                       className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
@@ -175,10 +175,10 @@ export const AuthProvider = ({ children }) => {
                       <IoWarning className="text-4xl" />
                     </div>
                     <div className="ml-3 flex-1">
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-medium text-zinc-900">
                         Management Dashboard
                       </p>
-                      <p className="mt-1 text-sm text-gray-500">
+                      <p className="mt-1 text-sm text-zinc-500">
                         Looks like you have yet to authenticate any facilities.
                         Click <span className="text-blue-500">here</span> to
                         authenticate a facility.
@@ -186,7 +186,7 @@ export const AuthProvider = ({ children }) => {
                     </div>
                   </div>
                 </div>
-                <div className="flex border-l border-gray-200">
+                <div className="flex border-l border-zinc-200">
                   <button
                     onClick={() => toast.dismiss(t.id)}
                     className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"

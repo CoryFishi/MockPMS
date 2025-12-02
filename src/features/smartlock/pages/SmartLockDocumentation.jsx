@@ -170,7 +170,7 @@ export default function SmartLockDocumentationPage() {
               </div>
               <p className="text-xs">{selectedPDF.updatedOn}</p>
               <button
-                className="ml-auto text-gray-600 hover:cursor-pointer bg-gray-100 hover:bg-gray-300 dark:text-white dark:hover:bg-red-500 h-full px-5 rounded-tr dark:bg-gray-800"
+                className="ml-auto text-zinc-600 hover:cursor-pointer bg-zinc-100 hover:bg-zinc-300 dark:text-white dark:hover:bg-red-500 h-full px-5 rounded-tr dark:bg-zinc-800"
                 onClick={() => setSelectedPDF("")}
               >
                 x
@@ -184,7 +184,7 @@ export default function SmartLockDocumentationPage() {
           </div>
         </div>
       )}
-      <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <IoDocumentTextSharp className="text-lg" />
           &ensp; Documentation
@@ -193,14 +193,14 @@ export default function SmartLockDocumentationPage() {
       <div className="w-full px-5 flex flex-col rounded-lg">
         <div className="mt-5">
           <h1 className="text-3xl font-semibold">SmartLock Documentation</h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-300">
+          <p className="mt-2 text-zinc-600 dark:text-zinc-300">
             Welcome to the SmartLock documentation. Here you will find all the
             information you need to get started with SmartLock.
           </p>
         </div>
         <div className="mt-5">
           <h2 className="text-2xl font-semibold">Getting Started</h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-300">
+          <p className="mt-2 text-zinc-600 dark:text-zinc-300">
             To get started with SmartLock, you will need an Insmoniac Control
             Center account. Once you have an account, you can log in and start
             using SmartLock.

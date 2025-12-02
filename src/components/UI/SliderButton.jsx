@@ -2,7 +2,7 @@ export default function SliderButton({ onclick, value, offValue, onValue }) {
   return (
     <div
       className={`min-w-9 h-5 flex items-center rounded-full p-1 cursor-pointer ${
-        value ? "bg-blue-600" : "bg-gray-300"
+        value ? "bg-blue-600" : "bg-zinc-300"
       }`}
       onClick={() => onclick()}
       type="button"

@@ -413,7 +413,7 @@ export default function CreateVisitorVisitor({
       responseContent={
         <div className="mt-4 flex justify-end">
           <button
-            className="bg-gray-400 hover:cursor-pointer px-4 py-2 rounded-sm mr-2 hover:bg-gray-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
+            className="bg-zinc-400 hover:cursor-pointer px-4 py-2 rounded-sm mr-2 hover:bg-zinc-500 font-bold transition duration-300 ease-in-out transform hover:scale-105 text-white"
             onClick={() => setIsCreateVisitorModalOpen(false)}
             type="button"
           >

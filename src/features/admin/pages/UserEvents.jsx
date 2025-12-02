@@ -122,7 +122,7 @@ export default function UserEvents() {
   return (
     <div className="overflow-auto dark:text-white dark:bg-darkPrimary">
       {/* Header */}
-      <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <FaPerson className="text-lg" />
           &ensp; User Events

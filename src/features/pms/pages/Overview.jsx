@@ -285,7 +285,7 @@ export default function Overview({ currentFacilityName }) {
       className={`relative overflow-auto h-full dark:text-white dark:bg-darkPrimary`}
     >
       {/* Page Header */}
-      <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <RiDoorLockFill className="text-lg" />
           &ensp; Overview | {currentFacilityName}
@@ -373,19 +373,19 @@ export default function Overview({ currentFacilityName }) {
                       </div>
                       <div className="flex items-center w-full">
                         <button
-                          className="text-green-700 font-bold text-xs w-1/3 cursor-pointer p-3 hover:bg-gray-300 rounded-bl-lg"
+                          className="text-green-700 font-bold text-xs w-1/3 cursor-pointer p-3 hover:bg-zinc-300 rounded-bl-lg"
                           onClick={() => handleOpen(a)}
                         >
                           OPEN
                         </button>
                         <button
-                          className="text-blue-700 font-bold text-xs w-1/3 cursor-pointer p-3 hover:bg-gray-300"
+                          className="text-blue-700 font-bold text-xs w-1/3 cursor-pointer p-3 hover:bg-zinc-300"
                           onClick={() => handleHold(a)}
                         >
                           HOLD
                         </button>
                         <button
-                          className="text-red-700 font-bold text-xs cursor-pointer w-1/3 p-3 hover:bg-gray-300 rounded-br-lg"
+                          className="text-red-700 font-bold text-xs cursor-pointer w-1/3 p-3 hover:bg-zinc-300 rounded-br-lg"
                           onClick={() => handleClose(a)}
                         >
                           CLOSE

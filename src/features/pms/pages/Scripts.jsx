@@ -277,7 +277,7 @@ export default function Scripts() {
           setIsModalOpen={setIsTenantModalOpen}
         />
       )}
-      <div className="flex h-12 bg-gray-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
         <div className="ml-5 flex items-center text-sm">
           <FaScroll className="text-lg" />
           &ensp; Scripts

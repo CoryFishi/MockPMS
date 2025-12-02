@@ -281,7 +281,7 @@ export default function PMSDashboardLayout({
 
             {/* Facilities Side Bar */}
             <div
-              className={`border-t border-b pl-2 pr-2 border-gray-500 pb-8 ${
+              className={`border-t border-b pl-2 pr-2 border-zinc-500 pb-8 ${
                 openPage === "allFacilities" || openPage === "favorites"
                   ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
                   : "dark:bg-darkNavPrimary"
@@ -347,7 +347,7 @@ export default function PMSDashboardLayout({
             {/* Admin Side bar */}
             {permissions.pmsPlatformAdmin && currentFacility.id > 0 && (
               <div
-                className={`border-t border-b pl-2 pr-2 border-gray-500 pb-8 ${
+                className={`border-t border-b pl-2 pr-2 border-zinc-500 pb-8 ${
                   openPage === "scripts"
                     ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
                     : "dark:bg-darkNavPrimary"
