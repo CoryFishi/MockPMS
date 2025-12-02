@@ -4,12 +4,6 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import { RiErrorWarningFill } from "react-icons/ri";
-import PropTypes from "prop-types";
-
-AllSmartLockOnlineTimeReport.propTypes = {
-  selectedFacilities: PropTypes.array.isRequired,
-  searchQuery: PropTypes.string.isRequired,
-};
 
 export default function AllSmartLockOnlineTimeReport({
   selectedFacilities,

@@ -5,7 +5,7 @@ import AddAuthentication from "@features/facilityAuthentication/modals/AddAuthen
 import PaginationFooter from "@components/shared/PaginationFooter";
 import RenameAuthentication from "@features/facilityAuthentication/modals/RenameAuthentication";
 import toast from "react-hot-toast";
-import { supabase } from "../../app/supabaseClient";
+import { supabase } from "@app/supabaseClient";
 import { FaCircleCheck, FaSpinner } from "react-icons/fa6";
 import { MdOutlineError } from "react-icons/md";
 import { useAuth } from "@context/AuthProvider";

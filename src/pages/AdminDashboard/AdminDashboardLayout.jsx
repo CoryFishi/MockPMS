@@ -5,11 +5,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
-import PropTypes from "prop-types";
-
-AdminDashboardLayout.propTypes = {
-  dashboardMenu: PropTypes.bool, // Boolean to determine if the dashboard menu should be displayed
-};
 
 export default function AdminDashboardLayout({ dashboardMenu }) {
   const [openSections, setOpenSections] = useState({

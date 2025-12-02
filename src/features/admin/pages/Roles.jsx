@@ -1,6 +1,6 @@
 import PaginationFooter from "@components/shared/PaginationFooter";
-import EditRole from "../modals/EditRole";
-import CreateRole from "../modals/CreateRole";
+import EditRole from "@features/admin/modals/EditRole";
+import CreateRole from "@features/admin/modals/CreateRole";
 import DataTable from "@components/shared/DataTable";
 import { useRef, useState, useEffect } from "react";
 import { FaPerson } from "react-icons/fa6";

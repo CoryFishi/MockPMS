@@ -7,12 +7,6 @@ import { addEvent } from "@hooks/supabase";
 import ModalButton from "@components/UI/ModalButton";
 import ModalContainer from "@components/UI/ModalContainer";
 import InputBox from "@components/UI/InputBox";
-import PropTypes from "prop-types";
-
-CreateUnit.propTypes = {
-  setIsUnitModalOpen: PropTypes.func.isRequired, // Function to close the modal
-  setUnits: PropTypes.func.isRequired, // Function to update the units list
-};
 
 export default function CreateUnit({ setIsUnitModalOpen, setUnits }) {
   // Store the unit number to be created

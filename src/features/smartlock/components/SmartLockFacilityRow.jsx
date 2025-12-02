@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FaCheckCircle, FaExternalLinkAlt } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
-import SmartLock from "../modals/SmartLock";
+import SmartLock from "@features/smartlock/modals/SmartLock";
 
 export default function SmartLockFacilityRow({
   facility,

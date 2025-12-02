@@ -2,7 +2,7 @@ import { FaScroll } from "react-icons/fa6";
 import { useAuth } from "@context/AuthProvider";
 import axios from "axios";
 import { useState } from "react";
-import ScriptConfirmation from "../modals/ScriptConfirmation";
+import ScriptConfirmation from "@features/pms/modals/ScriptConfirmation";
 import GeneralButton from "@components/UI/GeneralButton";
 import { addEvent } from "@hooks/supabase";
 

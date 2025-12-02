@@ -2,11 +2,11 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { FaLock } from "react-icons/fa";
-import SmartLockFacilityCard from "../components/SmartLockFacilityCard";
-import SmartLockExport from "../components/SmartLockExport";
+import SmartLockFacilityCard from "@features/smartlock/components/SmartLockFacilityCard";
+import SmartLockExport from "@features/smartlock/components/SmartLockExport";
 import { useAuth } from "@context/AuthProvider";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
-import SmartLockDashboardList from "../components/SmartLockDashboardList";
+import SmartLockDashboardList from "@features/smartlock/components/SmartLockDashboardList";
 
 export default function SmartLockDashboardView() {
   const [facilitiesWithBearers, setFacilitiesWithBearers] = useState([]);

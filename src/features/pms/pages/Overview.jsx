@@ -7,11 +7,6 @@ import toast from "react-hot-toast";
 import { MdArrowDropDown } from "react-icons/md";
 import { BiInfoCircle } from "react-icons/bi";
 import { IoInformationCircle } from "react-icons/io5";
-import PropTypes from "prop-types";
-
-Overview.propTypes = {
-  currentFacilityName: PropTypes.string.isRequired,
-};
 
 export default function Overview({ currentFacilityName }) {
   const { currentFacility } = useAuth();

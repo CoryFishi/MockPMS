@@ -3,13 +3,6 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { FaEdit } from "react-icons/fa";
 import qs from "qs";
-import PropTypes from "prop-types";
-
-EditCurrentFacility.propTypes = {
-  setIsEditCurrentFacilityModalOpen: PropTypes.func.isRequired, // Function to close the modal
-  newUserData: PropTypes.object.isRequired, // The current user data to be edited
-  setNewUserData: PropTypes.func.isRequired, // Function to update the user data in the parent component
-};
 
 export default function EditCurrentFacility({
   setIsEditCurrentFacilityModalOpen,

@@ -10,12 +10,6 @@ import { supabase } from "@app/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import TableButton from "@components/UI/TableButton";
 import InputBox from "@components/UI/InputBox";
-import PropTypes from "prop-types";
-
-Favorites.propTypes = {
-  setOpenPage: PropTypes.func.isRequired, // Function to change the current page
-  setCurrentFacilityName: PropTypes.func.isRequired, // Function to set the current facility name
-};
 
 export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
   const [facilities, setFacilities] = useState([]);

@@ -2,13 +2,6 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 import { IoIosCreate } from "react-icons/io";
 import { supabase } from "@app/supabaseClient";
-import PropTypes from "prop-types";
-
-EditRole.propTypes = {
-  setIsEditRoleModalOpen: PropTypes.func.isRequired, // Function to close the modal
-  setRoles: PropTypes.func.isRequired, // Function to update the roles list in the parent component
-  selectedRole: PropTypes.object.isRequired, // The role data to be edited
-};
 
 export default function EditRole({
   setIsEditRoleModalOpen,

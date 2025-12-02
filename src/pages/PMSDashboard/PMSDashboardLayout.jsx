@@ -8,13 +8,13 @@ import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import axios from "axios";
 import { useAuth } from "@context/AuthProvider";
-import { supabase } from "../../app/supabaseClient";
+import { supabase } from "@app/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { handleSingleLogin } from "@hooks/opentech";
-import Scripts from "../../features/pms/pages/Scripts";
+import Scripts from "@features/pms/pages/Scripts";
 import { RiAdminFill } from "react-icons/ri";
-import Overview from "../../features/pms/pages/Overview";
+import Overview from "@features/pms/pages/Overview";
 
 export default function PMSDashboardLayout({
   dashboardMenu,

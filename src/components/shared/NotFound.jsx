@@ -10,7 +10,7 @@ export default function NotFound() {
   };
 
   useEffect(() => {
-    // Show the 404 content after 1 second
+    // Show the 404 content after .5 second
     const timer = setTimeout(() => {
       setShow404(true);
     }, 500);

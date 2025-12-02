@@ -19,12 +19,6 @@ import {
 import { FaLock, FaLockOpen, FaCheckCircle } from "react-icons/fa";
 import { BsShieldLockFill } from "react-icons/bs";
 import { IoIosWarning } from "react-icons/io";
-import PropTypes from "prop-types";
-
-AllSmartLocksReport.propTypes = {
-  selectedFacilities: PropTypes.array.isRequired,
-  searchQuery: PropTypes.string.isRequired,
-};
 
 export default function AllSmartLocksReport({
   selectedFacilities,

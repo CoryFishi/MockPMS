@@ -1,4 +1,4 @@
-import EditVisitorVisitorPage from "./EditVisitorVisitorPage";
+import EditVisitorVisitorPage from "@features/pms/modals/EditVisitorVisitorPage";
 import PaginationFooter from "@components/shared/PaginationFooter";
 import DataTable from "@components/shared/DataTable";
 import { addEvent } from "@hooks/supabase";
@@ -7,19 +7,12 @@ import { MdEdit } from "react-icons/md";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import CreateVisitorUnitPage from "./CreateVisitorUnitPage";
+import CreateVisitorUnitPage from "@features/pms/modals/CreateVisitorUnitPage";
 import ModalContainer from "@components/UI/ModalContainer";
-import DeleteModal from "./DeleteModal";
+import DeleteModal from "@features/pms/modals/DeleteModal";
 import InputBox from "@components/UI/InputBox";
 import GeneralButton from "@components/UI/GeneralButton";
 import SliderButton from "@components/UI/SliderButton";
-import PropTypes from "prop-types";
-
-EditVisitor.propTypes = {
-  setIsEditVisitorModalOpen: PropTypes.func.isRequired, // Function to close the modal
-  visitors: PropTypes.array, // Array of visitors to display
-  unit: PropTypes.object.isRequired, // Unit object to edit
-};
 
 export default function EditVisitor({
   setIsEditVisitorModalOpen,

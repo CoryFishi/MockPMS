@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import PropTypes from "prop-types";
-import SmartLockMapping from "../../features/smartlock/pages/SmartLockMapping";
+import SmartLockMapping from "@features/smartlock/pages/SmartLockMapping";
 
 SmartLockDashboardLayout.propTypes = {
   dashboardMenu: PropTypes.bool, // Boolean to determine if the dashboard menu should be displayed

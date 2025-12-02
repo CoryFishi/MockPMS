@@ -7,12 +7,6 @@ import {
   BiChevronsLeft,
   BiChevronsRight,
 } from "react-icons/bi";
-import PropTypes from "prop-types";
-
-ExtendedHistoryReport.propTypes = {
-  selectedFacilities: PropTypes.array.isRequired, // Array of selected facilities
-  searchQuery: PropTypes.string.isRequired, // Search query string
-};
 
 export default function ExtendedHistoryReport({
   selectedFacilities,

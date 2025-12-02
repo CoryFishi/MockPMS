@@ -1,16 +1,16 @@
-import AllSmartLocksReport from "../reports/AllSmartLocksReport";
-import AllEdgeRoutersReport from "../reports/AllEdgeRoutersReport";
-import AllAccessPointsReport from "../reports/AllAccessPointsReport";
-import AllSmartLocksEventsReport from "../reports/AllSmartLockEventsReport";
-import AllSmartLockOnlineTimeReport from "../reports/AllSmartLockOnlineTimeReport";
-import ExtendedHistoryReport from "../reports/ExtendedHistoryReport";
+import AllSmartLocksReport from "@features/smartlock/reports/AllSmartLocksReport";
+import AllEdgeRoutersReport from "@features/smartlock/reports/AllEdgeRoutersReport";
+import AllAccessPointsReport from "@features/smartlock/reports/AllAccessPointsReport";
+import AllSmartLocksEventsReport from "@features/smartlock/reports/AllSmartLockEventsReport";
+import AllSmartLockOnlineTimeReport from "@features/smartlock/reports/AllSmartLockOnlineTimeReport";
+import ExtendedHistoryReport from "@features/smartlock/reports/ExtendedHistoryReport";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
 import { useAuth } from "@context/AuthProvider";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useRef, useState } from "react";
 import { FaLock } from "react-icons/fa";
-import AllSmartLockOfflineEventsReport from "../reports/AllSmartLockOfflineEventsReport";
+import AllSmartLockOfflineEventsReport from "@features/smartlock/reports/AllSmartLockOfflineEventsReport";
 
 export default function SmartLockReports() {
   const [searchQuery, setSearchQuery] = useState("");

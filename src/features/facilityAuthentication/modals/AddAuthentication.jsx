@@ -4,8 +4,8 @@ import { MdOutlineError } from "react-icons/md";
 import toast from "react-hot-toast";
 import InputBox from "@components/UI/InputBox";
 import ModalButton from "@components/UI/ModalButton";
-import ModalContainer from "../../../components/UI/ModalContainer";
-import SelectOption from "../../../components/UI/SelectOption";
+import ModalContainer from "@components/UI/ModalContainer";
+import SelectOption from "@components/UI/SelectOption";
 
 export default function AddAuthentication({
   isOpen,

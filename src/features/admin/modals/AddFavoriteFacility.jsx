@@ -3,12 +3,6 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { FaEdit } from "react-icons/fa";
 import qs from "qs";
-import PropTypes from "prop-types";
-
-AddFavoriteFacility.propTypes = {
-  setIsAddFavoriteFacilityModalOpen: PropTypes.func.isRequired,
-  setNewUserData: PropTypes.func.isRequired,
-};
 
 export default function AddFavoriteFacility({
   setIsAddFavoriteFacilityModalOpen,

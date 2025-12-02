@@ -1,5 +1,5 @@
-import CreateVisitorVisitor from "../modals/CreateVisitorVisitorPage";
-import EditVisitorVisitorPage from "../modals/EditVisitorVisitorPage";
+import CreateVisitorVisitor from "@features/pms/modals/CreateVisitorVisitorPage";
+import EditVisitorVisitorPage from "@features/pms/modals/EditVisitorVisitorPage";
 import PaginationFooter from "@components/shared/PaginationFooter";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
 import DataTable from "@components/shared/DataTable";
@@ -8,7 +8,7 @@ import { FaPerson } from "react-icons/fa6";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
-import DeleteModal from "../modals/DeleteModal";
+import DeleteModal from "@features/pms/modals/DeleteModal";
 import InputBox from "@components/UI/InputBox";
 import GeneralButton from "@components/UI/GeneralButton";
 import TableButton from "@components/UI/TableButton";

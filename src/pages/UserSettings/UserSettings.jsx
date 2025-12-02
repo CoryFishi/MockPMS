@@ -7,9 +7,10 @@ import { useAuth } from "@context/AuthProvider";
 import InputBox from "@components/UI/InputBox";
 import toast from "react-hot-toast";
 import { BiCheckCircle, BiCircle } from "react-icons/bi";
-import { supabase } from "../../app/supabaseClient";
+import { supabase } from "@app/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
+import { addEvent } from "@hooks/supabase";
 
 export default function UserSettings({ darkMode, toggleDarkMode }) {
   const [newPassword1, setNewPassword1] = useState("");
@@ -55,27 +56,14 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
     if (!error) setEnabled(!enabled);
     setLoading(false);
   };
-  async function addEvent(eventName, eventDescription, completed) {
-    const { data, error } = await supabase.from("user_events").insert([
-      {
-        event_name: eventName,
-        event_description: eventDescription,
-        completed: completed,
-      },
-    ]);
-
-    if (error) {
-      console.error("Error inserting event:", error);
-    } else {
-      console.log("Inserted event:", data);
-    }
-  }
   const getAllEvents = useCallback(async () => {
     if (!user) return;
     const { data, error } = await supabase
       .from("user_events")
       .select("*")
-      .eq("user_id", user.id);
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(1000);
 
     if (error) {
       console.error("Error fetching events:", error);

@@ -1,5 +1,5 @@
-import CreateUnit from "../modals/CreateUnit";
-import EditVisitor from "../modals/EditVisitorUnitPage";
+import CreateUnit from "@features/pms/modals/CreateUnit";
+import EditVisitor from "@features/pms/modals/EditVisitorUnitPage";
 import PaginationFooter from "@components/shared/PaginationFooter";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
 import DataTable from "@components/shared/DataTable";
@@ -13,9 +13,9 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { RiDoorLockFill } from "react-icons/ri";
-import DeleteModal from "../modals/DeleteModal";
-import CreateVisitorUnitPage from "../modals/CreateVisitorUnitPage";
-import DelinquencyModal from "../modals/DelinquencyModal";
+import DeleteModal from "@features/pms/modals/DeleteModal";
+import CreateVisitorUnitPage from "@features/pms/modals/CreateVisitorUnitPage";
+import DelinquencyModal from "@features/pms/modals/DelinquencyModal";
 
 export default function Units({ currentFacilityName }) {
   const [units, setUnits] = useState([]);

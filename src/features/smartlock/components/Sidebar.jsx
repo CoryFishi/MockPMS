@@ -1,12 +1,12 @@
-import layoutUnits from "../utils/facility1.json";
+import layoutUnits from "@features/smartlock/utils/facility1.json";
 import { useMemo, useState } from "react";
-import CreateUnitModal from "../modals/CreateUnitModal";
+import CreateUnitModal from "@features/smartlock/modals/CreateUnitModal";
 import { v4 as uuid } from "uuid";
 import {
   TbLayoutSidebarLeftCollapseFilled,
   TbLayoutSidebarRightCollapseFilled,
 } from "react-icons/tb";
-import CreateWallModal from "../modals/CreateWallModal";
+import CreateWallModal from "@features/smartlock/modals/CreateWallModal";
 export default function Sidebar({
   layout,
   setLayout,

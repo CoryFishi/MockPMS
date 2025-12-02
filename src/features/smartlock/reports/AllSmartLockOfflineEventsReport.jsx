@@ -13,7 +13,6 @@ import {
 
 export default function AllSmartLockOfflineEventsReport({
   selectedFacilities,
-  searchQuery,
 }) {
   const [dayValue, setDayValue] = useState(7);
   const currentTime = Math.floor(Date.now() / 1000);

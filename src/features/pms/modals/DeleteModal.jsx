@@ -2,16 +2,6 @@ import ModalButton from "@components/UI/ModalButton";
 import ModalContainer from "@components/UI/ModalContainer";
 import { MdDeleteForever } from "react-icons/md";
 import { useState } from "react";
-import PropTypes from "prop-types";
-
-DeleteModal.propTypes = {
-  type: PropTypes.oneOf(["unit", "uv", "facility"]).isRequired, // Type of item to delete (unit, uv, or facility)
-  setContinousDelete: PropTypes.func.isRequired, // Function to set continuous delete setting
-  continousDelete: PropTypes.bool.isRequired, // Current state of continuous delete setting
-  handleDelete: PropTypes.func.isRequired, // Function to handle the delete action
-  value: PropTypes.object.isRequired, // Object containing details of the item to delete (e.g., unitNumber, name)
-  setIsDeleteModalOpen: PropTypes.func.isRequired, // Function to close the modal
-};
 
 export default function DeleteModal({
   type,

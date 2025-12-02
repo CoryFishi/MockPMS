@@ -1,12 +1,3 @@
-import PropTypes from "prop-types";
-
-SliderButton.propTypes = {
-  onclick: PropTypes.func.isRequired,
-  value: PropTypes.bool.isRequired,
-  offValue: PropTypes.node,
-  onValue: PropTypes.node,
-};
-
 export default function SliderButton({ onclick, value, offValue, onValue }) {
   return (
     <div

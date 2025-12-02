@@ -8,19 +8,12 @@ import {
   FaEdit,
   FaEyeSlash,
 } from "react-icons/fa";
-import EditCurrentFacility from "./EditCurrentFacility";
-import AddToken from "./AddToken";
-import AddFavoriteFacility from "./AddFavoriteFacility";
-import AddSelectedFacility from "./AddSelectedFacility";
+import EditCurrentFacility from "@features/admin/modals/EditCurrentFacility";
+import AddToken from "@features/admin/modals/AddToken";
+import AddFavoriteFacility from "@features/admin/modals/AddFavoriteFacility";
+import AddSelectedFacility from "@features/admin/modals/AddSelectedFacility";
 import { addEvent } from "@hooks/supabase";
 import { useAuth } from "@context/AuthProvider";
-import PropTypes from "prop-types";
-
-EditUser.propTypes = {
-  setIsEditUserModalOpen: PropTypes.func.isRequired, // Function to close the modal
-  selectedUser: PropTypes.object.isRequired, // The user data to be edited
-  setUsers: PropTypes.func.isRequired, // Function to update the users list in the parent component
-};
 
 export default function EditUser({
   setIsEditUserModalOpen,

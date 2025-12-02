@@ -1,29 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import PropTypes from "prop-types";
-
-DataTable.propTypes = {
-  columns: PropTypes.arrayOf(
-    PropTypes.shape({
-      key: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired,
-      accessor: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.func, // For custom accessors
-      ]).isRequired,
-      sortable: PropTypes.bool, // Optional, default is true
-      render: PropTypes.func, // Optional custom render function
-    })
-  ).isRequired,
-  data: PropTypes.arrayOf(PropTypes.object).isRequired,
-  currentPage: PropTypes.number,
-  rowsPerPage: PropTypes.number,
-  sortDirection: PropTypes.oneOf(["asc", "desc"]),
-  sortedColumn: PropTypes.string,
-  onSort: PropTypes.func, // Function to handle sorting
-  hoveredRow: PropTypes.number, // Index of the currently hovered row
-  setHoveredRow: PropTypes.func, // Function to set hovered row index
-  onRowClick: PropTypes.func, // Function to handle row click
-};
 
 export default function DataTable({
   columns,

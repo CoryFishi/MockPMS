@@ -2,12 +2,6 @@ import PaginationFooter from "@components/shared/PaginationFooter";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-
-AllSmartLocksEventsReport.propTypes = {
-  selectedFacilities: PropTypes.array.isRequired, // Array of selected facilities
-  searchQuery: PropTypes.string.isRequired, // Search query string
-};
 
 export default function AllSmartLocksEventsReport({
   selectedFacilities,

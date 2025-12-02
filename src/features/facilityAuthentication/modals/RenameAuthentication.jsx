@@ -1,13 +1,5 @@
 import { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
-import PropTypes from "prop-types";
-
-RenameAuthentication.propTypes = {
-  isOpen: PropTypes.bool.isRequired, // Controls modal visibility
-  onClose: PropTypes.func.isRequired, // Function to close the modal
-  onSubmit: PropTypes.func.isRequired, // Function to submit the new name
-  token: PropTypes.object.isRequired, // Token object containing id and name
-};
 
 export default function RenameAuthentication({
   isOpen,

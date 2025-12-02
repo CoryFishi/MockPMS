@@ -7,14 +7,6 @@ import { addEvent } from "@hooks/supabase";
 import ModalContainer from "@components/UI/ModalContainer";
 import InputBox from "@components/UI/InputBox";
 import SelectOption from "@components/UI/SelectOption";
-import PropTypes from "prop-types";
-
-CreateVisitorUnitPage.propTypes = {
-  setIsCreateVisitorModalOpen: PropTypes.func.isRequired, // Function to close the modal
-  setValues: PropTypes.func.isRequired, // Function to update the unit or visitor list
-  unit: PropTypes.object.isRequired, // Unit object containing unitNumber and id
-  type: PropTypes.oneOf(["new", "existing"]), // Type of visitor creation: "new" for renting a unit, "existing" for adding a visitor to an existing unit
-};
 
 export default function CreateVisitorUnitPage({
   setIsCreateVisitorModalOpen,

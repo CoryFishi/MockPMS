@@ -19,14 +19,6 @@ import {
 } from "react-icons/ri";
 import { BsShieldLockFill } from "react-icons/bs";
 import { IoIosWarning } from "react-icons/io";
-import PropTypes from "prop-types";
-
-SmartLock.propTypes = {
-  smartlockModalOption: PropTypes.string, // Filter option for the modal
-  smartLocks: PropTypes.array.isRequired, // Array of smart locks
-  facilityName: PropTypes.string.isRequired, // Name of the facility
-  setIsSmartlockModalOpen: PropTypes.func.isRequired, // Function to close the modal
-};
 
 export default function SmartLock({
   smartlockModalOption,
