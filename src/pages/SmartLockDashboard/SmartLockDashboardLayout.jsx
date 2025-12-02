@@ -7,12 +7,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
-import PropTypes from "prop-types";
 import SmartLockMapping from "@features/smartlock/pages/SmartLockMapping";
-
-SmartLockDashboardLayout.propTypes = {
-  dashboardMenu: PropTypes.bool, // Boolean to determine if the dashboard menu should be displayed
-};
 
 export default function SmartLockDashboardLayout({ dashboardMenu }) {
   // Drop down variables for the left navigation menu
@@ -69,9 +64,9 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                   <span className="pl-1 truncate max-w-[18ch]">Dashboard</span>
                 </div>
                 {openSections.currentFacility ? (
-                  <MdExpandLess className="flex-shrink-0 text-2xl" />
+                  <MdExpandLess className="shrink-0 text-2xl" />
                 ) : (
-                  <MdExpandMore className="flex-shrink-0 text-2xl" />
+                  <MdExpandMore className="shrink-0 text-2xl" />
                 )}
               </div>
 
@@ -145,9 +140,9 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                   </span>
                 </div>
                 {openSections.facilities ? (
-                  <MdExpandLess className="flex-shrink-0 text-2xl" />
+                  <MdExpandLess className="shrink-0 text-2xl" />
                 ) : (
-                  <MdExpandMore className="flex-shrink-0 text-2xl" />
+                  <MdExpandMore className="shrink-0 text-2xl" />
                 )}
               </div>
 

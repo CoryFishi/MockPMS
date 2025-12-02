@@ -252,7 +252,7 @@ export default function AllSmartLockOnlineTimeReport({
       </div>
       <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
         {/* Header */}
-        <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
+        <thead className="select-none sticky -top-px z-10 bg-gray-200 dark:bg-darkNavSecondary">
           <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
             {/* Facility Column */}
             <th

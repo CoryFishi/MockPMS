@@ -25,7 +25,7 @@ export default function SmartLockDetailModal({ lock, onClose }) {
           {Object.entries(lock).map(([key, value]) => (
             <div key={key}>
               <strong className="text-yellow-500">{key}</strong>
-              <div className="break-words">
+              <div className="wrap-break-word">
                 {typeof value === "boolean"
                   ? value.toString()
                   : Array.isArray(value)

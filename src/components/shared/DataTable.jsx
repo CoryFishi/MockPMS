@@ -49,7 +49,7 @@ export default function DataTable({
   return (
     <>
       <table className="w-full table-auto border-collapse border-zinc-300 dark:border-border">
-        <thead className="sticky top-[-1px] z-10 bg-zinc-200 dark:bg-darkNavSecondary">
+        <thead className="sticky -top-px z-10 bg-zinc-200 dark:bg-darkNavSecondary">
           <tr>
             {columns.map(({ key, label, accessor, sortable = true }) => (
               <th

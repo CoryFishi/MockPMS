@@ -635,7 +635,7 @@ export default function Units({ currentFacilityName }) {
                           <span className="font-bold text-yellow-400 overflow-ellipsis">
                             {key}:
                           </span>{" "}
-                          <span className="break-words">
+                          <span className="wrap-break-word">
                             {value == null || value === ""
                               ? "null"
                               : typeof value === "object"

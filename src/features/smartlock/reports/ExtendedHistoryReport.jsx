@@ -133,7 +133,7 @@ export default function ExtendedHistoryReport({
           className="select-none"
           onClick={() => console.log(filteredSmartLockEvents)}
         >
-          <tr className="bg-gray-200 dark:bg-darkNavSecondary sticky top-[-1px] z-10">
+          <tr className="bg-gray-200 dark:bg-darkNavSecondary sticky -top-px z-10">
             <th
               className="border border-gray-300 dark:border-border px-4 py-2  hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
@@ -316,12 +316,12 @@ export default function ExtendedHistoryReport({
                       <div className="grid grid-cols-4 gap-1 overflow-hidden">
                         {Object.entries(smartlock).map(
                           ([key, value], index) => (
-                            <div key={index} className="break-words">
+                            <div key={index} className="wrap-break-word">
                               <span className="font-bold text-yellow-500">
                                 {key}:
                               </span>
                               <br />
-                              <span className="whitespace-normal break-words">
+                              <span className="whitespace-normal wrap-break-word">
                                 {value === null
                                   ? "null"
                                   : value === ""

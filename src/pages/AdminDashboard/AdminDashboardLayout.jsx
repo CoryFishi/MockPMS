@@ -59,9 +59,9 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                   <span className="pl-2">User Administrastion</span>
                 </div>
                 {openSections.userAdmin ? (
-                  <MdExpandLess className="flex-shrink-0 text-2xl" />
+                  <MdExpandLess className="shrink-0 text-2xl" />
                 ) : (
-                  <MdExpandMore className="flex-shrink-0 text-2xl" />
+                  <MdExpandMore className="shrink-0 text-2xl" />
                 )}
               </div>
 

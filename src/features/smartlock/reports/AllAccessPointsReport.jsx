@@ -103,7 +103,7 @@ export default function AllAccessPointsReport({
     <div className="w-full px-2">
       <table className="w-full table-auto border-collapse border-gray-300 dark:border-border">
         {/* Header */}
-        <thead className="select-none sticky top-[-1px] z-10 bg-gray-200 dark:bg-darkNavSecondary">
+        <thead className="select-none sticky -top-px z-10 bg-gray-200 dark:bg-darkNavSecondary">
           <tr className="bg-gray-200 dark:bg-darkNavSecondary text-center">
             <th
               className="px-4 py-2 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
@@ -256,12 +256,12 @@ export default function AllAccessPointsReport({
                       <div className="grid grid-cols-4 gap-1 overflow-hidden">
                         {Object.entries(accessPoint).map(
                           ([key, value], index) => (
-                            <div key={index} className="break-words">
+                            <div key={index} className="wrap-break-word">
                               <span className="font-bold text-yellow-500">
                                 {key}:
                               </span>
                               <br />
-                              <span className="whitespace-normal break-words">
+                              <span className="whitespace-normal wrap-break-word">
                                 {value === null
                                   ? "null"
                                   : value === ""
