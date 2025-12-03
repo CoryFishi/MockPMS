@@ -28,7 +28,7 @@ export default function SmartLockFacilityRow({
 
   return (
     <>
-      <tr className="hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-300 dark:border-zinc-700">
+      <tr className="hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
         <td
           className="px-4 py-2 cursor-pointer"
           onClick={() => toggleRowExpansion(facility.id)}
@@ -60,7 +60,7 @@ export default function SmartLockFacilityRow({
           </div>
         </td>
 
-        <td className="px-4 py-2" onClick={() => console.log(facility)}>
+        <td className="px-4 py-2">
           <div className="inline-flex items-center gap-1 text-center">
             {facility.edgeRouterStatus === "error" ? (
               <IoIosWarning className="text-red-500 mr-2 min-w-5" />
@@ -72,10 +72,7 @@ export default function SmartLockFacilityRow({
             {facility.edgeRouterName}
           </div>
         </td>
-        <td
-          className="px-4 py-2 text-center"
-          onClick={() => console.log(facility)}
-        >
+        <td className="px-4 py-2 text-center">
           {facility.onlineAccessPointsCount}
         </td>
         <td className="px-4 py-2 text-center">
@@ -135,7 +132,7 @@ export default function SmartLockFacilityRow({
         <tr>
           <td
             colSpan="10"
-            className="bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 p-5 border"
+            className="bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 p-5 border"
           >
             <div className="grid grid-cols-3">
               {/* Facility Info */}

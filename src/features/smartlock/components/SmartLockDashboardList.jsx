@@ -52,39 +52,38 @@ export default function SmartLockDashboardList({
 
       return nextDirection === "asc" ? aVal - bVal : bVal - aVal;
     });
-    console.log("Sorted:", sorted);
     setFilteredFacilities(sorted);
   };
 
   return (
     <table className="w-full">
       <thead className="select-none">
-        <tr className="bg-zinc-100 dark:bg-darkNavSecondary">
-          <th className="border border-zinc-300 dark:border-border px-4 py-2"></th>
+        <tr className="bg-zinc-100 dark:bg-zinc-800">
+          <th className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"></th>
           <th
-            className="border border-zinc-300 dark:border-border px-4 py-2"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"
             colSpan="3"
           >
             OpenNet
           </th>
           <th
-            className="border border-zinc-300 dark:border-border px-4 py-2"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"
             colSpan="6"
           >
             SmartLock
           </th>
         </tr>
-        <tr className="bg-zinc-100 dark:bg-darkNavSecondary">
+        <tr className="bg-zinc-100 dark:bg-zinc-800">
           <th
             onClick={() => handleSort("name")}
-            className="border border-zinc-300 dark:border-border px-4 py-2 cursor-pointer"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2 cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-900"
           >
             Facility{" "}
             {sortKey === "name" && (sortDirection === "asc" ? "▲" : "▼")}
           </th>
           <th
             onClick={() => handleSort("edgeRouterStatus")}
-            className="border border-zinc-300 dark:border-border px-4 py-2 cursor-pointer"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2 cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-900"
           >
             Edge Router{" "}
             {sortKey === "edgeRouterStatus" &&
@@ -92,7 +91,7 @@ export default function SmartLockDashboardList({
           </th>
           <th
             onClick={() => handleSort("onlineAccessPointsCount")}
-            className="border border-zinc-300 dark:border-border px-4 py-2 cursor-pointer"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2 cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-900"
           >
             Online APs{" "}
             {sortKey === "onlineAccessPointsCount" &&
@@ -100,21 +99,21 @@ export default function SmartLockDashboardList({
           </th>
           <th
             onClick={() => handleSort("offlineAccessPointsCount")}
-            className="border border-zinc-300 dark:border-border px-4 py-2 cursor-pointer"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2 cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-900"
           >
             Offline APs{" "}
             {sortKey === "offlineAccessPointsCount" &&
               (sortDirection === "asc" ? "▲" : "▼")}
           </th>
           <th
-            className="border border-zinc-300 dark:border-border px-4 py-2 cursor-pointer"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2 cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-900"
             onClick={() => handleSort("okCount")}
           >
             Okay{" "}
             {sortKey === "okCount" && (sortDirection === "asc" ? "▲" : "▼")}
           </th>
           <th
-            className="border border-zinc-300 dark:border-border px-4 py-2 cursor-pointer"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2 cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-900"
             onClick={() => handleSort("warningCount")}
           >
             Warning{" "}
@@ -122,14 +121,14 @@ export default function SmartLockDashboardList({
               (sortDirection === "asc" ? "▲" : "▼")}
           </th>
           <th
-            className="border border-zinc-300 dark:border-border px-4 py-2 cursor-pointer"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2 cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-900"
             onClick={() => handleSort("errorCount")}
           >
             Error{" "}
             {sortKey === "errorCount" && (sortDirection === "asc" ? "▲" : "▼")}
           </th>
           <th
-            className="border border-zinc-300 dark:border-border px-4 py-2 cursor-pointer"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2 cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-900"
             onClick={() => handleSort("offlineCount")}
           >
             Offline{" "}
@@ -138,7 +137,7 @@ export default function SmartLockDashboardList({
           </th>
           <th
             onClick={() => handleSort("lowestSignal")}
-            className="cursor-pointer border border-zinc-300 dark:border-border px-4 py-2"
+            className="cursor-pointer border border-zinc-300 dark:border-zinc-700 px-4 py-2 hover:bg-zinc-300 dark:hover:bg-zinc-900"
           >
             Lowest Signal{" "}
             {sortKey === "lowestSignal" &&
@@ -146,7 +145,7 @@ export default function SmartLockDashboardList({
           </th>
           <th
             onClick={() => handleSort("lowestBattery")}
-            className="cursor-pointer border border-zinc-300 dark:border-border px-4 py-2"
+            className="cursor-pointer border border-zinc-300 dark:border-zinc-700 px-4 py-2 hover:bg-zinc-300 dark:hover:bg-zinc-900"
           >
             Lowest Battery{" "}
             {sortKey === "lowestBattery" &&
@@ -164,9 +163,9 @@ export default function SmartLockDashboardList({
             key={index}
           />
         ))}
-        <tr className="bg-zinc-100 dark:bg-darkSecondary text-center">
+        <tr className="bg-zinc-100 dark:bg-zinc-800 text-center">
           <td
-            className="border border-zinc-300 dark:border-border px-4 py-2 font-bold text-left"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2 font-bold text-left"
             title={
               totalSmartlocks +
               " SmartLocks \n" +
@@ -179,7 +178,7 @@ export default function SmartLockDashboardList({
             Totals:
           </td>
           <td
-            className="border border-zinc-300 dark:border-border px-4 py-2"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"
             title={
               Math.round((edgeRouterOnlineCount / totalEdgeRouters) * 100) +
               "% Online \n" +
@@ -200,7 +199,7 @@ export default function SmartLockDashboardList({
               : ""}
           </td>
           <td
-            className="border border-zinc-300 dark:border-border px-4 py-2"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"
             title={
               Math.round((accessPointsOnlineCount / totalAccessPoints) * 100) +
               "% Online"
@@ -209,7 +208,7 @@ export default function SmartLockDashboardList({
             {accessPointsOnlineCount}
           </td>
           <td
-            className="border border-zinc-300 dark:border-border px-4 py-2"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"
             title={
               Math.round((accessPointsOfflineCount / totalAccessPoints) * 100) +
               "% Offline"
@@ -218,7 +217,7 @@ export default function SmartLockDashboardList({
             {accessPointsOfflineCount}
           </td>
           <td
-            className="border border-zinc-300 dark:border-border px-4 py-2"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"
             title={
               Math.round((smartlockOkayCount / totalSmartlocks) * 100) +
               "% Okay Status"
@@ -227,7 +226,7 @@ export default function SmartLockDashboardList({
             {smartlockOkayCount}
           </td>
           <td
-            className="border border-zinc-300 dark:border-border px-4 py-2"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"
             title={
               Math.round((smartlockWarningCount / totalSmartlocks) * 100) +
               "% Warning Status"
@@ -236,7 +235,7 @@ export default function SmartLockDashboardList({
             {smartlockWarningCount}
           </td>
           <td
-            className="border border-zinc-300 dark:border-border px-4 py-2"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"
             title={
               Math.round((smartlockErrorCount / totalSmartlocks) * 100) +
               "% Error Status"
@@ -245,7 +244,7 @@ export default function SmartLockDashboardList({
             {smartlockErrorCount}
           </td>
           <td
-            className="border border-zinc-300 dark:border-border px-4 py-2"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"
             title={
               Math.round((smartlockOfflineCount / totalSmartlocks) * 100) +
               "% Offline"
@@ -254,13 +253,13 @@ export default function SmartLockDashboardList({
             {smartlockOfflineCount}
           </td>
           <td
-            className="border border-zinc-300 dark:border-border px-4 py-2"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"
             title={smartlockLowestSignal.facility}
           >
             {smartlockLowestSignal.lowestSignal}%
           </td>
           <td
-            className="border border-zinc-300 dark:border-border px-4 py-2"
+            className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"
             title={smartlockLowestBattery.facility}
           >
             {smartlockLowestBattery.lowestBattery}%

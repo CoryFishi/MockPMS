@@ -7,6 +7,7 @@ import SmartLockExport from "@features/smartlock/components/SmartLockExport";
 import { useAuth } from "@context/AuthProvider";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
 import SmartLockDashboardList from "@features/smartlock/components/SmartLockDashboardList";
+import InputBox from "@components/UI/InputBox";
 
 export default function SmartLockDashboardView() {
   const [facilitiesWithBearers, setFacilitiesWithBearers] = useState([]);
@@ -364,12 +365,12 @@ export default function SmartLockDashboardView() {
     <div
       className={`relative ${
         isLoading ? "overflow-hidden min-h-full" : "overflow-auto"
-      } h-full dark:text-white dark:bg-darkPrimary relative`}
+      } h-full dark:text-white dark:bg-zinc-900 relative`}
     >
       {/* Loading Spinner */}
       {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* tab title */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
         <div className="ml-5 flex items-center text-sm">
           <FaLock className="text-lg" />
           &ensp; SmartLock Dashboard
@@ -377,21 +378,21 @@ export default function SmartLockDashboardView() {
       </div>
       <div className="mt-5 mb-2 flex items-center justify-end text-center mx-5">
         {/* Search Bar */}
-        <input
+
+        <InputBox
           type="text"
           placeholder="Search facilities..."
-          value={searchQuery}
-          onChange={(e) => {
+          onchange={(e) => {
             const value = e.target.value;
             setSearchQuery(value);
             search(value);
           }}
-          className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
+          value={searchQuery}
         />
 
         {/* Toggle view button */}
         <button
-          className="bg-zinc-300 text-white p-1 py-2 rounded-sm hover:bg-zinc-400 ml-3 w-44 font-bold cursor-pointer hover:transition hover:duration-300 hover:ease-in-out"
+          className="bg-sky-500 text-white p-1 py-2 rounded-sm hover:bg-sky-600 ml-3 w-44 font-bold cursor-pointer hover:transition hover:duration-300 hover:ease-in-out"
           onClick={() => toggleListView()}
         >
           {listView ? "Card View" : "List View"}
@@ -423,7 +424,7 @@ export default function SmartLockDashboardView() {
       ) : (
         // Card View
         <div className="p-5 pt-1 text-left">
-          <div className="bg-white shadow-lg rounded-lg p-5 mb-4 border dark:bg-darkSecondary text-black dark:text-white dark:border-border flex justify-center gap-8">
+          <div className="bg-white shadow-lg rounded-lg p-5 mb-4 border dark:bg-zinc-900 text-black dark:text-white dark:border-zinc-700 flex justify-center gap-8">
             <div>
               <h1 className="w-full border-b-2 mb-2 border-yellow-400 text-black dark:text-white text-lg">
                 Edge Routers:

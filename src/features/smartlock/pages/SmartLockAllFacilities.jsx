@@ -16,6 +16,7 @@ import {
   RiCheckboxCircleFill,
   RiCheckboxBlankCircleLine,
 } from "react-icons/ri";
+import InputBox from "@components/UI/InputBox";
 
 export default function SmartLockAllFacilitiesPage() {
   const [facilities, setFacilities] = useState([]);
@@ -333,7 +334,7 @@ export default function SmartLockAllFacilitiesPage() {
   const columns = [
     {
       key: "isSelected",
-      label: <RiCheckboxBlankCircleLine className="text-lg text-slate-400" />,
+      label: "◯",
       accessor: (f) => (isFacilitySelected(f.facilityId) ? 1 : 0),
       render: (f) => (
         <div
@@ -419,12 +420,12 @@ export default function SmartLockAllFacilitiesPage() {
     <div
       className={`relative ${
         isLoading ? "overflow-hidden min-h-full" : "overflow-auto"
-      } h-full dark:text-white dark:bg-darkPrimary relative`}
+      } h-full dark:text-white dark:bg-zinc-900 relative`}
     >
       {/* Loading Spinner */}
       {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
         <div className="ml-5 flex items-center text-sm">
           <FaWarehouse className="text-lg" />
           &ensp; All Facilities
@@ -434,12 +435,11 @@ export default function SmartLockAllFacilitiesPage() {
       <div className="w-full px-5 flex flex-col rounded-lg h-full">
         {/* Search Bar */}
         <div className="mt-5 mb-2 flex items-center justify-end text-center">
-          <input
-            type="text"
+          <InputBox
             placeholder="Search facilities..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
+            onchange={(e) => setSearchQuery(e.target.value)}
+            className="w-full max-w-md"
           />
         </div>
         {/* Table */}

@@ -7,6 +7,7 @@ import { FaPerson } from "react-icons/fa6";
 import { useAuth } from "@context/AuthProvider";
 import { supabaseAdmin, supabase } from "@app/supabaseClient";
 import toast from "react-hot-toast";
+import InputBox from "@components/UI/InputBox";
 
 export default function Roles() {
   const { user } = useAuth();
@@ -181,7 +182,7 @@ export default function Roles() {
       render: (role, index) => (
         <div className="flex justify-center relative">
           <button
-            className="dark:bg-darkSecondary border rounded-lg dark:border-border p-2 dark:hover:bg-darkPrimary w-full cursor-pointer"
+            className="dark:bg-zinc-800 border rounded-lg dark:border-zinc-700 p-2 dark:hover:bg-zinc-900 w-full cursor-pointer"
             onMouseDown={(e) => {
               e.stopPropagation();
               toggleDropdown(index);
@@ -192,7 +193,7 @@ export default function Roles() {
           {dropdownIndex === index && (
             <div
               ref={(el) => (modalRefs.current[index] = el)}
-              className="absolute top-full mt-1 right-0 w-full bg-white dark:bg-darkSecondary border border-zinc-200 dark:border-border rounded-lg shadow-lg z-20 flex flex-col"
+              className="absolute top-full mt-1 right-0 w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg z-20 flex flex-col"
             >
               <button
                 className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md hover:cursor-pointer rounded-b"
@@ -227,7 +228,7 @@ export default function Roles() {
   ];
 
   return (
-    <div className="overflow-auto dark:text-white dark:bg-darkPrimary h-full">
+    <div className="overflow-auto dark:text-white dark:bg-zinc-900 h-full">
       {/* Edit Role Modal */}
       {isEditRoleModalOpen && (
         <EditRole
@@ -244,7 +245,7 @@ export default function Roles() {
         />
       )}
       {/* Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
         <div className="ml-5 flex items-center text-sm">
           <FaPerson className="text-lg" />
           &ensp; Roles
@@ -253,16 +254,15 @@ export default function Roles() {
       <div className="w-full px-5 flex flex-col rounded-lg h-fit">
         {/* Search Bar */}
         <div className="mb-2 mt-5 flex items-center justify-end text-center">
-          <input
-            type="text"
+          <InputBox
             placeholder="Search roles..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
+            onchange={(e) => setSearchQuery(e.target.value)}
+            className="w-full max-w-md"
           />
           <button
             onClick={() => setIsCreateRoleModalOpen(true)}
-            className="hover:cursor-pointer bg-green-500 text-white p-1 py-2 rounded-sm hover:bg-green-600 hover:scale-105 ml-3 w-44 font-bold transition duration-300 ease-in-out transform select-none"
+            className="hover:cursor-pointer bg-yellow-500 text-white p-1 py-2 rounded-sm hover:bg-yellow-600 hover:scale-105 ml-3 w-44 font-bold transition duration-300 ease-in-out transform select-none"
           >
             Create Role
           </button>

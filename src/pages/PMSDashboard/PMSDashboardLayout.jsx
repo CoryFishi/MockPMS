@@ -169,7 +169,7 @@ export default function PMSDashboardLayout({
     <div className="flex flex-col w-full h-screen overflow-y-auto overflow-hidden">
       <div className="flex flex-row w-full h-full shrink-0">
         {dashboardMenu === true && (
-          <div className="flex flex-col h-full md:min-w-[250px] min-w-full bg-navPrimary text-white dark:bg-darkNavPrimary border-r dark:border-border select-none text-lg relative">
+          <div className="flex flex-col h-full md:min-w-[250px] min-w-full bg-zinc-950 text-white dark:bg-zinc-950 border-r dark:border-zinc-700 select-none text-lg relative">
             {/* Header Side Bar */}
             <div className="pt-2">
               <h3 className="text-center m-5 text-xl">OpenTech PMS</h3>
@@ -182,8 +182,8 @@ export default function PMSDashboardLayout({
                   openPage === "visitors" ||
                   openPage === "units" ||
                   openPage === "dashboard"
-                    ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
-                    : "dark:bg-darkNavPrimary"
+                    ? "bg-zinc-900 dark:bg-zinc-900 border-l-yellow-500 border-l-2"
+                    : "dark:bg-zinc-950"
                 }`}
               >
                 <div
@@ -219,7 +219,7 @@ export default function PMSDashboardLayout({
                         localStorage.setItem("openPage", "visitors");
                         if (window.innerWidth < 768) setDashboardMenu(false);
                       }}
-                      className={`px-2 block hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer ${
+                      className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
                         openPage === "visitors"
                           ? "border-b-2 border-yellow-500"
                           : ""
@@ -233,7 +233,7 @@ export default function PMSDashboardLayout({
                         localStorage.setItem("openPage", "units");
                         if (window.innerWidth < 768) setDashboardMenu(false);
                       }}
-                      className={`px-2 block hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer ${
+                      className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
                         openPage === "units"
                           ? "border-b-2 border-yellow-500"
                           : ""
@@ -255,7 +255,7 @@ export default function PMSDashboardLayout({
                                 window.open(baseUrl, "_blank");
                               }}
                               title={baseUrl}
-                              className="px-2 hover:bg-darkNavSecondary dark:hover:bg-darkPrimary flex items-center gap-2"
+                              className="px-2 hover:bg-zinc-900 dark:hover:bg-zinc-950 flex items-center gap-2"
                             >
                               <FaExternalLinkAlt />
                               Control Center
@@ -270,7 +270,7 @@ export default function PMSDashboardLayout({
                         handleCurrentFacilityDelete();
                         if (window.innerWidth < 768) setDashboardMenu(false);
                       }}
-                      className="px-2 block hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer"
+                      className="px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer"
                     >
                       Clear Facility
                     </button>
@@ -283,8 +283,8 @@ export default function PMSDashboardLayout({
             <div
               className={`border-t border-b pl-2 pr-2 border-zinc-500 pb-8 ${
                 openPage === "allFacilities" || openPage === "favorites"
-                  ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
-                  : "dark:bg-darkNavPrimary"
+                  ? "bg-zinc-900 dark:bg-zinc-900 border-l-yellow-500 border-l-2"
+                  : "dark:bg-zinc-950"
               }`}
             >
               <div
@@ -318,7 +318,7 @@ export default function PMSDashboardLayout({
                       localStorage.setItem("openPage", "allFacilities");
                       if (window.innerWidth < 768) setDashboardMenu(false);
                     }}
-                    className={`px-2 block hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer ${
+                    className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
                       openPage === "allFacilities"
                         ? "border-b-2 border-yellow-500"
                         : ""
@@ -332,7 +332,7 @@ export default function PMSDashboardLayout({
                       localStorage.setItem("openPage", "favorites");
                       if (window.innerWidth < 768) setDashboardMenu(false);
                     }}
-                    className={`px-2 block hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer ${
+                    className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
                       openPage === "favorites"
                         ? "border-b-2 border-yellow-500"
                         : ""
@@ -349,10 +349,9 @@ export default function PMSDashboardLayout({
               <div
                 className={`border-t border-b pl-2 pr-2 border-zinc-500 pb-8 ${
                   openPage === "scripts"
-                    ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
-                    : "dark:bg-darkNavPrimary"
+                    ? "bg-zinc-900 dark:bg-zinc-900 border-l-yellow-500 border-l-2"
+                    : "dark:bg-zinc-950"
                 }`}
-                onClick={() => console.log(currentFacility)}
               >
                 <div
                   className="flex justify-between items-center cursor-pointer mt-8"
@@ -383,7 +382,7 @@ export default function PMSDashboardLayout({
                         localStorage.setItem("openPage", "scripts");
                         if (window.innerWidth < 768) setDashboardMenu(false);
                       }}
-                      className={`px-2 block hover:bg-darkNavSecondary dark:hover:bg-darkPrimary w-full text-left cursor-pointer ${
+                      className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
                         openPage === "scripts"
                           ? "border-b-2 border-yellow-500"
                           : ""
@@ -399,11 +398,11 @@ export default function PMSDashboardLayout({
             <div className="absolute bottom-0 w-full hidden md:flex justify-between text-sm hover:cursor-pointer text-center">
               <Link
                 to="/user-settings"
-                className="hover:dark:bg-darkNavSecondary w-full p-2"
+                className="hover:dark:bg-zinc-900 w-full p-2"
               >
                 Settings
               </Link>
-              <div className="hover:dark:bg-darkNavSecondary w-full p-2">
+              <div className="hover:dark:bg-zinc-900 w-full p-2">
                 <a
                   href="https://opentechalliancesupport.zendesk.com/hc/en-us/categories/115001966887-OpenTech-IoE"
                   target="_blank"
@@ -413,7 +412,7 @@ export default function PMSDashboardLayout({
                 </a>
               </div>
               <button
-                className="hover:dark:bg-darkNavSecondary w-full p-2"
+                className="hover:dark:bg-zinc-900 w-full p-2"
                 onClick={() => handleLogout()}
               >
                 Logout

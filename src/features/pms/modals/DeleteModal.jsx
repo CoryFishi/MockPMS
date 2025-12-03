@@ -25,7 +25,7 @@ export default function DeleteModal({
       icon={<MdDeleteForever />}
       mainContent={
         <>
-          <p className="text-wrap mt-3" onClick={() => console.log(type)}>
+          <p className="text-wrap mt-3">
             Would you like to {type !== "uv" ? "delete" : "move out the tenant"}{" "}
             {type == "unit" ? value.unitNumber : value.name} from this{" "}
             {type !== "uv" ? "facility" : "unit"}?

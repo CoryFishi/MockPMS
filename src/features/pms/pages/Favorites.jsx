@@ -312,8 +312,8 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
   ];
 
   return (
-    <div className="relative overflow-auto h-full dark:text-white dark:bg-darkPrimary">
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
+    <div className="relative overflow-auto h-full dark:text-white dark:bg-zinc-900">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
         <div className="ml-5 flex items-center text-sm">
           <GoStarFill className="text-lg" />
           &ensp; Favorites

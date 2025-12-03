@@ -5,8 +5,10 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
+import { useAuth } from "@context/AuthProvider";
 
 export default function AdminDashboardLayout({ dashboardMenu }) {
+  const { handleLogout } = useAuth();
   const [openSections, setOpenSections] = useState({
     facilities: false,
     currentFacility: false,
@@ -26,7 +28,7 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
     <div className="flex flex-col w-full h-screen overflow-y-auto overflow-hidden">
       <div className="flex flex-row w-full h-full shrink-0">
         {dashboardMenu === true && (
-          <div className="flex flex-col h-full md:min-w-[250px] min-w-full bg-navPrimary text-white dark:bg-darkNavPrimary border-r dark:border-border select-none text-lg relative">
+          <div className="flex flex-col h-full md:min-w-[250px] min-w-full bg-zinc-950 text-white dark:bg-zinc-950 border-r dark:border-zinc-700 select-none text-lg relative">
             {/* Header Side Bar */}
             <div className="pt-2">
               <h3 className="text-center m-5 text-xl">OpenTech Admin</h3>
@@ -38,8 +40,8 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                 openPage === "users" ||
                 openPage === "userEvents" ||
                 openPage === "roles"
-                  ? "bg-navSecondary dark:bg-darkNavSecondary border-l-yellow-500 border-l-2"
-                  : "dark:bg-darkNavPrimary"
+                  ? "bg-zinc-800 dark:bg-zinc-900 border-l-yellow-500 border-l-2"
+                  : "dark:bg-zinc-950"
               }`}
             >
               <div
@@ -72,7 +74,9 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                       setOpenPage("users") &
                       localStorage.setItem("openPage3", "users")
                     }
-                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
+                      openPage === "users" ? "border-b-2 border-yellow-500" : ""
+                    }`}
                   >
                     Users
                   </Link>
@@ -81,7 +85,11 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                       setOpenPage("userEvents") &
                       localStorage.setItem("openPage3", "userEvents")
                     }
-                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
+                      openPage === "userEvents"
+                        ? "border-b-2 border-yellow-500"
+                        : ""
+                    }`}
                   >
                     User Events
                   </Link>
@@ -90,7 +98,9 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                       setOpenPage("roles") &
                       localStorage.setItem("openPage3", "roles")
                     }
-                    className="px-2 block rounded-sm hover:bg-darkNavSecondary dark:hover:bg-darkPrimary"
+                    className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
+                      openPage === "roles" ? "border-b-2 border-yellow-500" : ""
+                    }`}
                   >
                     Roles
                   </Link>
@@ -100,11 +110,11 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
             <div className="absolute bottom-0 w-full hidden md:flex justify-between text-sm hover:cursor-pointer text-center">
               <Link
                 to="/user-settings"
-                className="hover:dark:bg-darkNavSecondary w-full p-2"
+                className="hover:dark:bg-zinc-900 w-full p-2"
               >
                 Settings
               </Link>
-              <div className="hover:dark:bg-darkNavSecondary w-full p-2">
+              <div className="hover:dark:bg-zinc-900 w-full p-2">
                 <a
                   href="https://opentechalliancesupport.zendesk.com/hc/en-us/categories/115001966887-OpenTech-IoE"
                   target="_blank"
@@ -114,15 +124,15 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                 </a>
               </div>
               <div
-                className="hover:dark:bg-darkNavSecondary w-full p-2"
-                // onClick={() => handleLogout()}
+                className="hover:dark:bg-zinc-900 w-full p-2"
+                onClick={() => handleLogout()}
               >
                 Logout
               </div>
             </div>
           </div>
         )}
-        <div className="w-full flex flex-col bg-background-50 dark:bg-darkPrimary h-full">
+        <div className="w-full flex flex-col bg-background-50 dark:bg-zinc-900 h-full">
           {openPage === "users" && <Users />}
           {openPage === "userEvents" && <UserEvents />}
           {openPage === "roles" && <Roles />}

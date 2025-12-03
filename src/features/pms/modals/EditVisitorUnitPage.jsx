@@ -63,7 +63,7 @@ export default function EditVisitor({
         setTimeProfiles(response.data);
       })
       .catch(function (error) {
-        console.log(error);
+        console.error(error);
       });
   };
   const handleAccessProfiles = async () => {
@@ -90,7 +90,7 @@ export default function EditVisitor({
         setAccessProfiles(response.data);
       })
       .catch(function (error) {
-        console.log(error);
+        console.error(error);
       });
   };
   const createTenant = () => {

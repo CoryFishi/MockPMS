@@ -37,7 +37,6 @@ export default function AllEdgeRoutersReport({
         }
       );
       const edgeRouters = response.data;
-      console.log(edgeRouters);
       return edgeRouters;
     } catch (error) {
       console.error(`Error fetching Edge Routers for: ${facility.name}`, error);

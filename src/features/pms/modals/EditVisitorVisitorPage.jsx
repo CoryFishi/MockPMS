@@ -47,7 +47,7 @@ export default function EditVisitorVisitorPage({
         setTimeProfiles(response.data);
       })
       .catch(function (error) {
-        console.log(error);
+        console.error(error);
       });
   };
   const handleAccessProfiles = async () => {
@@ -74,7 +74,7 @@ export default function EditVisitorVisitorPage({
         setAccessProfiles(response.data);
       })
       .catch(function (error) {
-        console.log(error);
+        console.error(error);
       });
   };
   const handleEditVisitor = () => {
@@ -169,7 +169,7 @@ export default function EditVisitorVisitorPage({
         })
 
         .catch(function (error) {
-          console.log(error);
+          console.error(error);
           throw error;
         }),
       {

@@ -21,11 +21,11 @@ export default function InputBox({
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         placeholder=""
-        className="w-full px-3 py-3 pr-8 border border-zinc-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 dark:bg-darkPrimary dark:border-border"
+        className="w-full px-3 py-3 pr-8 border border-zinc-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 dark:bg-zinc-900 dark:border-zinc-700"
       />
       {/* Floating label */}
       <label
-        className={`absolute left-3 px-1 transition-all duration-200 bg-white dark:bg-darkPrimary
+        className={`absolute left-3 px-1 transition-all duration-200 bg-white dark:bg-zinc-900
         ${
           shouldFloat
             ? "text-xs -top-2 text-yellow-400"

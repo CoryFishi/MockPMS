@@ -237,10 +237,7 @@ export default function Sidebar({
             >
               Limit Links {limitNearest ? "On" : "Off"}
             </button>
-            <button
-              className="w-full py-2 bg-blue-600 text-white rounded cursor-pointer"
-              onClick={() => setProximityPairs([]) & console.log(layout.units)}
-            >
+            <button className="w-full py-2 bg-blue-600 text-white rounded cursor-pointer">
               Clear Distance Lines
             </button>
           </div>

@@ -68,10 +68,8 @@ export default function FacilityMap({
         const wall = layout.walls.find((w) => w.id === selectedId);
         if (unit) {
           setClipboard(unit);
-          console.log("Copied unit", unit.id);
         } else if (wall) {
           setClipboard(wall);
-          console.log("Copied wall", wall.id);
         }
       }
       // Paste
@@ -96,7 +94,6 @@ export default function FacilityMap({
           }));
         }
         setSelectedId(newUnit.id);
-        console.log("Pasted unit", newUnit.id);
       }
       if (e.key === "Delete" && selectedId) {
         setLayout((prev) => ({
@@ -820,7 +817,6 @@ export default function FacilityMap({
                 onDblClick={(e) => {
                   e.cancelBubble = true;
                   setIsEditAccessPointModalOpen(true);
-                  console.log(ap);
                 }}
                 onClick={(e) => {
                   setEditAccessPoint(ap);

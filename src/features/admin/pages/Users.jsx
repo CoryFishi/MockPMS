@@ -7,6 +7,7 @@ import EditUser from "@features/admin/modals/EditUser";
 import PaginationFooter from "@components/shared/PaginationFooter";
 import { addEvent } from "@hooks/supabase";
 import DataTable from "@components/shared/DataTable";
+import InputBox from "@components/UI/InputBox";
 
 export default function Users() {
   const { user } = useAuth();
@@ -204,7 +205,7 @@ export default function Users() {
       render: (user, index) => (
         <div className="flex justify-center relative">
           <button
-            className="dark:bg-darkSecondary border rounded-lg dark:border-border p-2 dark:hover:bg-darkPrimary w-full cursor-pointer"
+            className="dark:bg-zinc-800 border rounded-lg dark:border-zinc-700 p-2 dark:hover:bg-zinc-900 w-full cursor-pointer"
             onMouseDown={(e) => {
               e.stopPropagation();
               toggleDropdown(index);
@@ -215,7 +216,7 @@ export default function Users() {
           {dropdownIndex === index && (
             <div
               ref={(el) => (modalRefs.current[index] = el)}
-              className="absolute top-full mt-1 right-0 w-full bg-white dark:bg-darkSecondary border border-zinc-200 dark:border-border rounded-lg shadow-lg z-20 flex flex-col"
+              className="absolute top-full mt-1 right-0 w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg z-20 flex flex-col"
             >
               <button
                 className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md hover:cursor-pointer rounded-t"
@@ -262,7 +263,7 @@ export default function Users() {
   ];
 
   return (
-    <div className="overflow-auto dark:text-white dark:bg-darkPrimary h-full">
+    <div className="overflow-auto dark:text-white dark:bg-zinc-900 h-full">
       {/* User Edit Modal */}
       {isEditUserModalOpen && (
         <EditUser
@@ -273,7 +274,7 @@ export default function Users() {
         />
       )}
       {/* Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
         <div className="ml-5 flex items-center text-sm">
           <FaPerson className="text-lg" />
           &ensp; Users
@@ -283,12 +284,11 @@ export default function Users() {
       <div className="w-full px-5 flex flex-col rounded-lg h-fit">
         {/* Search Bar */}
         <div className="mt-5 mb-2 flex items-center justify-end text-center">
-          <input
-            type="text"
+          <InputBox
             placeholder="Search users..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
+            onchange={(e) => setSearchQuery(e.target.value)}
+            className="w-full max-w-md"
           />
         </div>
         {/* Table */}

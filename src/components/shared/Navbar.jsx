@@ -66,7 +66,7 @@ export default function Navbar({
   }, [isDropdownOpen]);
 
   return (
-    <nav className="bg-white dark:bg-darkPrimary p-2 w-full border-zinc-200 dark:border-zinc-700 border-b select-none relative">
+    <nav className="bg-white dark:bg-zinc-900 p-2 w-full border-zinc-200 dark:border-zinc-700 border-b select-none relative">
       <div className="flex items-center justify-between text-black dark:text-white relative">
         <div className="flex">
           {showSideToggle && (
@@ -121,13 +121,13 @@ export default function Navbar({
             <div className="relative" ref={userRef}>
               <h2
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="cursor-pointer bg-zinc-100 dark:bg-darkSecondary rounded-md p-2 px-4 flex items-center text-center"
+                className="cursor-pointer bg-zinc-100 dark:bg-zinc-800 rounded-md p-2 px-4 flex items-center text-center"
               >
                 {user.email}{" "}
                 {isDropdownOpen ? <MdExpandLess /> : <MdExpandMore />}
               </h2>
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-1 w-full bg-white dark:bg-darkSecondary border border-zinc-200 dark:border-border rounded-lg shadow-lg z-50 flex flex-col">
+                <div className="absolute right-0 mt-1 w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg z-50 flex flex-col">
                   <button
                     className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium text-center hover:cursor-pointer rounded-t"
                     onClick={() =>

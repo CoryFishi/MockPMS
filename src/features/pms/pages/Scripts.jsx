@@ -260,7 +260,7 @@ export default function Scripts() {
   };
 
   return (
-    <div className="relative overflow-auto h-full dark:text-white dark:bg-darkPrimary">
+    <div className="relative overflow-auto h-full dark:text-white dark:bg-zinc-900">
       {isUnitModalOpen && (
         <ScriptConfirmation
           title={"Confirm Unit Creation"}
@@ -277,7 +277,7 @@ export default function Scripts() {
           setIsModalOpen={setIsTenantModalOpen}
         />
       )}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
         <div className="ml-5 flex items-center text-sm">
           <FaScroll className="text-lg" />
           &ensp; Scripts
@@ -421,7 +421,7 @@ export default function Scripts() {
           })}
         </div>
         <h2>Log of Events</h2>
-        <div className="w-full flex border rounded-2xl max-h-96 min-h-24 flex-col p-2 overflow-y-auto dark:border-border">
+        <div className="w-full flex border rounded-2xl max-h-96 min-h-24 flex-col p-2 overflow-y-auto dark:border-zinc-700">
           {logs.map((log, idx) => (
             <div
               key={idx}

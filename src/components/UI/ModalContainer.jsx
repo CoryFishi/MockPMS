@@ -9,7 +9,7 @@ export default function ModalContainer({
     // Modal Background
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
       {/* Modal Container */}
-      <div className="bg-white dark:bg-darkPrimary dark:text-whiterounded shadow-lg rounded">
+      <div className="bg-white dark:bg-zinc-900 dark:text-white rounded shadow-lg">
         {/* Header Container */}
         <div className="pl-5 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex items-center">

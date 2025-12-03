@@ -282,10 +282,10 @@ export default function Overview({ currentFacilityName }) {
 
   return (
     <div
-      className={`relative overflow-auto h-full dark:text-white dark:bg-darkPrimary`}
+      className={`relative overflow-auto h-full dark:text-white dark:bg-zinc-900`}
     >
       {/* Page Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
         <div className="ml-5 flex items-center text-sm">
           <RiDoorLockFill className="text-lg" />
           &ensp; Overview | {currentFacilityName}
@@ -330,7 +330,7 @@ export default function Overview({ currentFacilityName }) {
                           "warning" && "bg-yellow-500"
                   }`}
                 >
-                  <div className="w-40 h-40 bg-white dark:bg-darkPrimary rounded-full flex flex-col items-center justify-center">
+                  <div className="w-40 h-40 bg-white dark:bg-zinc-900 rounded-full flex flex-col items-center justify-center">
                     <h2 className="text-center">
                       Gateway <br />
                       <span className="text-sm">Platform</span>
@@ -362,7 +362,7 @@ export default function Overview({ currentFacilityName }) {
                 {actiongroups.map((a, index) => {
                   return (
                     <div
-                      className="bg-zinc-200 dark:bg-darkNavSecondary rounded-lg flex flex-col w-full shadow-md"
+                      className="bg-zinc-200 dark:bg-zinc-950 rounded-lg flex flex-col w-full shadow-md"
                       key={index}
                     >
                       <div className="flex items-center gap-2 pt-2 px-5">
@@ -394,7 +394,7 @@ export default function Overview({ currentFacilityName }) {
                     </div>
                   );
                 })}
-                <div className="bg-zinc-200 dark:bg-darkNavSecondary rounded-lg flex flex-col w-full shadow-md">
+                <div className="bg-zinc-200 dark:bg-zinc-950 rounded-lg flex flex-col w-full shadow-md">
                   <div className="flex items-center gap-2 pt-2 px-5">
                     <CiCircleInfo />
                     <span className="font-medium">Emergency Mode</span>
@@ -407,7 +407,7 @@ export default function Overview({ currentFacilityName }) {
                     {emergency ? "Enabled" : "Disabled"}
                   </button>
                 </div>
-                <div className="bg-zinc-200 dark:bg-darkNavSecondary rounded-lg flex flex-col w-full shadow-md">
+                <div className="bg-zinc-200 dark:bg-zinc-950 rounded-lg flex flex-col w-full shadow-md">
                   <div className="flex items-center gap-2 pt-2 px-5">
                     <CiCircleInfo />
                     <span className="font-medium">Lockdown Mode</span>
@@ -461,7 +461,7 @@ export default function Overview({ currentFacilityName }) {
                         "bg-yellow-500"
                   }`}
                 >
-                  <div className="w-40 h-40 bg-white dark:bg-darkPrimary rounded-full flex flex-col items-center justify-center">
+                  <div className="w-40 h-40 bg-white dark:bg-zinc-900 rounded-full flex flex-col items-center justify-center">
                     <h2 className="text-center">
                       OpenNet <br />
                       <span className="text-sm">Platform</span>

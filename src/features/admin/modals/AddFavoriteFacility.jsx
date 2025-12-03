@@ -48,7 +48,6 @@ export default function AddFavoriteFacility({
     return axios(config)
       .then(async function (response) {
         setIsAuthenticated(true);
-        console.log("Facility Info:", response.data);
         toast.success("Successfully Authenticated!");
         await handleFacilityInfo(response.data);
         return response.data;

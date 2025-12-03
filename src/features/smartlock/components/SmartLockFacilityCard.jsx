@@ -38,7 +38,7 @@ export default function SmartLockFacilityCard({ facility }) {
       )}
 
       {facility && (
-        <div className="break-inside-avoid bg-white shadow-lg rounded-lg p-5 mb-4 border dark:bg-darkSecondary text-black dark:text-white dark:border-border">
+        <div className="break-inside-avoid bg-white shadow-lg rounded-lg p-5 mb-4 border dark:bg-zinc-900 text-black dark:text-white dark:border-zinc-700">
           <h1
             className="break-all w-full text-2xl cursor-pointer flex items-center"
             onClick={() => setIsCardShown(!isCardShown)}
@@ -77,7 +77,7 @@ export default function SmartLockFacilityCard({ facility }) {
                   {isSmartlockSectionOpen && (
                     <div className="grid grid-cols-3 grid-rows-2 gap-4 text-black dark:text-white">
                       <div
-                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-border hover:scale-105 transition-transform duration-300"
+                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-zinc-700 hover:scale-105 transition-transform duration-300"
                         onClick={() => openSmartLockModal("good")}
                       >
                         <h2 className="text-3xl font-bold">
@@ -86,7 +86,7 @@ export default function SmartLockFacilityCard({ facility }) {
                         <p className="text-sm">Good</p>
                       </div>
                       <div
-                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-border hover:scale-105 transition-transform duration-300"
+                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-zinc-700 hover:scale-105 transition-transform duration-300"
                         onClick={() => openSmartLockModal("warning")}
                       >
                         <h2 className="text-3xl font-bold">
@@ -95,7 +95,7 @@ export default function SmartLockFacilityCard({ facility }) {
                         <p className="text-sm">Warning</p>
                       </div>
                       <div
-                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-border hover:scale-105 transition-transform duration-300"
+                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-zinc-700 hover:scale-105 transition-transform duration-300"
                         onClick={() => openSmartLockModal("error")}
                       >
                         <h2 className="text-3xl font-bold">
@@ -104,7 +104,7 @@ export default function SmartLockFacilityCard({ facility }) {
                         <p className="text-sm">Error</p>
                       </div>
                       <div
-                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-border hover:scale-105 transition-transform duration-300"
+                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-zinc-700 hover:scale-105 transition-transform duration-300"
                         onClick={() => openSmartLockModal("lowestBattery")}
                       >
                         <h2 className="text-3xl font-bold">
@@ -113,7 +113,7 @@ export default function SmartLockFacilityCard({ facility }) {
                         <p className="text-sm">Lowest Battery</p>
                       </div>
                       <div
-                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-border hover:scale-105 transition-transform duration-300"
+                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-zinc-700 hover:scale-105 transition-transform duration-300"
                         onClick={() => openSmartLockModal("lowestSignal")}
                       >
                         <h2 className="text-3xl font-bold">
@@ -122,7 +122,7 @@ export default function SmartLockFacilityCard({ facility }) {
                         <p className="text-sm">Lowest Signal</p>
                       </div>
                       <div
-                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-border hover:scale-105 transition-transform duration-300"
+                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-zinc-700 hover:scale-105 transition-transform duration-300"
                         onClick={() => openSmartLockModal("offline")}
                       >
                         <h2 className="text-3xl font-bold">
@@ -148,7 +148,7 @@ export default function SmartLockFacilityCard({ facility }) {
               {isOpenNetSectionOpen && (
                 <>
                   <div
-                    className="shadow-md rounded-lg p-2 flex items-center text-black dark:text-white border dark:border-border cursor-pointer hover:scale-105 transition-transform duration-300"
+                    className="shadow-md rounded-lg p-2 flex items-center text-black dark:text-white border dark:border-zinc-700 cursor-pointer hover:scale-105 transition-transform duration-300"
                     title={facility?.edgeRouter?.connectionStatusMessage}
                     onClick={() => setSelectedRouter(facility.edgeRouter)}
                   >
@@ -180,7 +180,7 @@ export default function SmartLockFacilityCard({ facility }) {
                   <div className="grid grid-cols-2 gap-2 text-black dark:text-white mt-2">
                     {facility.accessPoints?.map((accessPoint, index) => (
                       <div
-                        className="shadow-md rounded-lg p-2 flex items-center border dark:border-border cursor-pointer hover:scale-105 transition-transform duration-300"
+                        className="shadow-md rounded-lg p-2 flex items-center border dark:border-zinc-700 cursor-pointer hover:scale-105 transition-transform duration-300"
                         key={index}
                         title={accessPoint.connectionStatusMessage}
                         onClick={() => setSelectedRouter(accessPoint)}

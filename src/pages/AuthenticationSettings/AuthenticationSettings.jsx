@@ -159,7 +159,6 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
   };
 
   const removeToken = async (facility) => {
-    console.log("Removing facility:", facility);
     if (!user) {
       toast.error("User not authenticated.");
       return;
@@ -325,7 +324,6 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     });
 
     importFacilities(data);
-    console.log("Imported Data:", data);
   };
   const importFacilities = async (facilities) => {
     const updatedFacilities = facilities.map(

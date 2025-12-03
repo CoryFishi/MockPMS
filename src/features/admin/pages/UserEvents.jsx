@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { FaPerson } from "react-icons/fa6";
 import { useAuth } from "@context/AuthProvider";
 import { supabase } from "@app/supabaseClient";
+import InputBox from "@components/UI/InputBox";
 
 export default function UserEvents() {
   const { user } = useAuth();
@@ -120,9 +121,9 @@ export default function UserEvents() {
   ];
 
   return (
-    <div className="overflow-auto dark:text-white dark:bg-darkPrimary">
+    <div className="overflow-auto dark:text-white dark:bg-zinc-900">
       {/* Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
         <div className="ml-5 flex items-center text-sm">
           <FaPerson className="text-lg" />
           &ensp; User Events
@@ -134,12 +135,11 @@ export default function UserEvents() {
       <div className="w-full px-5 flex flex-col rounded-lg h-fit">
         {/* Search Bar */}
         <div className="mt-5 mb-2 flex items-center justify-end text-center">
-          <input
-            type="text"
+          <InputBox
             placeholder="Search events..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
+            onchange={(e) => setSearchQuery(e.target.value)}
+            className="w-full max-w-md"
           />
         </div>
         {/* Table */}

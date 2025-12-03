@@ -774,7 +774,7 @@ export default function Units({ currentFacilityName }) {
     <div
       className={`relative ${
         !unitsPulled ? "overflow-hidden min-h-full" : "overflow-auto"
-      } h-full dark:text-white dark:bg-darkPrimary relative`}
+      } h-full dark:text-white dark:bg-zinc-900 relative`}
     >
       {/* Create Unit Modal Popup */}
       {isUnitModalOpen && (
@@ -836,7 +836,7 @@ export default function Units({ currentFacilityName }) {
       {/* Loading Spinner */}
       {!unitsPulled && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* Page Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
         <div className="ml-5 flex items-center text-sm">
           <RiDoorLockFill className="text-lg" />
           &ensp; Units | {currentFacilityName}

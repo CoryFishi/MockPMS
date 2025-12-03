@@ -96,7 +96,6 @@ export default function AllSmartLockOnlineTimeReport({
       smartLockEvents.sort(
         (a, b) => new Date(a.createdUtc) - new Date(b.createdUtc)
       );
-      console.log(smartLockEvents);
       return smartLockEvents;
     } catch (error) {
       console.error(`Error fetching Events for: ${facility.name}`, error);

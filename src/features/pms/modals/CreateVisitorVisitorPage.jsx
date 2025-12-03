@@ -91,7 +91,7 @@ export default function CreateVisitorVisitor({
         setTimeProfiles(response.data);
       })
       .catch(function (error) {
-        console.log(error);
+        console.error(error);
       });
   };
   const handleAccessProfiles = async () => {
@@ -118,7 +118,7 @@ export default function CreateVisitorVisitor({
         setAccessProfiles(response.data);
       })
       .catch(function (error) {
-        console.log(error);
+        console.error(error);
       });
   };
   const handleCreateVisitor = () => {

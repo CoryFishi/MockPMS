@@ -36,7 +36,11 @@ function App() {
 
   return (
     <>
-      <Toaster position="bottom-right" toastOptions={{ duration: 2000 }} />
+      <Toaster
+        position="bottom-right"
+        reverseOrder={true}
+        toastOptions={{ duration: 2000 }}
+      />
       <Routes>
         <Route
           path="/"

@@ -9,6 +9,7 @@ import {
   RiCheckboxCircleFill,
   RiCheckboxBlankCircleLine,
 } from "react-icons/ri";
+import InputBox from "@components/UI/InputBox";
 
 export default function SmartLockSelectedPage() {
   const [facilities, setFacilities] = useState([]);
@@ -231,9 +232,9 @@ export default function SmartLockSelectedPage() {
     "cia-stg-1.aws.": "Staging",
   };
   return (
-    <div className="relative overflow-auto h-full dark:text-white dark:bg-darkPrimary">
+    <div className="relative overflow-auto h-full dark:text-white dark:bg-zinc-900">
       {/* Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
         <div className="ml-5 flex items-center text-sm">
           <RiCheckboxCircleFill className="text-lg" />
           &ensp; Selected Facilities
@@ -243,12 +244,11 @@ export default function SmartLockSelectedPage() {
       <div className="w-full px-5 flex flex-col rounded-lg h-full">
         {/* Seach Bar */}
         <div className="mt-5 mb-2 flex items-center justify-end text-center">
-          <input
-            type="text"
+          <InputBox
             placeholder="Search facilities..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
+            onchange={(e) => setSearchQuery(e.target.value)}
+            className="w-full max-w-md"
           />
         </div>
         {/* Table */}

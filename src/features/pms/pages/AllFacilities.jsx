@@ -192,7 +192,6 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
         return response.data;
       })
       .catch(function (error) {
-        console.log(facility);
         console.error("Error during login:", error);
         throw error;
       });
@@ -554,12 +553,12 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
     <div
       className={`relative ${
         isLoading ? "overflow-hidden min-h-full" : "overflow-auto"
-      } h-full dark:text-white dark:bg-darkPrimary relative`}
+      } h-full dark:text-white dark:bg-zinc-900 relative`}
     >
       {/* Loading Spinner */}
       {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* Page Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-darkNavPrimary">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
         <div className="ml-5 flex items-center text-sm">
           <FaWarehouse className="text-lg" />
           &ensp; All Facilities

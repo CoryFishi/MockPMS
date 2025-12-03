@@ -40,7 +40,7 @@ export default function RenameAuthentication({
         </div>
         <div className="px-5 py-3 flex flex-col gap-2">
           <input
-            className="border border-zinc-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-border"
+            className="border border-zinc-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-zinc-700"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder="New name"

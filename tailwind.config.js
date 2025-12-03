@@ -11,7 +11,7 @@ export default {
         darkPrimary: "#1A1C21",
         darkSecondary: "#292c33",
         darkNavPrimary: "#121317",
-        darkNavSecondary: "#292C33",
+        darkNavSecondary: darkSecondary,
         navPrimary: "#10141f",
         navSecondary: "#1e2538",
         border: "#444444b3",

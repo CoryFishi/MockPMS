@@ -3,7 +3,6 @@ import AllEdgeRoutersReport from "@features/smartlock/reports/AllEdgeRoutersRepo
 import AllAccessPointsReport from "@features/smartlock/reports/AllAccessPointsReport";
 import AllSmartLocksEventsReport from "@features/smartlock/reports/AllSmartLockEventsReport";
 import AllSmartLockOnlineTimeReport from "@features/smartlock/reports/AllSmartLockOnlineTimeReport";
-import ExtendedHistoryReport from "@features/smartlock/reports/ExtendedHistoryReport";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
 import { useAuth } from "@context/AuthProvider";
 import axios from "axios";
@@ -11,6 +10,7 @@ import toast from "react-hot-toast";
 import { useEffect, useRef, useState } from "react";
 import { FaLock } from "react-icons/fa";
 import AllSmartLockOfflineEventsReport from "@features/smartlock/reports/AllSmartLockOfflineEventsReport";
+import InputBox from "@components/UI/InputBox";
 
 export default function SmartLockReports() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,7 +23,17 @@ export default function SmartLockReports() {
   const modalRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentLoadingText, setCurrentLoadingText] = useState("");
-  const [pageLoadDateTime] = useState(new Date().toLocaleString());
+  const [pageLoadDateTime, setPageLoadDateTime] = useState(
+    new Date().toLocaleString()
+  );
+  const [reportOptions] = useState({
+    AllSmartLocksReport: AllSmartLocksReport,
+    AllEdgeRoutersReport: AllEdgeRoutersReport,
+    AllAccessPointsReport: AllAccessPointsReport,
+    AllSmartLockEventsReport: AllSmartLocksEventsReport,
+    AllSmartLockOnlineTimeReport: AllSmartLockOnlineTimeReport,
+    OfflineEvents: AllSmartLockOfflineEventsReport,
+  });
 
   // Close modal if clicking outside of it
   useEffect(() => {
@@ -142,12 +152,12 @@ export default function SmartLockReports() {
     <div
       className={`relative ${
         isLoading ? "overflow-hidden min-h-full" : "overflow-auto"
-      } h-full dark:text-white dark:bg-darkPrimary relative`}
+      } h-full dark:text-white dark:bg-zinc-900 relative`}
     >
       {/* Loading Spinner */}
-      {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}{" "}
+      {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* tab title */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-border dark:bg-zinc-900 border-b border-zinc-300 text-lg font-bold">
+      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
         <div className="ml-5 flex items-center text-sm">
           <FaLock className="text-lg" />
           &ensp; SmartLock Reports
@@ -158,17 +168,16 @@ export default function SmartLockReports() {
       </p>
       <div className="mt-3 mb-2 flex items-center justify-end text-center mx-5">
         {/* Search Bar */}
-        <input
-          type="text"
-          placeholder="Search..."
+        <InputBox
+          placeholder="Search reports..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
+          onchange={(e) => setSearchQuery(e.target.value)}
+          className="w-full max-w-md"
         />
         <select
           name="report"
           id="report"
-          className="ml-2 w-96 border rounded-sm dark:bg-darkNavSecondary dark:border-border text-black dark:text-white p-[10.5px] hover:cursor-pointer"
+          className="ml-2 w-96 border rounded-sm dark:bg-zinc-900 dark:border-zinc-700 text-black dark:text-white p-[10.5px] hover:cursor-pointer"
           onChange={(e) => setOpenPage(e.target.value) & setReportSearch(false)}
         >
           <option value="AllSmartLocksReport">All SmartLocks</option>
@@ -178,22 +187,21 @@ export default function SmartLockReports() {
           <option value="AllSmartLockOnlineTimeReport">
             SmartLock Online Time
           </option>
-          <option value="ExtendedReport">Extended Report</option>
           <option value="OfflineEvents">SmartLock Offline Events</option>
         </select>
         <div className="ml-2 relative inline-block w-96" ref={modalRef}>
           <button
             onClick={toggleDropdown}
-            className="w-full border rounded-sm dark:bg-darkNavSecondary dark:border-border text-black dark:text-white p-2 hover:cursor-pointer"
+            className="w-full border rounded-sm dark:bg-zinc-900 dark:border-zinc-700 text-black dark:text-white p-2 hover:cursor-pointer"
           >
             {newSelectedFacilities.length} facilities selected
           </button>
 
           {isOpen && (
-            <div className="absolute mt-1 w-full bg-white dark:bg-darkNavSecondary border border-zinc-300 dark:border-border rounded-lg shadow-lg p-2 z-50 max-h-60 overflow-y-auto">
-              <div className="w-full text-white text-left px-1 justify-between flex">
+            <div className="absolute mt-1 w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg shadow-lg p-2 z-50 max-h-60 overflow-y-auto">
+              <div className="w-full text-white text-left px-1 justify-evenly flex">
                 <button
-                  className="text-green-400 hover:cursor-pointer"
+                  className="text-green-400 hover:cursor-pointer hover:underline"
                   onClick={() => selectAllFacilities()}
                 >
                   Select all
@@ -225,8 +233,11 @@ export default function SmartLockReports() {
         </div>
         {/* Search Button */}
         <button
-          className="bg-green-500 text-white p-1 py-2 rounded-sm hover:bg-green-600 hover:scale-105 duration-300 ml-3 w-44 font-bold hover:cursor-pointer"
-          onClick={() => setReportSearch(true)}
+          className="bg-sky-500 text-white p-1 py-2 rounded-sm hover:bg-sky-600 hover:scale-105 duration-300 ml-3 w-44 font-bold hover:cursor-pointer"
+          onClick={() => {
+            setReportSearch(true);
+            setPageLoadDateTime(new Date().toLocaleString());
+          }}
         >
           Search
         </button>
@@ -236,48 +247,16 @@ export default function SmartLockReports() {
           Choose and search a report...
         </div>
       )}
-      {openPage === "AllSmartLocksReport" && reportSearch && (
-        <AllSmartLocksReport
-          selectedFacilities={newSelectedFacilities}
-          searchQuery={searchQuery}
-        />
-      )}
-      {openPage === "AllEdgeRoutersReport" && reportSearch && (
-        <AllEdgeRoutersReport
-          selectedFacilities={newSelectedFacilities}
-          searchQuery={searchQuery}
-        />
-      )}
-      {openPage === "AllAccessPointsReport" && reportSearch && (
-        <AllAccessPointsReport
-          selectedFacilities={newSelectedFacilities}
-          searchQuery={searchQuery}
-        />
-      )}
-      {openPage === "AllSmartLockEventsReport" && reportSearch && (
-        <AllSmartLocksEventsReport
-          selectedFacilities={newSelectedFacilities}
-          searchQuery={searchQuery}
-        />
-      )}
-      {openPage === "AllSmartLockOnlineTimeReport" && reportSearch && (
-        <AllSmartLockOnlineTimeReport
-          selectedFacilities={newSelectedFacilities}
-          searchQuery={searchQuery}
-        />
-      )}
-      {openPage === "ExtendedReport" && reportSearch && (
-        <ExtendedHistoryReport
-          selectedFacilities={newSelectedFacilities}
-          searchQuery={searchQuery}
-        />
-      )}
-      {openPage === "OfflineEvents" && reportSearch && (
-        <AllSmartLockOfflineEventsReport
-          selectedFacilities={newSelectedFacilities}
-          searchQuery={searchQuery}
-        />
-      )}
+      {reportSearch &&
+        (() => {
+          const ReportComponent = reportOptions[openPage];
+          return (
+            <ReportComponent
+              selectedFacilities={newSelectedFacilities}
+              searchQuery={searchQuery}
+            />
+          );
+        })()}
     </div>
   );
 }

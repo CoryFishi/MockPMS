@@ -20,7 +20,7 @@ export default function NotFound() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-zinc-50 dark:bg-darkPrimary text-zinc-900 dark:text-zinc-100">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
       {show404 ? (
         // 404 content
         <>

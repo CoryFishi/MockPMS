@@ -48,19 +48,19 @@ export default function DataTable({
 
   return (
     <>
-      <table className="w-full table-auto border-collapse border-zinc-300 dark:border-border">
-        <thead className="sticky -top-px z-10 bg-zinc-200 dark:bg-darkNavSecondary">
+      <table className="w-full table-auto border-collapse border-zinc-300 dark:border-zinc-700">
+        <thead className="sticky -top-px z-10 bg-zinc-200 dark:bg-zinc-800">
           <tr>
             {columns.map(({ key, label, accessor, sortable = true }) => (
               <th
                 key={key}
                 className={`px-4 py-2 select-none justify-center text-center items-center ${
                   sortable
-                    ? "hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary"
+                    ? "hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-900"
                     : ""
                 } ${
                   sortedColumn === key && sortable
-                    ? "bg-zinc-300 dark:bg-darkPrimary"
+                    ? "bg-zinc-300 dark:bg-zinc-900"
                     : ""
                 }`}
                 onClick={() => {
@@ -88,14 +88,14 @@ export default function DataTable({
               onMouseLeave={
                 setHoveredRow ? () => setHoveredRow(null) : undefined
               }
-              className={`hover:bg-gray-100 dark:hover:bg-darkNavSecondary ${
+              className={`hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
                 hoveredRow !== null ? "cursor-pointer" : ""
               }`}
             >
               {columns.map(({ key, accessor, render }) => (
                 <td
                   key={key}
-                  className="border-y border-zinc-300 dark:border-border px-4 py-2 text-center items-center justify-center"
+                  className="border-y border-zinc-300 dark:border-zinc-700 px-4 py-2 text-center items-center justify-center"
                   onContextMenu={(e) => {
                     e.preventDefault();
                     const value =
@@ -127,7 +127,7 @@ export default function DataTable({
       {contextMenu.visible && (
         <div
           ref={contextRef}
-          className="fixed bg-white dark:bg-darkSecondary border rounded shadow-lg z-50 text-sm"
+          className="fixed bg-white dark:bg-zinc-800 border dark:border-zinc-700 rounded shadow-lg z-50 text-sm"
           style={{ top: contextMenu.y, left: contextMenu.x }}
           onClick={() => setContextMenu({ ...contextMenu, visible: false })}
         >
@@ -136,7 +136,7 @@ export default function DataTable({
               navigator.clipboard.writeText(contextMenu.content.cell);
               setContextMenu({ ...contextMenu, visible: false });
             }}
-            className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-darkPrimary"
+            className="block w-full text-left px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-900 cursor-pointer"
           >
             Copy Cell
           </button>
@@ -147,7 +147,7 @@ export default function DataTable({
               );
               setContextMenu({ ...contextMenu, visible: false });
             }}
-            className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-darkPrimary"
+            className="block w-full text-left px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-900 cursor-pointer"
           >
             Copy Row
           </button>
