@@ -887,7 +887,7 @@ export default function Units({ currentFacilityName }) {
             <GeneralButton
               onclick={() => setIsUnitModalOpen(true)}
               text="Create Unit(s)"
-              className={"bg-green-500 hover:bg-green-600"}
+              className={"bg-yellow-500 hover:bg-yellow-600"}
             />
           )}
         </div>

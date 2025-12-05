@@ -11,6 +11,8 @@ import { supabase } from "@app/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import { addEvent } from "@hooks/supabase";
+import { FiSettings } from "react-icons/fi";
+import { RiFileSettingsFill, RiSettingsFill } from "react-icons/ri";
 
 export default function UserSettings({ darkMode, toggleDarkMode }) {
   const [newPassword1, setNewPassword1] = useState("");
@@ -176,19 +178,27 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
   };
 
   return (
-    <div className="dark:text-white dark:bg-darkPrimary min-h-screen w-full flex flex-col font-roboto">
+    <div className="dark:text-white dark:bg-zinc-900 min-h-screen w-full flex flex-col font-roboto">
       {user ? (
         <div className="flex flex-col h-screen">
           {/* Navbar */}
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           {/* Body */}
-          <div className="flex-1 overflow-y-auto px-5 flex flex-col items-center">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-2 text-center rounded-sm max-w-7xl mx-auto">
+          <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
+            <div className="ml-5 flex items-center text-sm">
+              <RiSettingsFill className="text-lg" />
+              &ensp; User Settings
+            </div>
+          </div>
+          <div className="flex-1 overflow-y-auto px-5 flex flex-col">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-2 rounded-sm max-w-7xl mx-auto">
               {/* Account Information */}
-              <div className="dark:bg-darkNavSecondary rounded-sm p-5 border shadow-md dark:border-border">
-                <div className="flex flex-col items-center justify-center text-center gap-5">
-                  <h1 className="text-2xl py-2">Account Information</h1>
-                  <div>
+              <div className="dark:bg-zinc-800 rounded-sm p-5 border shadow-md dark:border-zinc-700">
+                <div className="flex flex-col gap-5 w-full">
+                  <h1 className="text-2xl py-2 w-full text-center">
+                    Account Information
+                  </h1>
+                  <div className="w-full">
                     <span className="font-bold">Email:</span>{" "}
                     {user?.email || "null"}
                   </div>
@@ -199,11 +209,15 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                     <span className="font-bold">Last Sign-In:</span>{" "}
                     {user.last_sign_in_at || "null"}
                   </div>
-                  <GeneralButton text="Logout" onclick={() => handleLogout()} />
+                  <GeneralButton
+                    text="Logout"
+                    onclick={() => handleLogout()}
+                    className="bg-sky-500 hover:bg-sky-600 text-white w-full self-center"
+                  />
                 </div>
               </div>
               {/* Update Password */}
-              <div className="flex flex-col  items-center text-center h-full dark:bg-darkNavSecondary rounded-sm p-5 border shadow-md dark:border-border gap-5">
+              <div className="flex flex-col  items-center text-center h-full dark:bg-zinc-800 rounded-sm p-5 border shadow-md dark:border-zinc-700 gap-5">
                 <h1 className="text-2xl py-2">Update Password</h1>
                 <InputBox
                   label="New Password"
@@ -222,10 +236,11 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
                 <GeneralButton
                   text="Change Password"
                   onClick={() => handlePasswordChange()}
+                  className="bg-sky-500 hover:bg-sky-600 text-white w-full"
                 />
               </div>
               {/* Email Preferences */}
-              <div className="flex flex-col h-full dark:bg-darkNavSecondary rounded-sm p-5 border shadow-md dark:border-border">
+              <div className="flex flex-col h-full dark:bg-zinc-800 rounded-sm p-5 border shadow-md dark:border-zinc-700">
                 <div className="flex flex-col max-w-5xl">
                   <h1 className="text-2xl py-2">Email Preferences</h1>
                   <div className="flex-col flex justify-center max-w-5xl gap-2">

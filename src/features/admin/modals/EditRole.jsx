@@ -53,7 +53,7 @@ export default function EditRole({
     // Background Filter
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
       {/* Modal Container */}
-      <div className="bg-white rounded-sm shadow-lg dark:bg-darkPrimary min-w-96">
+      <div className="bg-white rounded-sm shadow-lg dark:bg-zinc-900 min-w-96">
         {/* Header Container */}
         <div className="pl-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">
@@ -71,7 +71,7 @@ export default function EditRole({
           <label className="block">Role Name</label>
           <input
             type="text"
-            className="border border-zinc-300 rounded-sm px-3 py-2 w-full dark:bg-darkSecondary dark:border-border"
+            className="border border-zinc-300 rounded-sm px-3 py-2 w-full dark:bg-zinc-800 dark:border-zinc-700"
             value={roleName}
             onChange={(e) => setRoleName(e.target.value)}
             placeholder="Enter role name..."
@@ -80,7 +80,7 @@ export default function EditRole({
           <label className="block mt-2">Role Description</label>
           <input
             type="text"
-            className="border border-zinc-300 rounded-sm px-3 py-2 w-full dark:bg-darkSecondary dark:border-border"
+            className="border border-zinc-300 rounded-sm px-3 py-2 w-full dark:bg-zinc-800 dark:border-zinc-700"
             value={roleDesc}
             onChange={(e) => setRoleDesc(e.target.value)}
             placeholder="Enter role description..."

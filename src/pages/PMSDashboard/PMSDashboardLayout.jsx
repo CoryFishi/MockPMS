@@ -169,7 +169,7 @@ export default function PMSDashboardLayout({
     <div className="flex flex-col w-full h-screen overflow-y-auto overflow-hidden">
       <div className="flex flex-row w-full h-full shrink-0">
         {dashboardMenu === true && (
-          <div className="flex flex-col h-full md:min-w-[250px] min-w-full bg-zinc-950 text-white dark:bg-zinc-950 border-r dark:border-zinc-700 select-none text-lg relative">
+          <div className="flex flex-col h-full md:min-w-[250px] min-w-full bg-zinc-950 text-white dark:bg-zinc-950 border-r dark:border-zinc-800 select-none text-lg relative">
             {/* Header Side Bar */}
             <div className="pt-2">
               <h3 className="text-center m-5 text-xl">OpenTech PMS</h3>
@@ -395,7 +395,7 @@ export default function PMSDashboardLayout({
               </div>
             )}
 
-            <div className="absolute bottom-0 w-full hidden md:flex justify-between text-sm hover:cursor-pointer text-center">
+            <div className="absolute bottom-0 w-full hidden md:flex justify-between text-sm cursor-pointer text-center">
               <Link
                 to="/user-settings"
                 className="hover:dark:bg-zinc-900 w-full p-2"
@@ -411,12 +411,12 @@ export default function PMSDashboardLayout({
                   Help
                 </a>
               </div>
-              <button
-                className="hover:dark:bg-zinc-900 w-full p-2"
+              <div
+                className="hover:dark:bg-zinc-900 w-full p-2 curs"
                 onClick={() => handleLogout()}
               >
                 Logout
-              </button>
+              </div>
             </div>
           </div>
         )}

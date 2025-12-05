@@ -7,7 +7,7 @@ import RenameAuthentication from "@features/facilityAuthentication/modals/Rename
 import toast from "react-hot-toast";
 import { supabase } from "@app/supabaseClient";
 import { FaCircleCheck, FaSpinner } from "react-icons/fa6";
-import { MdOutlineError } from "react-icons/md";
+import { MdOutlineError, MdToken } from "react-icons/md";
 import { useAuth } from "@context/AuthProvider";
 import { useRef, useState, useEffect } from "react";
 import { addEvent } from "@hooks/supabase";
@@ -518,7 +518,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
   };
 
   return (
-    <div className="dark:text-white dark:bg-darkPrimary h-screen w-screen flex flex-col overflow-hidden font-roboto">
+    <div className="dark:text-white dark:bg-zinc-900 h-screen w-screen flex flex-col overflow-hidden font-roboto">
       {/* Authentication Creation Modal */}
       {isAddModalOpen && (
         <AddAuthentication
@@ -543,6 +543,12 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
           {/* Navbar */}
           <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           {/* Body */}
+          <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
+            <div className="ml-5 flex items-center text-sm">
+              <MdToken className="text-lg" />
+              &ensp; Authentication Settings
+            </div>
+          </div>
           <div className="w-full h-full px-5 flex flex-col rounded-lg overflow-y-auto">
             <div className="flex justify-between mt-2">
               <div></div>

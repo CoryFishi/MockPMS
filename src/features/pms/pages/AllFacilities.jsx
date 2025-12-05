@@ -542,7 +542,7 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
         ) : (
           <TableButton
             onclick={() => handleSelect(r)}
-            className="bg-green-500 hover:bg-green-600"
+            className="bg-yellow-500 hover:bg-yellow-600"
             text={"Select"}
           />
         ),

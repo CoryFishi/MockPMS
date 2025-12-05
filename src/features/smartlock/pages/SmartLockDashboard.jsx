@@ -392,7 +392,7 @@ export default function SmartLockDashboardView() {
 
         {/* Toggle view button */}
         <button
-          className="bg-sky-500 text-white p-1 py-2 rounded-sm hover:bg-sky-600 ml-3 w-44 font-bold cursor-pointer hover:transition hover:duration-300 hover:ease-in-out"
+          className="bg-yellow-500 text-white p-1 py-2 rounded-sm hover:bg-yellow-600 ml-3 w-44 font-bold cursor-pointer hover:transition hover:duration-300 hover:ease-in-out"
           onClick={() => toggleListView()}
         >
           {listView ? "Card View" : "List View"}

@@ -66,7 +66,7 @@ export default function Navbar({
   }, [isDropdownOpen]);
 
   return (
-    <nav className="bg-white dark:bg-zinc-900 p-2 w-full border-zinc-200 dark:border-zinc-700 border-b select-none relative">
+    <nav className="bg-white dark:bg-zinc-900 p-2 w-fullselect-none relative">
       <div className="flex items-center justify-between text-black dark:text-white relative">
         <div className="flex">
           {showSideToggle && (

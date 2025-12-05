@@ -23,7 +23,7 @@ export default function RenameAuthentication({
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center">
-      <div className="bg-white rounded-sm dark:bg-darkPrimary shadow-md w-full max-w-md">
+      <div className="bg-white rounded-sm dark:bg-zinc-900 shadow-md w-full max-w-md">
         <div className="pl-5 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex items-center">
             <FaEdit />

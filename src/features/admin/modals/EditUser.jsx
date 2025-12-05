@@ -127,7 +127,7 @@ export default function EditUser({
         />
       )}
       {/* Modal Container */}
-      <div className="bg-white rounded-sm shadow-lg dark:bg-darkPrimary">
+      <div className="bg-white rounded-sm shadow-lg dark:bg-zinc-900">
         {/* Header Container */}
         <div className="px-2 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex text-center items-center">
@@ -155,7 +155,7 @@ export default function EditUser({
           <label className="block my-2 font-bold">Role:</label>
           <select
             value={newUserData.role}
-            className="border border-zinc-300 rounded-sm px-3 py-2 w-full dark:bg-darkSecondary dark:border-border hover:cursor-pointer"
+            className="border border-zinc-300 rounded-sm px-3 py-2 w-full dark:bg-zinc-800 dark:border-zinc-700 hover:cursor-pointer"
             onChange={(e) =>
               setNewUserData((prevData) => ({
                 ...prevData,
@@ -215,7 +215,7 @@ export default function EditUser({
             {newUserData.tokens.map((token, index) => (
               <div
                 key={index}
-                className="border-collapse dark:border-border border-dotted border justify-between flex flex-col w-full"
+                className="border-collapse dark:border-zinc-700 border-dotted border justify-between flex flex-col w-full"
               >
                 <div className="justify-between flex w-full">
                   <p>
@@ -302,7 +302,7 @@ export default function EditUser({
             {newUserData.favorite_tokens.map((token, index) => (
               <div
                 key={index}
-                className="border-collapse dark:border-border border-dotted border justify-between flex"
+                className="border-collapse dark:border-zinc-700 border-dotted border justify-between flex"
               >
                 <p>{token.name}</p>
                 <button
@@ -333,7 +333,7 @@ export default function EditUser({
             {newUserData.selected_tokens.map((token, index) => (
               <div
                 key={index}
-                className="border-collapse dark:border-border border-dotted border justify-between flex"
+                className="border-collapse dark:border-zinc-700 border-dotted border justify-between flex"
               >
                 <p>{token.name}</p>
                 <button

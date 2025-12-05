@@ -490,7 +490,7 @@ export default function Visitors({ currentFacilityName }) {
           {permissions.pmsPlatformVisitorCreate && (
             <GeneralButton
               text={"Create Visitor"}
-              className="bg-green-500 hover:bg-green-600"
+              className="bg-yellow-500 hover:bg-yellow-600"
               onclick={() => {
                 if (permissions.pmsPlatformVisitorCreate) {
                   setIsCreateVisitorModalOpen(true);

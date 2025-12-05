@@ -6,17 +6,7 @@ export default {
     fontFamily: {
       roboto: ["Roboto", "sans-serif"],
     },
-    extend: {
-      colors: {
-        darkPrimary: "#1A1C21",
-        darkSecondary: "#292c33",
-        darkNavPrimary: "#121317",
-        darkNavSecondary: darkSecondary,
-        navPrimary: "#10141f",
-        navSecondary: "#1e2538",
-        border: "#444444b3",
-      },
-    },
+    extend: {},
   },
   plugins: [],
 };

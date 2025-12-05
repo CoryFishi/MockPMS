@@ -43,10 +43,10 @@ export default function LoginComp() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-zinc-100 dark:bg-darkPrimary">
+    <div className="flex items-center justify-center min-h-screen bg-zinc-100 dark:bg-zinc-900">
       {error && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center dark:text-white z-30">
-          <div className="bg-white p-4 rounded-sm shadow-lg max-w-sm w-full dark:bg-darkSecondary">
+          <div className="bg-white p-4 rounded-sm shadow-lg max-w-sm w-full dark:bg-zinc-800">
             <h1 className="font-bold text-center text-3xl">Oh no!</h1>
             <p className="text-center text-red-500 mt-3">{error}</p>
             <button
@@ -60,7 +60,7 @@ export default function LoginComp() {
       )}
       <form
         onSubmit={handleSignIn}
-        className="bg-white dark:bg-darkSecondary shadow-lg rounded-lg p-8 max-w-md w-full space-y-4 mb-16"
+        className="bg-white dark:bg-zinc-800 shadow-lg rounded-lg p-8 max-w-md w-full space-y-4 mb-16"
       >
         <h2 className="text-2xl font-semibold text-zinc-700 dark:text-zinc-200 text-center mb-6">
           Sign In

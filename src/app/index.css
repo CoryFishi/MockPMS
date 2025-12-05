@@ -5,13 +5,6 @@
 @theme {
   --font-*: initial;
   --font-roboto: Roboto, sans-serif;
-  --color-darkPrimary: #1a1c21;
-  --color-darkSecondary: #292c33;
-  --color-darkNavPrimary: #121317;
-  --color-darkNavSecondary: #292c33;
-  --color-navPrimary: #10141f;
-  --color-navSecondary: #1e2538;
-  --color-border: #444444b3;
 }
 
 /*
