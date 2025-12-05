@@ -1,6 +1,6 @@
 import Dashboard from "@pages/PMSDashboard/PMSDashboard";
 import AuthenticationSettings from "@pages/AuthenticationSettings/AuthenticationSettings";
-import SmartLockDashboard from "@pages/SmartLockDashboard/SmartLockDashboard";
+import SmartLockDashboard from "@pages/SmartSpaceDashboard/SmartSpaceDashboard";
 import Login from "@pages/Login/Login";
 import Register from "@pages/Register/Register";
 import Admin from "@pages/AdminDashboard/AdminDashboard";

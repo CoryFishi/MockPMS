@@ -1,15 +1,15 @@
-import SmartLockAllFacilitiesPage from "@features/smartlock/pages/SmartLockAllFacilities";
-import SmartLockSelectedPage from "@features/smartlock/pages/SmartLockSelected";
-import SmartLockDashboardView from "@features/smartlock/pages/SmartLockDashboard";
-import SmartLockReports from "@features/smartlock/pages/SmartLockReports";
+import SmartSpaceAllFacilitiesPage from "@features/smartspace/pages/SmartSpaceAllFacilities";
+import SmartSpaceSelectedPage from "@features/smartspace/pages/SmartSpaceSelected";
+import SmartSpaceDashboardView from "@features/smartspace/pages/SmartSpaceDashboard";
+import SmartSpaceReports from "@features/smartspace/pages/SmartSpaceReports";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
-import SmartLockMapping from "@features/smartlock/pages/SmartLockMapping";
+import SmartSpaceMapping from "@features/smartspace/pages/SmartSpaceMapping";
 import { useAuth } from "@context/AuthProvider";
 
-export default function SmartLockDashboardLayout({ dashboardMenu }) {
+export default function SmartSpaceDashboardLayout({ dashboardMenu }) {
   const { handleLogout } = useAuth();
   // Drop down variables for the left navigation menu
   const [openSections, setOpenSections] = useState({
@@ -32,10 +32,10 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
     <div className="flex flex-col w-full h-screen overflow-y-auto overflow-hidden">
       <div className="flex flex-row w-full h-full shrink-0">
         {dashboardMenu === true && (
-          <div className="flex flex-col h-full md:min-w-[250px] min-w-full bg-zinc-900 text-white dark:bg-zinc-950 border-r dark:border-zinc-800 select-none text-lg relative">
+          <div className="flex flex-col h-full md:min-w-[250px] min-w-full bg-zinc-950 text-white dark:bg-zinc-950 border-r dark:border-zinc-800 select-none text-lg relative">
             {/* Header Side Bar */}
             <div className="pt-2">
-              <h3 className="text-center m-5 text-xl">OpenTech Smarts</h3>
+              <h3 className="text-center m-5 text-xl">OpenTech SmartSpace</h3>
             </div>
 
             {/* Current Facility Side Bar */}
@@ -44,7 +44,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                 openPage === "dashboard" ||
                 openPage === "reports" ||
                 openPage === "mapping"
-                  ? "bg-navSecondary dark:bg-zinc-900 border-l-yellow-500 border-l-2"
+                  ? "bg-zinc-900 dark:bg-zinc-900 border-l-yellow-500 border-l-2"
                   : ""
               }`}
             >
@@ -84,7 +84,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
                         : ""
                     }`}
                   >
-                    SmartLock
+                    SmartSpace
                   </Link>
                   <Link
                     onClick={() =>
@@ -120,7 +120,7 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
             <div
               className={`border-t border-b pl-2 pr-2 border-zinc-500 pb-8 ${
                 openPage === "allFacilities" || openPage === "selected"
-                  ? "bg-navSecondary dark:bg-zinc-900 border-l-yellow-500 border-l-2"
+                  ? "bg-zinc-900 dark:bg-zinc-900 border-l-yellow-500 border-l-2"
                   : ""
               }`}
             >
@@ -214,11 +214,11 @@ export default function SmartLockDashboardLayout({ dashboardMenu }) {
           </div>
         )}
         <div className="w-full flex flex-col bg-background-50 h-full">
-          {openPage === "dashboard" && <SmartLockDashboardView />}
-          {openPage === "reports" && <SmartLockReports />}
-          {openPage === "allFacilities" && <SmartLockAllFacilitiesPage />}
-          {openPage === "selected" && <SmartLockSelectedPage />}
-          {openPage === "mapping" && <SmartLockMapping />}
+          {openPage === "dashboard" && <SmartSpaceDashboardView />}
+          {openPage === "reports" && <SmartSpaceReports />}
+          {openPage === "allFacilities" && <SmartSpaceAllFacilitiesPage />}
+          {openPage === "selected" && <SmartSpaceSelectedPage />}
+          {openPage === "mapping" && <SmartSpaceMapping />}
         </div>
       </div>
     </div>

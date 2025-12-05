@@ -1,18 +1,18 @@
-import AllSmartLocksReport from "@features/smartlock/reports/AllSmartLocksReport";
-import AllEdgeRoutersReport from "@features/smartlock/reports/AllEdgeRoutersReport";
-import AllAccessPointsReport from "@features/smartlock/reports/AllAccessPointsReport";
-import AllSmartLocksEventsReport from "@features/smartlock/reports/AllSmartLockEventsReport";
-import AllSmartLockOnlineTimeReport from "@features/smartlock/reports/AllSmartLockOnlineTimeReport";
+import AllSmartLocksReport from "@features/SmartSpace/reports/AllSmartLocksReport";
+import AllEdgeRoutersReport from "@features/SmartSpace/reports/AllEdgeRoutersReport";
+import AllAccessPointsReport from "@features/SmartSpace/reports/AllAccessPointsReport";
+import AllSmartLocksEventsReport from "@features/SmartSpace/reports/AllSmartLockEventsReport";
+import AllSmartLockOnlineTimeReport from "@features/SmartSpace/reports/AllSmartLockOnlineTimeReport";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
 import { useAuth } from "@context/AuthProvider";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useRef, useState } from "react";
 import { FaLock } from "react-icons/fa";
-import AllSmartLockOfflineEventsReport from "@features/smartlock/reports/AllSmartLockOfflineEventsReport";
+import AllSmartLockOfflineEventsReport from "@features/SmartSpace/reports/AllSmartLockOfflineEventsReport";
 import InputBox from "@components/UI/InputBox";
 
-export default function SmartLockReports() {
+export default function SmartSpaceReports() {
   const [searchQuery, setSearchQuery] = useState("");
   const [newSelectedFacilities, setNewSelectedFacilities] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -233,7 +233,7 @@ export default function SmartLockReports() {
         </div>
         {/* Search Button */}
         <button
-          className="bg-sky-500 text-white p-1 py-2 rounded-sm hover:bg-sky-600 hover:scale-105 duration-300 ml-3 w-44 font-bold hover:cursor-pointer"
+          className="bg-yellow-500 text-white p-1 py-2 rounded-sm hover:bg-yellow-600 hover:scale-105 duration-300 ml-3 w-44 font-bold hover:cursor-pointer"
           onClick={() => {
             setReportSearch(true);
             setPageLoadDateTime(new Date().toLocaleString());

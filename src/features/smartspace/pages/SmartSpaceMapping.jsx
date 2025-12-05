@@ -1,13 +1,13 @@
 import { useState, useCallback, useMemo } from "react";
-import FacilityMap from "@features/smartlock/components/FacilityMap";
-import Sidebar from "@features/smartlock/components/Sidebar";
-import { applyChange } from "@features/smartlock/utils/applyChange";
-import EditUnitModal from "@features/smartlock/modals/EditUnitModal";
+import FacilityMap from "@features/SmartSpace/components/FacilityMap";
+import Sidebar from "@features/SmartSpace/components/Sidebar";
+import { applyChange } from "@features/SmartSpace/utils/applyChange";
+import EditUnitModal from "@features/SmartSpace/modals/EditUnitModal";
 import { GrSettingsOption } from "react-icons/gr";
 
 const PX_PER_FT = 5;
 
-function SmartLockMapping() {
+function SmartSpaceMapping() {
   const [params, setParams] = useState({
     baseInCone: 150,
     baseOutCone: 55,
@@ -1030,4 +1030,4 @@ function SmartLockMapping() {
   );
 }
 
-export default SmartLockMapping;
+export default SmartSpaceMapping;

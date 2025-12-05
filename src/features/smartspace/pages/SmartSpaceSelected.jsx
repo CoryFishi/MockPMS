@@ -11,7 +11,7 @@ import {
 } from "react-icons/ri";
 import InputBox from "@components/UI/InputBox";
 
-export default function SmartLockSelectedPage() {
+export default function SmartSpaceSelectedPage() {
   const [facilities, setFacilities] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredFacilities, setFilteredFacilities] = useState([]);

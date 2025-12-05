@@ -1,4 +1,4 @@
-export default function SmartLockExport({ facilitiesInfo }) {
+export default function SmartSpaceExport({ facilitiesInfo }) {
   // Export function
   const exportTable = () => {
     // Convert the data to CSV format

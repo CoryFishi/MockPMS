@@ -20,7 +20,7 @@ import {
 import { BsShieldLockFill } from "react-icons/bs";
 import { IoIosWarning } from "react-icons/io";
 
-export default function SmartLock({
+export default function SmartSpace({
   smartlockModalOption,
   smartLocks,
   facilityName,

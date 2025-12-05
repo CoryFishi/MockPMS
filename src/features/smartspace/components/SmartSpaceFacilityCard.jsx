@@ -1,10 +1,10 @@
 import { useState } from "react";
-import SmartLock from "@features/smartlock/modals/SmartLock";
+import SmartSpace from "@features/SmartSpace/modals/SmartSpace";
 import { RiRouterFill } from "react-icons/ri";
-import SmartLockDetailModal from "@components/shared/DetailModal";
+import SmartSpaceDetailModal from "@components/shared/DetailModal";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 
-export default function SmartLockFacilityCard({ facility }) {
+export default function SmartSpaceFacilityCard({ facility }) {
   const [isSmartlockModalOpen, setIsSmartlockModalOpen] = useState(false);
   const [smartlockModalOption, setSmartlockModalOption] = useState(null);
   const [selectedRouter, setSelectedRouter] = useState(null);

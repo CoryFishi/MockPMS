@@ -251,8 +251,8 @@ export default function AllSmartLockOnlineTimeReport({
       </div>
       <table className="w-full table-auto border-collapse border-zinc-300 dark:border-border">
         {/* Header */}
-        <thead className="select-none sticky -top-px z-10 bg-zinc-200 dark:bg-darkNavSecondary">
-          <tr className="bg-zinc-200 dark:bg-darkNavSecondary text-center">
+        <thead className="select-none sticky -top-px z-10 bg-zinc-200 dark:bg-zinc-800">
+          <tr className="bg-zinc-200 dark:bg-zinc-800 text-center">
             {/* Facility Column */}
             <th
               className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
@@ -406,7 +406,7 @@ export default function AllSmartLockOnlineTimeReport({
             .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
             .map((device, index) => (
               <tr
-                className="hover:bg-zinc-100 dark:hover:bg-darkNavSecondary relative hover:cursor-pointer"
+                className="hover:bg-zinc-100 dark:hover:bg-zinc-800 relative hover:cursor-pointer"
                 key={index}
                 onClick={() => setHoveredRow(index)}
                 onMouseLeave={() => setHoveredRow(null)}

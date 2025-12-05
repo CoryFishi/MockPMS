@@ -2,23 +2,21 @@ import PaginationFooter from "@components/shared/PaginationFooter";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
+import { FaCheckCircle } from "react-icons/fa";
 
-export default function AllSmartLocksEventsReport({
+export default function AllAccessPointsReport({
   selectedFacilities,
   searchQuery,
 }) {
-  const [filteredSmartLockEvents, setFilteredSmartLockEvents] = useState([]);
-  const [smartlockEvents, setSmartlockEvents] = useState([]);
+  const [filteredAccessPoints, setFilteredAccessPoints] = useState([]);
+  const [accessPoints, setAccessPoints] = useState([]);
   const [hoveredRow, setHoveredRow] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [sortDirection, setSortDirection] = useState("desc");
+  const [sortDirection, setSortDirection] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
-  const [dayValue, setDayValue] = useState(0.5);
-  const currentTime = Math.floor(Date.now() / 1000);
-  const pastDayValue = currentTime - dayValue * 24 * 60 * 60;
 
-  const fetchSmartLockEvents = async (facility) => {
+  const fetchAccessPoints = async (facility) => {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -29,111 +27,92 @@ export default function AllSmartLocksEventsReport({
       }
 
       const response = await axios.get(
-        `https://accessevent.${tokenStageKey}insomniaccia${tokenEnvKey}.com/combinedevents/facilities/${facility.id}?uq=&vq=&etq=1&etq=2&etq=3&etq=4&etq=5&etq=6&etq=7&etq=8&etq=9&etq=10&etq=11&etq=12&etq=13&etq=14&etq=15&etq=16&etq=17&etq=18&etq=19&etq=20&etq=21&etq=22&etq=23&etq=24&etq=25&minDate=${pastDayValue}&maxDate=${currentTime}&hideMetadata=true`,
+        `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${facility.id}/edgerouterplatformdevicesstatus`,
         {
           headers: {
             Authorization: "Bearer " + facility.bearer,
             accept: "application/json",
-            "api-version": "3.0",
+            "api-version": "2.0",
           },
         }
       );
-      const smartLockEvents = response.data;
-      return smartLockEvents;
+      const accessPoints = response.data;
+      return accessPoints;
     } catch (error) {
-      console.error(`Error fetching Events for: ${facility.name}`, error);
-      toast.error(`${facility.name} does not have Events`);
+      console.error(
+        `Error fetching Access Points for: ${facility.name}`,
+        error
+      );
+      toast.error(`${facility.name} does not have Access Points`);
       return null;
     }
   };
 
   const fetchDataForSelectedFacilities = async () => {
-    setSmartlockEvents([]); // Clear existing data
+    setAccessPoints([]); // Clear existing data
     const fetchPromises = selectedFacilities.map(async (facility) => {
-      const smartlockData = await fetchSmartLockEvents(facility);
-      return smartlockData;
+      const facilityName = facility.name;
+      const accessPointsData = await fetchAccessPoints(facility);
+
+      // Add facilityName to each Access Points in the fetched data
+      const updatedAccessPointData = accessPointsData.map((accessPoint) => ({
+        ...accessPoint,
+        facilityName,
+      }));
+
+      return updatedAccessPointData;
     });
 
-    const allSmartlockData = await Promise.all(fetchPromises);
+    const allAccessPointData = await Promise.all(fetchPromises);
 
-    // Flatten the array and update state with all smartlocks
-    const flattenedData = allSmartlockData.flat();
-    setSmartlockEvents(flattenedData);
+    // Flatten the array and update state with all Access Points
+    const flattenedData = allAccessPointData.flat();
+    setAccessPoints(flattenedData);
   };
-
-  // Pagination logic
 
   useEffect(() => {
     fetchDataForSelectedFacilities();
-  }, [selectedFacilities, dayValue]);
+  }, [selectedFacilities]);
 
   useEffect(() => {
-    setSortedColumn("Created On");
-    var sortedSmartLockEvents = [...smartlockEvents].sort((a, b) => {
-      if (a.createdOn < b.createdOn) return 1;
-      if (a.createdOn > b.createdOn) return -1;
+    setSortedColumn("Facility");
+    var sortedAccesspoints = [...accessPoints].sort((a, b) => {
+      if (a.facilityName.toLowerCase() < b.facilityName.toLowerCase())
+        return -1;
+      if (a.facilityName.toLowerCase() > b.facilityName.toLowerCase()) return 1;
       return 0;
     });
 
-    const filteredSmartLockEvents = sortedSmartLockEvents.filter(
-      (event) =>
-        (event.facilityName || "")
+    const filteredAccessPoints = sortedAccesspoints.filter(
+      (accessPoint) =>
+        (accessPoint.name || "")
           .toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
-        (event.deviceName || "")
+        (accessPoint.facilityName || "")
           .toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
-        (event.eventCategory || "")
+        (accessPoint.overallStatus || "")
           .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (event.eventType || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (event.eventDetails || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (event.createdOn || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (event.unitName || "").toLowerCase().includes(searchQuery.toLowerCase())
+          .includes(searchQuery.toLowerCase())
     );
-    setFilteredSmartLockEvents(filteredSmartLockEvents);
+    setFilteredAccessPoints(filteredAccessPoints);
     setCurrentPage(1);
-  }, [smartlockEvents, searchQuery]);
+  }, [accessPoints, searchQuery]);
 
   return (
     <div className="w-full px-2">
-      <p className="text-left text-sm ml-2 mb-1">
-        Events shown from the last
-        <select
-          className="border rounded-sm mx-2 dark:bg-darkSecondary dark:border-border"
-          id="dayValue"
-          value={dayValue}
-          onChange={(e) => {
-            setDayValue(Number(e.target.value));
-          }}
-        >
-          <option value={0.5}>0.5</option>
-          <option value={7}>7</option>
-          <option value={30}>30</option>
-          <option value={90}>90</option>
-          <option value={120}>120</option>
-          <option value={180}>180</option>
-        </select>
-        days
-      </p>
       <table className="w-full table-auto border-collapse border-zinc-300 dark:border-border">
         {/* Header */}
-        <thead className="select-none sticky -top-px z-10 bg-zinc-200 dark:bg-darkNavSecondary">
-          <tr className="bg-zinc-200 dark:bg-darkNavSecondary text-center">
+        <thead className="select-none sticky -top-px z-10 bg-zinc-200 dark:bg-zinc-800">
+          <tr className="bg-zinc-200 dark:bg-zinc-800 text-center">
             <th
               className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
                 setSortedColumn("Facility");
-                setFilteredSmartLockEvents(
-                  [...filteredSmartLockEvents].sort((a, b) => {
+                setFilteredAccessPoints(
+                  [...filteredAccessPoints].sort((a, b) => {
                     if (
                       a.facilityName.toLowerCase() <
                       b.facilityName.toLowerCase()
@@ -162,18 +141,18 @@ export default function AllSmartLocksEventsReport({
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
                 setSortedColumn("Name");
-                setFilteredSmartLockEvents(
-                  [...filteredSmartLockEvents].sort((a, b) => {
-                    if (a.deviceName < b.deviceName)
+                setFilteredAccessPoints(
+                  [...filteredAccessPoints].sort((a, b) => {
+                    if (a.name.toLowerCase() < b.name.toLowerCase())
                       return newDirection === "asc" ? -1 : 1;
-                    if (a.deviceName > b.deviceName)
+                    if (a.name.toLowerCase() > b.name.toLowerCase())
                       return newDirection === "asc" ? 1 : -1;
                     return 0;
                   })
                 );
               }}
             >
-              Device Name
+              Name
               {sortedColumn === "Name" && (
                 <span className="ml-2">
                   {sortDirection === "asc" ? "▲" : "▼"}
@@ -185,17 +164,17 @@ export default function AllSmartLocksEventsReport({
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
-                setSortedColumn("Event Category");
-                setFilteredSmartLockEvents(
-                  [...filteredSmartLockEvents].sort((a, b) => {
+                setSortedColumn("Connection Status");
+                setFilteredAccessPoints(
+                  [...filteredAccessPoints].sort((a, b) => {
                     if (
-                      a.eventCategory.toLowerCase() <
-                      b.eventCategory.toLowerCase()
+                      a.connectionStatus.toLowerCase() <
+                      b.connectionStatus.toLowerCase()
                     )
                       return newDirection === "asc" ? -1 : 1;
                     if (
-                      a.eventCategory.toLowerCase() >
-                      b.eventCategory.toLowerCase()
+                      a.connectionStatus.toLowerCase() >
+                      b.connectionStatus.toLowerCase()
                     )
                       return newDirection === "asc" ? 1 : -1;
                     return 0;
@@ -203,8 +182,8 @@ export default function AllSmartLocksEventsReport({
                 );
               }}
             >
-              Event Category
-              {sortedColumn === "Event Category" && (
+              Connection Status
+              {sortedColumn === "Connection Status" && (
                 <span className="ml-2">
                   {sortDirection === "asc" ? "▲" : "▼"}
                 </span>
@@ -215,21 +194,20 @@ export default function AllSmartLocksEventsReport({
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
-                setSortedColumn("Event Type");
-
-                setFilteredSmartLockEvents(
-                  [...filteredSmartLockEvents].sort((a, b) => {
-                    if (a.eventType < b.eventType)
+                setSortedColumn("Status");
+                setFilteredAccessPoints(
+                  [...filteredAccessPoints].sort((a, b) => {
+                    if (a.isDeviceOffline < b.isDeviceOffline)
                       return newDirection === "asc" ? -1 : 1;
-                    if (a.eventType > b.eventType)
+                    if (a.isDeviceOffline > b.isDeviceOffline)
                       return newDirection === "asc" ? 1 : -1;
                     return 0;
                   })
                 );
               }}
             >
-              Event Type
-              {sortedColumn === "Event Type" && (
+              Status
+              {sortedColumn === "Status" && (
                 <span className="ml-2">
                   {sortDirection === "asc" ? "▲" : "▼"}
                 </span>
@@ -240,50 +218,20 @@ export default function AllSmartLocksEventsReport({
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
-                setSortedColumn("Event Details");
-                setFilteredSmartLockEvents(
-                  [...filteredSmartLockEvents].sort((a, b) => {
-                    if (
-                      a.eventDetails.toLowerCase() <
-                      b.eventDetails.toLowerCase()
-                    )
+                setSortedColumn("Last Updated");
+                setFilteredAccessPoints(
+                  [...filteredAccessPoints].sort((a, b) => {
+                    if (a.lastUpdateTimestamp < b.lastUpdateTimestamp)
                       return newDirection === "asc" ? -1 : 1;
-                    if (
-                      a.eventDetails.toLowerCase() >
-                      b.eventDetails.toLowerCase()
-                    )
+                    if (a.lastUpdateTimestamp > b.lastUpdateTimestamp)
                       return newDirection === "asc" ? 1 : -1;
                     return 0;
                   })
                 );
               }}
             >
-              Event Details
-              {sortedColumn === "Event Details" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Created On");
-                setFilteredSmartLockEvents(
-                  [...filteredSmartLockEvents].sort((a, b) => {
-                    if (a.createdOn < b.createdOn)
-                      return newDirection === "asc" ? -1 : 1;
-                    if (a.createdOn > b.createdOn)
-                      return newDirection === "asc" ? 1 : -1;
-                    return 0;
-                  })
-                );
-              }}
-            >
-              Created On
-              {sortedColumn === "Created On" && (
+              Last Updated
+              {sortedColumn === "Last Updated" && (
                 <span className="ml-2">
                   {sortDirection === "asc" ? "▲" : "▼"}
                 </span>
@@ -292,21 +240,21 @@ export default function AllSmartLocksEventsReport({
           </tr>
         </thead>
         <tbody>
-          {filteredSmartLockEvents
+          {filteredAccessPoints
             .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-            .map((smartlock, index) => (
+            .map((accessPoint, index) => (
               <tr
                 key={index}
-                className="hover:bg-zinc-100 dark:hover:bg-darkNavSecondary relative hover:cursor-pointer"
+                className="hover:bg-zinc-100 dark:hover:bg-zinc-800 relative hover:cursor-pointer"
                 onClick={() => setHoveredRow(index)}
                 onMouseLeave={() => setHoveredRow(null)}
               >
                 <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {smartlock.facilityName}
+                  {accessPoint.facilityName}
                   {hoveredRow === index && (
                     <div className="absolute bg-zinc-700 dark:bg-zinc-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-4/5">
                       <div className="grid grid-cols-4 gap-1 overflow-hidden">
-                        {Object.entries(smartlock).map(
+                        {Object.entries(accessPoint).map(
                           ([key, value], index) => (
                             <div key={index} className="wrap-break-word">
                               <span className="font-bold text-yellow-500">
@@ -332,19 +280,23 @@ export default function AllSmartLocksEventsReport({
                   )}
                 </td>
                 <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {smartlock.deviceName}
+                  {accessPoint.name}
                 </td>
                 <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {smartlock.eventCategory}
+                  <div className="inline-flex items-center gap-2">
+                    {accessPoint.connectionStatus === "ok" ? (
+                      <FaCheckCircle className="text-green-500" />
+                    ) : (
+                      ""
+                    )}
+                    <div>{accessPoint.connectionStatusMessage}</div>
+                  </div>
                 </td>
                 <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {smartlock.eventType}
+                  {!accessPoint.isDeviceOffline ? "Online" : "Offline"}
                 </td>
                 <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {smartlock.eventDetails}
-                </td>
-                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {smartlock.createdOn}
+                  {accessPoint.lastUpdateTimestamp}
                 </td>
               </tr>
             ))}
@@ -357,7 +309,7 @@ export default function AllSmartLocksEventsReport({
           setRowsPerPage={setRowsPerPage}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
-          items={filteredSmartLockEvents}
+          items={filteredAccessPoints}
         />
       </div>
     </div>

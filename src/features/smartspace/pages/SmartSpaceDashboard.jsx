@@ -2,18 +2,26 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { FaLock } from "react-icons/fa";
-import SmartLockFacilityCard from "@features/smartlock/components/SmartLockFacilityCard";
-import SmartLockExport from "@features/smartlock/components/SmartLockExport";
+import SmartSpaceFacilityCard from "@features/SmartSpace/components/SmartSpaceFacilityCard";
+import SmartSpaceExport from "@features/SmartSpace/components/SmartSpaceExport";
 import { useAuth } from "@context/AuthProvider";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
-import SmartLockDashboardList from "@features/smartlock/components/SmartLockDashboardList";
+import SmartSpaceDashboardList from "@features/SmartSpace/components/SmartSpaceDashboardList";
 import InputBox from "@components/UI/InputBox";
+import SliderButton from "@components/UI/SliderButton";
 
-export default function SmartLockDashboardView() {
+export default function SmartSpaceDashboardView() {
   const [facilitiesWithBearers, setFacilitiesWithBearers] = useState([]);
   const [filteredFacilities, setFilteredFacilities] = useState([]);
   const [listView, setListView] = useState(
-    JSON.parse(localStorage.getItem("smartlockListView")) || false
+    JSON.parse(localStorage.getItem("smartSpaceListView")) || false
+  );
+  const [toggledSections, setToggledSections] = useState(
+    JSON.parse(localStorage.getItem("smartSpaceToggledSections")) || {
+      openNet: true,
+      smartLock: true,
+      smartMotion: true,
+    }
   );
   const [facilitiesInfo, setFacilitiesInfo] = useState([]);
   const [edgeRouterOfflineCount, setEdgeRouterOfflineCount] = useState([]);
@@ -93,7 +101,7 @@ export default function SmartLockDashboardView() {
   // Toggle view - list or card
   const toggleListView = () => {
     setListView(!listView);
-    localStorage.setItem("smartlockListView", !listView);
+    localStorage.setItem("smartSpaceListView", !listView);
   };
   // Add totals together from each facility
   useEffect(() => {
@@ -191,8 +199,6 @@ export default function SmartLockDashboardView() {
   useEffect(() => {
     const fetchFacilitiesWithBearers = async () => {
       try {
-        let currentIndex = 0;
-
         const fetchFacilityWithBearerAndStats = async (facility) => {
           const bearer = await fetchBearerToken(facility);
           if (!bearer) return null;
@@ -204,7 +210,6 @@ export default function SmartLockDashboardView() {
 
         const results = await Promise.all(
           selectedTokens.map(async (facility, index) => {
-            currentIndex = index;
             return await fetchFacilityWithBearerAndStats(facility);
           })
         );
@@ -275,6 +280,15 @@ export default function SmartLockDashboardView() {
         .catch(() => []),
     ]);
 
+    const fetchSmartMotion = async () => {
+      const res = await axios.get(
+        `https://accesscontrol.${tokenPrefix}insomniaccia${tokenSuffix}.com/facilities/${id}/smartmotionstatus`,
+        { headers }
+      );
+      console.log(res.data);
+      return res.data;
+    };
+
     const fetchFacilityDetail = async () => {
       const res = await axios.get(
         `https://accesscontrol.${tokenPrefix}insomniaccia${tokenSuffix}.com/facilities/${id}`,
@@ -291,6 +305,28 @@ export default function SmartLockDashboardView() {
       );
       return res.data;
     };
+    var smartMotion = [];
+    if (tokenSuffix === "-dev") {
+      smartMotion = await fetchSmartMotion();
+      console.log(smartMotion);
+    }
+
+    const smartMotionOkayCount = smartMotion.filter(
+      (s) => s.overallStatus === "ok"
+    ).length;
+    const smartMotionWarningCount = smartMotion.filter(
+      (s) => s.overallStatus === "warning"
+    ).length;
+    const smartMotionErrorCount = smartMotion.filter(
+      (s) => s.overallStatus === "error"
+    ).length;
+    const smartMotionOfflineCount = smartMotion.filter(
+      (s) => s.isDeviceOffline
+    ).length;
+    console.log(smartMotionOkayCount);
+    console.log(smartMotionWarningCount);
+    console.log(smartMotionErrorCount);
+    console.log(smartMotionOfflineCount);
 
     const facilityDetail = await fetchFacilityDetail();
     const weather = await fetchWeather(facilityDetail);
@@ -349,6 +385,11 @@ export default function SmartLockDashboardView() {
         weather,
         edgeRouter: edgeRouter || {},
         accessPoints: aps || [],
+        smartMotion,
+        smartMotionOkayCount,
+        smartMotionWarningCount,
+        smartMotionErrorCount,
+        smartMotionOfflineCount,
       };
     }
   };
@@ -373,7 +414,7 @@ export default function SmartLockDashboardView() {
       <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
         <div className="ml-5 flex items-center text-sm">
           <FaLock className="text-lg" />
-          &ensp; SmartLock Dashboard
+          &ensp; SmartSpace Dashboard
         </div>
       </div>
       <div className="mt-5 mb-2 flex items-center justify-end text-center mx-5">
@@ -398,10 +439,71 @@ export default function SmartLockDashboardView() {
           {listView ? "Card View" : "List View"}
         </button>
       </div>
+      {listView && (
+        <div className="mt-2 mb-2 flex items-center justify-end text-center mx-5 gap-3">
+          <div className="flex gap-1 items-center">
+            <label htmlFor="toggleOpenNetView">OpenNet</label>
+            <SliderButton
+              onclick={() =>
+                setToggledSections((prev) => ({
+                  ...prev,
+                  openNet: !prev.openNet,
+                })) &
+                localStorage.setItem(
+                  "smartSpaceToggledSections",
+                  JSON.stringify({
+                    ...toggledSections,
+                    openNet: !toggledSections.openNet,
+                  })
+                )
+              }
+              value={toggledSections.openNet}
+            />
+          </div>
+          <div className="flex gap-1 items-center">
+            <label htmlFor="toggleSmartLockView">SmartLock</label>
+            <SliderButton
+              onclick={() =>
+                setToggledSections((prev) => ({
+                  ...prev,
+                  smartLock: !prev.smartLock,
+                })) &
+                localStorage.setItem(
+                  "smartSpaceToggledSections",
+                  JSON.stringify({
+                    ...toggledSections,
+                    smartLock: !toggledSections.smartLock,
+                  })
+                )
+              }
+              value={toggledSections.smartLock}
+            />
+          </div>
+          <div className="flex gap-1 items-center">
+            <label htmlFor="toggleSmartMotionView">SmartMotion</label>
+            <SliderButton
+              onclick={() =>
+                setToggledSections((prev) => ({
+                  ...prev,
+                  smartMotion: !prev.smartMotion,
+                })) &
+                localStorage.setItem(
+                  "smartSpaceToggledSections",
+                  JSON.stringify({
+                    ...toggledSections,
+                    smartMotion: !toggledSections.smartMotion,
+                  })
+                )
+              }
+              value={toggledSections.smartMotion}
+            />
+          </div>
+        </div>
+      )}
       {/* List view */}
       {listView ? (
         <div className="w-full px-5">
-          <SmartLockDashboardList
+          <SmartSpaceDashboardList
             filteredFacilities={filteredFacilities}
             totalSmartlocks={totalSmartlocks}
             totalAccessPoints={totalAccessPoints}
@@ -419,6 +521,7 @@ export default function SmartLockDashboardView() {
             smartlockLowestBattery={smartlockLowestBattery}
             facilitiesWithBearers={facilitiesWithBearers}
             setFilteredFacilities={setFilteredFacilities}
+            toggledSections={toggledSections}
           />
         </div>
       ) : (
@@ -615,7 +718,7 @@ export default function SmartLockDashboardView() {
           <div className="columns-1 sm:columns-2 lg:columns-3 gap-4">
             {filteredFacilities.map((facility, index) => (
               <div key={index} className="break-inside-avoid">
-                <SmartLockFacilityCard facility={facility} />
+                <SmartSpaceFacilityCard facility={facility} />
               </div>
             ))}
           </div>
@@ -623,7 +726,7 @@ export default function SmartLockDashboardView() {
       )}
       {/* Export Button */}
       <div className="float-right px-5">
-        <SmartLockExport facilitiesInfo={facilitiesInfo} />
+        <SmartSpaceExport facilitiesInfo={facilitiesInfo} />
       </div>
     </div>
   );

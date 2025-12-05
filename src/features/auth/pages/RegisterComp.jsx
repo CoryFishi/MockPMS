@@ -89,7 +89,7 @@ export default function RegisterComp() {
       )}
       <form
         onSubmit={handleSignUp}
-        className="bg-white dark:bg-darkNavSecondary shadow-lg rounded-lg p-8 max-w-md w-full space-y-4 mb-16"
+        className="bg-white dark:bg-zinc-800 shadow-lg rounded-lg p-8 max-w-md w-full space-y-4 mb-16"
       >
         <h2 className="text-2xl font-semibold text-zinc-700 dark:text-zinc-200 text-center mb-6">
           Sign Up

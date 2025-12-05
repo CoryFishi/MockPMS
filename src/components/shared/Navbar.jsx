@@ -92,7 +92,7 @@ export default function Navbar({
                   : ""
               }`}
             >
-              SmartLock
+              SmartSpace
             </Link>
           )}
           {user && permissions.pmsPlatform && (
@@ -102,7 +102,7 @@ export default function Navbar({
                 location.pathname === "/" ? "border-b-2 border-yellow-400" : ""
               }`}
             >
-              Property Manager
+              Property Management
             </Link>
           )}
           {user && role === "admin" && (

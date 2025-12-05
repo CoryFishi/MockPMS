@@ -4,19 +4,19 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 
-export default function AllAccessPointsReport({
+export default function AllEdgeRoutersReport({
   selectedFacilities,
   searchQuery,
 }) {
-  const [filteredAccessPoints, setFilteredAccessPoints] = useState([]);
-  const [accessPoints, setAccessPoints] = useState([]);
+  const [filteredEdgeRouters, setFilteredEdgeRouters] = useState([]);
+  const [edgeRouters, setEdgeRouters] = useState([]);
   const [hoveredRow, setHoveredRow] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [sortDirection, setSortDirection] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
 
-  const fetchAccessPoints = async (facility) => {
+  const fetchEdgeRouters = async (facility) => {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -27,7 +27,7 @@ export default function AllAccessPointsReport({
       }
 
       const response = await axios.get(
-        `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${facility.id}/edgerouterplatformdevicesstatus`,
+        `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${facility.id}/edgerouterstatus`,
         {
           headers: {
             Authorization: "Bearer " + facility.bearer,
@@ -36,38 +36,32 @@ export default function AllAccessPointsReport({
           },
         }
       );
-      const accessPoints = response.data;
-      return accessPoints;
+      const edgeRouters = response.data;
+      return edgeRouters;
     } catch (error) {
-      console.error(
-        `Error fetching Access Points for: ${facility.name}`,
-        error
-      );
-      toast.error(`${facility.name} does not have Access Points`);
+      console.error(`Error fetching Edge Routers for: ${facility.name}`, error);
+      toast.error(`${facility.name} does not have Edge Routers`);
       return null;
     }
   };
 
   const fetchDataForSelectedFacilities = async () => {
-    setAccessPoints([]); // Clear existing data
+    setEdgeRouters([]); // Clear existing data
     const fetchPromises = selectedFacilities.map(async (facility) => {
       const facilityName = facility.name;
-      const accessPointsData = await fetchAccessPoints(facility);
+      const edgeRoutersData = await fetchEdgeRouters(facility);
 
-      // Add facilityName to each Access Points in the fetched data
-      const updatedAccessPointData = accessPointsData.map((accessPoint) => ({
-        ...accessPoint,
-        facilityName,
-      }));
+      // Add facilityName to the edgeRoutersData array
+      edgeRoutersData.facilityName = facilityName;
 
-      return updatedAccessPointData;
+      return edgeRoutersData;
     });
 
-    const allAccessPointData = await Promise.all(fetchPromises);
+    const allEdgeRouterData = await Promise.all(fetchPromises);
 
-    // Flatten the array and update state with all Access Points
-    const flattenedData = allAccessPointData.flat();
-    setAccessPoints(flattenedData);
+    // Flatten the array and update state with all Edge Routers
+    const flattenedData = allEdgeRouterData.flat();
+    setEdgeRouters(flattenedData);
   };
 
   useEffect(() => {
@@ -76,43 +70,43 @@ export default function AllAccessPointsReport({
 
   useEffect(() => {
     setSortedColumn("Facility");
-    var sortedAccesspoints = [...accessPoints].sort((a, b) => {
+    var sortedEdgeRouters = [...edgeRouters].sort((a, b) => {
       if (a.facilityName.toLowerCase() < b.facilityName.toLowerCase())
         return -1;
       if (a.facilityName.toLowerCase() > b.facilityName.toLowerCase()) return 1;
       return 0;
     });
 
-    const filteredAccessPoints = sortedAccesspoints.filter(
-      (accessPoint) =>
-        (accessPoint.name || "")
+    const filteredEdgeRouters = sortedEdgeRouters.filter(
+      (edgeRouter) =>
+        (edgeRouter.name || "")
           .toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
-        (accessPoint.facilityName || "")
+        (edgeRouter.facilityName || "")
           .toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
-        (accessPoint.overallStatus || "")
+        (edgeRouter.overallStatus || "")
           .toLowerCase()
           .includes(searchQuery.toLowerCase())
     );
-    setFilteredAccessPoints(filteredAccessPoints);
+    setFilteredEdgeRouters(filteredEdgeRouters);
     setCurrentPage(1);
-  }, [accessPoints, searchQuery]);
+  }, [edgeRouters, searchQuery]);
 
   return (
     <div className="w-full px-2">
       <table className="w-full table-auto border-collapse border-zinc-300 dark:border-border">
         {/* Header */}
-        <thead className="select-none sticky -top-px z-10 bg-zinc-200 dark:bg-darkNavSecondary">
-          <tr className="bg-zinc-200 dark:bg-darkNavSecondary text-center">
+        <thead className="select-none sticky -top-px z-10 bg-zinc-200 dark:bg-zinc-800">
+          <tr className="bg-zinc-200 dark:bg-zinc-800 text-center">
             <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2  hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
                 setSortedColumn("Facility");
-                setFilteredAccessPoints(
-                  [...filteredAccessPoints].sort((a, b) => {
+                setFilteredEdgeRouters(
+                  [...filteredEdgeRouters].sort((a, b) => {
                     if (
                       a.facilityName.toLowerCase() <
                       b.facilityName.toLowerCase()
@@ -136,13 +130,13 @@ export default function AllAccessPointsReport({
               )}
             </th>
             <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2  hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
                 setSortedColumn("Name");
-                setFilteredAccessPoints(
-                  [...filteredAccessPoints].sort((a, b) => {
+                setFilteredEdgeRouters(
+                  [...filteredEdgeRouters].sort((a, b) => {
                     if (a.name.toLowerCase() < b.name.toLowerCase())
                       return newDirection === "asc" ? -1 : 1;
                     if (a.name.toLowerCase() > b.name.toLowerCase())
@@ -160,13 +154,13 @@ export default function AllAccessPointsReport({
               )}
             </th>
             <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2  hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
                 setSortedColumn("Connection Status");
-                setFilteredAccessPoints(
-                  [...filteredAccessPoints].sort((a, b) => {
+                setFilteredEdgeRouters(
+                  [...filteredEdgeRouters].sort((a, b) => {
                     if (
                       a.connectionStatus.toLowerCase() <
                       b.connectionStatus.toLowerCase()
@@ -190,13 +184,65 @@ export default function AllAccessPointsReport({
               )}
             </th>
             <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2  hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              onClick={() => {
+                const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                setSortDirection(newDirection);
+                setSortedColumn("Event Status");
+                setFilteredEdgeRouters(
+                  [...filteredEdgeRouters].sort((a, b) => {
+                    if (a.eventStatusMessage < b.eventStatusMessage)
+                      return newDirection === "asc" ? -1 : 1;
+                    if (a.eventStatusMessage > b.eventStatusMessage)
+                      return newDirection === "asc" ? 1 : -1;
+                    return 0;
+                  })
+                );
+              }}
+            >
+              Event Status
+              {sortedColumn === "Event Status" && (
+                <span className="ml-2">
+                  {sortDirection === "asc" ? "▲" : "▼"}
+                </span>
+              )}
+            </th>
+            <th
+              className="px-4 py-2  hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              onClick={() => {
+                const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                setSortDirection(newDirection);
+                setSortedColumn("Provisioning");
+                setFilteredEdgeRouters(
+                  [...filteredEdgeRouters].sort((a, b) => {
+                    if (
+                      a.isLockProvisioningEnabled < b.isLockProvisioningEnabled
+                    )
+                      return newDirection === "asc" ? -1 : 1;
+                    if (
+                      a.isLockProvisioningEnabled > b.isLockProvisioningEnabled
+                    )
+                      return newDirection === "asc" ? 1 : -1;
+                    return 0;
+                  })
+                );
+              }}
+            >
+              Provisioning Enabled
+              {sortedColumn === "Provisioning" && (
+                <span className="ml-2">
+                  {sortDirection === "asc" ? "▲" : "▼"}
+                </span>
+              )}
+            </th>
+            <th
+              className="px-4 py-2  hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
                 setSortedColumn("Status");
-                setFilteredAccessPoints(
-                  [...filteredAccessPoints].sort((a, b) => {
+                setFilteredEdgeRouters(
+                  [...filteredEdgeRouters].sort((a, b) => {
                     if (a.isDeviceOffline < b.isDeviceOffline)
                       return newDirection === "asc" ? -1 : 1;
                     if (a.isDeviceOffline > b.isDeviceOffline)
@@ -214,24 +260,24 @@ export default function AllAccessPointsReport({
               )}
             </th>
             <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              className="px-4 py-2  hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
               onClick={() => {
                 const newDirection = sortDirection === "asc" ? "desc" : "asc";
                 setSortDirection(newDirection);
-                setSortedColumn("Last Updated");
-                setFilteredAccessPoints(
-                  [...filteredAccessPoints].sort((a, b) => {
-                    if (a.lastUpdateTimestamp < b.lastUpdateTimestamp)
+                setSortedColumn("Last Communication On");
+                setFilteredEdgeRouters(
+                  [...filteredEdgeRouters].sort((a, b) => {
+                    if (a.lastCommunicationOn < b.lastCommunicationOn)
                       return newDirection === "asc" ? -1 : 1;
-                    if (a.lastUpdateTimestamp > b.lastUpdateTimestamp)
+                    if (a.lastCommunicationOn > b.lastCommunicationOn)
                       return newDirection === "asc" ? 1 : -1;
                     return 0;
                   })
                 );
               }}
             >
-              Last Updated
-              {sortedColumn === "Last Updated" && (
+              Last Communicated On
+              {sortedColumn === "Last Communication On" && (
                 <span className="ml-2">
                   {sortDirection === "asc" ? "▲" : "▼"}
                 </span>
@@ -240,21 +286,21 @@ export default function AllAccessPointsReport({
           </tr>
         </thead>
         <tbody>
-          {filteredAccessPoints
+          {filteredEdgeRouters
             .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-            .map((accessPoint, index) => (
+            .map((edgeRouter, index) => (
               <tr
                 key={index}
-                className="hover:bg-zinc-100 dark:hover:bg-darkNavSecondary relative hover:cursor-pointer"
+                className="hover:bg-zinc-100 dark:hover:bg-zinc-800 relative hover:cursor-pointer"
                 onClick={() => setHoveredRow(index)}
                 onMouseLeave={() => setHoveredRow(null)}
               >
                 <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {accessPoint.facilityName}
+                  {edgeRouter.facilityName}
                   {hoveredRow === index && (
                     <div className="absolute bg-zinc-700 dark:bg-zinc-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-4/5">
                       <div className="grid grid-cols-4 gap-1 overflow-hidden">
-                        {Object.entries(accessPoint).map(
+                        {Object.entries(edgeRouter).map(
                           ([key, value], index) => (
                             <div key={index} className="wrap-break-word">
                               <span className="font-bold text-yellow-500">
@@ -280,23 +326,39 @@ export default function AllAccessPointsReport({
                   )}
                 </td>
                 <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {accessPoint.name}
+                  {edgeRouter.name}
                 </td>
                 <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   <div className="inline-flex items-center gap-2">
-                    {accessPoint.connectionStatus === "ok" ? (
+                    {edgeRouter.connectionStatus === "ok" ? (
                       <FaCheckCircle className="text-green-500" />
                     ) : (
                       ""
                     )}
-                    <div>{accessPoint.connectionStatusMessage}</div>
+                    <div>{edgeRouter.connectionStatusMessage}</div>
                   </div>
                 </td>
                 <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {!accessPoint.isDeviceOffline ? "Online" : "Offline"}
+                  <div className="inline-flex items-center gap-2">
+                    {edgeRouter.eventStatusMessage === "ok" ? (
+                      <FaCheckCircle className="text-green-500" />
+                    ) : (
+                      ""
+                    )}
+                    <div>{edgeRouter.eventStatusMessage}</div>
+                  </div>
                 </td>
                 <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {accessPoint.lastUpdateTimestamp}
+                  {edgeRouter.isAccessPointProvisioningEnabled ||
+                  edgeRouter.isLockProvisioningEnabled
+                    ? "True"
+                    : "False"}
+                </td>
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
+                  {!edgeRouter.isDeviceOffline ? "Online" : "Offline"}
+                </td>
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
+                  {edgeRouter.lastCommunicationOn}
                 </td>
               </tr>
             ))}
@@ -309,7 +371,7 @@ export default function AllAccessPointsReport({
           setRowsPerPage={setRowsPerPage}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
-          items={filteredAccessPoints}
+          items={filteredEdgeRouters}
         />
       </div>
     </div>
