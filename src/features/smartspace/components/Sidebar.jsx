@@ -1,12 +1,12 @@
-import layoutUnits from "@features/SmartSpace/utils/facility1.json";
+import layoutUnits from "@features/smartspace/utils/facility1.json";
 import { useMemo, useState } from "react";
-import CreateUnitModal from "@features/SmartSpace/modals/CreateUnitModal";
+import CreateUnitModal from "@features/smartspace/modals/CreateUnitModal";
 import { v4 as uuid } from "uuid";
 import {
   TbLayoutSidebarLeftCollapseFilled,
   TbLayoutSidebarRightCollapseFilled,
 } from "react-icons/tb";
-import CreateWallModal from "@features/SmartSpace/modals/CreateWallModal";
+import CreateWallModal from "@features/smartspace/modals/CreateWallModal";
 export default function Sidebar({
   layout,
   setLayout,

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import SmartSpaceFacilityRow from "@features/SmartSpace/components/SmartSpaceFacilityRow";
+import SmartSpaceFacilityRow from "@features/smartspace/components/SmartSpaceFacilityRow";
 
 export default function SmartSpaceDashboardList({
   filteredFacilities,

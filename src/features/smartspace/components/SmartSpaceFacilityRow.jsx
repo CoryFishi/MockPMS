@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { FaCheckCircle, FaExternalLinkAlt } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
-import SmartLockModal from "@features/SmartSpace/modals/SmartLockModal";
-import SmartMotionModal from "@features/SmartSpace/modals/SmartMotionModal";
+import SmartLockModal from "@features/smartspace/modals/SmartLockModal";
+import SmartMotionModal from "@features/smartspace/modals/SmartMotionModal";
 
 export default function SmartSpaceFacilityRow({
   facility,

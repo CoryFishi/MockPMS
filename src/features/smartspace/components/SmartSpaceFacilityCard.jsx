@@ -1,5 +1,5 @@
 import { useState } from "react";
-import SmartLockModal from "@features/SmartSpace/modals/SmartLockModal";
+import SmartLockModal from "@features/smartspace/modals/SmartLockModal";
 import { RiRouterFill } from "react-icons/ri";
 import SmartSpaceDetailModal from "@components/shared/DetailModal";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";

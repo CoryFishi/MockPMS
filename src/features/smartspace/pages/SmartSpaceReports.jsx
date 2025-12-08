@@ -1,15 +1,15 @@
-import AllSmartLocksReport from "@features/SmartSpace/reports/AllSmartLocksReport";
-import AllEdgeRoutersReport from "@features/SmartSpace/reports/AllEdgeRoutersReport";
-import AllAccessPointsReport from "@features/SmartSpace/reports/AllAccessPointsReport";
-import AllSmartLocksEventsReport from "@features/SmartSpace/reports/AllSmartLockEventsReport";
-import AllSmartLockOnlineTimeReport from "@features/SmartSpace/reports/AllSmartLockOnlineTimeReport";
+import AllSmartLocksReport from "@features/smartspace/reports/AllSmartLocksReport";
+import AllEdgeRoutersReport from "@features/smartspace/reports/AllEdgeRoutersReport";
+import AllAccessPointsReport from "@features/smartspace/reports/AllAccessPointsReport";
+import AllSmartLocksEventsReport from "@features/smartspace/reports/AllSmartLockEventsReport";
+import AllSmartLockOnlineTimeReport from "@features/smartspace/reports/AllSmartLockOnlineTimeReport";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
 import { useAuth } from "@context/AuthProvider";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useRef, useState } from "react";
 import { FaLock } from "react-icons/fa";
-import AllSmartLockOfflineEventsReport from "@features/SmartSpace/reports/AllSmartLockOfflineEventsReport";
+import AllSmartLockOfflineEventsReport from "@features/smartspace/reports/AllSmartLockOfflineEventsReport";
 import InputBox from "@components/UI/InputBox";
 
 export default function SmartSpaceReports() {

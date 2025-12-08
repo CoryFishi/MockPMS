@@ -1,8 +1,8 @@
 import { useState, useCallback, useMemo } from "react";
-import FacilityMap from "@features/SmartSpace/components/FacilityMap";
-import Sidebar from "@features/SmartSpace/components/Sidebar";
-import { applyChange } from "@features/SmartSpace/utils/applyChange";
-import EditUnitModal from "@features/SmartSpace/modals/EditUnitModal";
+import FacilityMap from "@features/smartspace/components/FacilityMap";
+import Sidebar from "@features/smartspace/components/Sidebar";
+import { applyChange } from "@features/smartspace/utils/applyChange";
+import EditUnitModal from "@features/smartspace/modals/EditUnitModal";
 import { GrSettingsOption } from "react-icons/gr";
 
 const PX_PER_FT = 5;

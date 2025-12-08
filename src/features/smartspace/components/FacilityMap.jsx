@@ -12,8 +12,8 @@ import {
   Tag,
 } from "react-konva";
 import { v4 as uuid } from "uuid";
-import EditAccessPointModal from "@features/SmartSpace/modals/EditAccessPointModal";
-import EditWallModal from "@features/SmartSpace/modals/EditWallModal";
+import EditAccessPointModal from "@features/smartspace/modals/EditAccessPointModal";
+import EditWallModal from "@features/smartspace/modals/EditWallModal";
 
 const PX_PER_FT = 5;
 
