@@ -2,11 +2,11 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { FaLock } from "react-icons/fa";
-import SmartSpaceFacilityCard from "@features/SmartSpace/components/SmartSpaceFacilityCard";
-import SmartSpaceExport from "@features/SmartSpace/components/SmartSpaceExport";
+import SmartSpaceFacilityCard from "@features/smartspace/components/SmartSpaceFacilityCard";
+import SmartSpaceExport from "@features/smartspace/components/SmartSpaceExport";
 import { useAuth } from "@context/AuthProvider";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
-import SmartSpaceDashboardList from "@features/SmartSpace/components/SmartSpaceDashboardList";
+import SmartSpaceDashboardList from "@features/smartspace/components/SmartSpaceDashboardList";
 import InputBox from "@components/UI/InputBox";
 import SliderButton from "@components/UI/SliderButton";
 
