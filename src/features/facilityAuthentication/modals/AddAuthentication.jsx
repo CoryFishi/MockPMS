@@ -116,8 +116,8 @@ export default function AddAuthentication({
               onChange={(e) => setEnvironment(e.target.value)}
               options={[
                 { id: "prod", name: "Production" },
-                { id: "dev", name: "Development" },
-                { id: "qa", name: "QA" },
+                { id: "-dev", name: "Development" },
+                { id: "-qa", name: "QA" },
                 { id: "staging", name: "Staging" },
               ]}
               placeholder="Environment"

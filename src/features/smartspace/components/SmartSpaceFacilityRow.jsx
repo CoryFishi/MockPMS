@@ -8,6 +8,7 @@ export default function SmartSpaceFacilityRow({
   setExpandedRows,
   expandedRows,
   toggledSections,
+  explicitSort,
 }) {
   const [isSmartlockModalOpen, setIsSmartlockModalOpen] = useState(false);
   const [smartlockModalOption, setSmartlockModalOption] = useState(null);
@@ -27,9 +28,43 @@ export default function SmartSpaceFacilityRow({
     }
   };
 
+  // If no edge router data, do not render the row
+  // or if all toggled sections are false, do not render the row
+  if (
+    Object.keys(facility.edgeRouter).length === 0 ||
+    (toggledSections.openNet === false &&
+      toggledSections.smartLock === false &&
+      toggledSections.smartMotion === false)
+  ) {
+    return null;
+  }
+
+  // If explicit sort is enabled, and smart motion is selected do not render the row when there are no smart motion devices
+  if (
+    facility.smartMotion.length < 1 &&
+    !toggledSections.smartLock &&
+    toggledSections.smartMotion &&
+    explicitSort
+  ) {
+    return null;
+  }
+
+  // If explicit sort is enabled, and smart lock is selected do not render the row when there are no smart lock devices
+  if (
+    facility.smartLocks.length < 1 &&
+    !toggledSections.smartMotion &&
+    toggledSections.smartLock &&
+    explicitSort
+  ) {
+    return null;
+  }
+
   return (
     <>
-      <tr className="hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
+      <tr
+        className="hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-300 dark:border-zinc-700"
+        onClick={() => console.log(facility)}
+      >
         {/* Facility Name and Expand/Collapse */}
         {toggledSections.openNet ||
         toggledSections.smartLock ||
@@ -68,8 +103,8 @@ export default function SmartSpaceFacilityRow({
         {/* OpenNet Section */}
         {toggledSections.openNet && (
           <>
-            <td className="px-4 py-2">
-              <div className="inline-flex items-center gap-1 text-center">
+            <td className="px-4 py-2 border-l border-zinc-300 dark:border-zinc-700">
+              <div className="inline-flex items-center gap-1 text-center justify-center w-full">
                 {facility.edgeRouterStatus === "error" ? (
                   <IoIosWarning className="text-red-500 mr-2 min-w-5" />
                 ) : facility.edgeRouterStatus === "warning" ? (
@@ -88,113 +123,102 @@ export default function SmartSpaceFacilityRow({
             </td>
           </>
         )}
-
-        {facility.smartLocks.length > 1 ? (
+        {toggledSections.smartLock && facility.smartLocks.length > 0 ? (
           <>
-            {/* SmartLock */}
-            {toggledSections.smartLock && (
-              <>
-                <td
-                  className="px-4 py-2 text-center cursor-pointer hover:underline"
-                  onClick={() => openSmartLockModal("good")}
-                  title="Click to view Okay SmartLocks"
-                >
-                  {facility.okCount}
-                </td>
-                <td
-                  className="px-4 py-2 text-center cursor-pointer hover:underline"
-                  onClick={() => openSmartLockModal("warning")}
-                  title="Click to view Warning SmartLocks"
-                >
-                  {facility.warningCount}
-                </td>
-                <td
-                  className="px-4 py-2 text-center cursor-pointer hover:underline"
-                  onClick={() => openSmartLockModal("error")}
-                  title="Click to view Error SmartLocks"
-                >
-                  {facility.errorCount}
-                </td>
-                <td
-                  className="px-4 py-2 text-center cursor-pointer hover:underline"
-                  onClick={() => openSmartLockModal("offline")}
-                  title="Click to view Offline SmartLocks"
-                >
-                  {facility.offlineCount}
-                </td>
-                <td
-                  className="px-4 py-2 text-center cursor-pointer hover:underline"
-                  onClick={() => openSmartLockModal("lowestSignal")}
-                  title="Click to view SmartLocks with Lowest Signal"
-                >
-                  {facility.lowestSignal}%
-                </td>
-                <td
-                  className="px-4 py-2 text-center cursor-pointer hover:underline"
-                  onClick={() => openSmartLockModal("lowestBattery")}
-                  title="Click to view SmartLocks with Lowest Battery"
-                >
-                  {facility.lowestBattery}%
-                </td>
-              </>
-            )}
-            {/* SmartMotion */}
-            {toggledSections.smartMotion && (
-              <>
-                <td
-                  className="px-4 py-2 text-center cursor-pointer hover:underline"
-                  title="Click to view Okay SmartMotion devices"
-                >
-                  {facility.smartMotionOkayCount}
-                </td>
-                <td
-                  className="px-4 py-2 text-center cursor-pointer hover:underline"
-                  title="Click to view Warning SmartMotion devices"
-                >
-                  {facility.smartMotionWarningCount}
-                </td>
-                <td
-                  className="px-4 py-2 text-center cursor-pointer hover:underline"
-                  title="Click to view Error SmartMotion devices"
-                  onClick={() => console.log(facility.smartMotionErrorCount)}
-                >
-                  {facility.smartMotionErrorCount}
-                </td>
-                <td
-                  className="px-4 py-2 text-center cursor-pointer hover:underline"
-                  title="Click to view Offline SmartMotion devices"
-                >
-                  {facility.smartMotionOfflineCount}
-                </td>
-                <td
-                  className="px-4 py-2 text-center cursor-pointer hover:underline"
-                  title="-"
-                >
-                  -
-                </td>
-                <td
-                  className="px-4 py-2 text-center cursor-pointer hover:underline"
-                  title="-"
-                >
-                  -
-                </td>
-              </>
-            )}
+            <td
+              className="px-4 py-2 text-center cursor-pointer hover:underline border-l border-zinc-300 dark:border-zinc-700"
+              onClick={() => openSmartLockModal("good")}
+              title="Click to view Okay SmartLocks"
+            >
+              {facility.okCount}
+            </td>
+            <td
+              className="px-4 py-2 text-center cursor-pointer hover:underline"
+              onClick={() => openSmartLockModal("warning")}
+              title="Click to view Warning SmartLocks"
+            >
+              {facility.warningCount}
+            </td>
+            <td
+              className="px-4 py-2 text-center cursor-pointer hover:underline"
+              onClick={() => openSmartLockModal("error")}
+              title="Click to view Error SmartLocks"
+            >
+              {facility.errorCount}
+            </td>
+            <td
+              className="px-4 py-2 text-center cursor-pointer hover:underline"
+              onClick={() => openSmartLockModal("offline")}
+              title="Click to view Offline SmartLocks"
+            >
+              {facility.offlineCount}
+            </td>
+            <td
+              className="px-4 py-2 text-center cursor-pointer hover:underline"
+              onClick={() => openSmartLockModal("lowestSignal")}
+              title="Click to view SmartLocks with Lowest Signal"
+            >
+              {facility.lowestSignal}%
+            </td>
+            <td
+              className="px-4 py-2 text-center cursor-pointer hover:underline"
+              onClick={() => openSmartLockModal("lowestBattery")}
+              title="Click to view SmartLocks with Lowest Battery"
+            >
+              {facility.lowestBattery}%
+            </td>
+          </>
+        ) : toggledSections.smartLock ? (
+          <td
+            className="border-l border-zinc-300 dark:border-zinc-700"
+            colSpan={toggledSections.smartLock ? 6 : 0}
+          ></td>
+        ) : null}
+        {toggledSections.smartMotion && facility.smartMotion.length > 0 ? (
+          <>
+            <td
+              className="px-4 py-2 text-center cursor-pointer hover:underline border-l border-zinc-300 dark:border-zinc-700"
+              title="Click to view Okay SmartMotion devices"
+            >
+              {facility.smartMotionOkayCount}
+            </td>
+            <td
+              className="px-4 py-2 text-center cursor-pointer hover:underline"
+              title="Click to view Warning SmartMotion devices"
+            >
+              {facility.smartMotionWarningCount}
+            </td>
+            <td
+              className="px-4 py-2 text-center cursor-pointer hover:underline"
+              title="Click to view Error SmartMotion devices"
+              onClick={() => console.log(facility)}
+            >
+              {facility.smartMotionErrorCount}
+            </td>
+            <td
+              className="px-4 py-2 text-center cursor-pointer hover:underline"
+              title="Click to view Offline SmartMotion devices"
+            >
+              {facility.smartMotionOfflineCount}
+            </td>
+            <td
+              className="px-4 py-2 text-center cursor-pointer hover:underline"
+              title="-"
+            >
+              {facility.smartMotionLowestSignal}%
+            </td>
+            <td
+              className="px-4 py-2 text-center cursor-pointer hover:underline"
+              title="-"
+            >
+              {facility.smartMotionLowestBattery}%
+            </td>
           </>
         ) : (
-          <>
-            {toggledSections.openNet ||
-              toggledSections.smartLock ||
-              (toggledSections.smartMotion && (
-                <td
-                  colSpan={
-                    (toggledSections.openNet ? 4 : 0) +
-                    (toggledSections.smartLock ? 6 : 0) +
-                    (toggledSections.smartMotion ? 6 : 0)
-                  }
-                ></td>
-              ))}
-          </>
+          <td
+            colSpan={toggledSections.smartMotion ? 6 : 0}
+            className="border-l border-zinc-300 dark:border-zinc-700"
+          ></td>
         )}
       </tr>
 

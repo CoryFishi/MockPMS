@@ -78,10 +78,16 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }) {
                       setOpenPage("dashboard") &
                       localStorage.setItem("openPage2", "dashboard")
                     }
-                    className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
+                    className={`px-2 block w-full text-left cursor-pointer ${
                       openPage === "dashboard"
                         ? "border-b-2 border-yellow-500"
                         : ""
+                    } ${
+                      openPage === "mapping" ||
+                      openPage === "reports" ||
+                      openPage === "dashboard"
+                        ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
+                        : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
                     }`}
                   >
                     SmartSpace
@@ -91,10 +97,16 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }) {
                       setOpenPage("reports") &
                       localStorage.setItem("openPage2", "reports")
                     }
-                    className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
+                    className={`px-2 block w-full text-left cursor-pointer ${
                       openPage === "reports"
                         ? "border-b-2 border-yellow-500"
                         : ""
+                    } ${
+                      openPage === "mapping" ||
+                      openPage === "reports" ||
+                      openPage === "dashboard"
+                        ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
+                        : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
                     }`}
                   >
                     Reports
@@ -104,10 +116,16 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }) {
                       setOpenPage("mapping") &
                       localStorage.setItem("openPage2", "mapping")
                     }
-                    className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
+                    className={`px-2 block w-full text-left cursor-pointer ${
                       openPage === "mapping"
                         ? "border-b-2 border-yellow-500"
                         : ""
+                    } ${
+                      openPage === "mapping" ||
+                      openPage === "reports" ||
+                      openPage === "dashboard"
+                        ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
+                        : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
                     }`}
                   >
                     Mapping
@@ -154,10 +172,14 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }) {
                       setOpenPage("allFacilities") &
                       localStorage.setItem("openPage2", "allFacilities")
                     }
-                    className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
+                    className={`px-2 block w-full text-left cursor-pointer ${
                       openPage === "allFacilities"
                         ? "border-b-2 border-yellow-500"
                         : ""
+                    }  ${
+                      openPage === "selected" || openPage === "allFacilities"
+                        ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
+                        : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
                     }`}
                   >
                     All Facilities
@@ -167,23 +189,18 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }) {
                       setOpenPage("selected") &
                       localStorage.setItem("openPage2", "selected")
                     }
-                    className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
+                    className={`px-2 block w-full text-left cursor-pointer ${
                       openPage === "selected"
                         ? "border-b-2 border-yellow-500"
                         : ""
+                    }  ${
+                      openPage === "selected" || openPage === "allFacilities"
+                        ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
+                        : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
                     }`}
                   >
                     Selected Facilities
                   </button>
-                  {/* <button
-                    onClick={() =>
-                      setOpenPage("documentation") &
-                      localStorage.setItem("openPage2", "documentation")
-                    }
-                    className="px-2 block rounded-sm hover:bg-zinc-900 dark:hover:bg-zinc-950 text-left w-full hover:cursor-pointer"
-                  >
-                    Documentation
-                  </button> */}
                 </div>
               )}
             </div>

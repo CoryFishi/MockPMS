@@ -40,8 +40,8 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                 openPage === "users" ||
                 openPage === "userEvents" ||
                 openPage === "roles"
-                  ? "bg-zinc-800 dark:bg-zinc-900 border-l-yellow-500 border-l-2"
-                  : "dark:bg-zinc-950"
+                  ? "bg-zinc-900 dark:bg-zinc-900 border-l-yellow-500 border-l-2"
+                  : ""
               }`}
             >
               <div
@@ -74,8 +74,14 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                       setOpenPage("users") &
                       localStorage.setItem("openPage3", "users")
                     }
-                    className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
+                    className={`px-2 block w-full text-left cursor-pointer ${
                       openPage === "users" ? "border-b-2 border-yellow-500" : ""
+                    } ${
+                      openPage === "users" ||
+                      openPage === "userEvents" ||
+                      openPage === "roles"
+                        ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
+                        : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
                     }`}
                   >
                     Users
@@ -85,10 +91,16 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                       setOpenPage("userEvents") &
                       localStorage.setItem("openPage3", "userEvents")
                     }
-                    className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
+                    className={`px-2 block w-full text-left cursor-pointer ${
                       openPage === "userEvents"
                         ? "border-b-2 border-yellow-500"
                         : ""
+                    } ${
+                      openPage === "users" ||
+                      openPage === "userEvents" ||
+                      openPage === "roles"
+                        ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
+                        : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
                     }`}
                   >
                     User Events
@@ -98,8 +110,14 @@ export default function AdminDashboardLayout({ dashboardMenu }) {
                       setOpenPage("roles") &
                       localStorage.setItem("openPage3", "roles")
                     }
-                    className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
+                    className={`px-2 block w-full text-left cursor-pointer ${
                       openPage === "roles" ? "border-b-2 border-yellow-500" : ""
+                    } ${
+                      openPage === "users" ||
+                      openPage === "userEvents" ||
+                      openPage === "roles"
+                        ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
+                        : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
                     }`}
                   >
                     Roles

@@ -20,6 +20,7 @@ export default function SmartSpaceDashboardList({
   smartlockLowestSignal,
   smartlockLowestBattery,
   toggledSections,
+  explicitSort,
 }) {
   const [sortKey, setSortKey] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
@@ -247,6 +248,7 @@ export default function SmartSpaceDashboardList({
             expandedRows={expandedRows}
             key={index}
             toggledSections={toggledSections}
+            explicitSort={explicitSort}
           />
         ))}
         <tr className="bg-zinc-100 dark:bg-zinc-800 text-center">

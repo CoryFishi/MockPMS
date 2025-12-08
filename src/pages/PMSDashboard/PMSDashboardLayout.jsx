@@ -219,10 +219,16 @@ export default function PMSDashboardLayout({
                         localStorage.setItem("openPage", "visitors");
                         if (window.innerWidth < 768) setDashboardMenu(false);
                       }}
-                      className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
+                      className={`px-2 block w-full text-left cursor-pointer ${
                         openPage === "visitors"
                           ? "border-b-2 border-yellow-500"
                           : ""
+                      } ${
+                        openPage === "visitors" ||
+                        openPage === "units" ||
+                        openPage === "dashboard"
+                          ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
+                          : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
                       }`}
                     >
                       Visitors
@@ -233,10 +239,16 @@ export default function PMSDashboardLayout({
                         localStorage.setItem("openPage", "units");
                         if (window.innerWidth < 768) setDashboardMenu(false);
                       }}
-                      className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
+                      className={`px-2 block w-full text-left cursor-pointer ${
                         openPage === "units"
                           ? "border-b-2 border-yellow-500"
                           : ""
+                      } ${
+                        openPage === "visitors" ||
+                        openPage === "units" ||
+                        openPage === "dashboard"
+                          ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
+                          : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
                       }`}
                     >
                       Units
@@ -255,7 +267,13 @@ export default function PMSDashboardLayout({
                                 window.open(baseUrl, "_blank");
                               }}
                               title={baseUrl}
-                              className="px-2 hover:bg-zinc-900 dark:hover:bg-zinc-950 flex items-center gap-2"
+                              className={`px-2 flex items-center gap-2 ${
+                                openPage === "visitors" ||
+                                openPage === "units" ||
+                                openPage === "dashboard"
+                                  ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
+                                  : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
+                              }`}
                             >
                               <FaExternalLinkAlt />
                               Control Center
@@ -270,7 +288,13 @@ export default function PMSDashboardLayout({
                         handleCurrentFacilityDelete();
                         if (window.innerWidth < 768) setDashboardMenu(false);
                       }}
-                      className="px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer"
+                      className={`px-2 block w-full text-left cursor-pointer ${
+                        openPage === "visitors" ||
+                        openPage === "units" ||
+                        openPage === "dashboard"
+                          ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
+                          : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
+                      }`}
                     >
                       Clear Facility
                     </button>
@@ -318,10 +342,14 @@ export default function PMSDashboardLayout({
                       localStorage.setItem("openPage", "allFacilities");
                       if (window.innerWidth < 768) setDashboardMenu(false);
                     }}
-                    className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
+                    className={`px-2 block w-full text-left cursor-pointer ${
                       openPage === "allFacilities"
                         ? "border-b-2 border-yellow-500"
                         : ""
+                    } ${
+                      openPage === "allFacilities" || openPage === "favorites"
+                        ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
+                        : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
                     }`}
                   >
                     All Facilities
@@ -332,10 +360,14 @@ export default function PMSDashboardLayout({
                       localStorage.setItem("openPage", "favorites");
                       if (window.innerWidth < 768) setDashboardMenu(false);
                     }}
-                    className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
+                    className={`px-2 block w-full text-left cursor-pointer ${
                       openPage === "favorites"
                         ? "border-b-2 border-yellow-500"
                         : ""
+                    } ${
+                      openPage === "allFacilities" || openPage === "favorites"
+                        ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
+                        : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
                     }`}
                   >
                     Favorites
@@ -382,10 +414,14 @@ export default function PMSDashboardLayout({
                         localStorage.setItem("openPage", "scripts");
                         if (window.innerWidth < 768) setDashboardMenu(false);
                       }}
-                      className={`px-2 block hover:bg-zinc-900 dark:hover:bg-zinc-950 w-full text-left cursor-pointer ${
+                      className={`px-2 block w-full text-left cursor-pointer ${
                         openPage === "scripts"
                           ? "border-b-2 border-yellow-500"
                           : ""
+                      } ${
+                        openPage === "scripts"
+                          ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
+                          : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
                       }`}
                     >
                       Scripts

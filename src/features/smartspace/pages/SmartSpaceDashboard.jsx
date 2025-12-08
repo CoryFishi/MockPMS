@@ -41,6 +41,9 @@ export default function SmartSpaceDashboardView() {
   const [searchQuery, setSearchQuery] = useState("");
   const { selectedTokens } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
+  const [explicitSort, setExplicitSort] = useState(
+    JSON.parse(localStorage.getItem("smartSpaceExplicit")) || false
+  );
   const [currentLoadingText, setCurrentLoadingText] = useState("");
   // Search via search bar and button
   const search = (query) => {
@@ -285,7 +288,6 @@ export default function SmartSpaceDashboardView() {
         `https://accesscontrol.${tokenPrefix}insomniaccia${tokenSuffix}.com/facilities/${id}/smartmotionstatus`,
         { headers }
       );
-      console.log(res.data);
       return res.data;
     };
 
@@ -306,9 +308,8 @@ export default function SmartSpaceDashboardView() {
       return res.data;
     };
     var smartMotion = [];
-    if (tokenSuffix === "-dev") {
+    if (environment !== "") {
       smartMotion = await fetchSmartMotion();
-      console.log(smartMotion);
     }
 
     const smartMotionOkayCount = smartMotion.filter(
@@ -323,25 +324,37 @@ export default function SmartSpaceDashboardView() {
     const smartMotionOfflineCount = smartMotion.filter(
       (s) => s.isDeviceOffline
     ).length;
-    console.log(smartMotionOkayCount);
-    console.log(smartMotionWarningCount);
-    console.log(smartMotionErrorCount);
-    console.log(smartMotionOfflineCount);
-
-    const facilityDetail = await fetchFacilityDetail();
-    const weather = await fetchWeather(facilityDetail);
-
-    const lowestSignal = Math.min(
-      ...smartlocks
+    const smartMotionLowestSignal = Math.min(
+      ...smartMotion
         .filter((s) => !s.isDeviceOffline)
         .map((s) => s.signalQuality || 255)
     );
-    const lowestBattery = Math.min(
-      ...smartlocks
+    const smartMotionLowestBattery = Math.min(
+      ...smartMotion
         .filter((s) => !s.isDeviceOffline)
         .map((s) => s.batteryLevel || 100)
     );
-    const offlineCount = smartlocks.filter((s) => s.isDeviceOffline).length;
+    const facilityDetail = await fetchFacilityDetail();
+    const weather = await fetchWeather(facilityDetail);
+
+    const lowestSignal = smartlocks
+      ? Math.min(
+          ...(smartlocks ??
+            []
+              .filter((s) => !s.isDeviceOffline)
+              .map((s) => s.signalQuality || 255))
+        )
+      : 0;
+    const lowestBattery = smartlocks
+      ? Math.min(
+          ...smartlocks
+            .filter((s) => !s.isDeviceOffline)
+            .map((s) => s.batteryLevel || 100)
+        )
+      : 0;
+    const offlineCount = smartlocks
+      ? smartlocks.filter((s) => s.isDeviceOffline).length
+      : 0;
     if (smartlocks.length > 0) {
       return {
         ...facility,
@@ -364,6 +377,17 @@ export default function SmartSpaceDashboardView() {
         accessPoints: aps || [],
         facilityDetail,
         weather: weather || [],
+        smartMotion,
+        smartMotionOkayCount,
+        smartMotionWarningCount,
+        smartMotionErrorCount,
+        smartMotionOfflineCount,
+        smartMotionLowestSignal: isFinite(smartMotionLowestSignal)
+          ? Math.round((smartMotionLowestSignal / 255) * 100)
+          : 100,
+        smartMotionLowestBattery: isFinite(smartMotionLowestBattery)
+          ? smartMotionLowestBattery
+          : 100,
       };
     } else {
       return {
@@ -390,6 +414,12 @@ export default function SmartSpaceDashboardView() {
         smartMotionWarningCount,
         smartMotionErrorCount,
         smartMotionOfflineCount,
+        smartMotionLowestSignal: isFinite(smartMotionLowestSignal)
+          ? Math.round((smartMotionLowestSignal / 255) * 100)
+          : 100,
+        smartMotionLowestBattery: isFinite(smartMotionLowestBattery)
+          ? smartMotionLowestBattery
+          : 100,
       };
     }
   };
@@ -440,63 +470,77 @@ export default function SmartSpaceDashboardView() {
         </button>
       </div>
       {listView && (
-        <div className="mt-2 mb-2 flex items-center justify-end text-center mx-5 gap-3">
-          <div className="flex gap-1 items-center">
-            <label htmlFor="toggleOpenNetView">OpenNet</label>
-            <SliderButton
-              onclick={() =>
-                setToggledSections((prev) => ({
-                  ...prev,
-                  openNet: !prev.openNet,
-                })) &
-                localStorage.setItem(
-                  "smartSpaceToggledSections",
-                  JSON.stringify({
-                    ...toggledSections,
-                    openNet: !toggledSections.openNet,
-                  })
-                )
-              }
-              value={toggledSections.openNet}
-            />
+        <div className="mt-2 mb-2 flex items-center justify-between text-center mx-5">
+          <div className="flex gap-3 items-center text-center">
+            <div className="flex gap-1 items-center">
+              <label htmlFor="toggleOpenNetView">Explicit</label>
+              <SliderButton
+                onclick={() =>
+                  setExplicitSort(!explicitSort) &
+                  localStorage.setItem("smartSpaceExplicit", !explicitSort)
+                }
+                value={explicitSort}
+              />
+            </div>
           </div>
-          <div className="flex gap-1 items-center">
-            <label htmlFor="toggleSmartLockView">SmartLock</label>
-            <SliderButton
-              onclick={() =>
-                setToggledSections((prev) => ({
-                  ...prev,
-                  smartLock: !prev.smartLock,
-                })) &
-                localStorage.setItem(
-                  "smartSpaceToggledSections",
-                  JSON.stringify({
-                    ...toggledSections,
-                    smartLock: !toggledSections.smartLock,
-                  })
-                )
-              }
-              value={toggledSections.smartLock}
-            />
-          </div>
-          <div className="flex gap-1 items-center">
-            <label htmlFor="toggleSmartMotionView">SmartMotion</label>
-            <SliderButton
-              onclick={() =>
-                setToggledSections((prev) => ({
-                  ...prev,
-                  smartMotion: !prev.smartMotion,
-                })) &
-                localStorage.setItem(
-                  "smartSpaceToggledSections",
-                  JSON.stringify({
-                    ...toggledSections,
-                    smartMotion: !toggledSections.smartMotion,
-                  })
-                )
-              }
-              value={toggledSections.smartMotion}
-            />
+          <div className="flex gap-3 items-center justify-end text-center">
+            <div className="flex gap-1 items-center">
+              <label htmlFor="toggleOpenNetView">OpenNet</label>
+              <SliderButton
+                onclick={() =>
+                  setToggledSections((prev) => ({
+                    ...prev,
+                    openNet: !prev.openNet,
+                  })) &
+                  localStorage.setItem(
+                    "smartSpaceToggledSections",
+                    JSON.stringify({
+                      ...toggledSections,
+                      openNet: !toggledSections.openNet,
+                    })
+                  )
+                }
+                value={toggledSections.openNet}
+              />
+            </div>
+            <div className="flex gap-1 items-center">
+              <label htmlFor="toggleSmartLockView">SmartLock</label>
+              <SliderButton
+                onclick={() =>
+                  setToggledSections((prev) => ({
+                    ...prev,
+                    smartLock: !prev.smartLock,
+                  })) &
+                  localStorage.setItem(
+                    "smartSpaceToggledSections",
+                    JSON.stringify({
+                      ...toggledSections,
+                      smartLock: !toggledSections.smartLock,
+                    })
+                  )
+                }
+                value={toggledSections.smartLock}
+              />
+            </div>
+            <div className="flex gap-1 items-center">
+              <label htmlFor="toggleSmartMotionView">SmartMotion</label>
+              <SliderButton
+                onclick={() =>
+                  setToggledSections((prev) => ({
+                    ...prev,
+                    smartMotion: !prev.smartMotion,
+                  })) &
+                  localStorage.setItem(
+                    "smartSpaceToggledSections",
+                    JSON.stringify({
+                      ...toggledSections,
+                      smartMotion: !toggledSections.smartMotion,
+                    })
+                  )
+                }
+                value={toggledSections.smartMotion}
+              />
+            </div>
           </div>
         </div>
       )}
@@ -522,6 +566,7 @@ export default function SmartSpaceDashboardView() {
             facilitiesWithBearers={facilitiesWithBearers}
             setFilteredFacilities={setFilteredFacilities}
             toggledSections={toggledSections}
+            explicitSort={explicitSort}
           />
         </div>
       ) : (
