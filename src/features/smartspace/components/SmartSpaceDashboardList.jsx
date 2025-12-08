@@ -21,6 +21,13 @@ export default function SmartSpaceDashboardList({
   smartlockLowestBattery,
   toggledSections,
   explicitSort,
+  smartMotionOkayCount,
+  smartMotionWarningCount,
+  smartMotionErrorCount,
+  smartMotionOfflineCount,
+  smartMotionLowestSignal,
+  smartMotionLowestBattery,
+  totalSmartMotion,
 }) {
   const [sortKey, setSortKey] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
@@ -59,7 +66,7 @@ export default function SmartSpaceDashboardList({
 
   return (
     <table className="w-full">
-      <thead className="select-none">
+      <thead className="select-none sticky top-0 z-10">
         <tr className="bg-zinc-100 dark:bg-zinc-800">
           {toggledSections.openNet ||
           toggledSections.smartLock ||
@@ -382,39 +389,63 @@ export default function SmartSpaceDashboardList({
             <>
               <td
                 className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"
-                title={"-"}
+                title={
+                  totalSmartMotion > 0
+                    ? Math.round(
+                        (smartMotionOkayCount / totalSmartMotion) * 100
+                      ) + "% Okay Status"
+                    : "0% Okay Status"
+                }
               >
-                -
+                {smartMotionOkayCount}
               </td>
               <td
                 className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"
-                title={"-"}
+                title={
+                  totalSmartMotion > 0
+                    ? Math.round(
+                        (smartMotionWarningCount / totalSmartMotion) * 100
+                      ) + "% Warning Status"
+                    : "0% Warning Status"
+                }
               >
-                -
+                {smartMotionWarningCount}
               </td>
               <td
                 className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"
-                title={"-"}
+                title={
+                  totalSmartMotion > 0
+                    ? Math.round(
+                        (smartMotionErrorCount / totalSmartMotion) * 100
+                      ) + "% Error Status"
+                    : "0% Error Status"
+                }
               >
-                -
+                {smartMotionErrorCount}
               </td>
               <td
                 className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"
-                title={"-"}
+                title={
+                  totalSmartMotion > 0
+                    ? Math.round(
+                        (smartMotionOfflineCount / totalSmartMotion) * 100
+                      ) + "% Offline"
+                    : "0% Offline"
+                }
               >
-                -
+                {smartMotionOfflineCount}
               </td>
               <td
                 className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"
-                title={"-"}
+                title={smartMotionLowestSignal.facility}
               >
-                -
+                {smartMotionLowestSignal.lowestSignal}%
               </td>
               <td
                 className="border border-zinc-300 dark:border-zinc-700 px-4 py-2"
-                title={"-"}
+                title={smartMotionLowestBattery.facility}
               >
-                -
+                {smartMotionLowestBattery.lowestBattery}%
               </td>
             </>
           )}

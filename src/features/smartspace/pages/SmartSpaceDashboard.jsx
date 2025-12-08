@@ -14,7 +14,7 @@ export default function SmartSpaceDashboardView() {
   const [facilitiesWithBearers, setFacilitiesWithBearers] = useState([]);
   const [filteredFacilities, setFilteredFacilities] = useState([]);
   const [listView, setListView] = useState(
-    JSON.parse(localStorage.getItem("smartSpaceListView")) || false
+    JSON.parse(localStorage.getItem("smartSpaceListView")) || true
   );
   const [toggledSections, setToggledSections] = useState(
     JSON.parse(localStorage.getItem("smartSpaceToggledSections")) || {
@@ -38,6 +38,13 @@ export default function SmartSpaceDashboardView() {
   const [totalSmartlocks, setTotalSmartlocks] = useState(0);
   const [totalAccessPoints, setTotalAccessPoints] = useState(0);
   const [totalEdgeRouters, setTotalEdgeRouters] = useState(0);
+  const [totalSmartMotion, setTotalSmartMotion] = useState(0);
+  const [smartMotionOkayCount, setSmartMotionOkayCount] = useState([]);
+  const [smartMotionWarningCount, setSmartMotionWarningCount] = useState([]);
+  const [smartMotionErrorCount, setSmartMotionErrorCount] = useState([]);
+  const [smartMotionOfflineCount, setSmartMotionOfflineCount] = useState([]);
+  const [smartMotionLowestSignal, setSmartMotionLowestSignal] = useState([]);
+  const [smartMotionLowestBattery, setSmartMotionLowestBattery] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const { selectedTokens } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
@@ -108,9 +115,12 @@ export default function SmartSpaceDashboardView() {
   };
   // Add totals together from each facility
   useEffect(() => {
-    const updateAggregatedCounts = (facilitiesInfo) => {
-      const facilitiesWithSmartLocks = facilitiesInfo.filter(
+    const updateAggregatedCounts = (filteredFacilities) => {
+      const facilitiesWithSmartLocks = filteredFacilities.filter(
         (f) => Array.isArray(f.smartLocks) && f.smartLocks.length > 0
+      );
+      const facilitiesWithSmartMotions = filteredFacilities.filter(
+        (f) => Array.isArray(f.smartMotion) && f.smartMotion.length > 0
       );
 
       const totals = {
@@ -130,10 +140,39 @@ export default function SmartSpaceDashboardView() {
         smartlockLowestBattery: "100",
         smartlockLowestSignalFacility: "N/A",
         smartlockLowestBatteryFacility: "N/A",
+        smartMotionOkayCount: 0,
+        smartMotionWarningCount: 0,
+        smartMotionErrorCount: 0,
+        smartMotionOfflineCount: 0,
+        smartMotionLowestSignal: "100",
+        smartMotionLowestBattery: "100",
+        smartMotionLowestSignalFacility: "N/A",
+        smartMotionLowestBatteryFacility: "N/A",
+        totalSmartMotion: 0,
       };
 
       // Count all edge routers and access points (all facilities)
       for (const facility of facilitiesInfo) {
+        // If explicit sort is enabled, and smart motion is selected do not render the row when there are no smart motion devices
+        if (
+          facility.smartMotion.length < 1 &&
+          !toggledSections.smartLock &&
+          toggledSections.smartMotion &&
+          explicitSort
+        ) {
+          continue;
+        }
+
+        // If explicit sort is enabled, and smart lock is selected do not render the row when there are no smart lock devices
+        if (
+          facility.smartLocks.length < 1 &&
+          !toggledSections.smartMotion &&
+          toggledSections.smartLock &&
+          explicitSort
+        ) {
+          continue;
+        }
+
         totals.totalEdgeRouters += facility.edgeRouterStatus ? 1 : 1;
         totals.edgeRouterOfflineCount +=
           facility.edgeRouterStatus === "error" ? 1 : 0;
@@ -150,11 +189,28 @@ export default function SmartSpaceDashboardView() {
 
       // Count only smartlock stats from facilities with smartlocks
       for (const facility of facilitiesWithSmartLocks) {
+        // If explicit sort is enabled, and smart motion is selected do not render the row when there are no smart motion devices
+        if (
+          facility.smartMotion.length < 1 &&
+          !toggledSections.smartLock &&
+          toggledSections.smartMotion &&
+          explicitSort
+        ) {
+          continue;
+        }
+
+        // If explicit sort is enabled, and smart lock is selected do not render the row when there are no smart lock devices
+        if (
+          facility.smartLocks.length < 1 &&
+          !toggledSections.smartMotion &&
+          toggledSections.smartLock &&
+          explicitSort
+        ) {
+          continue;
+        }
+
         totals.totalSmartlocks +=
-          facility.okCount +
-          facility.warningCount +
-          facility.errorCount +
-          facility.offlineCount;
+          facility.okCount + facility.warningCount + facility.errorCount;
 
         totals.smartlockOkayCount += facility.okCount || 0;
         totals.smartlockWarningCount += facility.warningCount || 0;
@@ -173,9 +229,54 @@ export default function SmartSpaceDashboardView() {
         }
       }
 
+      // Count only smartlock stats from facilities with smartmotions
+      for (const facility of facilitiesWithSmartMotions) {
+        // If explicit sort is enabled, and smart motion is selected do not render the row when there are no smart motion devices
+        if (
+          facility.smartMotion.length < 1 &&
+          !toggledSections.smartLock &&
+          toggledSections.smartMotion &&
+          explicitSort
+        ) {
+          continue;
+        }
+
+        // If explicit sort is enabled, and smart lock is selected do not render the row when there are no smart lock devices
+        if (
+          facility.smartLocks.length < 1 &&
+          !toggledSections.smartMotion &&
+          toggledSections.smartLock &&
+          explicitSort
+        ) {
+          continue;
+        }
+
+        totals.totalSmartMotion +=
+          facility.smartMotionOkayCount +
+          facility.smartMotionWarningCount +
+          facility.smartMotionErrorCount;
+
+        totals.smartMotionOkayCount += facility.smartMotionOkayCount || 0;
+        totals.smartMotionWarningCount += facility.smartMotionWarningCount || 0;
+        totals.smartMotionErrorCount += facility.smartMotionErrorCount || 0;
+        totals.smartMotionOfflineCount += facility.smartMotionOfflineCount || 0;
+
+        const signal = parseInt(facility.smartMotionLowestSignal);
+        const battery = parseInt(facility.smartMotionLowestBattery);
+        if (signal < parseInt(totals.smartMotionLowestSignal)) {
+          totals.smartMotionLowestSignal = signal;
+          totals.smartMotionLowestSignalFacility = facility.name;
+        }
+        if (battery < parseInt(totals.smartMotionLowestBattery)) {
+          totals.smartMotionLowestBattery = battery;
+          totals.smartMotionLowestBatteryFacility = facility.name;
+        }
+      }
+
       setTotalAccessPoints(totals.totalAccessPoints);
       setTotalEdgeRouters(totals.totalEdgeRouters);
       setTotalSmartlocks(totals.totalSmartlocks);
+      setTotalSmartMotion(totals.totalSmartMotion);
       setEdgeRouterOfflineCount(totals.edgeRouterOfflineCount);
       setEdgeRouterWarningCount(totals.edgeRouterWarningCount);
       setEdgeRouterOnlineCount(totals.edgeRouterOnlineCount);
@@ -193,10 +294,22 @@ export default function SmartSpaceDashboardView() {
         lowestBattery: totals.smartlockLowestBattery,
         facility: totals.smartlockLowestBatteryFacility,
       });
+      setSmartMotionOkayCount(totals.smartMotionOkayCount);
+      setSmartMotionWarningCount(totals.smartMotionWarningCount);
+      setSmartMotionErrorCount(totals.smartMotionErrorCount);
+      setSmartMotionOfflineCount(totals.smartMotionOfflineCount);
+      setSmartMotionLowestSignal({
+        lowestSignal: totals.smartMotionLowestSignal,
+        facility: totals.smartMotionLowestSignalFacility,
+      });
+      setSmartMotionLowestBattery({
+        lowestBattery: totals.smartMotionLowestBattery,
+        facility: totals.smartMotionLowestBatteryFacility,
+      });
     };
 
-    updateAggregatedCounts(facilitiesInfo);
-  }, [facilitiesInfo]);
+    updateAggregatedCounts(filteredFacilities);
+  }, [filteredFacilities, toggledSections, explicitSort, searchQuery]);
 
   // Get bearer tokens prior to creating rows/cards
   useEffect(() => {
@@ -332,17 +445,17 @@ export default function SmartSpaceDashboardView() {
     const smartMotionLowestBattery = Math.min(
       ...smartMotion
         .filter((s) => !s.isDeviceOffline)
-        .map((s) => s.batteryLevel || 100)
+        .map((s) => s.batteryLevel)
     );
+
     const facilityDetail = await fetchFacilityDetail();
     const weather = await fetchWeather(facilityDetail);
 
     const lowestSignal = smartlocks
       ? Math.min(
-          ...(smartlocks ??
-            []
-              .filter((s) => !s.isDeviceOffline)
-              .map((s) => s.signalQuality || 255))
+          ...smartlocks
+            .filter((s) => !s.isDeviceOffline)
+            .map((s) => s.signalQuality || 255)
         )
       : 0;
     const lowestBattery = smartlocks
@@ -369,8 +482,8 @@ export default function SmartSpaceDashboardView() {
         offlineCount,
         lowestSignal: isFinite(lowestSignal)
           ? Math.round((lowestSignal / 255) * 100)
-          : 100,
-        lowestBattery: isFinite(lowestBattery) ? lowestBattery : 100,
+          : 0,
+        lowestBattery: isFinite(lowestBattery) ? lowestBattery : 0,
         smartLocks: smartlocks || [],
         edgeRouterName: edgeRouter?.name || "Edge Router",
         edgeRouter: edgeRouter || {},
@@ -384,10 +497,10 @@ export default function SmartSpaceDashboardView() {
         smartMotionOfflineCount,
         smartMotionLowestSignal: isFinite(smartMotionLowestSignal)
           ? Math.round((smartMotionLowestSignal / 255) * 100)
-          : 100,
+          : 0,
         smartMotionLowestBattery: isFinite(smartMotionLowestBattery)
           ? smartMotionLowestBattery
-          : 100,
+          : 0,
       };
     } else {
       return {
@@ -416,10 +529,10 @@ export default function SmartSpaceDashboardView() {
         smartMotionOfflineCount,
         smartMotionLowestSignal: isFinite(smartMotionLowestSignal)
           ? Math.round((smartMotionLowestSignal / 255) * 100)
-          : 100,
+          : 0,
         smartMotionLowestBattery: isFinite(smartMotionLowestBattery)
           ? smartMotionLowestBattery
-          : 100,
+          : 0,
       };
     }
   };
@@ -567,6 +680,13 @@ export default function SmartSpaceDashboardView() {
             setFilteredFacilities={setFilteredFacilities}
             toggledSections={toggledSections}
             explicitSort={explicitSort}
+            smartMotionOkayCount={smartMotionOkayCount}
+            smartMotionWarningCount={smartMotionWarningCount}
+            smartMotionErrorCount={smartMotionErrorCount}
+            smartMotionOfflineCount={smartMotionOfflineCount}
+            smartMotionLowestSignal={smartMotionLowestSignal}
+            smartMotionLowestBattery={smartMotionLowestBattery}
+            totalSmartMotion={totalSmartMotion}
           />
         </div>
       ) : (

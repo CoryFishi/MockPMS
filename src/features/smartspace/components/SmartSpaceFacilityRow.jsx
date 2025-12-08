@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { FaCheckCircle, FaExternalLinkAlt } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
-import SmartSpace from "@features/SmartSpace/modals/SmartSpace";
+import SmartLockModal from "@features/SmartSpace/modals/SmartLockModal";
+import SmartMotionModal from "@features/SmartSpace/modals/SmartMotionModal";
 
 export default function SmartSpaceFacilityRow({
   facility,
@@ -12,6 +13,8 @@ export default function SmartSpaceFacilityRow({
 }) {
   const [isSmartlockModalOpen, setIsSmartlockModalOpen] = useState(false);
   const [smartlockModalOption, setSmartlockModalOption] = useState(null);
+  const [isSmartMotionModalOpen, setIsSmartMotionModalOpen] = useState(false);
+  const [smartMotionModalOption, setSmartMotionModalOption] = useState(null);
 
   const toggleRowExpansion = (facilityId) => {
     setExpandedRows((prev) =>
@@ -25,6 +28,12 @@ export default function SmartSpaceFacilityRow({
     if (!isSmartlockModalOpen) {
       setSmartlockModalOption(option);
       setIsSmartlockModalOpen(true);
+    }
+  };
+  const openSmartMotionModal = (option) => {
+    if (!isSmartMotionModalOpen) {
+      setSmartMotionModalOption(option);
+      setIsSmartMotionModalOpen(true);
     }
   };
 
@@ -61,10 +70,7 @@ export default function SmartSpaceFacilityRow({
 
   return (
     <>
-      <tr
-        className="hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-300 dark:border-zinc-700"
-        onClick={() => console.log(facility)}
-      >
+      <tr className="hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
         {/* Facility Name and Expand/Collapse */}
         {toggledSections.openNet ||
         toggledSections.smartLock ||
@@ -179,37 +185,42 @@ export default function SmartSpaceFacilityRow({
             <td
               className="px-4 py-2 text-center cursor-pointer hover:underline border-l border-zinc-300 dark:border-zinc-700"
               title="Click to view Okay SmartMotion devices"
+              onClick={() => openSmartMotionModal("good")}
             >
               {facility.smartMotionOkayCount}
             </td>
             <td
               className="px-4 py-2 text-center cursor-pointer hover:underline"
               title="Click to view Warning SmartMotion devices"
+              onClick={() => openSmartMotionModal("warning")}
             >
               {facility.smartMotionWarningCount}
             </td>
             <td
               className="px-4 py-2 text-center cursor-pointer hover:underline"
               title="Click to view Error SmartMotion devices"
-              onClick={() => console.log(facility)}
+              onClick={() => openSmartMotionModal("error")}
             >
               {facility.smartMotionErrorCount}
             </td>
             <td
               className="px-4 py-2 text-center cursor-pointer hover:underline"
               title="Click to view Offline SmartMotion devices"
+              onClick={() => openSmartMotionModal("offline")}
             >
               {facility.smartMotionOfflineCount}
             </td>
             <td
               className="px-4 py-2 text-center cursor-pointer hover:underline"
-              title="-"
+              title="Click to view SmartMotion devices with Lowest Signal"
+              onClick={() => openSmartMotionModal("lowestSignal")}
             >
               {facility.smartMotionLowestSignal}%
             </td>
             <td
               className="px-4 py-2 text-center cursor-pointer hover:underline"
-              title="-"
+              title="Click to view SmartMotion devices with Lowest Battery"
+              onClick={() => openSmartMotionModal("lowestBattery")}
             >
               {facility.smartMotionLowestBattery}%
             </td>
@@ -332,11 +343,19 @@ export default function SmartSpaceFacilityRow({
       )}
 
       {isSmartlockModalOpen && (
-        <SmartSpace
+        <SmartLockModal
           smartlockModalOption={smartlockModalOption}
           smartLocks={facility.smartLocks || []}
           facilityName={facility.name}
           setIsSmartlockModalOpen={setIsSmartlockModalOpen}
+        />
+      )}
+      {isSmartMotionModalOpen && (
+        <SmartMotionModal
+          smartMotionModalOption={smartMotionModalOption}
+          smartMotion={facility.smartMotion || []}
+          facilityName={facility.name}
+          setIsSmartMotionModalOpen={setIsSmartMotionModalOpen}
         />
       )}
     </>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import SmartSpace from "@features/SmartSpace/modals/SmartSpace";
+import SmartLockModal from "@features/SmartSpace/modals/SmartLockModal";
 import { RiRouterFill } from "react-icons/ri";
 import SmartSpaceDetailModal from "@components/shared/DetailModal";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
@@ -23,7 +23,7 @@ export default function SmartSpaceFacilityCard({ facility }) {
   return (
     <>
       {isSmartlockModalOpen && (
-        <SmartLock
+        <SmartLockModal
           smartlockModalOption={smartlockModalOption}
           smartLocks={facility.smartLocks}
           facilityName={facility.name}
@@ -31,7 +31,7 @@ export default function SmartSpaceFacilityCard({ facility }) {
         />
       )}
       {selectedRouter && (
-        <SmartLockDetailModal
+        <SmartSpaceDetailModal
           onClose={() => setSelectedRouter(null)}
           lock={selectedRouter}
         />

@@ -17,17 +17,22 @@ import {
   RiSignalWifiFill,
   RiErrorWarningFill,
 } from "react-icons/ri";
-import { BsShieldLockFill } from "react-icons/bs";
+import {
+  BsBuildingFill,
+  BsDoorClosedFill,
+  BsShieldLockFill,
+} from "react-icons/bs";
 import { IoIosWarning } from "react-icons/io";
+import { GrStatusUnknown } from "react-icons/gr";
 
-export default function SmartSpace({
-  smartlockModalOption,
-  smartLocks,
+export default function SmartMotionModal({
+  smartMotionModalOption,
+  smartMotion,
   facilityName,
-  setIsSmartlockModalOpen,
+  setIsSmartMotionModalOpen,
 }) {
   const [filteredSmartLocks, setFilteredSmartLocks] = useState([]);
-  const [option, setOption] = useState(smartlockModalOption);
+  const [option, setOption] = useState(smartMotionModalOption);
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredRow, setHoveredRow] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
@@ -52,7 +57,7 @@ export default function SmartSpace({
     setSortDirection(newDirection);
 
     if (!newDirection) {
-      setFilteredSmartLocks([...smartLocks]);
+      setFilteredSmartLocks([...smartMotion]);
       return;
     }
 
@@ -68,7 +73,7 @@ export default function SmartSpace({
   };
 
   useEffect(() => {
-    let sorted = [...smartLocks].sort((a, b) => a.name.localeCompare(b.name));
+    let sorted = [...smartMotion].sort((a, b) => a.name.localeCompare(b.name));
     switch (option) {
       case "good":
         sorted = sorted.filter(
@@ -118,7 +123,7 @@ export default function SmartSpace({
 
     setFilteredSmartLocks(filtered);
     setCurrentPage(1);
-  }, [smartLocks, option, searchQuery]);
+  }, [smartMotion, option, searchQuery]);
 
   const columns = [
     {
@@ -128,14 +133,34 @@ export default function SmartSpace({
       render: (r) => <span>{r.name}</span>,
     },
     {
-      key: "unitName",
-      label: "Unit",
-      accessor: (r) => r.unitName,
-    },
-    {
-      key: "deviceType",
-      label: "Device Type",
-      accessor: (r) => r.deviceType,
+      key: "deploymentType",
+      label: "Deployment",
+      accessor: (r) => r.deploymentType,
+      render: (r) => {
+        const Icon =
+          r.deploymentType === "Unit"
+            ? BsDoorClosedFill
+            : r.deploymentType === "AccessArea"
+            ? BsBuildingFill
+            : GrStatusUnknown;
+        const color =
+          r.deploymentType === "Unit" && r.unitStatus === "Rented"
+            ? "text-green-500"
+            : r.deploymentType === "Unit" && r.unitStatus === "Delinquent"
+            ? "text-red-500"
+            : "text-zinc-500";
+
+        return (
+          <span className="inline-flex items-center gap-2">
+            <Icon className={`${color}`} /> {r.deploymentType}{" "}
+            {r.deploymentType === "Unit"
+              ? `- ${r.unitName} (${r.unitStatus}${
+                  r.visitorName ? " - " + r.visitorName : ""
+                })`
+              : ""}
+          </span>
+        );
+      },
     },
     {
       key: "signalQuality",
@@ -194,48 +219,18 @@ export default function SmartSpace({
       },
     },
     {
-      key: "lockState",
-      label: "Lock State",
-      accessor: (r) => r.lockState,
-      render: (r) => {
-        const Icon =
-          r.lockState === "Locked"
-            ? FaLock
-            : r.lockState.includes("Unlocked")
-            ? FaLockOpen
-            : BsShieldLockFill;
-        const color =
-          r.lockState === "Locked"
-            ? "text-green-500"
-            : r.lockState.includes("Unlocked")
-            ? "text-yellow-500"
-            : "text-red-500";
-
-        return (
-          <span className="inline-flex items-center gap-2">
-            <Icon className={`${color}`} /> {r.lockState}
-          </span>
-        );
-      },
-    },
-    {
-      key: "unitStatus",
-      label: "Unit Details",
-      accessor: (r) => r.unitStatus,
-      render: (r) => (
-        <span>
-          {r.unitStatus}
-          {r.visitorName ? " - " + r.visitorName : ""}
-        </span>
-      ),
+      key: "sensorState",
+      label: "Sensor State",
+      accessor: (r) => r.sensorState,
+      render: (r) => <span>{r.sensorState}</span>,
     },
     {
       key: "statusMessages",
-      label: "Lock Status",
+      label: "Sensor Status",
       accessor: (r) =>
         r.statusMessages?.some((m) => m.trim() !== "")
           ? r.statusMessages.join(" | ").toLowerCase()
-          : "SmartLock is online",
+          : "SmartMotion sensor is online",
       render: (r) => {
         const Icon =
           r.overallStatus === "error"
@@ -291,7 +286,7 @@ export default function SmartSpace({
             </h2>
           </div>
           <button
-            onClick={() => setIsSmartlockModalOpen(false)}
+            onClick={() => setIsSmartMotionModalOpen(false)}
             className="bg-zinc-100 h-full px-5 cursor-pointer rounded-tr text-zinc-600 dark:text-white dark:bg-zinc-800 dark:hover:hover:bg-red-500 hover:bg-red-500 transition duration-300 ease-in-out"
           >
             x
