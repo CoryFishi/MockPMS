@@ -1,16 +1,17 @@
 import AllSmartLocksReport from "@features/smartspace/reports/AllSmartLocksReport";
 import AllEdgeRoutersReport from "@features/smartspace/reports/AllEdgeRoutersReport";
 import AllAccessPointsReport from "@features/smartspace/reports/AllAccessPointsReport";
-import AllSmartLocksEventsReport from "@features/smartspace/reports/AllSmartLockEventsReport";
-import AllSmartLockOnlineTimeReport from "@features/smartspace/reports/AllSmartLockOnlineTimeReport";
+import EventsReport from "@features/smartspace/reports/EventsReport";
+import OnlineTimeReport from "@features/smartspace/reports/OnlineTimeReport";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
 import { useAuth } from "@context/AuthProvider";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useRef, useState } from "react";
 import { FaLock } from "react-icons/fa";
-import AllSmartLockOfflineEventsReport from "@features/smartspace/reports/AllSmartLockOfflineEventsReport";
+import OfflineEventsComparison from "@features/smartspace/reports/OfflineEventsComparison";
 import InputBox from "@components/UI/InputBox";
+import AllSmartMotionReport from "@features/smartspace/reports/AllSmartMotionReport";
 
 export default function SmartSpaceReports() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,9 +31,10 @@ export default function SmartSpaceReports() {
     AllSmartLocksReport: AllSmartLocksReport,
     AllEdgeRoutersReport: AllEdgeRoutersReport,
     AllAccessPointsReport: AllAccessPointsReport,
-    AllSmartLockEventsReport: AllSmartLocksEventsReport,
-    AllSmartLockOnlineTimeReport: AllSmartLockOnlineTimeReport,
-    OfflineEvents: AllSmartLockOfflineEventsReport,
+    EventsReport: EventsReport,
+    OnlineTimeReport: OnlineTimeReport,
+    OfflineEventsComparison: OfflineEventsComparison,
+    AllSmartMotionReport: AllSmartMotionReport,
   });
 
   // Close modal if clicking outside of it
@@ -181,13 +183,14 @@ export default function SmartSpaceReports() {
           onChange={(e) => setOpenPage(e.target.value) & setReportSearch(false)}
         >
           <option value="AllSmartLocksReport">All SmartLocks</option>
+          <option value="AllSmartMotionReport">All SmartMotion</option>
           <option value="AllEdgeRoutersReport">All EdgeRouters</option>
           <option value="AllAccessPointsReport">All AccessPoints</option>
-          <option value="AllSmartLockEventsReport">SmartLock Events</option>
-          <option value="AllSmartLockOnlineTimeReport">
-            SmartLock Online Time
+          <option value="EventsReport">Events</option>
+          <option value="OnlineTimeReport">Online Time</option>
+          <option value="OfflineEventsComparison">
+            Offline Events Comparison
           </option>
-          <option value="OfflineEvents">SmartLock Offline Events</option>
         </select>
         <div className="ml-2 relative inline-block w-96" ref={modalRef}>
           <button

@@ -3,10 +3,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 
-export default function AllSmartLocksEventsReport({
-  selectedFacilities,
-  searchQuery,
-}) {
+export default function EventsReport({ selectedFacilities, searchQuery }) {
   const [filteredSmartLockEvents, setFilteredSmartLockEvents] = useState([]);
   const [smartlockEvents, setSmartlockEvents] = useState([]);
   const [hoveredRow, setHoveredRow] = useState(null);

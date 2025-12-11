@@ -3,12 +3,21 @@ import SmartLockModal from "@features/smartspace/modals/SmartLockModal";
 import { RiRouterFill } from "react-icons/ri";
 import SmartSpaceDetailModal from "@components/shared/DetailModal";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
+import SmartMotionModal from "@features/smartspace/modals/SmartMotionModal";
 
-export default function SmartSpaceFacilityCard({ facility }) {
+export default function SmartSpaceFacilityCard({
+  facility,
+  toggledSections,
+  explicitSort,
+}) {
   const [isSmartlockModalOpen, setIsSmartlockModalOpen] = useState(false);
   const [smartlockModalOption, setSmartlockModalOption] = useState(null);
   const [selectedRouter, setSelectedRouter] = useState(null);
   const [isSmartlockSectionOpen, setIsSmartlockSectionOpen] = useState(true);
+  const [isSmartMotionSectionOpen, setIsSmartMotionSectionOpen] =
+    useState(true);
+  const [smartMotionModalOption, setSmartMotionModalOption] = useState(null);
+  const [isSmartMotionModalOpen, setIsSmartMotionModalOpen] = useState(false);
   const [isOpenNetSectionOpen, setIsOpenNetSectionOpen] = useState(true);
   const [isCardShown, setIsCardShown] = useState(true);
 
@@ -19,6 +28,45 @@ export default function SmartSpaceFacilityCard({ facility }) {
     setSmartlockModalOption(option);
     setIsSmartlockModalOpen(true);
   };
+
+  const openSmartMotionModal = (option) => {
+    if (isSmartMotionModalOpen) {
+      return;
+    }
+    setSmartMotionModalOption(option);
+    setIsSmartMotionModalOpen(true);
+  };
+
+  // If no edge router data, do not render the row
+  // or if all toggled sections are false, do not render the row
+  if (
+    Object.keys(facility.edgeRouter).length === 0 ||
+    (toggledSections.openNet === false &&
+      toggledSections.smartLock === false &&
+      toggledSections.smartMotion === false)
+  ) {
+    return null;
+  }
+
+  // If explicit sort is enabled, and smart motion is selected do not render the row when there are no smart motion devices
+  if (
+    facility.smartMotion.length < 1 &&
+    !toggledSections.smartLock &&
+    toggledSections.smartMotion &&
+    explicitSort
+  ) {
+    return null;
+  }
+
+  // If explicit sort is enabled, and smart lock is selected do not render the row when there are no smart lock devices
+  if (
+    facility.smartLocks.length < 1 &&
+    !toggledSections.smartMotion &&
+    toggledSections.smartLock &&
+    explicitSort
+  ) {
+    return null;
+  }
 
   return (
     <>
@@ -36,7 +84,14 @@ export default function SmartSpaceFacilityCard({ facility }) {
           lock={selectedRouter}
         />
       )}
-
+      {isSmartMotionModalOpen && (
+        <SmartMotionModal
+          smartMotionModalOption={smartMotionModalOption}
+          smartMotion={facility.smartMotion}
+          facilityName={facility.name}
+          setIsSmartMotionModalOpen={setIsSmartMotionModalOpen}
+        />
+      )}
       {facility && (
         <div className="break-inside-avoid bg-white shadow-lg rounded-lg p-5 mb-4 border dark:bg-zinc-900 text-black dark:text-white dark:border-zinc-700">
           <h1
@@ -69,9 +124,9 @@ export default function SmartSpaceFacilityCard({ facility }) {
                         e.stopPropagation();
                         openSmartLockModal();
                       }}
-                      title="Click to view all smart locks"
+                      title="Click to view all SmartLocks"
                     >
-                      view all smartlocks
+                      View all SmartLocks
                     </p>
                   </h2>
                   {isSmartlockSectionOpen && (
@@ -127,6 +182,91 @@ export default function SmartSpaceFacilityCard({ facility }) {
                       >
                         <h2 className="text-3xl font-bold">
                           {facility.offlineCount}
+                        </h2>
+                        <p className="text-sm">Offline</p>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+              {facility.smartMotion.length > 0 && (
+                <>
+                  <h2
+                    className="w-full border-b-2 mb-2 border-yellow-400 text-black dark:text-white text-lg mt-2 select-none flex gap-2 items-center cursor-pointer"
+                    onClick={() =>
+                      setIsSmartMotionSectionOpen(!isSmartMotionSectionOpen)
+                    }
+                  >
+                    {isSmartMotionSectionOpen ? (
+                      <IoMdArrowDropdown />
+                    ) : (
+                      <IoMdArrowDropup />
+                    )}{" "}
+                    SmartMotion:{" "}
+                    <p
+                      className="text-xs text-zinc-400 cursor-pointer "
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openSmartMotionModal();
+                      }}
+                      title="Click to view all SmartMotion devices"
+                    >
+                      View all SmartMotion devices
+                    </p>
+                  </h2>
+                  {isSmartMotionSectionOpen && (
+                    <div className="grid grid-cols-3 grid-rows-2 gap-4 text-black dark:text-white">
+                      <div
+                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-zinc-700 hover:scale-105 transition-transform duration-300"
+                        onClick={() => openSmartMotionModal("good")}
+                      >
+                        <h2 className="text-3xl font-bold">
+                          {facility.smartMotionOkayCount}
+                        </h2>
+                        <p className="text-sm">Good</p>
+                      </div>
+                      <div
+                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-zinc-700 hover:scale-105 transition-transform duration-300"
+                        onClick={() => openSmartMotionModal("warning")}
+                      >
+                        <h2 className="text-3xl font-bold">
+                          {facility.smartMotionWarningCount}
+                        </h2>
+                        <p className="text-sm">Warning</p>
+                      </div>
+                      <div
+                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-zinc-700 hover:scale-105 transition-transform duration-300"
+                        onClick={() => openSmartMotionModal("error")}
+                      >
+                        <h2 className="text-3xl font-bold">
+                          {facility.smartMotionErrorCount}
+                        </h2>
+                        <p className="text-sm">Error</p>
+                      </div>
+                      <div
+                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-zinc-700 hover:scale-105 transition-transform duration-300"
+                        onClick={() => openSmartMotionModal("lowestBattery")}
+                      >
+                        <h2 className="text-3xl font-bold">
+                          {facility.smartMotionLowestBattery}%
+                        </h2>
+                        <p className="text-sm">Lowest Battery</p>
+                      </div>
+                      <div
+                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-zinc-700 hover:scale-105 transition-transform duration-300"
+                        onClick={() => openSmartMotionModal("lowestSignal")}
+                      >
+                        <h2 className="text-3xl font-bold">
+                          {facility.smartMotionLowestSignal}%
+                        </h2>
+                        <p className="text-sm">Lowest Signal</p>
+                      </div>
+                      <div
+                        className="text-center shadow-md rounded-lg p-3 hover:cursor-pointer border dark:border-zinc-700 hover:scale-105 transition-transform duration-300"
+                        onClick={() => openSmartMotionModal("offline")}
+                      >
+                        <h2 className="text-3xl font-bold">
+                          {facility.smartMotionOfflineCount}
                         </h2>
                         <p className="text-sm">Offline</p>
                       </div>

@@ -582,81 +582,79 @@ export default function SmartSpaceDashboardView() {
           {listView ? "Card View" : "List View"}
         </button>
       </div>
-      {listView && (
-        <div className="mt-2 mb-2 flex items-center justify-between text-center mx-5">
-          <div className="flex gap-3 items-center text-center">
-            <div className="flex gap-1 items-center">
-              <label htmlFor="toggleOpenNetView">Explicit</label>
-              <SliderButton
-                onclick={() =>
-                  setExplicitSort(!explicitSort) &
-                  localStorage.setItem("smartSpaceExplicit", !explicitSort)
-                }
-                value={explicitSort}
-              />
-            </div>
-          </div>
-          <div className="flex gap-3 items-center justify-end text-center">
-            <div className="flex gap-1 items-center">
-              <label htmlFor="toggleOpenNetView">OpenNet</label>
-              <SliderButton
-                onclick={() =>
-                  setToggledSections((prev) => ({
-                    ...prev,
-                    openNet: !prev.openNet,
-                  })) &
-                  localStorage.setItem(
-                    "smartSpaceToggledSections",
-                    JSON.stringify({
-                      ...toggledSections,
-                      openNet: !toggledSections.openNet,
-                    })
-                  )
-                }
-                value={toggledSections.openNet}
-              />
-            </div>
-            <div className="flex gap-1 items-center">
-              <label htmlFor="toggleSmartLockView">SmartLock</label>
-              <SliderButton
-                onclick={() =>
-                  setToggledSections((prev) => ({
-                    ...prev,
-                    smartLock: !prev.smartLock,
-                  })) &
-                  localStorage.setItem(
-                    "smartSpaceToggledSections",
-                    JSON.stringify({
-                      ...toggledSections,
-                      smartLock: !toggledSections.smartLock,
-                    })
-                  )
-                }
-                value={toggledSections.smartLock}
-              />
-            </div>
-            <div className="flex gap-1 items-center">
-              <label htmlFor="toggleSmartMotionView">SmartMotion</label>
-              <SliderButton
-                onclick={() =>
-                  setToggledSections((prev) => ({
-                    ...prev,
-                    smartMotion: !prev.smartMotion,
-                  })) &
-                  localStorage.setItem(
-                    "smartSpaceToggledSections",
-                    JSON.stringify({
-                      ...toggledSections,
-                      smartMotion: !toggledSections.smartMotion,
-                    })
-                  )
-                }
-                value={toggledSections.smartMotion}
-              />
-            </div>
+      <div className="mt-2 mb-2 flex items-center justify-between text-center mx-5">
+        <div className="flex gap-3 items-center text-center">
+          <div className="flex gap-1 items-center">
+            <label htmlFor="toggleOpenNetView">Explicit</label>
+            <SliderButton
+              onclick={() =>
+                setExplicitSort(!explicitSort) &
+                localStorage.setItem("smartSpaceExplicit", !explicitSort)
+              }
+              value={explicitSort}
+            />
           </div>
         </div>
-      )}
+        <div className="flex gap-3 items-center justify-end text-center">
+          <div className="flex gap-1 items-center">
+            <label htmlFor="toggleOpenNetView">OpenNet</label>
+            <SliderButton
+              onclick={() =>
+                setToggledSections((prev) => ({
+                  ...prev,
+                  openNet: !prev.openNet,
+                })) &
+                localStorage.setItem(
+                  "smartSpaceToggledSections",
+                  JSON.stringify({
+                    ...toggledSections,
+                    openNet: !toggledSections.openNet,
+                  })
+                )
+              }
+              value={toggledSections.openNet}
+            />
+          </div>
+          <div className="flex gap-1 items-center">
+            <label htmlFor="toggleSmartLockView">SmartLock</label>
+            <SliderButton
+              onclick={() =>
+                setToggledSections((prev) => ({
+                  ...prev,
+                  smartLock: !prev.smartLock,
+                })) &
+                localStorage.setItem(
+                  "smartSpaceToggledSections",
+                  JSON.stringify({
+                    ...toggledSections,
+                    smartLock: !toggledSections.smartLock,
+                  })
+                )
+              }
+              value={toggledSections.smartLock}
+            />
+          </div>
+          <div className="flex gap-1 items-center">
+            <label htmlFor="toggleSmartMotionView">SmartMotion</label>
+            <SliderButton
+              onclick={() =>
+                setToggledSections((prev) => ({
+                  ...prev,
+                  smartMotion: !prev.smartMotion,
+                })) &
+                localStorage.setItem(
+                  "smartSpaceToggledSections",
+                  JSON.stringify({
+                    ...toggledSections,
+                    smartMotion: !toggledSections.smartMotion,
+                  })
+                )
+              }
+              value={toggledSections.smartMotion}
+            />
+          </div>
+        </div>
+      </div>
       {/* List view */}
       {listView ? (
         <div className="w-full px-5">
@@ -849,33 +847,76 @@ export default function SmartSpaceDashboardView() {
             </div>
             <div>
               <h1 className="w-full border-b-2 mb-2 border-yellow-400 text-black dark:text-white text-lg">
-                Totals:
+                SmartMotion:
               </h1>
               <div className="flex gap-2">
                 <div
                   className="text-center shadow-md rounded-lg p-3 border"
-                  title={totalEdgeRouters + " Edge Routers"}
+                  title={
+                    Math.round(
+                      (smartMotionOkayCount / totalSmartMotion) * 100
+                    ) + "% Okay Status"
+                  }
                 >
-                  <h2 className="text-3xl font-bold">
-                    {totalEdgeRouters || 0}
-                  </h2>
-                  <p className="text-sm">Edge Routers</p>
+                  <h2 className="text-3xl font-bold">{smartMotionOkayCount}</h2>
+                  <p className="text-sm">Okay</p>
                 </div>
                 <div
                   className="text-center shadow-md rounded-lg p-3 border"
-                  title={totalAccessPoints + " Access Points"}
+                  title={
+                    Math.round(
+                      (smartMotionWarningCount / totalSmartMotion) * 100
+                    ) + "% Warning Status"
+                  }
                 >
                   <h2 className="text-3xl font-bold">
-                    {totalAccessPoints || 0}
+                    {smartMotionWarningCount}
                   </h2>
-                  <p className="text-sm">Access Points</p>
+                  <p className="text-sm">Warning</p>
                 </div>
                 <div
                   className="text-center shadow-md rounded-lg p-3 border"
-                  title={totalSmartlocks + " SmartLocks"}
+                  title={
+                    Math.round(
+                      (smartMotionErrorCount / totalSmartMotion) * 100
+                    ) + "% Error Status"
+                  }
                 >
-                  <h2 className="text-3xl font-bold">{totalSmartlocks || 0}</h2>
-                  <p className="text-sm">SmartLocks</p>
+                  <h2 className="text-3xl font-bold">
+                    {smartMotionErrorCount}
+                  </h2>
+                  <p className="text-sm">Error</p>
+                </div>
+                <div
+                  className="text-center shadow-md rounded-lg p-3 border"
+                  title={
+                    Math.round(
+                      (smartMotionOfflineCount / totalSmartMotion) * 100
+                    ) + "% Offline"
+                  }
+                >
+                  <h2 className="text-3xl font-bold">
+                    {smartMotionOfflineCount}
+                  </h2>
+                  <p className="text-sm">Offline</p>
+                </div>
+                <div
+                  className="text-center shadow-md rounded-lg p-3 border"
+                  title={smartMotionLowestSignal.facility}
+                >
+                  <h2 className="text-3xl font-bold">
+                    {smartMotionLowestSignal.lowestSignal}%
+                  </h2>
+                  <p className="text-sm">Lowest Signal</p>
+                </div>
+                <div
+                  className="text-center shadow-md rounded-lg p-3 border"
+                  title={smartMotionLowestBattery.facility}
+                >
+                  <h2 className="text-3xl font-bold">
+                    {smartMotionLowestBattery.lowestBattery}%
+                  </h2>
+                  <p className="text-sm">Lowest Battery</p>
                 </div>
               </div>
             </div>
@@ -883,7 +924,11 @@ export default function SmartSpaceDashboardView() {
           <div className="columns-1 sm:columns-2 lg:columns-3 gap-4">
             {filteredFacilities.map((facility, index) => (
               <div key={index} className="break-inside-avoid">
-                <SmartSpaceFacilityCard facility={facility} />
+                <SmartSpaceFacilityCard
+                  facility={facility}
+                  toggledSections={toggledSections}
+                  explicitSort={explicitSort}
+                />
               </div>
             ))}
           </div>

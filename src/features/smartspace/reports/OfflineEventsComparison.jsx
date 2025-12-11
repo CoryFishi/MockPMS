@@ -11,9 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-export default function AllSmartLockOfflineEventsReport({
-  selectedFacilities,
-}) {
+export default function OfflineEventsComparison({ selectedFacilities }) {
   const [dayValue, setDayValue] = useState(7);
   const currentTime = Math.floor(Date.now() / 1000);
   const pastDayValue = currentTime - dayValue * 24 * 60 * 60;

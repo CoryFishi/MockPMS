@@ -2,7 +2,7 @@ import PaginationFooter from "@components/shared/PaginationFooter";
 import DataTable from "@components/shared/DataTable";
 import SmartLockDetailModal from "@components/shared/DetailModal";
 import { useState, useEffect } from "react";
-import { FaWarehouse, FaLock, FaLockOpen, FaCheckCircle } from "react-icons/fa";
+import { FaWarehouse, FaCheckCircle } from "react-icons/fa";
 import {
   MdBattery20,
   MdBattery60,
@@ -17,11 +17,7 @@ import {
   RiSignalWifiFill,
   RiErrorWarningFill,
 } from "react-icons/ri";
-import {
-  BsBuildingFill,
-  BsDoorClosedFill,
-  BsShieldLockFill,
-} from "react-icons/bs";
+import { BsBuildingFill, BsDoorClosedFill } from "react-icons/bs";
 import { IoIosWarning } from "react-icons/io";
 import { GrStatusUnknown } from "react-icons/gr";
 
@@ -130,7 +126,13 @@ export default function SmartMotionModal({
       key: "name",
       label: "Name",
       accessor: (r) => r.name,
-      render: (r) => <span>{r.name}</span>,
+      render: (r) => (
+        <div className="w-full flex items-center justify-center">
+          <div className="truncate max-w-[32ch] flex items-center text-center justify-center">
+            {r.name}
+          </div>
+        </div>
+      ),
     },
     {
       key: "deploymentType",
@@ -212,9 +214,9 @@ export default function SmartMotionModal({
             ? "text-yellow-500"
             : "text-green-500";
         return (
-          <span className="inline-flex items-center gap-1">
+          <div className="inline-flex items-center gap-1">
             <Icon className={`${color}`} /> {lvl}%
-          </span>
+          </div>
         );
       },
     },
@@ -246,14 +248,14 @@ export default function SmartMotionModal({
             : "text-green-500";
 
         return (
-          <span className={`inline-flex items-start gap-2 ${color}`}>
+          <div className={`inline-flex items-center gap-2 ${color}`}>
             <Icon className="text-xl" />
             <span className="flex flex-col text-left">
               {r.statusMessages?.some((m) => m.trim() !== "")
                 ? r.statusMessages.map((m, i) => <span key={i}>{m}</span>)
                 : "SmartLock is online"}
             </span>
-          </span>
+          </div>
         );
       },
     },

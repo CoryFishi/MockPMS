@@ -5,10 +5,7 @@ import { useEffect, useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import { RiErrorWarningFill } from "react-icons/ri";
 
-export default function AllSmartLockOnlineTimeReport({
-  selectedFacilities,
-  searchQuery,
-}) {
+export default function OnlineTimeReport({ selectedFacilities, searchQuery }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [sortDirection, setSortDirection] = useState("asc");
@@ -67,12 +64,12 @@ export default function AllSmartLockOnlineTimeReport({
     // Create a link to download the file
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "SmartLock_Offline.csv");
+    link.setAttribute("download", "OfflineTime.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
-  const fetchSmartLockEvents = async (facility) => {
+  const fetchEvents = async (facility) => {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -92,11 +89,21 @@ export default function AllSmartLockOnlineTimeReport({
           },
         }
       );
-      const smartLockEvents = await response.data;
-      smartLockEvents.sort(
-        (a, b) => new Date(a.createdUtc) - new Date(b.createdUtc)
-      );
-      return smartLockEvents;
+      const events = await response.data;
+      events.sort((a, b) => new Date(a.createdUtc) - new Date(b.createdUtc));
+      console.log(events);
+      events.forEach((event) => {
+        if (event.eventDetails?.includes("SmartLock")) {
+          event.eventDevice = "SmartLock";
+        } else if (event.eventDetails?.includes("SmartMotion")) {
+          event.eventDevice = "SmartMotion";
+        } else if (event.eventDetails?.includes("Edge Router")) {
+          event.eventDevice = "Edge Router";
+        } else if (event.eventDetails?.includes("Access Point")) {
+          event.eventDevice = "Access Point";
+        }
+      });
+      return events;
     } catch (error) {
       console.error(`Error fetching Events for: ${facility.name}`, error);
       toast.error(`${facility.name} does not have Events`);
@@ -120,8 +127,14 @@ export default function AllSmartLockOnlineTimeReport({
     events.forEach((event) => {
       if (event.eventTypeEnum !== 5 && event.eventTypeEnum !== 6) return;
       if (!event.deviceId) return;
-      const { deviceId, deviceName, eventType, createdUtc, facilityName } =
-        event;
+      const {
+        deviceId,
+        deviceName,
+        eventType,
+        createdUtc,
+        facilityName,
+        eventDevice,
+      } = event;
       if (!durationsArray[deviceId]) {
         durationsArray[deviceId] = {
           firstOnlineEvent: null,
@@ -132,6 +145,7 @@ export default function AllSmartLockOnlineTimeReport({
           facilityName: facilityName,
           deviceName: deviceName,
           deviceId: deviceId,
+          eventDevice: eventDevice,
         };
       }
 
@@ -177,14 +191,13 @@ export default function AllSmartLockOnlineTimeReport({
   }
   const fetchDataForSelectedFacilities = async () => {
     const fetchPromises = selectedFacilities.map(async (facility) => {
-      const smartlockData = await fetchSmartLockEvents(facility);
-      return smartlockData;
+      const eventData = await fetchEvents(facility);
+      return eventData;
     });
 
-    const allSmartlockData = await Promise.all(fetchPromises);
+    const allEventData = await Promise.all(fetchPromises);
 
-    // Flatten the array and update state with all smartlocks
-    const flattenedData = allSmartlockData.flat();
+    const flattenedData = allEventData.flat();
     calculateOfflineDurations(flattenedData);
   };
 
@@ -211,6 +224,8 @@ export default function AllSmartLockOnlineTimeReport({
         (duration.facilityName || "").toLowerCase(),
         (duration.deviceName || "").toLowerCase(),
         String(duration.totalDuration || ""),
+        (duration.eventDevice || "").toLowerCase(),
+        (duration.onlineTimePercentage || "").toLowerCase(),
       ].some((field) => field.includes(searchQuery.toLowerCase()))
     );
 
@@ -282,6 +297,39 @@ export default function AllSmartLockOnlineTimeReport({
             >
               Facility
               {sortedColumn === "Facility" && (
+                <span className="ml-2">
+                  {sortDirection === "asc" ? "▲" : "▼"}
+                </span>
+              )}
+            </th>
+
+            {/* Device Type Column */}
+            <th
+              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
+              onClick={() => {
+                const newDirection = sortDirection === "asc" ? "desc" : "asc";
+                setSortDirection(newDirection);
+                setSortedColumn("Device Type");
+
+                // Convert to array, sort, and update state
+                const sortedDurations = Object.values(filteredDurations).sort(
+                  (a, b) => {
+                    if (
+                      a.eventDevice.toLowerCase() < b.eventDevice.toLowerCase()
+                    )
+                      return newDirection === "asc" ? -1 : 1;
+                    if (
+                      a.eventDevice.toLowerCase() > b.eventDevice.toLowerCase()
+                    )
+                      return newDirection === "asc" ? 1 : -1;
+                    return 0;
+                  }
+                );
+                setFilteredDurations(sortedDurations);
+              }}
+            >
+              Device Type
+              {sortedColumn === "Device Type" && (
                 <span className="ml-2">
                   {sortDirection === "asc" ? "▲" : "▼"}
                 </span>
@@ -424,6 +472,12 @@ export default function AllSmartLockOnlineTimeReport({
                         </div>
                         <div>
                           <span className="font-bold text-yellow-500">
+                            Device Type:
+                          </span>
+                          {device.eventDevice}
+                        </div>
+                        <div>
+                          <span className="font-bold text-yellow-500">
                             Device Name:
                           </span>
                           {device.deviceName}
@@ -487,6 +541,9 @@ export default function AllSmartLockOnlineTimeReport({
                       </div>
                     </div>
                   )}
+                </td>
+                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
+                  {device.eventDevice}
                 </td>
                 <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
                   {device.deviceName}
