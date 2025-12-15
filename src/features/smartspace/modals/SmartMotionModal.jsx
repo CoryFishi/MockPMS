@@ -279,7 +279,7 @@ export default function SmartMotionModal({
           onClose={() => setIsDetailModalOpen(false)}
         />
       )}
-      <div className="bg-white rounded-sm shadow-lg text-black relative max-h-[95vh] w-full max-w-[95vw] dark:text-white dark:bg-darkPrimary">
+      <div className="bg-white rounded-sm shadow-lg text-black relative max-h-[95vh] w-full max-w-[95vw] dark:text-white dark:bg-zinc-900">
         <div className="pl-5 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex items-center">
             <FaWarehouse />
@@ -308,7 +308,7 @@ export default function SmartMotionModal({
             placeholder="Search SmartLocks..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="mb-2 border p-2 w-full dark:bg-darkNavSecondary rounded-sm dark:border-border"
+            className="mb-2 border p-2 w-full dark:bg-zinc-800 rounded-sm dark:border-zinc-700"
           />
           <div className="h-[73vh] overflow-y-auto text-center">
             <DataTable
