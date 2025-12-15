@@ -2,6 +2,8 @@ import PaginationFooter from "@components/shared/PaginationFooter";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
+import DataTable from "@components/shared/DataTable";
+import DetailModal from "@components/shared/DetailModal";
 
 export default function EventsReport({ selectedFacilities, searchQuery }) {
   const [filteredSmartLockEvents, setFilteredSmartLockEvents] = useState([]);
@@ -14,6 +16,8 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
   const [dayValue, setDayValue] = useState(0.5);
   const currentTime = Math.floor(Date.now() / 1000);
   const pastDayValue = currentTime - dayValue * 24 * 60 * 60;
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const fetchSmartLockEvents = async (facility) => {
     try {
@@ -58,8 +62,6 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
     setSmartlockEvents(flattenedData);
   };
 
-  // Pagination logic
-
   useEffect(() => {
     fetchDataForSelectedFacilities();
   }, [selectedFacilities, dayValue]);
@@ -98,8 +100,92 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
     setCurrentPage(1);
   }, [smartlockEvents, searchQuery]);
 
+  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
+    let newDirection;
+
+    if (sortedColumn !== columnKey) {
+      newDirection = "asc";
+    } else if (sortDirection === "asc") {
+      newDirection = "desc";
+    } else if (sortDirection === "desc") {
+      newDirection = null;
+    }
+
+    setSortedColumn(newDirection ? columnKey : null);
+    setSortDirection(newDirection);
+
+    if (!newDirection) {
+      setFilteredSmartLockEvents([...smartlockEvents]);
+      return;
+    }
+
+    setFilteredSmartLockEvents(
+      [...filteredSmartLockEvents].sort((a, b) => {
+        const aVal = accessor(a);
+        const bVal = accessor(b);
+        return newDirection === "asc"
+          ? aVal.localeCompare?.(bVal) ?? aVal - bVal
+          : bVal.localeCompare?.(aVal) ?? bVal - aVal;
+      })
+    );
+  };
+
+  const columns = [
+    {
+      key: "facilityName",
+      label: "Facility Name",
+      accessor: (r) => r.facilityName,
+      render: (r) => (
+        <div className="w-full flex items-center justify-center">
+          <div className="truncate max-w-[32ch]">{r.facilityName}</div>
+        </div>
+      ),
+    },
+    {
+      key: "deviceName",
+      label: "Device Name",
+      accessor: (r) => r.deviceName,
+      render: (r) => (
+        <div className="w-full flex items-center justify-center">
+          <div className="truncate max-w-[32ch]">{r.deviceName}</div>
+        </div>
+      ),
+    },
+    {
+      key: "eventCategory",
+      label: "Event Category",
+      accessor: (r) => r.eventCategory,
+    },
+    {
+      key: "eventType",
+      label: "Event Type",
+      accessor: (r) => r.eventType,
+    },
+    {
+      key: "eventDetails",
+      label: "Event Details",
+      accessor: (r) => r.eventDetails,
+    },
+    {
+      key: "createdOn",
+      label: "Created On",
+      accessor: (r) => r.createdOn,
+    },
+  ];
+
+  const handleRowClick = (row) => {
+    setSelectedEvent(row);
+    setIsDetailModalOpen(true);
+  };
+
   return (
     <div className="w-full px-2">
+      {isDetailModalOpen && (
+        <DetailModal
+          device={selectedEvent}
+          onClose={() => setIsDetailModalOpen(false)}
+        />
+      )}
       <p className="text-left text-sm ml-2 mb-1">
         Events shown from the last
         <select
@@ -119,235 +205,20 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
         </select>
         days
       </p>
-      <table className="w-full table-auto border-collapse border-zinc-300 dark:border-border">
-        {/* Header */}
-        <thead className="select-none sticky -top-px z-10 bg-zinc-200 dark:bg-zinc-800">
-          <tr className="bg-zinc-200 dark:bg-zinc-800 text-center">
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Facility");
-                setFilteredSmartLockEvents(
-                  [...filteredSmartLockEvents].sort((a, b) => {
-                    if (
-                      a.facilityName.toLowerCase() <
-                      b.facilityName.toLowerCase()
-                    )
-                      return newDirection === "asc" ? -1 : 1;
-                    if (
-                      a.facilityName.toLowerCase() >
-                      b.facilityName.toLowerCase()
-                    )
-                      return newDirection === "asc" ? 1 : -1;
-                    return 0;
-                  })
-                );
-              }}
-            >
-              Facility
-              {sortedColumn === "Facility" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Name");
-                setFilteredSmartLockEvents(
-                  [...filteredSmartLockEvents].sort((a, b) => {
-                    if (a.deviceName < b.deviceName)
-                      return newDirection === "asc" ? -1 : 1;
-                    if (a.deviceName > b.deviceName)
-                      return newDirection === "asc" ? 1 : -1;
-                    return 0;
-                  })
-                );
-              }}
-            >
-              Device Name
-              {sortedColumn === "Name" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Event Category");
-                setFilteredSmartLockEvents(
-                  [...filteredSmartLockEvents].sort((a, b) => {
-                    if (
-                      a.eventCategory.toLowerCase() <
-                      b.eventCategory.toLowerCase()
-                    )
-                      return newDirection === "asc" ? -1 : 1;
-                    if (
-                      a.eventCategory.toLowerCase() >
-                      b.eventCategory.toLowerCase()
-                    )
-                      return newDirection === "asc" ? 1 : -1;
-                    return 0;
-                  })
-                );
-              }}
-            >
-              Event Category
-              {sortedColumn === "Event Category" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Event Type");
-
-                setFilteredSmartLockEvents(
-                  [...filteredSmartLockEvents].sort((a, b) => {
-                    if (a.eventType < b.eventType)
-                      return newDirection === "asc" ? -1 : 1;
-                    if (a.eventType > b.eventType)
-                      return newDirection === "asc" ? 1 : -1;
-                    return 0;
-                  })
-                );
-              }}
-            >
-              Event Type
-              {sortedColumn === "Event Type" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Event Details");
-                setFilteredSmartLockEvents(
-                  [...filteredSmartLockEvents].sort((a, b) => {
-                    if (
-                      a.eventDetails.toLowerCase() <
-                      b.eventDetails.toLowerCase()
-                    )
-                      return newDirection === "asc" ? -1 : 1;
-                    if (
-                      a.eventDetails.toLowerCase() >
-                      b.eventDetails.toLowerCase()
-                    )
-                      return newDirection === "asc" ? 1 : -1;
-                    return 0;
-                  })
-                );
-              }}
-            >
-              Event Details
-              {sortedColumn === "Event Details" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Created On");
-                setFilteredSmartLockEvents(
-                  [...filteredSmartLockEvents].sort((a, b) => {
-                    if (a.createdOn < b.createdOn)
-                      return newDirection === "asc" ? -1 : 1;
-                    if (a.createdOn > b.createdOn)
-                      return newDirection === "asc" ? 1 : -1;
-                    return 0;
-                  })
-                );
-              }}
-            >
-              Created On
-              {sortedColumn === "Created On" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredSmartLockEvents
-            .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-            .map((smartlock, index) => (
-              <tr
-                key={index}
-                className="hover:bg-zinc-100 dark:hover:bg-zinc-800 relative hover:cursor-pointer"
-                onClick={() => setHoveredRow(index)}
-                onMouseLeave={() => setHoveredRow(null)}
-              >
-                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {smartlock.facilityName}
-                  {hoveredRow === index && (
-                    <div className="absolute bg-zinc-700 dark:bg-zinc-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-4/5">
-                      <div className="grid grid-cols-4 gap-1 overflow-hidden">
-                        {Object.entries(smartlock).map(
-                          ([key, value], index) => (
-                            <div key={index} className="wrap-break-word">
-                              <span className="font-bold text-yellow-500">
-                                {key}:
-                              </span>
-                              <br />
-                              <span className="whitespace-normal wrap-break-word">
-                                {value === null
-                                  ? "null"
-                                  : value === ""
-                                  ? "null"
-                                  : value === true
-                                  ? "true"
-                                  : value === false
-                                  ? "false"
-                                  : value}
-                              </span>
-                            </div>
-                          )
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </td>
-                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {smartlock.deviceName}
-                </td>
-                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {smartlock.eventCategory}
-                </td>
-                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {smartlock.eventType}
-                </td>
-                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {smartlock.eventDetails}
-                </td>
-                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {smartlock.createdOn}
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-      {/* Modal footer/pagination */}
+      <div className="h-[73vh] overflow-y-auto text-center">
+        <DataTable
+          columns={columns}
+          data={filteredSmartLockEvents}
+          currentPage={currentPage}
+          rowsPerPage={rowsPerPage}
+          sortDirection={sortDirection}
+          sortedColumn={sortedColumn}
+          onSort={handleColumnSort}
+          hoveredRow={hoveredRow}
+          setHoveredRow={setHoveredRow}
+          onRowClick={handleRowClick}
+        />
+      </div>
       <div className="px-2 py-5 mx-1">
         <PaginationFooter
           rowsPerPage={rowsPerPage}

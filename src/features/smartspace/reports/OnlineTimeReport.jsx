@@ -4,6 +4,8 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import { RiErrorWarningFill } from "react-icons/ri";
+import DataTable from "@components/shared/DataTable";
+import DetailModal from "@components/shared/DetailModal";
 
 export default function OnlineTimeReport({ selectedFacilities, searchQuery }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -11,11 +13,13 @@ export default function OnlineTimeReport({ selectedFacilities, searchQuery }) {
   const [sortDirection, setSortDirection] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
   const [durations, setDurations] = useState({});
-  const [filteredDurations, setFilteredDurations] = useState({});
+  const [filteredDurations, setFilteredDurations] = useState([]);
   const [dayValue, setDayValue] = useState(7);
   const currentTime = Math.floor(Date.now() / 1000);
   const pastDayValue = currentTime - dayValue * 24 * 60 * 60;
   const [hoveredRow, setHoveredRow] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedDevice, setSelectedDevice] = useState(null);
 
   const exportDurations = () => {
     // Convert the data to CSV format
@@ -91,7 +95,6 @@ export default function OnlineTimeReport({ selectedFacilities, searchQuery }) {
       );
       const events = await response.data;
       events.sort((a, b) => new Date(a.createdUtc) - new Date(b.createdUtc));
-      console.log(events);
       events.forEach((event) => {
         if (event.eventDetails?.includes("SmartLock")) {
           event.eventDevice = "SmartLock";
@@ -234,8 +237,129 @@ export default function OnlineTimeReport({ selectedFacilities, searchQuery }) {
     setCurrentPage(1);
   }, [durations, searchQuery]);
 
+  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
+    let newDirection;
+
+    if (sortedColumn !== columnKey) {
+      newDirection = "asc";
+    } else if (sortDirection === "asc") {
+      newDirection = "desc";
+    } else if (sortDirection === "desc") {
+      newDirection = null;
+    }
+
+    setSortedColumn(newDirection ? columnKey : null);
+    setSortDirection(newDirection);
+
+    if (!newDirection) {
+      setFilteredAccessPoints([...accessPoints]);
+      return;
+    }
+
+    setFilteredAccessPoints(
+      [...filteredAccessPoints].sort((a, b) => {
+        const aVal = accessor(a);
+        const bVal = accessor(b);
+        return newDirection === "asc"
+          ? aVal.localeCompare?.(bVal) ?? aVal - bVal
+          : bVal.localeCompare?.(aVal) ?? bVal - aVal;
+      })
+    );
+  };
+
+  const columns = [
+    {
+      key: "facilityName",
+      label: "Facility Name",
+      accessor: (r) => r.facilityName,
+      render: (r) => (
+        <div className="w-full flex items-center justify-center">
+          <div className="truncate max-w-[32ch]">{r.facilityName}</div>
+        </div>
+      ),
+    },
+    {
+      key: "eventDevice",
+      label: "Device Type",
+      accessor: (r) => r.eventDevice,
+    },
+    {
+      key: "deviceName",
+      label: "Device Name",
+      accessor: (r) => r.deviceName,
+      render: (r) => (
+        <div className="w-full flex items-center justify-center">
+          <div className="truncate max-w-[32ch]">{r.deviceName}</div>
+        </div>
+      ),
+    },
+    {
+      key: "offlineDuration",
+      label: "Offline Time (minutes)",
+      accessor: (r) => Math.round(r.totalDuration / 60),
+      render: (r) => (
+        <div
+          title={r.durations.map((d) => `${Math.round(d / 60)} min`).join(", ")}
+        >
+          {Math.round(r.totalDuration / 60)}
+        </div>
+      ),
+    },
+    {
+      key: "onlineTimePercentage",
+      label: "Online Time",
+      accessor: (r) =>
+        `${(
+          ((currentTime - pastDayValue - r.totalDuration) /
+            (currentTime - pastDayValue)) *
+          100
+        ).toFixed(2)}%`,
+      render: (r) => (
+        <div>
+          {(
+            ((currentTime - pastDayValue - r.totalDuration) /
+              (currentTime - pastDayValue)) *
+            100
+          ).toFixed(2)}
+          %
+        </div>
+      ),
+    },
+    {
+      key: "status",
+      label: "Status",
+      accessor: (r) => (r.offlineStart ? "Offline" : "Online"),
+      render: (r) => (
+        <div>
+          {r.offlineStart ? (
+            <div className="inline-flex items-center gap-2">
+              <RiErrorWarningFill className="text-red-500 text-2xl" />
+              <div>Offline</div>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2">
+              <FaCheckCircle className="text-green-500 text-xl" />
+              <div>Online</div>
+            </div>
+          )}
+        </div>
+      ),
+    },
+  ];
+
+  const handleRowClick = (row) => {
+    setSelectedDevice(row);
+    setIsDetailModalOpen(true);
+  };
+
   return (
     <div className="w-full px-2">
+      {isDetailModalOpen && (
+        <DetailModal
+          device={selectedDevice}
+          onClose={() => setIsDetailModalOpen(false)}
+        />
+      )}
       <div className="flex justify-between mb-1">
         <p className="text-left text-sm ml-2">
           Events shown from the last
@@ -264,328 +388,20 @@ export default function OnlineTimeReport({ selectedFacilities, searchQuery }) {
           Export
         </p>
       </div>
-      <table className="w-full table-auto border-collapse border-zinc-300 dark:border-border">
-        {/* Header */}
-        <thead className="select-none sticky -top-px z-10 bg-zinc-200 dark:bg-zinc-800">
-          <tr className="bg-zinc-200 dark:bg-zinc-800 text-center">
-            {/* Facility Column */}
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Facility");
-
-                // Convert to array, sort, and update state
-                const sortedDurations = Object.values(filteredDurations).sort(
-                  (a, b) => {
-                    if (
-                      a.facilityName.toLowerCase() <
-                      b.facilityName.toLowerCase()
-                    )
-                      return newDirection === "asc" ? -1 : 1;
-                    if (
-                      a.facilityName.toLowerCase() >
-                      b.facilityName.toLowerCase()
-                    )
-                      return newDirection === "asc" ? 1 : -1;
-                    return 0;
-                  }
-                );
-                setFilteredDurations(sortedDurations);
-              }}
-            >
-              Facility
-              {sortedColumn === "Facility" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-
-            {/* Device Type Column */}
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Device Type");
-
-                // Convert to array, sort, and update state
-                const sortedDurations = Object.values(filteredDurations).sort(
-                  (a, b) => {
-                    if (
-                      a.eventDevice.toLowerCase() < b.eventDevice.toLowerCase()
-                    )
-                      return newDirection === "asc" ? -1 : 1;
-                    if (
-                      a.eventDevice.toLowerCase() > b.eventDevice.toLowerCase()
-                    )
-                      return newDirection === "asc" ? 1 : -1;
-                    return 0;
-                  }
-                );
-                setFilteredDurations(sortedDurations);
-              }}
-            >
-              Device Type
-              {sortedColumn === "Device Type" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-
-            {/* Device Name Column */}
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Device Name");
-
-                // Convert to array, sort, and update state
-                const sortedDurations = Object.values(filteredDurations).sort(
-                  (a, b) => {
-                    if (a.deviceName.toLowerCase() < b.deviceName.toLowerCase())
-                      return newDirection === "asc" ? -1 : 1;
-                    if (a.deviceName.toLowerCase() > b.deviceName.toLowerCase())
-                      return newDirection === "asc" ? 1 : -1;
-                    return 0;
-                  }
-                );
-                setFilteredDurations(sortedDurations);
-              }}
-            >
-              Device Name
-              {sortedColumn === "Device Name" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-
-            {/* Offline Time Column */}
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Offline Time");
-
-                // Convert to array, sort, and update state
-                const sortedDurations = Object.values(filteredDurations).sort(
-                  (a, b) => {
-                    return newDirection === "asc"
-                      ? a.totalDuration - b.totalDuration
-                      : b.totalDuration - a.totalDuration;
-                  }
-                );
-                setFilteredDurations(sortedDurations);
-              }}
-            >
-              Offline Time (minutes)
-              {sortedColumn === "Offline Time" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-
-            {/* Online Time Percentage Column */}
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Online Time");
-
-                // Convert to array, sort, and update state
-                const sortedDurations = Object.values(filteredDurations).sort(
-                  (a, b) => {
-                    return newDirection === "asc"
-                      ? a.totalDuration - b.totalDuration
-                      : b.totalDuration - a.totalDuration;
-                  }
-                );
-                setFilteredDurations(sortedDurations);
-              }}
-            >
-              Online Time %
-              {sortedColumn === "Online Time" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-
-            {/* Status Column */}
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Status");
-
-                // Convert to array, sort, and update state
-                const sortedDurations = Object.values(filteredDurations).sort(
-                  (a, b) => {
-                    if (!a.offlineStart) return newDirection === "asc" ? -1 : 1;
-                    if (!b.offlineStart) return newDirection === "asc" ? 1 : -1;
-                    return newDirection === "asc"
-                      ? new Date(a.offlineStart) - new Date(b.offlineStart)
-                      : new Date(b.offlineStart) - new Date(a.offlineStart);
-                  }
-                );
-                setFilteredDurations(sortedDurations);
-              }}
-            >
-              Status
-              {sortedColumn === "Status" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.values(filteredDurations)
-            .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-            .map((device, index) => (
-              <tr
-                className="hover:bg-zinc-100 dark:hover:bg-zinc-800 relative hover:cursor-pointer"
-                key={index}
-                onClick={() => setHoveredRow(index)}
-                onMouseLeave={() => setHoveredRow(null)}
-              >
-                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {device.facilityName}
-                  {hoveredRow === index && (
-                    <div className="absolute bg-zinc-700 dark:bg-zinc-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-5/6">
-                      <div className="grid grid-cols-4 gap-1 overflow-hidden">
-                        <div>
-                          <span className="font-bold text-yellow-500">
-                            Facility:
-                          </span>
-                          {device.facilityName}
-                        </div>
-                        <div>
-                          <span className="font-bold text-yellow-500">
-                            Device Type:
-                          </span>
-                          {device.eventDevice}
-                        </div>
-                        <div>
-                          <span className="font-bold text-yellow-500">
-                            Device Name:
-                          </span>
-                          {device.deviceName}
-                        </div>
-                        <div>
-                          <span className="font-bold text-yellow-500">
-                            Offline Time:
-                          </span>
-                          {Math.round(device.totalDuration / 60)}
-                        </div>
-                        <div>
-                          <span className="font-bold text-yellow-500">
-                            Online Time %:
-                          </span>
-                          {(
-                            ((currentTime -
-                              pastDayValue -
-                              device.totalDuration) /
-                              (currentTime - pastDayValue)) *
-                            100
-                          ).toFixed(2)}
-                          %
-                        </div>
-                        <div>
-                          <span className="font-bold text-yellow-500">
-                            Status:
-                          </span>
-                          {device.offlineStart ? "Offline" : "Online"}
-                        </div>
-
-                        <div>
-                          <span className="font-bold text-yellow-500">
-                            First Online Event:
-                          </span>
-                          {device.firstOnlineEvent
-                            ? new Date(device.firstOnlineEvent).toISOString()
-                            : "No First Online Event"}
-                        </div>
-                        <div>
-                          <span className="font-bold text-yellow-500">
-                            Offline Started:
-                          </span>
-                          {device.offlineStart
-                            ? new Date(device.offlineStart).toISOString()
-                            : "Not Offline"}
-                        </div>
-                        <div>
-                          <span className="font-bold text-yellow-500">
-                            Online Started:
-                          </span>
-                          {device.onlineStart
-                            ? new Date(device.onlineStart).toISOString()
-                            : "Not Online"}
-                        </div>
-                        <div>
-                          <span className="font-bold text-yellow-500">
-                            Device Id:
-                          </span>
-                          {device.deviceId}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </td>
-                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {device.eventDevice}
-                </td>
-                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {device.deviceName}
-                </td>
-
-                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {Math.round(device.totalDuration / 60)}
-                </td>
-                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {(
-                    ((currentTime - pastDayValue - device.totalDuration) /
-                      (currentTime - pastDayValue)) *
-                    100
-                  ).toFixed(2)}
-                  %
-                </td>
-                <td
-                  className="border-y border-zinc-300 dark:border-border px-4 py-2"
-                  title={
-                    device.offlineStart
-                      ? device.offlineStart.toISOString()
-                      : device.onlineStart.toISOString()
-                  }
-                >
-                  {device.offlineStart ? (
-                    <div className="inline-flex items-center gap-2">
-                      <RiErrorWarningFill className="text-red-500 text-2xl" />
-                      <div>Offline</div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <FaCheckCircle className="text-green-500 text-xl" />
-                      <div>Online</div>
-                    </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-
-      {/* Modal footer/pagination */}
+      <div className="h-[73vh] overflow-y-auto text-center">
+        <DataTable
+          columns={columns}
+          data={filteredDurations}
+          currentPage={currentPage}
+          rowsPerPage={rowsPerPage}
+          sortDirection={sortDirection}
+          sortedColumn={sortedColumn}
+          onSort={handleColumnSort}
+          hoveredRow={hoveredRow}
+          setHoveredRow={setHoveredRow}
+          onRowClick={handleRowClick}
+        />
+      </div>
       <div className="px-2 py-5 mx-1">
         <PaginationFooter
           rowsPerPage={rowsPerPage}

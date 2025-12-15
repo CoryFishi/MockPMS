@@ -3,6 +3,10 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
+import DataTable from "@components/shared/DataTable";
+import DetailModal from "@components/shared/DetailModal";
+import { IoIosWarning } from "react-icons/io";
+import { RiErrorWarningFill } from "react-icons/ri";
 
 export default function AllAccessPointsReport({
   selectedFacilities,
@@ -15,6 +19,8 @@ export default function AllAccessPointsReport({
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [sortDirection, setSortDirection] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedAccessPoint, setSelectedAccessPoint] = useState(null);
 
   const fetchAccessPoints = async (facility) => {
     try {
@@ -99,210 +105,116 @@ export default function AllAccessPointsReport({
     setCurrentPage(1);
   }, [accessPoints, searchQuery]);
 
+  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
+    let newDirection;
+
+    if (sortedColumn !== columnKey) {
+      newDirection = "asc";
+    } else if (sortDirection === "asc") {
+      newDirection = "desc";
+    } else if (sortDirection === "desc") {
+      newDirection = null;
+    }
+
+    setSortedColumn(newDirection ? columnKey : null);
+    setSortDirection(newDirection);
+
+    if (!newDirection) {
+      setFilteredAccessPoints([...accessPoints]);
+      return;
+    }
+
+    setFilteredAccessPoints(
+      [...filteredAccessPoints].sort((a, b) => {
+        const aVal = accessor(a);
+        const bVal = accessor(b);
+        return newDirection === "asc"
+          ? aVal.localeCompare?.(bVal) ?? aVal - bVal
+          : bVal.localeCompare?.(aVal) ?? bVal - aVal;
+      })
+    );
+  };
+
+  const columns = [
+    {
+      key: "facilityName",
+      label: "Facility Name",
+      accessor: (r) => r.facilityName,
+      render: (r) => (
+        <div className="w-full flex items-center justify-center">
+          <div className="truncate max-w-[32ch]">{r.facilityName}</div>
+        </div>
+      ),
+    },
+    {
+      key: "name",
+      label: "Name",
+      accessor: (r) => r.name,
+      render: (r) => (
+        <div className="w-full flex items-center justify-center">
+          <div className="truncate max-w-[32ch]">{r.name}</div>
+        </div>
+      ),
+    },
+    {
+      key: "connectionStatus",
+      label: "Connection Status",
+      accessor: (r) => r.connectionStatus,
+      render: (r) => (
+        <div className="inline-flex items-center gap-2">
+          {r.connectionStatus === "ok" ? (
+            <FaCheckCircle className="text-green-500" />
+          ) : r.connectionStatus === "warning" ? (
+            <IoIosWarning className="text-yellow-500" />
+          ) : r.connectionStatus === "error" ? (
+            <RiErrorWarningFill className="text-red-500" />
+          ) : (
+            ""
+          )}
+          <div>{r.connectionStatusMessage}</div>
+        </div>
+      ),
+    },
+    {
+      key: "isDeviceOffline",
+      label: "Status",
+      accessor: (r) => r.isDeviceOffline,
+      render: (r) => <div>{!r.isDeviceOffline ? "Online" : "Offline"}</div>,
+    },
+    {
+      key: "lastUpdateTimestamp",
+      label: "Last Updated",
+      accessor: (r) => r.lastUpdateTimestamp,
+    },
+  ];
+
+  const handleRowClick = (row) => {
+    setSelectedAccessPoint(row);
+    setIsDetailModalOpen(true);
+  };
+
   return (
     <div className="w-full px-2">
-      <table className="w-full table-auto border-collapse border-zinc-300 dark:border-border">
-        {/* Header */}
-        <thead className="select-none sticky -top-px z-10 bg-zinc-200 dark:bg-zinc-800">
-          <tr className="bg-zinc-200 dark:bg-zinc-800 text-center">
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Facility");
-                setFilteredAccessPoints(
-                  [...filteredAccessPoints].sort((a, b) => {
-                    if (
-                      a.facilityName.toLowerCase() <
-                      b.facilityName.toLowerCase()
-                    )
-                      return newDirection === "asc" ? -1 : 1;
-                    if (
-                      a.facilityName.toLowerCase() >
-                      b.facilityName.toLowerCase()
-                    )
-                      return newDirection === "asc" ? 1 : -1;
-                    return 0;
-                  })
-                );
-              }}
-            >
-              Facility
-              {sortedColumn === "Facility" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Name");
-                setFilteredAccessPoints(
-                  [...filteredAccessPoints].sort((a, b) => {
-                    if (a.name.toLowerCase() < b.name.toLowerCase())
-                      return newDirection === "asc" ? -1 : 1;
-                    if (a.name.toLowerCase() > b.name.toLowerCase())
-                      return newDirection === "asc" ? 1 : -1;
-                    return 0;
-                  })
-                );
-              }}
-            >
-              Name
-              {sortedColumn === "Name" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Connection Status");
-                setFilteredAccessPoints(
-                  [...filteredAccessPoints].sort((a, b) => {
-                    if (
-                      a.connectionStatus.toLowerCase() <
-                      b.connectionStatus.toLowerCase()
-                    )
-                      return newDirection === "asc" ? -1 : 1;
-                    if (
-                      a.connectionStatus.toLowerCase() >
-                      b.connectionStatus.toLowerCase()
-                    )
-                      return newDirection === "asc" ? 1 : -1;
-                    return 0;
-                  })
-                );
-              }}
-            >
-              Connection Status
-              {sortedColumn === "Connection Status" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Status");
-                setFilteredAccessPoints(
-                  [...filteredAccessPoints].sort((a, b) => {
-                    if (a.isDeviceOffline < b.isDeviceOffline)
-                      return newDirection === "asc" ? -1 : 1;
-                    if (a.isDeviceOffline > b.isDeviceOffline)
-                      return newDirection === "asc" ? 1 : -1;
-                    return 0;
-                  })
-                );
-              }}
-            >
-              Status
-              {sortedColumn === "Status" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-            <th
-              className="px-4 py-2 hover:cursor-pointer hover:bg-zinc-300 dark:hover:bg-darkPrimary hover:transition hover:duration-300 hover:ease-in-out"
-              onClick={() => {
-                const newDirection = sortDirection === "asc" ? "desc" : "asc";
-                setSortDirection(newDirection);
-                setSortedColumn("Last Updated");
-                setFilteredAccessPoints(
-                  [...filteredAccessPoints].sort((a, b) => {
-                    if (a.lastUpdateTimestamp < b.lastUpdateTimestamp)
-                      return newDirection === "asc" ? -1 : 1;
-                    if (a.lastUpdateTimestamp > b.lastUpdateTimestamp)
-                      return newDirection === "asc" ? 1 : -1;
-                    return 0;
-                  })
-                );
-              }}
-            >
-              Last Updated
-              {sortedColumn === "Last Updated" && (
-                <span className="ml-2">
-                  {sortDirection === "asc" ? "▲" : "▼"}
-                </span>
-              )}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredAccessPoints
-            .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-            .map((accessPoint, index) => (
-              <tr
-                key={index}
-                className="hover:bg-zinc-100 dark:hover:bg-zinc-800 relative hover:cursor-pointer"
-                onClick={() => setHoveredRow(index)}
-                onMouseLeave={() => setHoveredRow(null)}
-              >
-                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {accessPoint.facilityName}
-                  {hoveredRow === index && (
-                    <div className="absolute bg-zinc-700 dark:bg-zinc-700 text-white p-2 rounded-sm shadow-lg z-10 top-10 left-2/4 transform -translate-x-1/2 text-left w-4/5">
-                      <div className="grid grid-cols-4 gap-1 overflow-hidden">
-                        {Object.entries(accessPoint).map(
-                          ([key, value], index) => (
-                            <div key={index} className="wrap-break-word">
-                              <span className="font-bold text-yellow-500">
-                                {key}:
-                              </span>
-                              <br />
-                              <span className="whitespace-normal wrap-break-word">
-                                {value === null
-                                  ? "null"
-                                  : value === ""
-                                  ? "null"
-                                  : value === true
-                                  ? "true"
-                                  : value === false
-                                  ? "false"
-                                  : value}
-                              </span>
-                            </div>
-                          )
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </td>
-                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {accessPoint.name}
-                </td>
-                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  <div className="inline-flex items-center gap-2">
-                    {accessPoint.connectionStatus === "ok" ? (
-                      <FaCheckCircle className="text-green-500" />
-                    ) : (
-                      ""
-                    )}
-                    <div>{accessPoint.connectionStatusMessage}</div>
-                  </div>
-                </td>
-                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {!accessPoint.isDeviceOffline ? "Online" : "Offline"}
-                </td>
-                <td className="border-y border-zinc-300 dark:border-border px-4 py-2">
-                  {accessPoint.lastUpdateTimestamp}
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-      {/* Modal footer/pagination */}
+      {isDetailModalOpen && (
+        <DetailModal
+          device={selectedAccessPoint}
+          onClose={() => setIsDetailModalOpen(false)}
+        />
+      )}
+      <div className="h-[73vh] overflow-y-auto text-center">
+        <DataTable
+          columns={columns}
+          data={filteredAccessPoints}
+          currentPage={currentPage}
+          rowsPerPage={rowsPerPage}
+          sortDirection={sortDirection}
+          sortedColumn={sortedColumn}
+          onSort={handleColumnSort}
+          hoveredRow={hoveredRow}
+          setHoveredRow={setHoveredRow}
+          onRowClick={handleRowClick}
+        />
+      </div>
       <div className="px-2 py-5 mx-1">
         <PaginationFooter
           rowsPerPage={rowsPerPage}
