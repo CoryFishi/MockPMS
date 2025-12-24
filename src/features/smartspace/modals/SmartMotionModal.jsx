@@ -1,6 +1,6 @@
 import PaginationFooter from "@components/shared/PaginationFooter";
 import DataTable from "@components/shared/DataTable";
-import SmartLockDetailModal from "@components/shared/DetailModal";
+import DetailModal from "@components/shared/DetailModal";
 import { useState, useEffect } from "react";
 import { FaWarehouse, FaCheckCircle } from "react-icons/fa";
 import {
@@ -27,7 +27,7 @@ export default function SmartMotionModal({
   facilityName,
   setIsSmartMotionModalOpen,
 }) {
-  const [filteredSmartLocks, setFilteredSmartLocks] = useState([]);
+  const [filteredSmartMotion, setFilteredSmartMotion] = useState([]);
   const [option, setOption] = useState(smartMotionModalOption);
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredRow, setHoveredRow] = useState(null);
@@ -35,7 +35,7 @@ export default function SmartMotionModal({
   const [sortedColumn, setSortedColumn] = useState("Name");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [selectedLock, setSelectedLock] = useState(null);
+  const [selectedMotion, setSelectedMotion] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
@@ -53,12 +53,12 @@ export default function SmartMotionModal({
     setSortDirection(newDirection);
 
     if (!newDirection) {
-      setFilteredSmartLocks([...smartMotion]);
+      setFilteredSmartMotion([...smartMotion]);
       return;
     }
 
-    setFilteredSmartLocks(
-      [...filteredSmartLocks].sort((a, b) => {
+    setFilteredSmartMotion(
+      [...filteredSmartMotion].sort((a, b) => {
         const aVal = accessor(a);
         const bVal = accessor(b);
         return newDirection === "asc"
@@ -117,7 +117,7 @@ export default function SmartMotionModal({
         )
     );
 
-    setFilteredSmartLocks(filtered);
+    setFilteredSmartMotion(filtered);
     setCurrentPage(1);
   }, [smartMotion, option, searchQuery]);
 
@@ -253,7 +253,7 @@ export default function SmartMotionModal({
             <span className="flex flex-col text-left">
               {r.statusMessages?.some((m) => m.trim() !== "")
                 ? r.statusMessages.map((m, i) => <span key={i}>{m}</span>)
-                : "SmartLock is online"}
+                : "SmartMotion sensor is online"}
             </span>
           </div>
         );
@@ -267,15 +267,15 @@ export default function SmartMotionModal({
   ];
 
   const handleRowClick = (row) => {
-    setSelectedLock(row);
+    setSelectedMotion(row);
     setIsDetailModalOpen(true);
   };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
       {isDetailModalOpen && (
-        <SmartLockDetailModal
-          lock={selectedLock}
+        <DetailModal
+          device={selectedMotion}
           onClose={() => setIsDetailModalOpen(false)}
         />
       )}
@@ -284,7 +284,7 @@ export default function SmartMotionModal({
           <div className="flex items-center">
             <FaWarehouse />
             <h2 className="ml-2 text-lg font-bold">
-              {facilityName}&apos;s SmartLocks
+              {facilityName}&apos;s SmartMotion Sensors
             </h2>
           </div>
           <button
@@ -305,7 +305,7 @@ export default function SmartMotionModal({
           )}
           <input
             type="text"
-            placeholder="Search SmartLocks..."
+            placeholder="Search SmartMotion sensors..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="mb-2 border p-2 w-full dark:bg-zinc-800 rounded-sm dark:border-zinc-700"
@@ -313,7 +313,7 @@ export default function SmartMotionModal({
           <div className="h-[73vh] overflow-y-auto text-center">
             <DataTable
               columns={columns}
-              data={filteredSmartLocks}
+              data={filteredSmartMotion}
               currentPage={currentPage}
               rowsPerPage={rowsPerPage}
               sortDirection={sortDirection}
@@ -330,7 +330,7 @@ export default function SmartMotionModal({
               setRowsPerPage={setRowsPerPage}
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
-              items={filteredSmartLocks}
+              items={filteredSmartMotion}
             />
           </div>
         </div>

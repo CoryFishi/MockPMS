@@ -1,8 +1,15 @@
 import { useState } from "react";
-import { FaCheckCircle, FaExternalLinkAlt } from "react-icons/fa";
+import { FaCheckCircle, FaExternalLinkAlt, FaWalking } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
 import SmartLockModal from "@features/smartspace/modals/SmartLockModal";
 import SmartMotionModal from "@features/smartspace/modals/SmartMotionModal";
+import AccessPointModal from "@features/smartspace/modals/AccessPointModal";
+import DetailModal from "@components/shared/DetailModal";
+import { BiLock } from "react-icons/bi";
+import { BsController, BsLockFill } from "react-icons/bs";
+import { TiWiFi } from "react-icons/ti";
+import { GiControlTower } from "react-icons/gi";
+import { CgController } from "react-icons/cg";
 
 export default function SmartSpaceFacilityRow({
   facility,
@@ -15,6 +22,10 @@ export default function SmartSpaceFacilityRow({
   const [smartlockModalOption, setSmartlockModalOption] = useState(null);
   const [isSmartMotionModalOpen, setIsSmartMotionModalOpen] = useState(false);
   const [smartMotionModalOption, setSmartMotionModalOption] = useState(null);
+  const [isAccessPointModalOpen, setIsAccessPointModalOpen] = useState(false);
+  const [accessPointModalOption, setAccessPointModalOption] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedEdgeRouter, setSelectedEdgeRouter] = useState(null);
 
   const toggleRowExpansion = (facilityId) => {
     setExpandedRows((prev) =>
@@ -35,6 +46,18 @@ export default function SmartSpaceFacilityRow({
       setSmartMotionModalOption(option);
       setIsSmartMotionModalOpen(true);
     }
+  };
+
+  const openAccessPointModal = (option) => {
+    if (!isAccessPointModalOpen) {
+      setAccessPointModalOption(option);
+      setIsAccessPointModalOpen(true);
+    }
+  };
+
+  const openDetailModal = (edgeRouter) => {
+    setSelectedEdgeRouter(edgeRouter);
+    setIsDetailModalOpen(true);
   };
 
   // If no edge router data, do not render the row
@@ -110,7 +133,10 @@ export default function SmartSpaceFacilityRow({
         {toggledSections.openNet && (
           <>
             <td className="px-4 py-2 border-l border-zinc-300 dark:border-zinc-700">
-              <div className="inline-flex items-center gap-1 text-center justify-center w-full">
+              <div
+                className="inline-flex items-center gap-1 text-center justify-center w-full cursor-pointer hover:underline"
+                onClick={() => openDetailModal(facility.edgeRouter)}
+              >
                 {facility.edgeRouterStatus === "error" ? (
                   <IoIosWarning className="text-red-500 mr-2 min-w-5" />
                 ) : facility.edgeRouterStatus === "warning" ? (
@@ -121,10 +147,16 @@ export default function SmartSpaceFacilityRow({
                 {facility.edgeRouterName}
               </div>
             </td>
-            <td className="px-4 py-2 text-center">
+            <td
+              className="px-4 py-2 text-center cursor-pointer hover:underline"
+              onClick={() => openAccessPointModal("online")}
+            >
               {facility.onlineAccessPointsCount}
             </td>
-            <td className="px-4 py-2 text-center">
+            <td
+              className="px-4 py-2 text-center cursor-pointer hover:underline"
+              onClick={() => openAccessPointModal("offline")}
+            >
               {facility.offlineAccessPointsCount}
             </td>
           </>
@@ -265,7 +297,7 @@ export default function SmartSpaceFacilityRow({
                   <h2 className="font-bold dark:text-yellow-500">Address</h2>
                   <p className="text-zinc-600 dark:text-zinc-200">
                     {facility.facilityDetail?.addressLine1 ?? "address line 1"}{" "}
-                    {facility.facilityDetail?.addressLine2 ?? "address line 2"}
+                    {facility.facilityDetail?.addressLine2 ?? ""}
                   </p>
                   <p className="text-zinc-600 dark:text-zinc-200">
                     {facility.facilityDetail?.city ?? "city"}{" "}
@@ -328,12 +360,36 @@ export default function SmartSpaceFacilityRow({
 
               {/* Action Button */}
               <div className="flex flex-col items-center justify-center space-y-1">
+                {facility.accessPoints?.length > 0 && (
+                  <button
+                    className="bg-zinc-400 text-white px-2 py-1 rounded-sm flex items-center justify-center gap-2 font-bold w-2/3 hover:bg-zinc-500 cursor-pointer"
+                    onClick={() => openDetailModal(facility.edgeRouter)}
+                  >
+                    <CgController /> View Edge Router
+                  </button>
+                )}
+                {facility.accessPoints?.length > 0 && (
+                  <button
+                    className="bg-zinc-400 text-white px-2 py-1 rounded-sm flex items-center justify-center gap-2 font-bold w-2/3 hover:bg-zinc-500 cursor-pointer"
+                    onClick={() => openAccessPointModal("")}
+                  >
+                    <TiWiFi /> View all AccessPoints
+                  </button>
+                )}
                 {facility.smartLocks?.length > 0 && (
                   <button
-                    className="bg-zinc-400 text-white px-2 py-1 rounded-sm font-bold w-2/3 hover:bg-zinc-500 hover:cursor-pointer"
+                    className="bg-zinc-400 text-white px-2 py-1 rounded-sm flex items-center justify-center gap-2 font-bold w-2/3 hover:bg-zinc-500 cursor-pointer"
                     onClick={() => openSmartLockModal("")}
                   >
-                    View all SmartLocks
+                    <BsLockFill /> View all SmartLocks
+                  </button>
+                )}
+                {facility.smartMotion?.length > 0 && (
+                  <button
+                    className="bg-zinc-400 text-white px-2 py-1 rounded-sm flex items-center justify-center gap-2 font-bold w-2/3 hover:bg-zinc-500 cursor-pointer"
+                    onClick={() => openSmartMotionModal("")}
+                  >
+                    <FaWalking /> View all SmartMotion
                   </button>
                 )}
               </div>
@@ -356,6 +412,20 @@ export default function SmartSpaceFacilityRow({
           smartMotion={facility.smartMotion || []}
           facilityName={facility.name}
           setIsSmartMotionModalOpen={setIsSmartMotionModalOpen}
+        />
+      )}
+      {isAccessPointModalOpen && (
+        <AccessPointModal
+          accessPointModalOption={accessPointModalOption}
+          accessPoints={facility.accessPoints || []}
+          facilityName={facility.name}
+          setIsAccessPointModalOpen={setIsAccessPointModalOpen}
+        />
+      )}
+      {isDetailModalOpen && (
+        <DetailModal
+          device={selectedEdgeRouter}
+          onClose={() => setIsDetailModalOpen(false)}
         />
       )}
     </>

@@ -1,6 +1,6 @@
 import PaginationFooter from "@components/shared/PaginationFooter";
 import DataTable from "@components/shared/DataTable";
-import SmartLockDetailModal from "@components/shared/DetailModal";
+import DetailModal from "@components/shared/DetailModal";
 import { useState, useEffect } from "react";
 import { FaWarehouse, FaLock, FaLockOpen, FaCheckCircle } from "react-icons/fa";
 import {
@@ -251,14 +251,14 @@ export default function SmartLockModal({
             : "text-green-500";
 
         return (
-          <span className={`inline-flex items-start gap-2 ${color}`}>
+          <div className={`flex items-center justify-center gap-2 ${color}`}>
             <Icon className="text-xl" />
             <span className="flex flex-col text-left">
               {r.statusMessages?.some((m) => m.trim() !== "")
                 ? r.statusMessages.map((m, i) => <span key={i}>{m}</span>)
                 : "SmartLock is online"}
             </span>
-          </span>
+          </div>
         );
       },
     },
@@ -277,8 +277,8 @@ export default function SmartLockModal({
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
       {isDetailModalOpen && (
-        <SmartLockDetailModal
-          lock={selectedLock}
+        <DetailModal
+          device={selectedLock}
           onClose={() => setIsDetailModalOpen(false)}
         />
       )}

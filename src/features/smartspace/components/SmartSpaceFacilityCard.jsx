@@ -81,7 +81,7 @@ export default function SmartSpaceFacilityCard({
       {selectedRouter && (
         <SmartSpaceDetailModal
           onClose={() => setSelectedRouter(null)}
-          lock={selectedRouter}
+          device={selectedRouter}
         />
       )}
       {isSmartMotionModalOpen && (

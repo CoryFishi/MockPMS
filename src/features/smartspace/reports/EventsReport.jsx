@@ -4,6 +4,8 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import DataTable from "@components/shared/DataTable";
 import DetailModal from "@components/shared/DetailModal";
+import GeneralButton from "@components/UI/GeneralButton";
+import ModalContainer from "@components/UI/ModalContainer";
 
 export default function EventsReport({ selectedFacilities, searchQuery }) {
   const [filteredSmartLockEvents, setFilteredSmartLockEvents] = useState([]);
@@ -18,8 +20,12 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
   const pastDayValue = currentTime - dayValue * 24 * 60 * 60;
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedEvents, setSelectedEvents] = useState([]);
+  const [eventTypes, setEventTypes] = useState(null);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [eventModalSelectedEvents, setEventModalSelectedEvents] = useState([]);
 
-  const fetchSmartLockEvents = async (facility) => {
+  const fetchEventsForFacility = async (facility) => {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -29,8 +35,29 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
         tokenEnvKey = facility.environment;
       }
 
+      const gatewayPlatform =
+        "&gtq=" +
+        selectedEvents
+          .filter(
+            (event) => event.eventCategoryName === "Gateway Controller Event"
+          )
+          .map((event) => event.eventTypeEnum)
+          .join("&gtq=");
+
+      const edgePlatform =
+        "&etq=" +
+        selectedEvents
+          .filter((event) => event.eventCategoryName === "Edge Router Event")
+          .map((event) => event.eventTypeEnum)
+          .join("&etq=");
+      console.log("Selected Events:", gatewayPlatform, edgePlatform);
+
       const response = await axios.get(
-        `https://accessevent.${tokenStageKey}insomniaccia${tokenEnvKey}.com/combinedevents/facilities/${facility.id}?uq=&vq=&etq=1&etq=2&etq=3&etq=4&etq=5&etq=6&etq=7&etq=8&etq=9&etq=10&etq=11&etq=12&etq=13&etq=14&etq=15&etq=16&etq=17&etq=18&etq=19&etq=20&etq=21&etq=22&etq=23&etq=24&etq=25&minDate=${pastDayValue}&maxDate=${currentTime}&hideMetadata=true`,
+        `https://accessevent.${tokenStageKey}insomniaccia${tokenEnvKey}.com/combinedevents/facilities/${
+          facility.id
+        }?uq=&vq=${gatewayPlatform !== "&gtq=" ? gatewayPlatform : ""}${
+          edgePlatform !== "&etq=" ? edgePlatform : ""
+        }&minDate=${pastDayValue}&maxDate=${currentTime}&hideMetadata=true`,
         {
           headers: {
             Authorization: "Bearer " + facility.bearer,
@@ -48,14 +75,46 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
     }
   };
 
+  const fetchEventTypes = async () => {
+    try {
+      var tokenStageKey = "";
+      var tokenEnvKey = "";
+      if (selectedFacilities[0].environment === "cia-stg-1.aws.") {
+        tokenStageKey = "cia-stg-1.aws.";
+      } else {
+        tokenEnvKey = selectedFacilities[0].environment;
+      }
+
+      const response = await axios.get(
+        `https://accessevent.${tokenStageKey}insomniaccia${tokenEnvKey}.com/combinedevents/types`,
+        {
+          headers: {
+            Authorization: "Bearer " + selectedFacilities[0].bearer,
+            accept: "application/json",
+            "api-version": "2.0",
+          },
+        }
+      );
+      const eventTypes = response.data;
+      console.log("Fetched Event Types:", eventTypes);
+      setEventTypes(eventTypes);
+      setSelectedEvents(eventTypes);
+      return eventTypes;
+    } catch (error) {
+      console.error(`Error fetching Event Types`, error);
+      return null;
+    }
+  };
+
   const fetchDataForSelectedFacilities = async () => {
     setSmartlockEvents([]); // Clear existing data
     const fetchPromises = selectedFacilities.map(async (facility) => {
-      const smartlockData = await fetchSmartLockEvents(facility);
+      const smartlockData = await fetchEventsForFacility(facility);
       return smartlockData;
     });
 
-    const allSmartlockData = await Promise.all(fetchPromises);
+    var allSmartlockData = await Promise.all(fetchPromises);
+    allSmartlockData = allSmartlockData.filter((data) => data !== null);
 
     // Flatten the array and update state with all smartlocks
     const flattenedData = allSmartlockData.flat();
@@ -63,8 +122,15 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
   };
 
   useEffect(() => {
+    if (selectedEvents.length === 0) {
+      return;
+    }
     fetchDataForSelectedFacilities();
-  }, [selectedFacilities, dayValue]);
+  }, [selectedFacilities, dayValue, selectedEvents]);
+
+  useEffect(() => {
+    fetchEventTypes();
+  }, [selectedFacilities]);
 
   useEffect(() => {
     setSortedColumn("Created On");
@@ -73,7 +139,6 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
       if (a.createdOn > b.createdOn) return -1;
       return 0;
     });
-
     const filteredSmartLockEvents = sortedSmartLockEvents.filter(
       (event) =>
         (event.facilityName || "")
@@ -186,25 +251,156 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
           onClose={() => setIsDetailModalOpen(false)}
         />
       )}
-      <p className="text-left text-sm ml-2 mb-1">
-        Events shown from the last
-        <select
-          className="border rounded-sm mx-2 dark:bg-darkSecondary dark:border-border"
-          id="dayValue"
-          value={dayValue}
-          onChange={(e) => {
-            setDayValue(Number(e.target.value));
+      {isEventModalOpen && (
+        <ModalContainer
+          device={selectedEvents}
+          onClose={() => setIsEventModalOpen(false)}
+          title={`${selectedEvents.length} Selected Events Details`}
+          mainContent={
+            <div className="max-h-[70vh] overflow-y-auto">
+              <div className="p-1 flex w-full justify-evenly gap-10">
+                <button
+                  className="py-2 px-5 hover:bg-zinc-100 cursor-pointer text-green-500"
+                  onClick={() => setEventModalSelectedEvents(eventTypes)}
+                >
+                  Select All
+                </button>
+                <button
+                  className="py-2 px-5 hover:bg-zinc-100 cursor-pointer text-red-500"
+                  onClick={() => setEventModalSelectedEvents([])}
+                >
+                  Deselect All
+                </button>
+              </div>
+              <h1 className="w-full text-center text-2xl p-3 underline font-bold">
+                CIA Events
+              </h1>
+              <div className="grid grid-cols-3 gap-2">
+                {eventTypes
+                  .filter(
+                    (event) =>
+                      event.eventCategoryName === "Gateway Controller Event"
+                  )
+                  .map((event, index) => (
+                    <div
+                      key={index}
+                      className={`p-2 flex items-center gap-2 cursor-pointer hover:bg-zinc-200 select-none ${
+                        eventModalSelectedEvents.includes(event)
+                          ? ""
+                          : "text-zinc-300"
+                      }`}
+                      onClick={() => {
+                        if (eventModalSelectedEvents.includes(event))
+                          setEventModalSelectedEvents((prevSelected) =>
+                            prevSelected.filter((e) => e !== event)
+                          );
+                        else {
+                          setEventModalSelectedEvents((prevSelected) => [
+                            ...prevSelected,
+                            event,
+                          ]);
+                        }
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={eventModalSelectedEvents.includes(event)}
+                        readOnly
+                      ></input>
+                      <p>{event.name}</p>
+                    </div>
+                  ))}
+              </div>
+              <h1 className="w-full text-center text-2xl p-3 underline font-bold">
+                OpenNet Events
+              </h1>
+              <div className="grid grid-cols-3 gap-2">
+                {eventTypes
+                  .filter(
+                    (event) => event.eventCategoryName === "Edge Router Event"
+                  )
+                  .map((event, index) => (
+                    <div
+                      key={index}
+                      className={`p-2 flex items-center gap-2 cursor-pointer hover:bg-zinc-200 select-none ${
+                        eventModalSelectedEvents.includes(event)
+                          ? ""
+                          : "text-zinc-300"
+                      }`}
+                      onClick={() => {
+                        if (eventModalSelectedEvents.includes(event))
+                          setEventModalSelectedEvents((prevSelected) =>
+                            prevSelected.filter((e) => e !== event)
+                          );
+                        else {
+                          setEventModalSelectedEvents((prevSelected) => [
+                            ...prevSelected,
+                            event,
+                          ]);
+                        }
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={eventModalSelectedEvents.includes(event)}
+                        readOnly
+                      ></input>
+                      <p>{event.name}</p>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          }
+          responseContent={
+            <div className="p-1 flex w-full justify-end gap-5">
+              <button
+                className="py-2 px-5 hover:bg-zinc-100 cursor-pointer rounded"
+                onClick={() => setIsEventModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="py-2 px-5 hover:bg-blue-400 cursor-pointer bg-blue-500 text-white rounded"
+                onClick={() => {
+                  setSelectedEvents(eventModalSelectedEvents);
+                  setIsEventModalOpen(false);
+                }}
+              >
+                Save & Apply
+              </button>
+            </div>
+          }
+        />
+      )}
+      <div className="flex justify-between p-1 items-center">
+        <p className="text-left text-sm ml-2 mb-1">
+          Events shown from the last
+          <select
+            className="border rounded-sm mx-2 dark:bg-darkSecondary dark:border-border"
+            id="dayValue"
+            value={dayValue}
+            onChange={(e) => {
+              setDayValue(Number(e.target.value));
+            }}
+          >
+            <option value={0.5}>0.5</option>
+            <option value={7}>7</option>
+            <option value={30}>30</option>
+            <option value={90}>90</option>
+            <option value={120}>120</option>
+            <option value={180}>180</option>
+          </select>
+          days
+        </p>
+        <GeneralButton
+          text={`${selectedEvents.length} Selected Events`}
+          onclick={() => {
+            setEventModalSelectedEvents(selectedEvents);
+            setIsEventModalOpen(true);
           }}
-        >
-          <option value={0.5}>0.5</option>
-          <option value={7}>7</option>
-          <option value={30}>30</option>
-          <option value={90}>90</option>
-          <option value={120}>120</option>
-          <option value={180}>180</option>
-        </select>
-        days
-      </p>
+        />
+      </div>
+
       <div className="h-[73vh] overflow-y-auto text-center">
         <DataTable
           columns={columns}
