@@ -8,6 +8,7 @@ import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import SmartSpaceMapping from "@features/smartspace/pages/SmartSpaceMapping";
 import { useAuth } from "@context/AuthProvider";
+import SmartSpaceTester from "../../features/smartspace/pages/SmartSpaceTester";
 
 export default function SmartSpaceDashboardLayout({ dashboardMenu }) {
   const { handleLogout } = useAuth();
@@ -32,7 +33,7 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }) {
     <div className="flex flex-col w-full h-screen overflow-y-auto overflow-hidden">
       <div className="flex flex-row w-full h-full shrink-0">
         {dashboardMenu === true && (
-          <div className="flex flex-col h-full md:min-w-[250px] min-w-full bg-zinc-950 text-white dark:bg-zinc-950 border-r dark:border-zinc-800 select-none text-lg relative">
+          <div className="flex flex-col h-full md:min-w-62.5 min-w-full bg-zinc-950 text-white dark:bg-zinc-950 border-r dark:border-zinc-800 select-none text-lg relative">
             {/* Header Side Bar */}
             <div className="pt-2">
               <h3 className="text-center m-5 text-xl">OpenTech SmartSpace</h3>
@@ -43,7 +44,8 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }) {
               className={`pl-2 pr-2 pb-8 mt-8 ${
                 openPage === "dashboard" ||
                 openPage === "reports" ||
-                openPage === "mapping"
+                openPage === "mapping" ||
+                openPage === "tester"
                   ? "bg-zinc-900 dark:bg-zinc-900 border-l-yellow-500 border-l-2"
                   : ""
               }`}
@@ -57,7 +59,8 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }) {
                     className={`${
                       openPage === "dashboard" ||
                       openPage === "reports" ||
-                      openPage === "mapping"
+                      openPage === "mapping" ||
+                      openPage === "tester"
                         ? "text-yellow-500"
                         : ""
                     }`}
@@ -85,7 +88,8 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }) {
                     } ${
                       openPage === "mapping" ||
                       openPage === "reports" ||
-                      openPage === "dashboard"
+                      openPage === "dashboard" ||
+                      openPage === "tester"
                         ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
                         : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
                     }`}
@@ -104,7 +108,8 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }) {
                     } ${
                       openPage === "mapping" ||
                       openPage === "reports" ||
-                      openPage === "dashboard"
+                      openPage === "dashboard" ||
+                      openPage === "tester"
                         ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
                         : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
                     }`}
@@ -123,12 +128,33 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }) {
                     } ${
                       openPage === "mapping" ||
                       openPage === "reports" ||
-                      openPage === "dashboard"
+                      openPage === "dashboard" ||
+                      openPage === "tester"
                         ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
                         : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
                     }`}
                   >
                     Mapping
+                  </Link>
+                  <Link
+                    onClick={() =>
+                      setOpenPage("tester") &
+                      localStorage.setItem("openPage2", "tester")
+                    }
+                    className={`px-2 block w-full text-left cursor-pointer ${
+                      openPage === "tester"
+                        ? "border-b-2 border-yellow-500"
+                        : ""
+                    } ${
+                      openPage === "mapping" ||
+                      openPage === "reports" ||
+                      openPage === "dashboard" ||
+                      openPage === "tester"
+                        ? "hover:bg-zinc-800 dark:hover:bg-zinc-800"
+                        : "hover:bg-zinc-900 dark:hover:bg-zinc-900"
+                    }`}
+                  >
+                    Tester
                   </Link>
                 </div>
               )}
@@ -236,6 +262,7 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }) {
           {openPage === "allFacilities" && <SmartSpaceAllFacilitiesPage />}
           {openPage === "selected" && <SmartSpaceSelectedPage />}
           {openPage === "mapping" && <SmartSpaceMapping />}
+          {openPage === "tester" && <SmartSpaceTester />}
         </div>
       </div>
     </div>
