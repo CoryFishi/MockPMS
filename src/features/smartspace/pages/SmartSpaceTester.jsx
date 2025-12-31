@@ -181,15 +181,13 @@ export default function SmartSpaceTester() {
           (existing) => existing.name === item.name
         );
         return {
-          ...existingItem,
-          // But override with new data
+          name: item.name,
           currentSensorState: item.sensorState,
           overallStatusMessage: item.overallStatusMessage,
           overallStatus: item.overallStatus,
           hasDetectedMotion:
-            existingItem.hasDetectedMotion || item.sensorState === "Motion"
-              ? true
-              : false,
+            existingItem?.hasDetectedMotion === true ||
+            item.sensorState === "Motion",
           lastUpdateTimestampDisplay: new Date(
             item.lastUpdateTimestamp
           ).toLocaleString(),
@@ -202,6 +200,47 @@ export default function SmartSpaceTester() {
         error
       );
       toast.error(`Failed to fetch SmartMotion data for ${facility.name}`);
+      return [];
+    }
+  };
+
+  const fetchNewSmartMotionEventData = async (facility) => {
+    const bearer = await fetchBearerToken(facility);
+    if (!bearer) return;
+    const { id, environment } = facility;
+    const tokenPrefix =
+      environment === "cia-stg-1.aws." ? "cia-stg-1.aws." : "";
+    const tokenSuffix = environment === "cia-stg-1.aws." ? "" : environment;
+    try {
+      const now = Math.floor(Date.now() / 1000);
+      const twoMinutesAgo = now - 120;
+
+      const response = await axios.get(
+        `https://accessevent.${tokenPrefix}insomniaccia${tokenSuffix}.com/combinedevents/facilities/${facility.id}?uq=&vq=&etq=27&etq=28
+        &minDate=${twoMinutesAgo}&maxDate=${now}&hideMetadata=true`,
+        {
+          headers: {
+            Authorization: `Bearer ${bearer}`,
+            accept: "application/json",
+            "api-version": "3.0",
+          },
+        }
+      );
+      const data = response.data;
+      for (const event of data) {
+        const motion = smartMotionData.find((m) => m.name === event.deviceName);
+        if (motion) {
+          motion.hasDetectedMotion = true;
+        }
+      }
+    } catch (error) {
+      console.error(
+        `Error fetching SmartMotion event data for ${facility.name}:`,
+        error
+      );
+      toast.error(
+        `Failed to fetch SmartMotion event data for ${facility.name}`
+      );
       return [];
     }
   };
@@ -274,6 +313,7 @@ export default function SmartSpaceTester() {
 
     const refreshSmartMotion = async () => {
       const data = await fetchNewSmartMotionData(selectedFacility);
+      fetchNewSmartMotionEventData(selectedFacility);
       setSmartMotionData(data);
       setFilteredSmartMotion(data);
       setLastPollTime(new Date());
