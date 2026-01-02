@@ -206,7 +206,7 @@ export default function SmartSpaceTester() {
 
   const fetchNewSmartMotionEventData = async (facility) => {
     const bearer = await fetchBearerToken(facility);
-    if (!bearer) return;
+    if (!bearer) return [];
     const { id, environment } = facility;
     const tokenPrefix =
       environment === "cia-stg-1.aws." ? "cia-stg-1.aws." : "";
@@ -216,8 +216,7 @@ export default function SmartSpaceTester() {
       const twoMinutesAgo = now - 120;
 
       const response = await axios.get(
-        `https://accessevent.${tokenPrefix}insomniaccia${tokenSuffix}.com/combinedevents/facilities/${facility.id}?uq=&vq=&etq=27&etq=28
-        &minDate=${twoMinutesAgo}&maxDate=${now}&hideMetadata=true`,
+        `https://accessevent.${tokenPrefix}insomniaccia${tokenSuffix}.com/combinedevents/facilities/${facility.id}?uq=&vq=&etq=27&etq=28&minDate=${twoMinutesAgo}&maxDate=${now}&hideMetadata=true`,
         {
           headers: {
             Authorization: `Bearer ${bearer}`,
@@ -227,12 +226,10 @@ export default function SmartSpaceTester() {
         }
       );
       const data = response.data;
-      for (const event of data) {
-        const motion = smartMotionData.find((m) => m.name === event.deviceName);
-        if (motion) {
-          motion.hasDetectedMotion = true;
-        }
-      }
+      const deviceNamesWithMotion = new Set(
+        data.map((event) => event.deviceName)
+      );
+      return deviceNamesWithMotion;
     } catch (error) {
       console.error(
         `Error fetching SmartMotion event data for ${facility.name}:`,
@@ -241,7 +238,7 @@ export default function SmartSpaceTester() {
       toast.error(
         `Failed to fetch SmartMotion event data for ${facility.name}`
       );
-      return [];
+      return new Set();
     }
   };
 
@@ -306,16 +303,28 @@ export default function SmartSpaceTester() {
 
     const beginPolling = async () => {
       const data = await fetchInitialSmartMotionData(selectedFacility);
-      const eventData = await fetchNewSmartMotionEventData(selectedFacility);
       setSmartMotionData(data);
+      const eventData = await fetchNewSmartMotionEventData(selectedFacility);
+      console.log("Event Data:", eventData);
+      for (let item of data) {
+        if (eventData.has(item.name)) {
+          item.hasDetectedMotion = true;
+        }
+      }
       setFilteredSmartMotion(data);
       setLastPollTime(new Date());
     };
 
     const refreshSmartMotion = async () => {
       const data = await fetchNewSmartMotionData(selectedFacility);
-      const eventData = await fetchNewSmartMotionEventData(selectedFacility);
       setSmartMotionData(data);
+      const eventData = await fetchNewSmartMotionEventData(selectedFacility);
+      console.log("Event Data:", eventData);
+      for (let item of data) {
+        if (eventData.has(item.name)) {
+          item.hasDetectedMotion = true;
+        }
+      }
       setFilteredSmartMotion(data);
       setLastPollTime(new Date());
     };
