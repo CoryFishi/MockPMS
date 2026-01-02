@@ -306,6 +306,7 @@ export default function SmartSpaceTester() {
 
     const beginPolling = async () => {
       const data = await fetchInitialSmartMotionData(selectedFacility);
+      const eventData = await fetchNewSmartMotionEventData(selectedFacility);
       setSmartMotionData(data);
       setFilteredSmartMotion(data);
       setLastPollTime(new Date());
@@ -313,7 +314,7 @@ export default function SmartSpaceTester() {
 
     const refreshSmartMotion = async () => {
       const data = await fetchNewSmartMotionData(selectedFacility);
-      fetchNewSmartMotionEventData(selectedFacility);
+      const eventData = await fetchNewSmartMotionEventData(selectedFacility);
       setSmartMotionData(data);
       setFilteredSmartMotion(data);
       setLastPollTime(new Date());
