@@ -18,7 +18,7 @@ export default function AddToken({
   const handleLogin = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (environment === "cia-stg-1.aws.") {
+    if (environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = environment;

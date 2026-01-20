@@ -114,7 +114,7 @@ export default function PMSDashboardLayout({
     if (Object.keys(currentFacility).length === 0) return;
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "cia-stg-1.aws.") {
+    if (currentFacility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = currentFacility.environment;
@@ -256,7 +256,7 @@ export default function PMSDashboardLayout({
                     {currentFacility && currentFacility.id > 0
                       ? (() => {
                           const baseUrl =
-                            currentFacility.environment === "cia-stg-1.aws."
+                            currentFacility.environment === "staging"
                               ? `https://portal.${currentFacility.environment}insomniaccia.com/facility/${currentFacility.id}/dashboard`
                               : `https://portal.insomniaccia${currentFacility.environment}.com/facility/${currentFacility.id}/dashboard`;
 

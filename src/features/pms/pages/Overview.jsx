@@ -29,7 +29,7 @@ export default function Overview({ currentFacilityName }) {
   const getActiongroups = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "cia-stg-1.aws.") {
+    if (currentFacility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = currentFacility.environment;
@@ -57,7 +57,7 @@ export default function Overview({ currentFacilityName }) {
   const getCIA = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "cia-stg-1.aws.") {
+    if (currentFacility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = currentFacility.environment;
@@ -121,7 +121,7 @@ export default function Overview({ currentFacilityName }) {
   const getStatus = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "cia-stg-1.aws.") {
+    if (currentFacility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = currentFacility.environment;
@@ -149,7 +149,7 @@ export default function Overview({ currentFacilityName }) {
   const getOpenNet = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "cia-stg-1.aws.") {
+    if (currentFacility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = currentFacility.environment;
@@ -195,7 +195,7 @@ export default function Overview({ currentFacilityName }) {
   const handleOpen = async (a) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "cia-stg-1.aws.") {
+    if (currentFacility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = currentFacility.environment;
@@ -222,7 +222,7 @@ export default function Overview({ currentFacilityName }) {
   const handleHold = async (a) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "cia-stg-1.aws.") {
+    if (currentFacility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = currentFacility.environment;
@@ -249,7 +249,7 @@ export default function Overview({ currentFacilityName }) {
   const handleClose = async (a) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "cia-stg-1.aws.") {
+    if (currentFacility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = currentFacility.environment;

@@ -77,7 +77,7 @@ export default function SmartSpaceDashboardView() {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
-      if (facility.environment === "cia-stg-1.aws.") {
+      if (facility.environment === "staging") {
         tokenStageKey = "cia-stg-1.aws.";
       } else {
         tokenEnvKey = facility.environment;
@@ -356,8 +356,8 @@ export default function SmartSpaceDashboardView() {
     setCurrentLoadingText(`Loading ${facility.name}...`);
     const { id, environment, bearer } = facility;
     const tokenPrefix =
-      environment === "cia-stg-1.aws." ? "cia-stg-1.aws." : "";
-    const tokenSuffix = environment === "cia-stg-1.aws." ? "" : environment;
+      environment === "staging" ? "cia-stg-1.aws." : "";
+    const tokenSuffix = environment === "staging" ? "" : environment;
 
     const headers = {
       Authorization: `Bearer ${bearer}`,

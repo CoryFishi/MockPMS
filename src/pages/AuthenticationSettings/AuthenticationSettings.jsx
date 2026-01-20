@@ -274,7 +274,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
             ? "Development"
             : facility.environment === "-qa"
             ? "QA"
-            : facility.environment === "cia-stg-1.aws."
+            : facility.environment === "staging"
             ? "Staging"
             : "N/A",
         ].join(",")

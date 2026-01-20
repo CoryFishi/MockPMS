@@ -37,7 +37,7 @@ export default function CreateVisitorVisitor({
   const handleUnits = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "cia-stg-1.aws.") {
+    if (currentFacility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = currentFacility.environment;
@@ -70,7 +70,7 @@ export default function CreateVisitorVisitor({
   const handleTimeProfiles = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "cia-stg-1.aws.") {
+    if (currentFacility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = currentFacility.environment;
@@ -97,7 +97,7 @@ export default function CreateVisitorVisitor({
   const handleAccessProfiles = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "cia-stg-1.aws.") {
+    if (currentFacility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = currentFacility.environment;
@@ -151,7 +151,7 @@ export default function CreateVisitorVisitor({
     }
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "cia-stg-1.aws.") {
+    if (currentFacility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = currentFacility.environment;

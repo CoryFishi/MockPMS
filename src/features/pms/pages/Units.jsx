@@ -60,7 +60,7 @@ export default function Units({ currentFacilityName }) {
   const handleTimeProfiles = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "cia-stg-1.aws.") {
+    if (currentFacility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = currentFacility.environment;
@@ -86,7 +86,7 @@ export default function Units({ currentFacilityName }) {
   const handleAccessProfiles = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "cia-stg-1.aws.") {
+    if (currentFacility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = currentFacility.environment;
@@ -113,7 +113,7 @@ export default function Units({ currentFacilityName }) {
   const handleUnits = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "cia-stg-1.aws.") {
+    if (currentFacility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = currentFacility.environment;
@@ -148,7 +148,7 @@ export default function Units({ currentFacilityName }) {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
-      if (currentFacility.environment === "cia-stg-1.aws.") {
+      if (currentFacility.environment === "staging") {
         tokenStageKey = "cia-stg-1.aws.";
       } else {
         tokenEnvKey = currentFacility.environment;
@@ -184,7 +184,7 @@ export default function Units({ currentFacilityName }) {
     const handleRent = async () => {
       var tokenStageKey = "";
       var tokenEnvKey = "";
-      if (currentFacility.environment === "cia-stg-1.aws.") {
+      if (currentFacility.environment === "staging") {
         tokenStageKey = "cia-stg-1.aws.";
       } else {
         tokenEnvKey = currentFacility.environment;
@@ -263,7 +263,7 @@ export default function Units({ currentFacilityName }) {
     const handleRentalStatus = async () => {
       var tokenStageKey = "";
       var tokenEnvKey = "";
-      if (currentFacility.environment === "cia-stg-1.aws.") {
+      if (currentFacility.environment === "staging") {
         tokenStageKey = "cia-stg-1.aws.";
       } else {
         tokenEnvKey = currentFacility.environment;
@@ -316,7 +316,7 @@ export default function Units({ currentFacilityName }) {
     const handleMoveOut = async () => {
       var tokenStageKey = "";
       var tokenEnvKey = "";
-      if (currentFacility.environment === "cia-stg-1.aws.") {
+      if (currentFacility.environment === "staging") {
         tokenStageKey = "cia-stg-1.aws.";
       } else {
         tokenEnvKey = currentFacility.environment;
@@ -371,7 +371,7 @@ export default function Units({ currentFacilityName }) {
     const handleRentalStatus = async () => {
       var tokenStageKey = "";
       var tokenEnvKey = "";
-      if (currentFacility.environment === "cia-stg-1.aws.") {
+      if (currentFacility.environment === "staging") {
         tokenStageKey = "cia-stg-1.aws.";
       } else {
         tokenEnvKey = currentFacility.environment;
@@ -424,7 +424,7 @@ export default function Units({ currentFacilityName }) {
     const handleDelete = async () => {
       var tokenStageKey = "";
       var tokenEnvKey = "";
-      if (currentFacility.environment === "cia-stg-1.aws.") {
+      if (currentFacility.environment === "staging") {
         tokenStageKey = "cia-stg-1.aws.";
       } else {
         tokenEnvKey = currentFacility.environment;
@@ -477,7 +477,7 @@ export default function Units({ currentFacilityName }) {
     const handleVisitorFetch = async () => {
       var tokenStageKey = "";
       var tokenEnvKey = "";
-      if (currentFacility.environment === "cia-stg-1.aws.") {
+      if (currentFacility.environment === "staging") {
         tokenStageKey = "cia-stg-1.aws.";
       } else {
         tokenEnvKey = currentFacility.environment;
