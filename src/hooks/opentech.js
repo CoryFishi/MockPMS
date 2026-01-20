@@ -4,7 +4,7 @@ import qs from "qs";
 export async function handleSingleLogin(facility) {
   let tokenStageKey = "";
   let tokenEnvKey = "";
-  if (facility.environment === "cia-stg-1.aws.") {
+  if (facility.environment === "staging") {
     tokenStageKey = "cia-stg-1.aws.";
   } else {
     tokenEnvKey = facility.environment;
@@ -41,7 +41,7 @@ export async function handleSingleLogin(facility) {
 export async function handleMultiLogin(facilities) {
   let tokenStageKey = "";
   let tokenEnvKey = "";
-  if (facilities.environment === "cia-stg-1.aws.") {
+  if (facilities.environment === "staging") {
     tokenStageKey = "cia-stg-1.aws.";
   } else {
     tokenEnvKey = facilities.environment;

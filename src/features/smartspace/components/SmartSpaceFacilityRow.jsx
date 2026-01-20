@@ -115,13 +115,13 @@ export default function SmartSpaceFacilityRow({
                 onClick={(e) => {
                   e.stopPropagation();
                   const url =
-                    facility.environment === "cia-stg-1.aws."
+                    facility.environment === "staging"
                       ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
                       : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`;
                   window.open(url, "_blank");
                 }}
                 title={
-                  facility.environment === "cia-stg-1.aws."
+                  facility.environment === "staging"
                     ? `https://portal.${facility.environment}insomniaccia.com/facility/${facility.id}/dashboard`
                     : `https://portal.insomniaccia${facility.environment}.com/facility/${facility.id}/dashboard`
                 }

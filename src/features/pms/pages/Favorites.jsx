@@ -78,7 +78,7 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
   const handleSelectLogin = async (facility) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (facility.environment === "cia-stg-1.aws.") {
+    if (facility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = facility.environment;
@@ -228,7 +228,7 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
     "-dev": "Development",
     "": "Production",
     "-qa": "QA",
-    "cia-stg-1.aws.": "Staging",
+    "staging": "Staging",
   };
 
   const columns = [
@@ -273,7 +273,7 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
               e.preventDefault();
               e.stopPropagation();
               const baseUrl =
-                r.environment === "cia-stg-1.aws."
+                r.environment === "staging"
                   ? `https://portal.${r.environment}insomniaccia.com/facility/${r.id}/dashboard`
                   : `https://portal.insomniaccia${r.environment}.com/facility/${r.id}/dashboard`;
               window.open(baseUrl, "_blank");

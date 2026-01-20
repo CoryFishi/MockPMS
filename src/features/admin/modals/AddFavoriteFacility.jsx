@@ -21,7 +21,7 @@ export default function AddFavoriteFacility({
   const handleLogin = async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (environment === "cia-stg-1.aws.") {
+    if (environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = environment;
@@ -63,7 +63,7 @@ export default function AddFavoriteFacility({
   const handleFacilityInfo = async (bearerToken) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (environment === "cia-stg-1.aws.") {
+    if (environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = environment;

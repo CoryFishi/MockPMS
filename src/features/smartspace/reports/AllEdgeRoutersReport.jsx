@@ -27,7 +27,7 @@ export default function AllEdgeRoutersReport({
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
-      if (facility.environment === "cia-stg-1.aws.") {
+      if (facility.environment === "staging") {
         tokenStageKey = "cia-stg-1.aws.";
       } else {
         tokenEnvKey = facility.environment;

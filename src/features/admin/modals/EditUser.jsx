@@ -225,7 +225,7 @@ export default function EditUser({
                       ? "Development"
                       : token.environment === "-qa"
                       ? "QA"
-                      : token.environment === "cia-stg-1.aws."
+                      : token.environment === "staging"
                       ? "Staging"
                       : token.environment}{" "}
                     - {token.client}
@@ -275,7 +275,7 @@ export default function EditUser({
                         ? "Development"
                         : token.environment === "-qa"
                         ? "QA"
-                        : token.environment === "cia-stg-1.aws."
+                        : token.environment === "staging"
                         ? "Staging"
                         : token.environment}
                     </p>

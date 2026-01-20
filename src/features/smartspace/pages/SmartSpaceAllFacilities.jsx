@@ -65,7 +65,7 @@ export default function SmartSpaceAllFacilitiesPage() {
   const handleLogin = async (facility) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (facility.environment === "cia-stg-1.aws.") {
+    if (facility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
       tokenEnvKey = facility.environment;
@@ -111,9 +111,9 @@ export default function SmartSpaceAllFacilitiesPage() {
         const bearer = await handleLogin(facility);
 
         const tokenStageKey =
-          facility.environment === "cia-stg-1.aws." ? "cia-stg-1.aws." : "";
+          facility.environment === "staging" ? "cia-stg-1.aws." : "";
         const tokenEnvKey =
-          facility.environment === "cia-stg-1.aws." ? "" : facility.environment;
+          facility.environment === "staging" ? "" : facility.environment;
 
         const res = await axios.get(
           `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/statuslist`,
@@ -328,7 +328,7 @@ export default function SmartSpaceAllFacilitiesPage() {
     "-dev": "Development",
     "": "Production",
     "-qa": "QA",
-    "cia-stg-1.aws.": "Staging",
+    "staging": "Staging",
   };
 
   const columns = [
@@ -384,7 +384,7 @@ export default function SmartSpaceAllFacilitiesPage() {
           </p>
           <FaExternalLinkAlt
             title={`https://portal.${
-              f.environment === "cia-stg-1.aws."
+              f.environment === "staging"
                 ? f.environment
                 : "insomniaccia" + f.environment
             }.com/facility/${f.id}/dashboard`}
@@ -393,7 +393,7 @@ export default function SmartSpaceAllFacilitiesPage() {
               e.preventDefault();
               e.stopPropagation();
               const url =
-                f.environment === "cia-stg-1.aws."
+                f.environment === "staging"
                   ? `https://portal.${f.environment}insomniaccia.com/facility/${f.id}/dashboard`
                   : `https://portal.insomniaccia${f.environment}.com/facility/${f.id}/dashboard`;
               window.open(url, "_blank");
