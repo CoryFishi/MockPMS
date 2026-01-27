@@ -25,6 +25,11 @@ export default function SmartLockModal({
   smartLocks,
   facilityName,
   setIsSmartlockModalOpen,
+} : {
+  smartlockModalOption: string;
+  smartLocks: any[];
+  facilityName: string;
+  setIsSmartlockModalOpen: any;
 }) {
   const [filteredSmartLocks, setFilteredSmartLocks] = useState([]);
   const [option, setOption] = useState(smartlockModalOption);

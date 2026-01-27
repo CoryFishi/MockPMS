@@ -1,25 +1,21 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@app/supabaseClient";
 
 export default function ResetPassword() {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState(null);
-  const [error, setError] = useState(null);
-  const [hasSession, setHasSession] = useState(false);
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [hasSession, setHasSession] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const hash = window.location.hash;
-    console.log()
     if (hash) {
       const params = new URLSearchParams(hash.substring(1));
       const access_token = params.get("access_token");
       const refresh_token = params.get("refresh_token");
-      console.log("Access Token:", access_token);
-      console.log("Refresh Token:", refresh_token);
-      console.log("Full Hash:", hash);
       if (access_token && refresh_token) {
         setHasSession(true);
         supabase.auth.setSession({ access_token, refresh_token });

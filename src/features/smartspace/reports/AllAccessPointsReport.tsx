@@ -1,7 +1,7 @@
 import PaginationFooter from "@components/shared/PaginationFooter";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import DataTable from "@components/shared/DataTable";
 import DetailModal from "@components/shared/DetailModal";
@@ -11,18 +11,21 @@ import { RiErrorWarningFill } from "react-icons/ri";
 export default function AllAccessPointsReport({
   selectedFacilities,
   searchQuery,
+}: {
+  selectedFacilities: any[];
+  searchQuery: string;
 }) {
-  const [filteredAccessPoints, setFilteredAccessPoints] = useState([]);
-  const [accessPoints, setAccessPoints] = useState([]);
-  const [hoveredRow, setHoveredRow] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [sortDirection, setSortDirection] = useState("asc");
-  const [sortedColumn, setSortedColumn] = useState(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [selectedAccessPoint, setSelectedAccessPoint] = useState(null);
+  const [filteredAccessPoints, setFilteredAccessPoints] = useState<any[]>([]);
+  const [accessPoints, setAccessPoints] = useState<any[]>([]);
+  const [hoveredRow, setHoveredRow] = useState<null | number>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(25);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [sortedColumn, setSortedColumn] = useState<null | string>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
+  const [selectedAccessPoint, setSelectedAccessPoint] = useState<any>(null);
 
-  const fetchAccessPoints = async (facility) => {
+  const fetchAccessPoints = async (facility: any) => {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -54,7 +57,7 @@ export default function AllAccessPointsReport({
     }
   };
 
-  const fetchDataForSelectedFacilities = async () => {
+  const fetchDataForSelectedFacilities = useCallback(async () => {
     setAccessPoints([]); // Clear existing data
     const fetchPromises = selectedFacilities.map(async (facility) => {
       const facilityName = facility.name;
@@ -74,11 +77,11 @@ export default function AllAccessPointsReport({
     // Flatten the array and update state with all Access Points
     const flattenedData = allAccessPointData.flat();
     setAccessPoints(flattenedData);
-  };
+  }, [selectedFacilities]);
 
   useEffect(() => {
     fetchDataForSelectedFacilities();
-  }, [selectedFacilities]);
+  }, [selectedFacilities, fetchDataForSelectedFacilities]);
 
   useEffect(() => {
     setSortedColumn("Facility");
@@ -105,8 +108,8 @@ export default function AllAccessPointsReport({
     setCurrentPage(1);
   }, [accessPoints, searchQuery]);
 
-  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
-    let newDirection;
+  const handleColumnSort = (columnKey: string, accessor: any = (a:any) => a[columnKey]) => {
+    let newDirection: "asc" | "desc" | null = "asc";
 
     if (sortedColumn !== columnKey) {
       newDirection = "asc";
@@ -139,8 +142,8 @@ export default function AllAccessPointsReport({
     {
       key: "facilityName",
       label: "Facility Name",
-      accessor: (r) => r.facilityName,
-      render: (r) => (
+      accessor: (r: any) => r.facilityName,
+      render: (r: any) => (
         <div className="w-full flex items-center justify-center">
           <div className="truncate max-w-[32ch]">{r.facilityName}</div>
         </div>
@@ -149,8 +152,8 @@ export default function AllAccessPointsReport({
     {
       key: "name",
       label: "Name",
-      accessor: (r) => r.name,
-      render: (r) => (
+      accessor: (r: any) => r.name,
+      render: (r: any) => (
         <div className="w-full flex items-center justify-center">
           <div className="truncate max-w-[32ch]">{r.name}</div>
         </div>
@@ -159,8 +162,8 @@ export default function AllAccessPointsReport({
     {
       key: "connectionStatus",
       label: "Connection Status",
-      accessor: (r) => r.connectionStatus,
-      render: (r) => (
+      accessor: (r: any) => r.connectionStatus,
+      render: (r: any) => (
         <div className="inline-flex items-center gap-2">
           {r.connectionStatus === "ok" ? (
             <FaCheckCircle className="text-green-500" />
@@ -178,17 +181,17 @@ export default function AllAccessPointsReport({
     {
       key: "isDeviceOffline",
       label: "Status",
-      accessor: (r) => r.isDeviceOffline,
-      render: (r) => <div>{!r.isDeviceOffline ? "Online" : "Offline"}</div>,
+      accessor: (r: any) => r.isDeviceOffline,
+      render: (r: any) => <div>{!r.isDeviceOffline ? "Online" : "Offline"}</div>,
     },
     {
       key: "lastUpdateTimestamp",
       label: "Last Updated",
-      accessor: (r) => r.lastUpdateTimestamp,
+      accessor: (r: any) => r.lastUpdateTimestamp,
     },
   ];
 
-  const handleRowClick = (row) => {
+  const handleRowClick = (row: any) => {
     setSelectedAccessPoint(row);
     setIsDetailModalOpen(true);
   };

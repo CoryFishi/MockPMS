@@ -1,4 +1,11 @@
-export default function SliderButton({ onclick, value, offValue, onValue }) {
+import React from "react";
+
+export default function SliderButton({ onclick, value, offValue, onValue } : {
+  onclick: () => void;
+  value: boolean;
+  offValue?: React.ReactNode;
+  onValue?: React.ReactNode;
+}) {
   return (
     <button
       className={`min-w-9 h-5 flex items-center rounded-full p-1 cursor-pointer ${

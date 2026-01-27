@@ -1,7 +1,6 @@
 import layoutUnits from "@features/smartspace/utils/facility1.json";
 import { useMemo, useState } from "react";
 import CreateUnitModal from "@features/smartspace/modals/CreateUnitModal";
-import { v4 as uuid } from "uuid";
 import {
   TbLayoutSidebarLeftCollapseFilled,
   TbLayoutSidebarRightCollapseFilled,
@@ -13,18 +12,26 @@ export default function Sidebar({
   findNearbyLocks,
   limitNearest,
   setLimitNearest,
-  handleCanvasChange,
   proximityText,
   setProximityText,
-  params,
   setProximityPairs,
-  handleParamChange,
   getAllLocks,
   computeReachability,
+} : {
+  layout: any;
+  setLayout: any;
+  findNearbyLocks: () => void;
+  limitNearest: boolean;
+  setLimitNearest:  any;
+  proximityText: boolean;
+  setProximityText:  any;
+  setProximityPairs:  any;
+  getAllLocks: () => any;
+  computeReachability:  any;
 }) {
-  const [isCreateUnitModalOpen, setIsCreateUnitModalOpen] = useState(false);
-  const [isCreateWallModalOpen, setIsCreateWallModalOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCreateUnitModalOpen, setIsCreateUnitModalOpen] = useState<boolean>(false);
+  const [isCreateWallModalOpen, setIsCreateWallModalOpen] = useState<boolean>(false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const PX_PER_FT = 5;
 
   // Helper to add an access point (e.g., put at center or anywhere)
@@ -37,7 +44,7 @@ export default function Sidebar({
       accessPoints: [
         ...(prev.accessPoints || []),
         {
-          id: uuid(),
+          id: Date.now().toString(),
           label: `AP ${(prev.accessPoints?.length || 0) + 1}`,
           x,
           y,
@@ -160,7 +167,6 @@ export default function Sidebar({
       {isCreateWallModalOpen && (
         <CreateWallModal
           setIsCreateWallModalOpen={setIsCreateWallModalOpen}
-          walls={layout.walls}
           onSave={handleCreateWallSave}
         />
       )}
@@ -233,14 +239,17 @@ export default function Sidebar({
                   ? "bg-blue-600 hover:bg-blue-700"
                   : "bg-red-600 hover:bg-red-700"
               }`}
-              onClick={() =>
-                setLimitNearest(!limitNearest) & setProximityPairs([])
-              }
+              onClick={() =>{
+                setLimitNearest(!limitNearest);
+                setProximityPairs([]);
+              }}
               title="Limit distance lines to nearest 3 locks"
             >
               Limit Links {limitNearest ? "On" : "Off"}
             </button>
-            <button className="w-full py-2 bg-blue-600 text-white rounded cursor-pointer">
+            <button className="w-full py-2 bg-blue-600 text-white rounded cursor-pointer" onClick={() => {
+              setProximityPairs([]);
+            }}>
               Clear Distance Lines
             </button>
           </div>

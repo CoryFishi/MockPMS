@@ -19,7 +19,6 @@ export default function EditUser({
   setIsEditUserModalOpen,
   selectedUser,
   setUsers,
-  users,
 }) {
   const [newUserData, setNewUserData] = useState(selectedUser);
   const [viewKey, setViewKey] = useState(null);

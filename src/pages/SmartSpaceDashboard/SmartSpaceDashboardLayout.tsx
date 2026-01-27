@@ -10,7 +10,7 @@ import SmartSpaceMapping from "@features/smartspace/pages/SmartSpaceMapping";
 import { useAuth } from "@context/AuthProvider";
 import SmartSpaceTester from "../../features/smartspace/pages/SmartSpaceTester";
 
-export default function SmartSpaceDashboardLayout({ dashboardMenu }) {
+export default function SmartSpaceDashboardLayout({ dashboardMenu }: { dashboardMenu: boolean }) {
   const { handleLogout } = useAuth();
   // Drop down variables for the left navigation menu
   const [openSections, setOpenSections] = useState({

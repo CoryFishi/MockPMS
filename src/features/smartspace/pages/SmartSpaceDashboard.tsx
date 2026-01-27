@@ -1,6 +1,6 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaLock } from "react-icons/fa";
 import SmartSpaceFacilityCard from "@features/smartspace/components/SmartSpaceFacilityCard";
 import SmartSpaceExport from "@features/smartspace/components/SmartSpaceExport";
@@ -23,37 +23,37 @@ export default function SmartSpaceDashboardView() {
       smartMotion: true,
     }
   );
-  const [facilitiesInfo, setFacilitiesInfo] = useState([]);
-  const [edgeRouterOfflineCount, setEdgeRouterOfflineCount] = useState([]);
-  const [edgeRouterOnlineCount, setEdgeRouterOnlineCount] = useState([]);
-  const [edgeRouterWarningCount, setEdgeRouterWarningCount] = useState([]);
-  const [accessPointsOnlineCount, setAccessPointsOnlineCount] = useState([]);
-  const [accessPointsOfflineCount, setAccessPointsOfflineCount] = useState([]);
-  const [smartlockOkayCount, setSmartlockOkayCount] = useState([]);
-  const [smartlockWarningCount, setSmartlockWarningCount] = useState([]);
-  const [smartlockErrorCount, setSmartlockErrorCount] = useState([]);
-  const [smartlockOfflineCount, setSmartlockOfflineCount] = useState([]);
-  const [smartlockLowestSignal, setSmartlockLowestSignal] = useState([]);
-  const [smartlockLowestBattery, setSmartlockLowestBattery] = useState([]);
-  const [totalSmartlocks, setTotalSmartlocks] = useState(0);
-  const [totalAccessPoints, setTotalAccessPoints] = useState(0);
-  const [totalEdgeRouters, setTotalEdgeRouters] = useState(0);
-  const [totalSmartMotion, setTotalSmartMotion] = useState(0);
-  const [smartMotionOkayCount, setSmartMotionOkayCount] = useState([]);
-  const [smartMotionWarningCount, setSmartMotionWarningCount] = useState([]);
-  const [smartMotionErrorCount, setSmartMotionErrorCount] = useState([]);
-  const [smartMotionOfflineCount, setSmartMotionOfflineCount] = useState([]);
-  const [smartMotionLowestSignal, setSmartMotionLowestSignal] = useState([]);
-  const [smartMotionLowestBattery, setSmartMotionLowestBattery] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [facilitiesInfo, setFacilitiesInfo] = useState<any[]>([]);
+  const [edgeRouterOfflineCount, setEdgeRouterOfflineCount] = useState<number>(0);
+  const [edgeRouterOnlineCount, setEdgeRouterOnlineCount] = useState<number>(0);
+  const [edgeRouterWarningCount, setEdgeRouterWarningCount] = useState<number>(0);
+  const [accessPointsOnlineCount, setAccessPointsOnlineCount] = useState<number>(0);
+  const [accessPointsOfflineCount, setAccessPointsOfflineCount] = useState<number>(0);
+  const [smartlockOkayCount, setSmartlockOkayCount] = useState<number>(0);
+  const [smartlockWarningCount, setSmartlockWarningCount] = useState<number>(0);
+  const [smartlockErrorCount, setSmartlockErrorCount] = useState<number>(0);
+  const [smartlockOfflineCount, setSmartlockOfflineCount] = useState<number>(0);
+  const [smartlockLowestSignal, setSmartlockLowestSignal] = useState<any>({});
+  const [smartlockLowestBattery, setSmartlockLowestBattery] = useState<any>({});
+  const [totalSmartlocks, setTotalSmartlocks] = useState<number>(0);
+  const [totalAccessPoints, setTotalAccessPoints] = useState<number>(0);
+  const [totalEdgeRouters, setTotalEdgeRouters] = useState<number>(0);
+  const [totalSmartMotion, setTotalSmartMotion] = useState<number>(0);
+  const [smartMotionOkayCount, setSmartMotionOkayCount] = useState<number>(0);
+  const [smartMotionWarningCount, setSmartMotionWarningCount] = useState<number>(0);
+  const [smartMotionErrorCount, setSmartMotionErrorCount] = useState<number>(0);
+  const [smartMotionOfflineCount, setSmartMotionOfflineCount] = useState<number>(0);
+  const [smartMotionLowestSignal, setSmartMotionLowestSignal] = useState<any>({});
+  const [smartMotionLowestBattery, setSmartMotionLowestBattery] = useState<any>({});
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const { selectedTokens } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
-  const [explicitSort, setExplicitSort] = useState(
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [explicitSort, setExplicitSort] = useState<boolean>(
     JSON.parse(localStorage.getItem("smartSpaceExplicit")) || false
   );
-  const [currentLoadingText, setCurrentLoadingText] = useState("");
+  const [currentLoadingText, setCurrentLoadingText] = useState<string>("");
   // Search via search bar and button
-  const search = (query) => {
+  const search = useCallback((query: string) => {
     const trimmed = query.trim().toLowerCase();
     const results = facilitiesWithBearers.filter((facility) => {
       const searchableFields = [
@@ -71,9 +71,9 @@ export default function SmartSpaceDashboardView() {
       );
     });
     setFilteredFacilities(results);
-  };
+  }, [facilitiesWithBearers]);
   // Function to get a bearer token for each facility
-  const fetchBearerToken = async (facility) => {
+  const fetchBearerToken = async (facility: any) => {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -111,16 +111,16 @@ export default function SmartSpaceDashboardView() {
   // Toggle view - list or card
   const toggleListView = () => {
     setListView(!listView);
-    localStorage.setItem("smartSpaceListView", !listView);
+    localStorage.setItem("smartSpaceListView", !listView ? "true" : "false");
   };
   // Add totals together from each facility
   useEffect(() => {
-    const updateAggregatedCounts = (filteredFacilities) => {
+    const updateAggregatedCounts = (filteredFacilities: any[]) => {
       const facilitiesWithSmartLocks = filteredFacilities.filter(
-        (f) => Array.isArray(f.smartLocks) && f.smartLocks.length > 0
+        (f: any) => Array.isArray(f.smartLocks) && f.smartLocks.length > 0
       );
       const facilitiesWithSmartMotions = filteredFacilities.filter(
-        (f) => Array.isArray(f.smartMotion) && f.smartMotion.length > 0
+        (f: any) => Array.isArray(f.smartMotion) && f.smartMotion.length > 0
       );
 
       const totals = {
@@ -220,11 +220,11 @@ export default function SmartSpaceDashboardView() {
         const signal = parseInt(facility.lowestSignal);
         const battery = parseInt(facility.lowestBattery);
         if (signal < parseInt(totals.smartlockLowestSignal)) {
-          totals.smartlockLowestSignal = signal;
+          totals.smartlockLowestSignal = signal as any;
           totals.smartlockLowestSignalFacility = facility.name;
         }
         if (battery < parseInt(totals.smartlockLowestBattery)) {
-          totals.smartlockLowestBattery = battery;
+          totals.smartlockLowestBattery = battery as any;
           totals.smartlockLowestBatteryFacility = facility.name;
         }
       }
@@ -264,11 +264,11 @@ export default function SmartSpaceDashboardView() {
         const signal = parseInt(facility.smartMotionLowestSignal);
         const battery = parseInt(facility.smartMotionLowestBattery);
         if (signal < parseInt(totals.smartMotionLowestSignal)) {
-          totals.smartMotionLowestSignal = signal;
+          totals.smartMotionLowestSignal = signal as any;
           totals.smartMotionLowestSignalFacility = facility.name;
         }
         if (battery < parseInt(totals.smartMotionLowestBattery)) {
-          totals.smartMotionLowestBattery = battery;
+          totals.smartMotionLowestBattery = battery as any;
           totals.smartMotionLowestBatteryFacility = facility.name;
         }
       }
@@ -309,13 +309,13 @@ export default function SmartSpaceDashboardView() {
     };
 
     updateAggregatedCounts(filteredFacilities);
-  }, [filteredFacilities, toggledSections, explicitSort, searchQuery]);
+  }, [filteredFacilities, toggledSections, explicitSort, searchQuery, facilitiesInfo]);
 
   // Get bearer tokens prior to creating rows/cards
   useEffect(() => {
     const fetchFacilitiesWithBearers = async () => {
       try {
-        const fetchFacilityWithBearerAndStats = async (facility) => {
+        const fetchFacilityWithBearerAndStats = async (facility: any) => {
           const bearer = await fetchBearerToken(facility);
           if (!bearer) return null;
 
@@ -325,7 +325,7 @@ export default function SmartSpaceDashboardView() {
         };
 
         const results = await Promise.all(
-          selectedTokens.map(async (facility, index) => {
+          selectedTokens.map(async (facility: any) => {
             return await fetchFacilityWithBearerAndStats(facility);
           })
         );
@@ -352,7 +352,7 @@ export default function SmartSpaceDashboardView() {
     fetchFacilitiesWithBearers();
   }, [selectedTokens]);
 
-  const fetchFacilityData = async (facility) => {
+  const fetchFacilityData = async (facility: any) => {
     setCurrentLoadingText(`Loading ${facility.name}...`);
     const { id, environment, bearer } = facility;
     const tokenPrefix =
@@ -412,7 +412,7 @@ export default function SmartSpaceDashboardView() {
       return res.data;
     };
 
-    const fetchWeather = async (facilityDetail) => {
+    const fetchWeather = async (facilityDetail: any) => {
       const weatherKey = import.meta.env.VITE_WEATHER_KEY;
       const city = facilityDetail.city;
       const res = await axios.get(
@@ -454,28 +454,28 @@ export default function SmartSpaceDashboardView() {
     const lowestSignal = smartlocks
       ? Math.min(
           ...smartlocks
-            .filter((s) => !s.isDeviceOffline)
-            .map((s) => s.signalQuality || 255)
+            .filter((s: any) => !s.isDeviceOffline)
+            .map((s: any) => s.signalQuality || 255)
         )
       : 0;
     const lowestBattery = smartlocks
       ? Math.min(
           ...smartlocks
-            .filter((s) => !s.isDeviceOffline)
-            .map((s) => s.batteryLevel || 100)
+            .filter((s: any) => !s.isDeviceOffline)
+            .map((s: any) => s.batteryLevel || 100)
         )
       : 0;
     const offlineCount = smartlocks
-      ? smartlocks.filter((s) => s.isDeviceOffline).length
+      ? smartlocks.filter((s: any) => s.isDeviceOffline).length
       : 0;
     if (smartlocks.length > 0) {
       return {
         ...facility,
         edgeRouterStatus: edgeRouter?.connectionStatus || "error",
         onlineAccessPointsCount:
-          aps.filter((ap) => !ap.isDeviceOffline).length || 0,
+          aps.filter((ap: any) => !ap.isDeviceOffline).length || 0,
         offlineAccessPointsCount:
-          aps.filter((ap) => ap.isDeviceOffline).length || 0,
+          aps.filter((ap: any) => ap.isDeviceOffline).length || 0,
         okCount: summary?.okCount || 0,
         warningCount: summary?.warningCount || 0,
         errorCount: summary?.errorCount || 0,
@@ -507,9 +507,9 @@ export default function SmartSpaceDashboardView() {
         ...facility,
         edgeRouterStatus: edgeRouter?.connectionStatus || "error",
         onlineAccessPointsCount:
-          aps.filter((ap) => !ap.isDeviceOffline).length || 0,
+          aps.filter((ap: any) => !ap.isDeviceOffline).length || 0,
         offlineAccessPointsCount:
-          aps.filter((ap) => ap.isDeviceOffline).length || 0,
+          aps.filter((ap: any) => ap.isDeviceOffline).length || 0,
         okCount: -100,
         warningCount: -100,
         errorCount: -100,
@@ -543,7 +543,7 @@ export default function SmartSpaceDashboardView() {
     } else {
       setFilteredFacilities(facilitiesWithBearers);
     }
-  }, [searchQuery]);
+  }, [searchQuery, facilitiesWithBearers, search]);
 
   return (
     <div
@@ -587,10 +587,10 @@ export default function SmartSpaceDashboardView() {
           <div className="flex gap-1 items-center">
             <label htmlFor="toggleOpenNetView">Explicit</label>
             <SliderButton
-              onclick={() =>
-                setExplicitSort(!explicitSort) &
-                localStorage.setItem("smartSpaceExplicit", !explicitSort)
-              }
+              onclick={() => {
+                setExplicitSort(!explicitSort);
+                localStorage.setItem("smartSpaceExplicit", !explicitSort ? "true" : "false");
+              }}
               value={explicitSort}
             />
           </div>
@@ -599,11 +599,11 @@ export default function SmartSpaceDashboardView() {
           <div className="flex gap-1 items-center">
             <label htmlFor="toggleOpenNetView">OpenNet</label>
             <SliderButton
-              onclick={() =>
-                setToggledSections((prev) => ({
+              onclick={() => {
+                setToggledSections((prev: any) => ({
                   ...prev,
                   openNet: !prev.openNet,
-                })) &
+                }));
                 localStorage.setItem(
                   "smartSpaceToggledSections",
                   JSON.stringify({
@@ -611,18 +611,18 @@ export default function SmartSpaceDashboardView() {
                     openNet: !toggledSections.openNet,
                   })
                 )
-              }
+              }}
               value={toggledSections.openNet}
             />
           </div>
           <div className="flex gap-1 items-center">
             <label htmlFor="toggleSmartLockView">SmartLock</label>
             <SliderButton
-              onclick={() =>
-                setToggledSections((prev) => ({
+              onclick={() => {
+                setToggledSections((prev: any) => ({
                   ...prev,
                   smartLock: !prev.smartLock,
-                })) &
+                }));
                 localStorage.setItem(
                   "smartSpaceToggledSections",
                   JSON.stringify({
@@ -630,18 +630,18 @@ export default function SmartSpaceDashboardView() {
                     smartLock: !toggledSections.smartLock,
                   })
                 )
-              }
+              }}
               value={toggledSections.smartLock}
             />
           </div>
           <div className="flex gap-1 items-center">
             <label htmlFor="toggleSmartMotionView">SmartMotion</label>
             <SliderButton
-              onclick={() =>
-                setToggledSections((prev) => ({
+              onclick={() => {
+                setToggledSections((prev: any) => ({
                   ...prev,
                   smartMotion: !prev.smartMotion,
-                })) &
+                }));
                 localStorage.setItem(
                   "smartSpaceToggledSections",
                   JSON.stringify({
@@ -649,7 +649,7 @@ export default function SmartSpaceDashboardView() {
                     smartMotion: !toggledSections.smartMotion,
                   })
                 )
-              }
+              }}
               value={toggledSections.smartMotion}
             />
           </div>

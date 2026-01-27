@@ -1,6 +1,6 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { IoIosCreate } from "react-icons/io";
 import { useAuth } from "@context/AuthProvider";
 import ModalContainer from "@components/UI/ModalContainer";
@@ -34,7 +34,7 @@ export default function CreateVisitorVisitor({
     { id: "nonTenant", name: "Non-Tenant Guest" },
   ];
 
-  const handleUnits = async () => {
+  const handleUnits = useCallback(async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "staging") {
@@ -66,8 +66,8 @@ export default function CreateVisitorVisitor({
       .catch(function (error) {
         throw error;
       });
-  };
-  const handleTimeProfiles = async () => {
+  }, [currentFacility]);
+  const handleTimeProfiles = useCallback(async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "staging") {
@@ -93,8 +93,8 @@ export default function CreateVisitorVisitor({
       .catch(function (error) {
         console.error(error);
       });
-  };
-  const handleAccessProfiles = async () => {
+  }, [currentFacility]);
+  const handleAccessProfiles = useCallback(async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "staging") {
@@ -120,7 +120,7 @@ export default function CreateVisitorVisitor({
       .catch(function (error) {
         console.error(error);
       });
-  };
+  }, [currentFacility]);
   const handleCreateVisitor = () => {
     const requiredFields = {
       firstName: "First name",
@@ -286,7 +286,7 @@ export default function CreateVisitorVisitor({
     handleUnits();
     handleTimeProfiles();
     handleAccessProfiles();
-  }, []);
+  }, [handleTimeProfiles, handleAccessProfiles, handleUnits]);
 
   return (
     <ModalContainer

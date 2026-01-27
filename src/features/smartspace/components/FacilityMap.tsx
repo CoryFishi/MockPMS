@@ -11,7 +11,6 @@ import {
   Label,
   Tag,
 } from "react-konva";
-import { v4 as uuid } from "uuid";
 import EditAccessPointModal from "@features/smartspace/modals/EditAccessPointModal";
 import EditWallModal from "@features/smartspace/modals/EditWallModal";
 
@@ -38,37 +37,34 @@ export default function FacilityMap({
   clamp01,
   canLockTalkToAP,
   cosHalfAngle,
-  findNearbyLocks,
-  setProximityText,
-  setProximityPairs,
-  computeReachability,
-  setReachability,
-  setRootLockIndex,
-  canTalk,
   calculateWallThickness,
 }) {
-  const [selectedId, setSelectedId] = useState(null);
-  const [tooltip, setTooltip] = useState({
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [tooltip, setTooltip] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+    text: string;
+  }>({
     visible: false,
     x: 0,
     y: 0,
     text: "",
   });
-  const trRef = useRef(null);
-  const stageRef = useRef(null);
-  const [clipboard, setClipboard] = useState(null);
+  const trRef = useRef<any>(null);
+  const stageRef = useRef<any>(null);
+  const [clipboard, setClipboard] = useState<any>(null);
   const [isEditAccessPointModalOpen, setIsEditAccessPointModalOpen] =
-    useState(false);
-  const [editAccessPoint, setEditAccessPoint] = useState(null);
-  const [isEditWallModalOpen, setIsEditWallModalOpen] = useState(false);
-  const [editWall, setEditWall] = useState(null);
+    useState<boolean>(false);
+  const [editAccessPoint, setEditAccessPoint] = useState<any>(null);
+  const [isEditWallModalOpen, setIsEditWallModalOpen] = useState<boolean>(false);
+  const [editWall, setEditWall] = useState<any>(null);
 
   const gridSize = 25;
 
-  const snap = (v) => Math.round(v / gridSize) * gridSize;
-
+  const snap = (v: number) => Math.round(v / gridSize) * gridSize;
   useEffect(() => {
-    const onKeyDown = (e) => {
+    const onKeyDown = (e: KeyboardEvent) => {
       // Copy
       if (e.ctrlKey && e.key === "c" && selectedId) {
         const unit = layout.units.find((u) => u.id === selectedId);
@@ -83,19 +79,19 @@ export default function FacilityMap({
       if (e.ctrlKey && e.key === "v" && clipboard) {
         let newUnit = { ...clipboard };
         if (clipboard.shape) {
-          newUnit.id = uuid();
+          newUnit.id = Date.now().toString();
           newUnit.x += 20;
           newUnit.y += 20;
-          setLayout((prev) => ({
+          setLayout((prev: any) => ({
             ...prev,
             units: [...prev.units, newUnit],
           }));
         } else {
-          newUnit.id = uuid();
+          newUnit.id = Date.now().toString();
           newUnit.x1 += 20;
           newUnit.x2 += 20;
           newUnit.y2 += 20;
-          setLayout((prev) => ({
+          setLayout((prev: any) => ({
             ...prev,
             walls: [...prev.walls, newUnit],
           }));
@@ -103,7 +99,7 @@ export default function FacilityMap({
         setSelectedId(newUnit.id);
       }
       if (e.key === "Delete" && selectedId) {
-        setLayout((prev) => ({
+        setLayout((prev: any) => ({
           ...prev,
           units: prev.units.filter((u) => u.id !== selectedId),
           walls: prev.walls.filter((w) => w.id !== selectedId),
@@ -114,15 +110,15 @@ export default function FacilityMap({
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [clipboard, selectedId, layout.units]);
+  }, [clipboard, selectedId, layout.units, layout.walls, setLayout]);
   // re‑attach transformer whenever selection or layout changes
   useEffect(() => {
-    if (trRef.current && selectedId) {
-      const stage = trRef.current.getStage();
+    if (trRef.current && selectedId && stageRef.current) {
+      const stage = stageRef.current;
       const node = stage.findOne(`#${selectedId}`);
       if (node) {
-        trRef.current.nodes([node]);
-        trRef.current.getLayer().batchDraw();
+        (trRef.current as any).nodes([node]);
+        (trRef.current as any).getLayer().batchDraw();
       }
     }
   }, [selectedId, layout]);
@@ -826,7 +822,7 @@ export default function FacilityMap({
                   e.cancelBubble = true;
                   setIsEditAccessPointModalOpen(true);
                 }}
-                onClick={(e) => {
+                onClick={() => {
                   setEditAccessPoint(ap);
                   setLayout((prev) => ({
                     ...prev,
@@ -912,7 +908,7 @@ export default function FacilityMap({
                     return a.dist - b.dist;
                   })
                   .slice(0, 14)
-                  .map(({ lock, dist, quality, color, wallCrosses }, idx) => (
+                  .map(({ lock, dist, quality, color }, idx) => (
                     <React.Fragment key={`ap-link-${ap.id}-${idx}`}>
                       <Line
                         points={[ap.x, ap.y, lock.x, lock.y]}

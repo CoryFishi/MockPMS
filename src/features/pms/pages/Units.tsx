@@ -11,42 +11,42 @@ import { useAuth } from "@context/AuthProvider";
 import { addEvent } from "@hooks/supabase";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { RiDoorLockFill } from "react-icons/ri";
 import DeleteModal from "@features/pms/modals/DeleteModal";
 import CreateVisitorUnitPage from "@features/pms/modals/CreateVisitorUnitPage";
 import DelinquencyModal from "@features/pms/modals/DelinquencyModal";
 
-export default function Units({ currentFacilityName }) {
-  const [units, setUnits] = useState([]);
-  const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
+export default function Units({ currentFacilityName } : { currentFacilityName: string }) {
+  const [units, setUnits] = useState<any[]>([]);
+  const [isUnitModalOpen, setIsUnitModalOpen] = useState<boolean>(false);
   const [isCreateVisitorModalOpen, setIsCreateVisitorModalOpen] =
-    useState(false);
-  const [visitorAutofill, setVisitorAutofill] = useState(
+    useState<boolean>(false);
+  const [visitorAutofill, setVisitorAutofill] = useState<boolean>(
     localStorage.getItem("visitorAutofill") === "true" || false
   );
-  const [selectedUnit, setSelectedUnit] = useState("");
-  const [timeProfiles, setTimeProfiles] = useState({});
-  const [accessProfiles, setAccessProfiles] = useState({});
-  const [isEditVisitorModalOpen, setIsEditVisitorModalOpen] = useState(false);
-  const [filteredUnits, setFilteredUnits] = useState(units);
-  const [sortDirection, setSortDirection] = useState("asc");
-  const [sortedColumn, setSortedColumn] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [unitsPulled, setUnitsPulled] = useState(false);
-  const [visitors, setVisitors] = useState([]);
+  const [selectedUnit, setSelectedUnit] = useState<string>("");
+  const [timeProfiles, setTimeProfiles] = useState<Record<string, any>>({});
+  const [accessProfiles, setAccessProfiles] = useState<Record<string, any>>({});
+  const [isEditVisitorModalOpen, setIsEditVisitorModalOpen] = useState<boolean>(false);
+  const [filteredUnits, setFilteredUnits] = useState<any[]>(units);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [sortedColumn, setSortedColumn] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(25);
+  const [unitsPulled, setUnitsPulled] = useState<boolean>(false);
+  const [visitors, setVisitors] = useState<any[]>([]);
   const { currentFacility, user, permissions } = useAuth();
-  const [smartLocks, setSmartLocks] = useState([]);
-  const [hoveredRow, setHoveredRow] = useState(null);
-  const [hoveredLock, setHoveredLock] = useState(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isDelinquencyModalOpen, setIsDelinquencyModalOpen] = useState(false);
-  const [continousDelinquency, setContinousDelinquency] = useState(false);
-  const [continousDelete, setContinousDelete] = useState(false);
-  const [isMoveOutModalOpen, setIsMoveOutModalOpen] = useState(false);
-  const [currentLoadingText] = useState("Loading Units...");
+  const [smartLocks, setSmartLocks] = useState<any[]>([]);
+  const [hoveredRow, setHoveredRow] = useState<number | null>(null);
+  const [hoveredLock, setHoveredLock] = useState<number | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const [isDelinquencyModalOpen, setIsDelinquencyModalOpen] = useState<boolean>(false);
+  const [continousDelinquency, setContinousDelinquency] = useState<boolean>(false);
+  const [continousDelete, setContinousDelete] = useState<boolean>(false);
+  const [isMoveOutModalOpen, setIsMoveOutModalOpen] = useState<boolean>(false);
+  const [currentLoadingText] = useState<string>("Loading Units...");
   const rentedCount = filteredUnits.filter(
     (unit) => unit.status === "Rented"
   ).length;
@@ -57,7 +57,7 @@ export default function Units({ currentFacilityName }) {
     (unit) => unit.status === "Vacant"
   ).length;
 
-  const handleTimeProfiles = async () => {
+  const handleTimeProfiles = useCallback(async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "staging") {
@@ -82,8 +82,8 @@ export default function Units({ currentFacilityName }) {
       .catch(function (error) {
         console.error(error);
       });
-  };
-  const handleAccessProfiles = async () => {
+  }, [currentFacility]);
+  const handleAccessProfiles = useCallback(async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "staging") {
@@ -109,8 +109,8 @@ export default function Units({ currentFacilityName }) {
       .catch(function (error) {
         console.error(error);
       });
-  };
-  const handleUnits = async () => {
+  }, [currentFacility]);
+  const handleUnits = useCallback(async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "staging") {
@@ -143,8 +143,8 @@ export default function Units({ currentFacilityName }) {
       .catch(function (error) {
         throw error;
       });
-  };
-  const handleSmartLocks = async () => {
+  }, [currentFacility]);
+  const handleSmartLocks = useCallback(async () => {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -179,7 +179,7 @@ export default function Units({ currentFacilityName }) {
       console.error(`${currentFacility.name} does not have SmartLocks`);
       return null;
     }
-  };
+  }, [currentFacility]);
   const moveIn = async (unit) => {
     const handleRent = async () => {
       var tokenStageKey = "";
@@ -528,7 +528,7 @@ export default function Units({ currentFacilityName }) {
     };
 
     fetchData();
-  }, [currentFacility, unitsPulled]);
+  }, [currentFacility, unitsPulled, handleAccessProfiles, handleTimeProfiles, handleUnits, handleSmartLocks]);
 
   useEffect(() => {
     const filteredUnits = units.filter(

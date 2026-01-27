@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import { v4 as uuid } from "uuid";
 import {
   Stage,
   Layer,
@@ -19,7 +18,7 @@ export default function CreateUnitModal({
 }) {
   const [newUnit, setNewUnit] = useState({
     label: `Unit ${units.length}`,
-    id: uuid(),
+    id: Date.now().toString(),
     type: "Square",
     shape: "square",
     orientation: "nw",

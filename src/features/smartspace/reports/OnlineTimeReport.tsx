@@ -1,25 +1,25 @@
 import PaginationFooter from "@components/shared/PaginationFooter";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import { RiErrorWarningFill } from "react-icons/ri";
 import DataTable from "@components/shared/DataTable";
 import DetailModal from "@components/shared/DetailModal";
 
-export default function OnlineTimeReport({ selectedFacilities, searchQuery }) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [sortDirection, setSortDirection] = useState("asc");
-  const [sortedColumn, setSortedColumn] = useState(null);
-  const [durations, setDurations] = useState({});
-  const [filteredDurations, setFilteredDurations] = useState([]);
-  const [dayValue, setDayValue] = useState(7);
-  const currentTime = Math.floor(Date.now() / 1000);
-  const pastDayValue = currentTime - dayValue * 24 * 60 * 60;
-  const [hoveredRow, setHoveredRow] = useState(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [selectedDevice, setSelectedDevice] = useState(null);
+export default function OnlineTimeReport({ selectedFacilities, searchQuery } : { selectedFacilities: any[]; searchQuery: string }) {
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(25);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [sortedColumn, setSortedColumn] = useState<string | null>(null);
+  const [durations, setDurations] = useState<any>({});
+  const [filteredDurations, setFilteredDurations] = useState<any[]>([]);
+  const [dayValue, setDayValue] = useState<number>(7);
+  const currentTime = useMemo(() => Math.floor(Date.now() / 1000), []);
+  const pastDayValue = useMemo(() => currentTime - dayValue * 24 * 60 * 60, [currentTime, dayValue]);
+  const [hoveredRow, setHoveredRow] = useState<any>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
+  const [selectedDevice, setSelectedDevice] = useState<any>(null);
 
   const exportDurations = () => {
     // Convert the data to CSV format
@@ -73,7 +73,7 @@ export default function OnlineTimeReport({ selectedFacilities, searchQuery }) {
     link.click();
     document.body.removeChild(link);
   };
-  const fetchEvents = async (facility) => {
+  const fetchEvents = useCallback(async (facility: any) => {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -112,7 +112,7 @@ export default function OnlineTimeReport({ selectedFacilities, searchQuery }) {
       toast.error(`${facility.name} does not have Events`);
       return null;
     }
-  };
+  }, [currentTime, pastDayValue]);
   function calculateOfflineDurations(events: any[]) {
     // Sort events by time
     events.sort((a, b) => {
@@ -124,7 +124,7 @@ export default function OnlineTimeReport({ selectedFacilities, searchQuery }) {
       }
       return timeDiff;
     });
-    const durationsArray = {};
+    const durationsArray: { [key: string]: any } = {};
 
     // Iterate through events
     events.forEach((event: any) => {
@@ -192,7 +192,7 @@ export default function OnlineTimeReport({ selectedFacilities, searchQuery }) {
 
     setDurations(Object.values(durationsArray));
   }
-  const fetchDataForSelectedFacilities = async () => {
+  const fetchDataForSelectedFacilities = useCallback(async () => {
     const fetchPromises = selectedFacilities.map(async (facility) => {
       const eventData = await fetchEvents(facility);
       return eventData;
@@ -202,11 +202,11 @@ export default function OnlineTimeReport({ selectedFacilities, searchQuery }) {
 
     const flattenedData = allEventData.flat();
     calculateOfflineDurations(flattenedData);
-  };
+  }, [selectedFacilities, fetchEvents]);
 
   useEffect(() => {
     fetchDataForSelectedFacilities();
-  }, [selectedFacilities, dayValue]);
+  }, [selectedFacilities, dayValue, fetchDataForSelectedFacilities]);
   useEffect(() => {
     setSortedColumn("Facility");
 
@@ -238,7 +238,7 @@ export default function OnlineTimeReport({ selectedFacilities, searchQuery }) {
   }, [durations, searchQuery]);
 
   const handleColumnSort = (columnKey: string, accessor = (a: any) => a[columnKey]) => {
-    let newDirection: string | null = null;
+    let newDirection: "asc" | "desc" | null = "asc";
 
     if (sortedColumn !== columnKey) {
       newDirection = "asc";

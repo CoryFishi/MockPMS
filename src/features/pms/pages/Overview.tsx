@@ -2,13 +2,13 @@ import { RiDoorLockFill } from "react-icons/ri";
 import { useAuth } from "@context/AuthProvider";
 import axios from "axios";
 import { CiCircleInfo } from "react-icons/ci";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import { MdArrowDropDown } from "react-icons/md";
 import { BiInfoCircle } from "react-icons/bi";
 import { IoInformationCircle } from "react-icons/io5";
 
-export default function Overview({ currentFacilityName }) {
+export default function Overview({ currentFacilityName } : { currentFacilityName: string }) {
   const { currentFacility } = useAuth();
   const [actiongroups, setActiongroups] = useState([]);
   const [emergency, setEmergency] = useState(false);
@@ -26,19 +26,19 @@ export default function Overview({ currentFacilityName }) {
   const offlineCount =
     smartlocks.filter((s) => s.isDeviceOffline == true).length || 0;
 
-  const getActiongroups = async () => {
+  const getActiongroups = useCallback(async (facility: any) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "staging") {
+    if (facility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
-      tokenEnvKey = currentFacility.environment;
+      tokenEnvKey = facility.environment;
     }
     const config = {
       method: "get",
-      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/actiongroups/manual`,
+      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${facility.id}/actiongroups/manual`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.token?.access_token,
+        Authorization: "Bearer " + facility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
         "Content-Type": "application/json",
@@ -52,21 +52,21 @@ export default function Overview({ currentFacilityName }) {
       .catch(function (error) {
         throw error;
       });
-  };
+  }, []);
 
-  const getCIA = async () => {
+  const getCIA = useCallback(async (facility: any) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "staging") {
+    if (facility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
-      tokenEnvKey = currentFacility.environment;
+      tokenEnvKey = facility.environment;
     }
     const emergencyConfig = {
       method: "get",
-      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/emergency`,
+      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${facility.id}/emergency`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.token?.access_token,
+        Authorization: "Bearer " + facility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
         "Content-Type": "application/json",
@@ -82,9 +82,9 @@ export default function Overview({ currentFacilityName }) {
       });
     const lockdownConfig = {
       method: "get",
-      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/lockdown`,
+      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${facility.id}/lockdown`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.token?.access_token,
+        Authorization: "Bearer " + facility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
         "Content-Type": "application/json",
@@ -100,9 +100,9 @@ export default function Overview({ currentFacilityName }) {
       });
     const devicesConfig = {
       method: "get",
-      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/devices`,
+      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${facility.id}/devices`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.token?.access_token,
+        Authorization: "Bearer " + facility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
         "Content-Type": "application/json",
@@ -116,21 +116,21 @@ export default function Overview({ currentFacilityName }) {
       .catch(function (error) {
         throw error;
       });
-  };
+  }, []);
 
-  const getStatus = async () => {
+  const getStatus = useCallback(async (facility: any) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "staging") {
+    if (facility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
-      tokenEnvKey = currentFacility.environment;
+      tokenEnvKey = facility.environment;
     }
     const config = {
       method: "get",
-      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/status`,
+      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${facility.id}/status`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.token?.access_token,
+        Authorization: "Bearer " + facility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
         "Content-Type": "application/json",
@@ -144,21 +144,21 @@ export default function Overview({ currentFacilityName }) {
       .catch(function (error) {
         throw error;
       });
-  };
+  }, []);
 
-  const getOpenNet = async () => {
+  const getOpenNet = useCallback(async (facility: any) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "staging") {
+    if (facility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
-      tokenEnvKey = currentFacility.environment;
+      tokenEnvKey = facility.environment;
     }
     const accesspointsConfig = {
       method: "get",
-      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/edgerouterplatformdevicesstatus`,
+      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${facility.id}/edgerouterplatformdevicesstatus`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.token?.access_token,
+        Authorization: "Bearer " + facility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
         "Content-Type": "application/json",
@@ -174,9 +174,9 @@ export default function Overview({ currentFacilityName }) {
       });
     const smartlocksConfig = {
       method: "get",
-      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/smartlockstatus`,
+      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${facility.id}/smartlockstatus`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.token?.access_token,
+        Authorization: "Bearer " + facility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
         "Content-Type": "application/json",
@@ -190,21 +190,21 @@ export default function Overview({ currentFacilityName }) {
       .catch(function (error) {
         throw error;
       });
-  };
+  }, []);
 
-  const handleOpen = async (a) => {
+  const handleOpen = async (a: any, facility: any) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "staging") {
+    if (facility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
-      tokenEnvKey = currentFacility.environment;
+      tokenEnvKey = facility.environment;
     }
     const config = {
       method: "post",
-      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/actiongroups/${a.id}/open`,
+      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${facility.id}/actiongroups/${a.id}/open`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.token?.access_token,
+        Authorization: "Bearer " + facility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
         "Content-Type": "application/json",
@@ -219,19 +219,19 @@ export default function Overview({ currentFacilityName }) {
       });
   };
 
-  const handleHold = async (a) => {
+  const handleHold = async (a: any, facility: any) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "staging") {
+    if (facility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
-      tokenEnvKey = currentFacility.environment;
+      tokenEnvKey = facility.environment;
     }
     const config = {
       method: "post",
-      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/actiongroups/${a.id}/hold`,
+      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${facility.id}/actiongroups/${a.id}/hold`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.token?.access_token,
+        Authorization: "Bearer " + facility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
         "Content-Type": "application/json",
@@ -246,19 +246,19 @@ export default function Overview({ currentFacilityName }) {
       });
   };
 
-  const handleClose = async (a) => {
+  const handleClose = async (a: any, facility: any) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
-    if (currentFacility.environment === "staging") {
+    if (facility.environment === "staging") {
       tokenStageKey = "cia-stg-1.aws.";
     } else {
-      tokenEnvKey = currentFacility.environment;
+      tokenEnvKey = facility.environment;
     }
     const config = {
       method: "post",
-      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${currentFacility.id}/actiongroups/${a.id}/close`,
+      url: `https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${facility.id}/actiongroups/${a.id}/close`,
       headers: {
-        Authorization: "Bearer " + currentFacility?.token?.access_token,
+        Authorization: "Bearer " + facility?.token?.access_token,
         accept: "application/json",
         "api-version": "2.0",
         "Content-Type": "application/json",
@@ -274,12 +274,11 @@ export default function Overview({ currentFacilityName }) {
   };
 
   useEffect(() => {
-    getActiongroups();
-    getCIA();
-    getStatus();
-    getOpenNet();
-  }, []);
-
+    getActiongroups(currentFacility);
+    getCIA(currentFacility);
+    getStatus(currentFacility);
+    getOpenNet(currentFacility);
+  }, [getActiongroups, getCIA, getStatus, getOpenNet, currentFacility]);
   return (
     <div
       className={`relative overflow-auto h-full dark:text-white dark:bg-zinc-900`}
@@ -374,19 +373,19 @@ export default function Overview({ currentFacilityName }) {
                       <div className="flex items-center w-full">
                         <button
                           className="text-green-700 font-bold text-xs w-1/3 cursor-pointer p-3 hover:bg-zinc-300 rounded-bl-lg"
-                          onClick={() => handleOpen(a)}
+                          onClick={() => handleOpen(a, currentFacility)}
                         >
                           OPEN
                         </button>
                         <button
                           className="text-blue-700 font-bold text-xs w-1/3 cursor-pointer p-3 hover:bg-zinc-300"
-                          onClick={() => handleHold(a)}
+                          onClick={() => handleHold(a, currentFacility)}
                         >
                           HOLD
                         </button>
                         <button
                           className="text-red-700 font-bold text-xs cursor-pointer w-1/3 p-3 hover:bg-zinc-300 rounded-br-lg"
-                          onClick={() => handleClose(a)}
+                          onClick={() => handleClose(a, currentFacility)}
                         >
                           CLOSE
                         </button>

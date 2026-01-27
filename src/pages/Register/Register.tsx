@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 
-export default function Register({ darkMode, toggleDarkMode }) {
+export default function Register({ darkMode, toggleDarkMode }: { darkMode: boolean; toggleDarkMode: () => void }) {
   const [dashboardMenu, setDashboardMenu] = useState(true);
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();

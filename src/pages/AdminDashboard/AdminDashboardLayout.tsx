@@ -7,7 +7,7 @@ import { BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import { useAuth } from "@context/AuthProvider";
 
-export default function AdminDashboardLayout({ dashboardMenu }) {
+export default function AdminDashboardLayout({ dashboardMenu } : { dashboardMenu: boolean }) {
   const { handleLogout } = useAuth();
   const [openSections, setOpenSections] = useState({
     facilities: false,

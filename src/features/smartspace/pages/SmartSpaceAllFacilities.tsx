@@ -3,7 +3,7 @@ import LoadingSpinner from "@components/shared/LoadingSpinner";
 import PaginationFooter from "@components/shared/PaginationFooter";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import qs from "qs";
 import { useAuth } from "@context/AuthProvider";
 import { supabase } from "@app/supabaseClient";
@@ -17,6 +17,7 @@ import {
   RiCheckboxBlankCircleLine,
 } from "react-icons/ri";
 import InputBox from "@components/UI/InputBox";
+import { getEnvironmentName } from "@hooks/opentech";
 
 export default function SmartSpaceAllFacilitiesPage() {
   const [facilities, setFacilities] = useState([]);
@@ -98,18 +99,18 @@ export default function SmartSpaceAllFacilitiesPage() {
         throw error;
       });
   };
-  const handleFacilities = async (saved) => {
+  const handleFacilities = useCallback(async (saved: any[]) => {
     setFacilities([]);
     setFilteredFacilities([]);
     setIsLoading(true);
     setCurrentLoadingText("Loading facilities...");
 
-    const handleAccount = async (facility) => {
+    const handleAccount = async (facility: any) => {
       try {
-        setCurrentLoadingText(`Loading ${facility.client}...`);
-
-        const bearer = await handleLogin(facility);
-
+         const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Login timeout after 8 seconds")), 8000)
+        );
+        const bearer = await Promise.race([handleLogin(facility), timeoutPromise]);
         const tokenStageKey =
           facility.environment === "staging" ? "cia-stg-1.aws." : "";
         const tokenEnvKey =
@@ -126,7 +127,7 @@ export default function SmartSpaceAllFacilitiesPage() {
           }
         );
 
-        const enriched = res.data.map((item) => ({
+        const enriched = res.data.map((item: any) => ({
           ...item,
           environment: facility.environment,
           api: facility.api,
@@ -138,6 +139,7 @@ export default function SmartSpaceAllFacilitiesPage() {
         return enriched;
       } catch (err) {
         console.error(`Error loading ${facility.client}:`, err);
+        toast.error(`Failed to load facilities for account ${facility.name || facility.client} in ${getEnvironmentName(facility)}.`);
         return [];
       }
     };
@@ -166,14 +168,14 @@ export default function SmartSpaceAllFacilitiesPage() {
         setFilteredFacilities(sorted);
       }
     } catch (err) {
-      toast.error("Facilities Failed to Load!:", err.message);
+      toast.error(`Facilities Failed to Load!: ${err.message}`);
     } finally {
       setCurrentLoadingText("");
       setIsLoading(false);
     }
-  };
+  }, [setFacilities]);
 
-  const handleSelectedFacilitiesUpdate = async (newFacility, isSelected) => {
+  const handleSelectedFacilitiesUpdate = async (newFacility: any, isSelected: boolean) => {
     const { data: currentData, error: fetchError } = await supabase
       .from("user_data")
       .select("selected_tokens")
@@ -228,13 +230,13 @@ export default function SmartSpaceAllFacilitiesPage() {
       setSelectedTokens(updatedTokens);
     }
   };
-  const addToSelected = async (facility) => {
+  const addToSelected = async (facility: any) => {
     const isSelected = isFacilitySelected(facility.facilityId);
     handleSelectedFacilitiesUpdate(facility, isSelected);
   };
 
-  const FacilityStatusIcons = ({ facility }) => {
-    const getStatusIcon = (status, Icon, message) => {
+  const FacilityStatusIcons = ({ facility }: { facility: any }) => {
+    const getStatusIcon = (status: string, Icon: any, message: string) => {
       if (!status) return null;
       const color =
         status === "ok"
@@ -277,7 +279,7 @@ export default function SmartSpaceAllFacilitiesPage() {
       </>
     );
   };
-  const isFacilitySelected = (facilityId) => {
+  const isFacilitySelected = (facilityId: string) => {
     return (selectedTokens || []).some(
       (facility) => facility.id === facilityId
     );
@@ -286,7 +288,7 @@ export default function SmartSpaceAllFacilitiesPage() {
   useEffect(() => {
     if (!tokens) return;
     handleFacilities(tokens);
-  }, [tokens]);
+  }, [tokens, handleFacilities]);
 
   useEffect(() => {
     setCurrentPage(1);

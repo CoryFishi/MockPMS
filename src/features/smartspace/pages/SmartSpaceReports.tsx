@@ -7,7 +7,7 @@ import LoadingSpinner from "@components/shared/LoadingSpinner";
 import { useAuth } from "@context/AuthProvider";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaLock } from "react-icons/fa";
 import OfflineEventsComparison from "@features/smartspace/reports/OfflineEventsComparison";
 import InputBox from "@components/UI/InputBox";

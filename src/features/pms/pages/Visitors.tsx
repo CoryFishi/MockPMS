@@ -7,7 +7,7 @@ import { useAuth } from "@context/AuthProvider";
 import { FaPerson } from "react-icons/fa6";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import DeleteModal from "@features/pms/modals/DeleteModal";
 import InputBox from "@components/UI/InputBox";
 import GeneralButton from "@components/UI/GeneralButton";
@@ -15,24 +15,24 @@ import TableButton from "@components/UI/TableButton";
 import { addEvent } from "@hooks/supabase";
 
 export default function Visitors({ currentFacilityName }) {
-  const [visitors, setVisitors] = useState([]);
+  const [visitors, setVisitors] = useState<any[]>([]);
   const [isCreateVisitorModalOpen, setIsCreateVisitorModalOpen] =
-    useState(false);
-  const [selectedVisitor, setSelectedVisitor] = useState("");
-  const [isEditVisitorModalOpen, setIsEditVisitorModalOpen] = useState(false);
-  const [filteredVisitors, setFilteredVisitors] = useState(visitors);
-  const [sortDirection, setSortDirection] = useState("asc");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortedColumn, setSortedColumn] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [visitorsPulled, setVisitorsPulled] = useState(false);
+    useState<boolean>(false);
+  const [selectedVisitor, setSelectedVisitor] = useState<any>(null);
+  const [isEditVisitorModalOpen, setIsEditVisitorModalOpen] = useState<boolean>(false);
+  const [filteredVisitors, setFilteredVisitors] = useState<any[]>(visitors);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc" | null>("asc");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [sortedColumn, setSortedColumn] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(25);
+  const [visitorsPulled, setVisitorsPulled] = useState<boolean>(false);
   const { currentFacility, permissions } = useAuth();
-  const [smartLocks, setSmartLocks] = useState([]);
-  const [hoveredRow, setHoveredRow] = useState(null);
-  const [currentLoadingText] = useState("Loading Visitors...");
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [continousDelete, setContinousDelete] = useState(false);
+  const [smartLocks, setSmartLocks] = useState<any[]>([]);
+  const [hoveredRow, setHoveredRow] = useState<number | null>(null);
+  const [currentLoadingText] = useState<string>("Loading Visitors...");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const [continousDelete, setContinousDelete] = useState<boolean>(false);
   const { user } = useAuth();
   const tenantCount = filteredVisitors.filter(
     (visitor) => visitor.isTenant === true
@@ -44,8 +44,8 @@ export default function Visitors({ currentFacilityName }) {
     (visitor) => visitor.isTenant === false && visitor.isPortalVisitor === false
   ).length;
 
-  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
-    let newDirection;
+  const handleColumnSort = (columnKey: string, accessor = (a: any) => a[columnKey]) => {
+    let newDirection: "asc" | "desc" | null = "asc";
 
     if (sortedColumn !== columnKey) {
       newDirection = "asc";
@@ -74,7 +74,7 @@ export default function Visitors({ currentFacilityName }) {
 
     setFilteredVisitors(sorted);
   };
-  const handleVisitors = async () => {
+  const handleVisitors = useCallback(async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "staging") {
@@ -107,8 +107,8 @@ export default function Visitors({ currentFacilityName }) {
       .catch(function (error) {
         throw error;
       });
-  };
-  const handleSmartLocks = async () => {
+  }, [currentFacility]);
+  const handleSmartLocks = useCallback(async () => {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -143,8 +143,8 @@ export default function Visitors({ currentFacilityName }) {
       console.error(`${currentFacility.name} does not have SmartLocks`);
       return null;
     }
-  };
-  const moveOutVisitor = async (visitor) => {
+  }, [currentFacility]);
+  const moveOutVisitor = async (visitor: any) => {
     const handleDelete = async () => {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -194,7 +194,7 @@ export default function Visitors({ currentFacilityName }) {
       true
     );
   };
-  const deleteVisitor = async (visitor) => {
+  const deleteVisitor = async (visitor: any) => {
     const handleDelete = async () => {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -265,7 +265,7 @@ export default function Visitors({ currentFacilityName }) {
     };
 
     fetchVisitors();
-  }, [currentFacility, visitorsPulled]);
+  }, [currentFacility, visitorsPulled, handleSmartLocks, handleVisitors]);
 
   useEffect(() => {
     // Filter facilities based on the search query

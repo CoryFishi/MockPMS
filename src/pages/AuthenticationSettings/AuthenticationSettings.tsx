@@ -9,29 +9,29 @@ import { supabase } from "@app/supabaseClient";
 import { FaCircleCheck, FaSpinner } from "react-icons/fa6";
 import { MdOutlineError, MdToken } from "react-icons/md";
 import { useAuth } from "@context/AuthProvider";
-import { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { addEvent } from "@hooks/supabase";
 import { handleSingleLogin } from "@hooks/opentech";
 import GeneralButton from "@components/UI/GeneralButton";
 
-export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
-  const [settingsSavedFacilities, setSettingsSavedFacilities] = useState([]);
-  const [sortDirection, setSortDirection] = useState("asc");
-  const [sortedColumn, setSortedColumn] = useState(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
-  const [selectedToken, setSelectedToken] = useState(null);
-  const fileInputRef = useRef(null);
+export default function AuthenticationSettings({ darkMode, toggleDarkMode } : { darkMode: boolean; toggleDarkMode: () => void }) {
+  const [settingsSavedFacilities, setSettingsSavedFacilities] = useState<any[]>([]);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [sortedColumn, setSortedColumn] = useState<string | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState<boolean>(false);
+  const [selectedToken, setSelectedToken] = useState<any>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { user, tokens, setTokens, permissions } = useAuth();
 
-  const handleRename = (token) => {
+  const handleRename = (token: any) => {
     setSelectedToken(token);
     setIsRenameModalOpen(true);
   };
 
-  const handleRenameSubmit = async (updatedToken) => {
+  const handleRenameSubmit = async (updatedToken: any) => {
     const currentTokens = await fetchTokens();
     const updatedTokens = currentTokens.map((t) =>
       t.api === updatedToken.api ? { ...t, name: updatedToken.name } : t
@@ -59,26 +59,9 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
-  const handleFetchTokens = async () => {
-    try {
-      const fetchedTokens = await fetchTokens();
 
-      if (!Array.isArray(fetchedTokens)) {
-        return;
-      }
-
-      setSettingsSavedFacilities(fetchedTokens);
-      setTokens(fetchedTokens);
-
-      fetchedTokens.forEach((facility, index) => {
-        handleReauthentication(facility, index);
-      });
-    } catch (error) {
-      console.error("Error fetching tokens:", error);
-    }
-  };
   // Fetch tokens from the Supabase database
-  const fetchTokens = async () => {
+  const fetchTokens = useCallback(async () => {
     if (!user) return;
 
     const { data: currentData, error } = await supabase
@@ -108,8 +91,9 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     }
 
     return currentData.tokens || [];
-  };
-  const submitCredentials = async (facility) => {
+  }, [user]);
+
+  const submitCredentials = async (facility: any) => {
     if (!user) return;
     const newToken = {
       name: facility.name || "",
@@ -158,7 +142,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     }
   };
 
-  const removeToken = async (facility) => {
+  const removeToken = async (facility: any) => {
     if (!user) {
       toast.error("User not authenticated.");
       return;
@@ -208,7 +192,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     }
   };
 
-  const handleReauthentication = async (facility: { api: string; apiSecret: string; client: string; clientSecret: string; environment: string }, index: number) => {
+  const handleReauthentication = useCallback(async (facility: any, index: number) => {
     const result: { token?: string; error?: string } = await handleSingleLogin({
       api: facility.api,
       apiSecret: facility.apiSecret,
@@ -229,8 +213,9 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
         )
       );
     }
-  };
-  const handleNewAuthenitcation = async (env: string, creds: { api: string; apiSecret: string; client: string; clientSecret: string; environment: string } | null = null) => {
+  }, []);
+
+  const handleNewAuthenitcation = async (env: string, creds: any) => {
     if (env === "prod") env = "";
     const res: { token?: string; error?: string } = await handleSingleLogin({
       api: creds.api,
@@ -299,7 +284,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       true
     );
   };
-  const handleFileUpload = (event) => {
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -310,7 +295,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       reader.readAsText(file);
     }
   };
-  const parseCSV = (csvData) => {
+  const parseCSV = (csvData: any) => {
     const lines = csvData.split("\n").filter((line) => line.trim() !== "");
     const headers = lines[0].split(",").map((header) => header.trim());
 
@@ -325,7 +310,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
 
     importFacilities(data);
   };
-  const importFacilities = async (facilities) => {
+  const importFacilities = async (facilities: any[]) => {
     const updatedFacilities = facilities.map(
       ({ name, api, apiSecret, client, clientSecret, environment }) => ({
         name,
@@ -374,28 +359,44 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     fileInputRef.current.click();
   };
 
-  // Run login for all saved facilities when settingsSavedFacilities changes
+  const handleFetchTokens = useCallback(async () => {
+    try {
+      const fetchedTokens = await fetchTokens();
+
+      if (!Array.isArray(fetchedTokens)) {
+        return;
+      }
+
+      setSettingsSavedFacilities(fetchedTokens);
+      setTokens(fetchedTokens);
+
+      fetchedTokens.forEach((facility, index) => {
+        handleReauthentication(facility, index);
+      });
+    } catch (error) {
+      console.error("Error fetching tokens:", error);
+    }
+  }, [setTokens, fetchTokens, handleReauthentication]);
+
+  // Run login for all saved facilities when component mounts
   useEffect(() => {
     if (!user) {
       return;
     }
     handleFetchTokens();
-    tokens.forEach((facility, index) => {
-      handleReauthentication(facility, index);
-    });
-  }, [user]);
+  }, [user, handleFetchTokens]);
 
   // Table and column definitions
   const columns = [
     {
       key: "name",
       label: "Name",
-      accessor: (f) => f.name || "",
+      accessor: (f: any) => f.name || "",
     },
     {
       key: "api",
       label: "API Key",
-      accessor: (f) =>
+      accessor: (f: any) =>
         f.api
           ? "•".repeat(Math.max(0, f.api.length - 5)) + f.api.slice(-5)
           : "",
@@ -403,7 +404,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     {
       key: "apiSecret",
       label: "API Secret",
-      accessor: (f) =>
+      accessor: (f: any) =>
         f.apiSecret
           ? "•".repeat(Math.max(0, f.apiSecret.length - 5)) +
             f.apiSecret.slice(-5)
@@ -412,12 +413,12 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     {
       key: "client",
       label: "Client",
-      accessor: (f) => f.client || "",
+      accessor: (f: any) => f.client || "",
     },
     {
       key: "clientSecret",
       label: "Client Secret",
-      accessor: (f) =>
+      accessor: (f: any) =>
         f.clientSecret
           ? "•".repeat(Math.max(0, f.clientSecret.length - 5)) +
             f.clientSecret.slice(-5)
@@ -426,7 +427,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
     {
       key: "environment",
       label: "Environment",
-      accessor: (f) => {
+      accessor: (f: any) => {
         switch (f.environment) {
           case "":
             return "Production";
@@ -434,7 +435,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
             return "Development";
           case "-qa":
             return "QA";
-          case "cia-stg-1.aws.":
+          case "staging":
             return "Staging";
           default:
             return f.environment;
@@ -445,7 +446,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       key: "isAuthenticated",
       label: "Authenticated",
       sortable: false,
-      render: (f) => (
+      render: (f: any) => (
         <div className="flex justify-center text-lg">
           {f.isAuthenticated === true ? (
             <FaCircleCheck className="text-green-500" />
@@ -461,7 +462,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       key: "actions",
       label: "Actions",
       sortable: false,
-      render: (f) => (
+      render: (f: any) => (
         <div className="flex justify-center gap-1">
           {permissions.authenticationPlatformDelete && (
             <button
@@ -489,7 +490,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode }) {
       ),
     },
   ];
-  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
+  const handleColumnSort = (columnKey: string, accessor: any = (a: any) => a[columnKey]) => {
     const newDirection =
       sortedColumn !== columnKey
         ? "asc"

@@ -9,19 +9,27 @@ export default function SmartSpaceFacilityCard({
   facility,
   toggledSections,
   explicitSort,
+} : {
+  facility: any;
+  toggledSections: {
+    smartLock: boolean;
+    smartMotion: boolean;
+    openNet: boolean;
+  };
+  explicitSort: boolean;
 }) {
-  const [isSmartlockModalOpen, setIsSmartlockModalOpen] = useState(false);
-  const [smartlockModalOption, setSmartlockModalOption] = useState(null);
-  const [selectedRouter, setSelectedRouter] = useState(null);
-  const [isSmartlockSectionOpen, setIsSmartlockSectionOpen] = useState(true);
+  const [isSmartlockModalOpen, setIsSmartlockModalOpen] = useState<boolean>(false);
+  const [smartlockModalOption, setSmartlockModalOption] = useState<any>(null);
+  const [selectedRouter, setSelectedRouter] = useState<any>(null);
+  const [isSmartlockSectionOpen, setIsSmartlockSectionOpen] = useState<boolean>(true);
   const [isSmartMotionSectionOpen, setIsSmartMotionSectionOpen] =
-    useState(true);
-  const [smartMotionModalOption, setSmartMotionModalOption] = useState(null);
-  const [isSmartMotionModalOpen, setIsSmartMotionModalOpen] = useState(false);
-  const [isOpenNetSectionOpen, setIsOpenNetSectionOpen] = useState(true);
-  const [isCardShown, setIsCardShown] = useState(true);
+    useState<boolean>(true);
+  const [smartMotionModalOption, setSmartMotionModalOption] = useState<any>(null);
+  const [isSmartMotionModalOpen, setIsSmartMotionModalOpen] = useState<boolean>(false);
+  const [isOpenNetSectionOpen, setIsOpenNetSectionOpen] = useState<boolean>(true);
+  const [isCardShown, setIsCardShown] = useState<boolean>(true);
 
-  const openSmartLockModal = (option) => {
+  const openSmartLockModal = (option: any) => {
     if (isSmartlockModalOpen) {
       return;
     }
@@ -29,7 +37,7 @@ export default function SmartSpaceFacilityCard({
     setIsSmartlockModalOpen(true);
   };
 
-  const openSmartMotionModal = (option) => {
+  const openSmartMotionModal = (option: any) => {
     if (isSmartMotionModalOpen) {
       return;
     }

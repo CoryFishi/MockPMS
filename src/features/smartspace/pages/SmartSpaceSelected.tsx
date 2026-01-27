@@ -140,7 +140,7 @@ export default function SmartSpaceSelectedPage() {
     } catch {
       alert("It broke");
     }
-  }, [selectedTokens]);
+  }, [selectedTokens, selectedTokensLoaded, facilities.length]);
 
   useEffect(() => {
     const filtered = facilities.filter(

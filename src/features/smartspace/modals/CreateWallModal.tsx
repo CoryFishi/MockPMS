@@ -1,12 +1,11 @@
-import { useState, useMemo } from "react";
-import { v4 as uuid } from "uuid";
-import { Stage, Layer, Rect, Line, Circle, Group } from "react-konva";
+import React, { useState } from "react";
+import { Stage, Layer } from "react-konva";
 
 const PX_PER_FT = 5;
 
-export default function CreateWallModal({ setIsCreateWallModalOpen, onSave, walls }) {
-  const [newWall, setNewWall] = useState({
-    id: uuid(),
+export default function CreateWallModal({ setIsCreateWallModalOpen, onSave } : { setIsCreateWallModalOpen: any; onSave: any}) {
+  const [newWall, setNewWall] = useState<any>({
+    id: Date.now().toString(),
     thickness: 2,
     x1: 25,
     y1: 25,
@@ -17,22 +16,22 @@ export default function CreateWallModal({ setIsCreateWallModalOpen, onSave, wall
     height: 25,
   });
 
-  const toFeetDisplay = (px) => Math.round((px / PX_PER_FT) * 10) / 10;
+  const toFeetDisplay = (px: number) => Math.round((px / PX_PER_FT) * 10) / 10;
 
-  const handleNumericFeet = (field) => (e) => {
+  const handleNumericFeet = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value);
     if (isNaN(val)) return;
-    setNewWall((prev) => ({ ...prev, [field]: Math.round(val * PX_PER_FT) }));
+    setNewWall((prev: any) => ({ ...prev, [field]: Math.round(val * PX_PER_FT) }));
   };
 
-  const handleChange = (field) => (e) => {
-    setNewWall((prev) => ({ ...prev, [field]: e.target.value }));
+  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewWall((prev: any) => ({ ...prev, [field]: e.target.value }));
   };
 
-  const handleWallThickness = (e) => {
+  const handleWallThickness = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value);
     if (isNaN(val) || val <= 0) return;
-    setNewWall((prev) => ({ ...prev, thickness: val }));
+    setNewWall((prev: any) => ({ ...prev, thickness: val }));
   };
 
   // Preview sizing
