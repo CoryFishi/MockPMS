@@ -28,13 +28,44 @@ export default function SmartSpaceDashboardList({
   smartMotionLowestSignal,
   smartMotionLowestBattery,
   totalSmartMotion,
+} : {
+  filteredFacilities: any[];
+  facilitiesWithBearers: any[];
+  setFilteredFacilities: any;
+  totalSmartlocks: number;
+  totalAccessPoints: number;
+  totalEdgeRouters: number;
+  edgeRouterOnlineCount: number;
+  edgeRouterWarningCount: number;
+  edgeRouterOfflineCount: number;
+  accessPointsOnlineCount: number;
+  accessPointsOfflineCount: number;
+  smartlockOkayCount: number;
+  smartlockWarningCount: number;
+  smartlockErrorCount: number;
+  smartlockOfflineCount: number;
+  smartlockLowestSignal: { facility: string; lowestSignal: number };
+  smartlockLowestBattery: { facility: string; lowestBattery: number };
+  toggledSections: {
+    smartLock: boolean;
+    smartMotion: boolean;
+    openNet: boolean;
+  };
+  explicitSort: boolean;
+  smartMotionOkayCount: number;
+  smartMotionWarningCount: number;
+  smartMotionErrorCount: number;
+  smartMotionOfflineCount: number;
+  smartMotionLowestSignal: { facility: string; lowestSignal: number };
+  smartMotionLowestBattery: { facility: string; lowestBattery: number };
+  totalSmartMotion: number;
 }) {
-  const [sortKey, setSortKey] = useState(null);
-  const [sortDirection, setSortDirection] = useState("asc");
-  const [expandedRows, setExpandedRows] = useState([]);
+  const [sortKey, setSortKey] = useState<keyof typeof filteredFacilities[0] | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc" | null>("asc");
+  const [expandedRows, setExpandedRows] = useState<(keyof typeof filteredFacilities[0])[]>([]);
 
-  const handleSort = (key) => {
-    let nextDirection = "asc";
+  const handleSort = (key: keyof typeof filteredFacilities[0]) => {
+    let nextDirection: "asc" | "desc" | null = "asc";
 
     if (sortKey === key) {
       if (sortDirection === "asc") nextDirection = "desc";

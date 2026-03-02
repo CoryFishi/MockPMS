@@ -1,6 +1,6 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { MdEdit } from "react-icons/md";
 import { useAuth } from "@context/AuthProvider";
 import { addEvent } from "@hooks/supabase";
@@ -23,7 +23,7 @@ export default function EditVisitorVisitorPage({
   const [accessProfiles, setAccessProfiles] = useState({});
   const { currentFacility, user } = useAuth();
 
-  const handleTimeProfiles = async () => {
+  const handleTimeProfiles = useCallback(async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "staging") {
@@ -49,8 +49,8 @@ export default function EditVisitorVisitorPage({
       .catch(function (error) {
         console.error(error);
       });
-  };
-  const handleAccessProfiles = async () => {
+  }, [currentFacility]);
+  const handleAccessProfiles = useCallback(async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "staging") {
@@ -76,7 +76,7 @@ export default function EditVisitorVisitorPage({
       .catch(function (error) {
         console.error(error);
       });
-  };
+  }, [currentFacility]);
   const handleEditVisitor = () => {
     const requiredNames = {
       firstName: "First name",
@@ -185,7 +185,7 @@ export default function EditVisitorVisitorPage({
   useEffect(() => {
     handleTimeProfiles();
     handleAccessProfiles();
-  }, []);
+  }, [handleTimeProfiles, handleAccessProfiles]);
 
   return (
     <ModalContainer

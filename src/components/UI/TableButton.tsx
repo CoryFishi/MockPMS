@@ -2,6 +2,10 @@ export default function TableButton({
   onclick,
   text,
   className = "bg-zinc-300 hover:bg-zinc-400",
+} : {
+  onclick: () => void;
+  text: string;
+  className?: string;
 }) {
   return (
     <button

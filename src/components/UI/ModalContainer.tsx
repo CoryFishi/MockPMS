@@ -1,9 +1,17 @@
+import React from "react";
+
 export default function ModalContainer({
   title,
   icon,
   mainContent,
   responseContent,
   onClose,
+} : {
+  title?: string;
+  icon?: React.ReactNode;
+  mainContent?: React.ReactNode;
+  responseContent?: React.ReactNode;
+  onClose: () => void;
 }) {
   return (
     // Modal Background

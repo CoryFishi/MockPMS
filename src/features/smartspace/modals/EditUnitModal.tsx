@@ -1,30 +1,30 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
 const PX_PER_FT = 5;
 
-export default function EditUnitModal({ unit, setIsUnitModalOpen, onSave }) {
+export default function EditUnitModal({ unit, setIsUnitModalOpen, onSave } : { unit: any; setIsUnitModalOpen: any; onSave: any }) {
   const [newUnit, setNewUnit] = useState({ ...unit });
-  const toFeetDisplay = (px) => {
+  const toFeetDisplay = (px: number) => {
     return Math.round((px / PX_PER_FT) * 10) / 10;
   };
   // update helpers
-  const handleChange = (field) => (e) => {
+  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
     if (["width", "height", "x", "y"].includes(field)) {
       const val = parseFloat(raw);
       if (isNaN(val)) return;
       // convert feet → pixels
       const px = Math.round(val * PX_PER_FT);
-      setNewUnit((prev) => ({ ...prev, [field]: px }));
+      setNewUnit((prev: any) => ({ ...prev, [field]: px }));
     } else {
-      setNewUnit((prev) => ({ ...prev, [field]: raw }));
+      setNewUnit((prev: any) => ({ ...prev, [field]: raw }));
     }
   };
-  const toggleDoor = (side) => {
-    setNewUnit((prev) => {
-      const has = prev.doors?.some((d) => d.side === side);
+  const toggleDoor = (side: string) => {
+    setNewUnit((prev: any) => {
+      const has = prev.doors?.some((d: any) => d.side === side);
       const doors = has
-        ? prev.doors.filter((d) => d.side !== side)
+        ? prev.doors.filter((d: any) => d.side !== side)
         : [...(prev.doors || []), { side }];
       return { ...prev, doors };
     });

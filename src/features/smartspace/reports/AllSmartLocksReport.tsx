@@ -1,7 +1,7 @@
 import PaginationFooter from "@components/shared/PaginationFooter";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   RiSignalWifi1Fill,
   RiSignalWifi2Fill,
@@ -25,19 +25,22 @@ import DetailModal from "@components/shared/DetailModal";
 export default function AllSmartLocksReport({
   selectedFacilities,
   searchQuery,
+}: {
+  selectedFacilities: any[];
+  searchQuery: string;
 }) {
-  const [filteredSmartLocks, setFilteredSmartLocks] = useState([]);
-  const [smartlocks, setSmartlocks] = useState([]);
-  const [hoveredRow, setHoveredRow] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [sortDirection, setSortDirection] = useState("asc");
-  const [sortedColumn, setSortedColumn] = useState(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [selectedSmartLock, setSelectedSmartLock] = useState(null);
+  const [filteredSmartLocks, setFilteredSmartLocks] = useState<any[]>([]);
+  const [smartlocks, setSmartlocks] = useState<any[]>([]);
+  const [hoveredRow, setHoveredRow] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(25);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc" | null>("asc");
+  const [sortedColumn, setSortedColumn] = useState<string | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
+  const [selectedSmartLock, setSelectedSmartLock] = useState<any>(null);
 
-  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
-    let newDirection;
+  const handleColumnSort = (columnKey: string, accessor:  any = (a:any) => a[columnKey]) => {
+    let newDirection: "asc" | "desc" | null = "asc";
 
     if (sortedColumn !== columnKey) {
       newDirection = "asc";
@@ -56,7 +59,7 @@ export default function AllSmartLocksReport({
     }
 
     setFilteredSmartLocks(
-      [...filteredSmartLocks].sort((a, b) => {
+      [...filteredSmartLocks].sort((a: any, b: any) => {
         const aVal = accessor(a);
         const bVal = accessor(b);
         return newDirection === "asc"
@@ -66,7 +69,7 @@ export default function AllSmartLocksReport({
     );
   };
 
-  const handleRowClick = (row) => {
+  const handleRowClick = (row: any) => {
     setSelectedSmartLock(row);
     setIsDetailModalOpen(true);
   };
@@ -121,7 +124,7 @@ export default function AllSmartLocksReport({
     document.body.removeChild(link);
   };
 
-  const fetchSmartLock = async (facility) => {
+  const fetchSmartLock = async (facility: { id: string; name: string; environment: string; bearer: string }) => {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -150,7 +153,7 @@ export default function AllSmartLocksReport({
     }
   };
 
-  const fetchDataForSelectedFacilities = async () => {
+  const fetchDataForSelectedFacilities = useCallback(async () => {
     setSmartlocks([]); // Clear existing data
     const fetchPromises = selectedFacilities.map(async (facility) => {
       const facilityName = facility.name;
@@ -176,11 +179,11 @@ export default function AllSmartLocksReport({
       return 0;
     });
     setSmartlocks(sortedSmartLocks);
-  };
+  }, [selectedFacilities]);
 
   useEffect(() => {
     fetchDataForSelectedFacilities();
-  }, [selectedFacilities]);
+  }, [selectedFacilities, fetchDataForSelectedFacilities]);
 
   useEffect(() => {
     setSortedColumn("Facility");
@@ -229,8 +232,8 @@ export default function AllSmartLocksReport({
     {
       key: "facilityName",
       label: "Facility Name",
-      accessor: (r) => r.facilityName,
-      render: (r) => (
+      accessor: (r: any) => r.facilityName,
+      render: (r: any) => (
         <div className="w-full flex items-center justify-center">
           <div className="truncate max-w-[32ch]">{r.facilityName}</div>
         </div>
@@ -239,8 +242,8 @@ export default function AllSmartLocksReport({
     {
       key: "name",
       label: "Name",
-      accessor: (r) => r.name,
-      render: (r) => (
+      accessor: (r: any) => r.name,
+      render: (r: any) => (
         <div className="w-full flex items-center justify-center">
           <div className="truncate max-w-[32ch]">{r.name}</div>
         </div>
@@ -249,18 +252,18 @@ export default function AllSmartLocksReport({
     {
       key: "unit",
       label: "Unit",
-      accessor: (r) => r.unitName,
+      accessor: (r: any) => r.unitName,
     },
     {
       key: "deviceType",
       label: "Device Type",
-      accessor: (r) => r.deviceType,
+      accessor: (r: any) => r.deviceType,
     },
     {
       key: "signalQuality",
       label: "Signal Quality",
-      accessor: (r) => r.signalQuality,
-      render: (r) => {
+      accessor: (r: any) => r.signalQuality,
+      render: (r: any) => {
         const pct = Math.round((r.signalQuality / 255) * 100);
         const Icon =
           pct < 24
@@ -286,8 +289,8 @@ export default function AllSmartLocksReport({
     {
       key: "batteryLevel",
       label: "Battery",
-      accessor: (r) => r.batteryLevel,
-      render: (r) => {
+      accessor: (r: any) => r.batteryLevel,
+      render: (r: any) => {
         const lvl = r.batteryLevel;
         const Icon =
           lvl < 20
@@ -315,8 +318,8 @@ export default function AllSmartLocksReport({
     {
       key: "lockState",
       label: "Lock State",
-      accessor: (r) => r.lockState,
-      render: (r) => (
+      accessor: (r: any) => r.lockState,
+      render: (r: any) => (
         <span>
           {r.lockState === "Locked" ? (
             <div className="inline-flex items-center gap-2">
@@ -340,17 +343,17 @@ export default function AllSmartLocksReport({
     {
       key: "unitDetails",
       label: "Unit Details",
-      accessor: (r) =>
+      accessor: (r: any) =>
         r.unitStatus + (r.visitorName ? " - " + r.visitorName : ""),
     },
     {
       key: "statusMessages",
       label: "SmartLock Status",
-      accessor: (r) =>
+      accessor: (r: any) =>
         r.statusMessages?.some((m) => m.trim() !== "")
           ? r.statusMessages.join(" | ").toLowerCase()
           : "SmartLock is online",
-      render: (r) => {
+      render: (r: any) => {
         const Icon =
           r.overallStatus === "error"
             ? RiErrorWarningFill
@@ -379,7 +382,7 @@ export default function AllSmartLocksReport({
     {
       key: "lastUpdateTimestampDisplay",
       label: "Last Update",
-      accessor: (r) => r.lastUpdateTimestampDisplay,
+      accessor: (r: any) => r.lastUpdateTimestampDisplay,
     },
   ];
 
@@ -387,7 +390,7 @@ export default function AllSmartLocksReport({
     <div className="w-full px-2">
       {isDetailModalOpen && (
         <DetailModal
-          device={selectedSmartLock}
+          device={selectedSmartLock as any}
           onClose={() => setIsDetailModalOpen(false)}
         />
       )}

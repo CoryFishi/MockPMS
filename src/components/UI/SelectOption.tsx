@@ -6,9 +6,15 @@ export default function SelectOption({
   options = [],
   placeholder = "Select an option",
   required = false,
+} : {
+  value: string;
+  onChange: any;
+  options: { id: string; name: string }[];
+  placeholder?: string;
+  required?: boolean;
 }) {
   const hasValue = value !== "";
-  const [isFocused, setIsFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState<boolean>(false);
 
   const shouldFloat = isFocused || hasValue;
 

@@ -4,7 +4,7 @@ import PMSDashboardLayout from "@pages/PMSDashboard/PMSDashboardLayout";
 import { useAuth } from "@context/AuthProvider";
 import { useState } from "react";
 
-export default function Dashboard({ darkMode, toggleDarkMode }) {
+export default function Dashboard({ darkMode, toggleDarkMode } : { darkMode: boolean; toggleDarkMode: () => void }) {
   const [dashboardMenu, setDashboardMenu] = useState(true);
   const { user, permissions } = useAuth();
 

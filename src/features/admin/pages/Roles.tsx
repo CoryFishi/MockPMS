@@ -2,7 +2,7 @@ import PaginationFooter from "@components/shared/PaginationFooter";
 import EditRole from "@features/admin/modals/EditRole";
 import CreateRole from "@features/admin/modals/CreateRole";
 import DataTable from "@components/shared/DataTable";
-import { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { FaPerson } from "react-icons/fa6";
 import { useAuth } from "@context/AuthProvider";
 import { supabaseAdmin, supabase } from "@app/supabaseClient";
@@ -11,23 +11,23 @@ import InputBox from "@components/UI/InputBox";
 
 export default function Roles() {
   const { user } = useAuth();
-  const [roles, setRoles] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [filteredRoles, setFilteredRoles] = useState([]);
-  const [rolesPulled, setRolesPulled] = useState(false);
-  const [dropdownIndex, setDropdownIndex] = useState(null);
-  const modalRefs = useRef({});
-  const [isEditRoleModalOpen, setIsEditRoleModalOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isCreateRoleModalOpen, setIsCreateRoleModalOpen] = useState(false);
-  const [users, setUsers] = useState([]);
-  const [sortedColumn, setSortedColumn] = useState(null);
-  const [sortDirection, setSortDirection] = useState("asc");
+  const [roles, setRoles] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [filteredRoles, setFilteredRoles] = useState<any[]>([]);
+  const [rolesPulled, setRolesPulled] = useState<boolean>(false);
+  const [dropdownIndex, setDropdownIndex] = useState<number | null>(null);
+  const modalRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
+  const [isEditRoleModalOpen, setIsEditRoleModalOpen] = useState<boolean>(false);
+  const [selectedRole, setSelectedRole] = useState<any | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isCreateRoleModalOpen, setIsCreateRoleModalOpen] = useState<boolean>(false);
+  const [users, setUsers] = useState<any[]>([]);
+  const [sortedColumn, setSortedColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc" | null>("asc");
 
-  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
-    let newDirection;
+  const handleColumnSort = (columnKey: string, accessor: any = (a:any) => a[columnKey]) => {
+    let newDirection: "asc" | "desc" | null;
 
     if (sortedColumn !== columnKey) {
       newDirection = "asc";
@@ -57,13 +57,13 @@ export default function Roles() {
     setFilteredRoles(sorted);
   };
 
-  const toggleDropdown = (index) => {
+  const toggleDropdown = (index: number) => {
     setDropdownIndex(dropdownIndex === index ? null : index);
   };
 
   // Close modal if clicking outside of it
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event: MouseEvent) => {
       const isClickInsideAny = Object.values(modalRefs.current).some((ref) =>
         ref instanceof HTMLElement && ref.contains(event.target as Node)
       );
@@ -76,7 +76,7 @@ export default function Roles() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const deleteRole = async (roleId) => {
+  const deleteRole = async (roleId: number) => {
     try {
       // Delete the role
       const { error } = await supabase.from("roles").delete().eq("id", roleId);
@@ -154,24 +154,24 @@ export default function Roles() {
     {
       key: "role_name",
       label: "Role",
-      accessor: (r) => r.role_name || "",
+      accessor: (r: any) => r.role_name || "",
     },
     {
       key: "role_description",
       label: "Description",
-      accessor: (r) => r.role_description || "",
+      accessor: (r: any) => r.role_description || "",
     },
     {
       key: "permissions",
       label: "Permissions",
-      accessor: (r) =>
+      accessor: (r: any) =>
         Object.values(r.permissions)?.filter((value) => value === true)
           ?.length || 0,
     },
     {
       key: "users",
       label: "Users",
-      accessor: (r) => {
+      accessor: (r: any) => {
         return users.filter((user) => user.role === r.role_name).length;
       },
     },
@@ -179,11 +179,11 @@ export default function Roles() {
       key: "actions",
       label: "Actions",
       sortable: false,
-      render: (role, index) => (
+      render: (role: any, index: number) => (
         <div className="flex justify-center relative">
           <button
             className="dark:bg-zinc-800 border rounded-lg dark:border-zinc-700 p-2 dark:hover:bg-zinc-900 w-full cursor-pointer"
-            onMouseDown={(e) => {
+            onMouseDown={(e: React.MouseEvent<HTMLButtonElement>) => {
               e.stopPropagation();
               toggleDropdown(index);
             }}
@@ -192,7 +192,7 @@ export default function Roles() {
           </button>
           {dropdownIndex === index && (
             <div
-              ref={(el) => { modalRefs.current[index] = el; }}
+              ref={(el: HTMLDivElement | null) => { modalRefs.current[index] = el; }}
               className="absolute top-full mt-1 right-0 w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg z-20 flex flex-col"
             >
               <button

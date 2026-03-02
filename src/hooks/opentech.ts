@@ -74,3 +74,17 @@ export async function handleMultiLogin(facilities: any) {
       throw error;
     });
 }
+
+export function getEnvironmentName(facility:any) {
+  if (facility.environment === "") {
+    return "Production";
+  } else if (facility.environment === "staging") {
+    return "Staging";
+  } else if (facility.environment === "-dev") {
+    return "Development";
+  } else if (facility.environment === "-qa") {
+    return "QA";
+  } else {
+    return facility.environment.toUpperCase();
+  }
+}

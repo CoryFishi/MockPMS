@@ -6,7 +6,7 @@ import { LuBrainCircuit } from "react-icons/lu";
 import { RiAlarmWarningFill } from "react-icons/ri";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { GoStar, GoStarFill } from "react-icons/go";
 import qs from "qs";
 import { FaWarehouse } from "react-icons/fa6";
@@ -15,6 +15,7 @@ import { supabase } from "@app/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import TableButton from "@components/UI/TableButton";
 import InputBox from "@components/UI/InputBox";
+import { getEnvironmentName } from "@hooks/opentech";
 
 export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
   const {
@@ -239,16 +240,19 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
       });
   };
 
-  const handleFacilities = async (saved) => {
+  const handleFacilities = useCallback(async (saved: any[]) => {
     setFilteredFacilities([]);
     setFacilities([]);
     setIsLoading(true);
     setCurrentLoadingText("Loading facilities...");
 
     // Helper to fetch each facility
-    const handleAccount = async (facility) => {
+    const handleAccount = async (facility: any) => {
       try {
-        const bearer = await handleLogin(facility);
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Login timeout after 8 seconds")), 8000)
+        );
+        const bearer = await Promise.race([handleLogin(facility), timeoutPromise]);
         const tokenStageKey =
           facility.environment === "staging" ? "cia-stg-1.aws." : "";
         const tokenEnvKey =
@@ -265,7 +269,7 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
           }
         );
 
-        const enriched = response.data.map((item) => ({
+        const enriched = response.data.map((item: any) => ({
           ...item,
           environment: facility.environment,
           api: facility.api,
@@ -277,6 +281,7 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
         return enriched;
       } catch (err) {
         console.error(`Error loading facility ${facility.client}`, err);
+        toast.error(`Failed to load facility ${facility.name || facility.client} in ${getEnvironmentName(facility)} environment.`);
         return [];
       }
     };
@@ -311,9 +316,9 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
       setCurrentLoadingText("");
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const handleSelect = async (facility) => {
+  const handleSelect = async (facility: any) => {
     await handleCurrentFacilityUpdate(facility);
     await toast.promise(handleSelectLogin(facility), {
       loading: "Selecting facility...",
@@ -323,7 +328,7 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
     localStorage.setItem("openPage", "units");
     setOpenPage("units");
   };
-  const addToFavorite = async (facility) => {
+  const addToFavorite = async (facility: any) => {
     const isFavorite = isFacilityFavorite(facility.facilityId);
     handleFavoriteFacilitiesUpdate(
       {
@@ -339,8 +344,8 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
       isFavorite
     );
   };
-  const FacilityStatusIcons = ({ facility }) => {
-    const getStatusIcon = (status, Icon, message) => {
+  const FacilityStatusIcons = ({ facility }: { facility: any }) => {
+    const getStatusIcon = (status: string, Icon: any, message: string) => {
       if (!status) return null;
       const color =
         status === "ok"
@@ -388,11 +393,11 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
     if (isPulled) {
       handleFacilities(tokens);
     }
-  }, [tokens]);
+  }, [tokens, isPulled, handleFacilities]);
 
-  const isFacilityFavorite = (facilityId) => {
+  const isFacilityFavorite = (facilityId: number) => {
     return (favoriteTokens || []).some(
-      (facility) => facility.id === facilityId
+      (facility: any) => facility.id === facilityId
     );
   };
 
@@ -443,8 +448,8 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
     {
       key: "isFavorite",
       label: "★",
-      accessor: (r) => (isFacilityFavorite(r.facilityId) ? 1 : 0),
-      render: (r) => (
+      accessor: (r: any) => (isFacilityFavorite(r.facilityId) ? 1 : 0),
+      render: (r: any) => (
         <div
           className="flex justify-center text-yellow-500 cursor-pointer"
           onClick={() => addToFavorite(r)}
@@ -460,8 +465,8 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
     {
       key: "environment",
       label: "Environment",
-      accessor: (r) => r.environment,
-      render: (r) => (
+      accessor: (r: any) => r.environment,
+      render: (r: any) => (
         <span
           onMouseEnter={() => setHoveredRow(r.facilityId)}
           className="cursor-pointer"
@@ -473,13 +478,13 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
     {
       key: "facilityId",
       label: "Facility Id",
-      accessor: (r) => r.facilityId,
+      accessor: (r: any) => r.facilityId,
     },
     {
       key: "accountName",
       label: "Account Name",
-      accessor: (r) => r.accountName,
-      render: (r) => (
+      accessor: (r: any) => r.accountName,
+      render: (r: any) => (
         <span>
           {r.accountName.length > 24
             ? r.accountName.slice(0, 24) + "..."
@@ -490,8 +495,8 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
     {
       key: "facilityName",
       label: "Facility Name",
-      accessor: (r) => r.facilityName,
-      render: (r) => (
+      accessor: (r: any) => r.facilityName,
+      render: (r: any) => (
         <div className="flex gap-2 justify-center">
           <span>
             {r.facilityName.length > 24
@@ -515,21 +520,21 @@ export default function AllFacilities({ setOpenPage, setCurrentFacilityName }) {
     {
       key: "facilityPropertyNumber",
       label: "Property Number",
-      accessor: (r) => r.facilityPropertyNumber,
+      accessor: (r: any) => r.facilityPropertyNumber,
     },
     {
       sortable: false,
       key: "status",
       label: "Status",
       accessor: () => null,
-      render: (r) => <FacilityStatusIcons facility={r} />,
+      render: (r: any) => <FacilityStatusIcons facility={r} />,
     },
     {
       sortable: false,
       key: "actions",
       label: "Actions",
       accessor: () => null,
-      render: (r) =>
+      render: (r: any) =>
         currentFacility.id === r.facilityId &&
         currentFacility.environment === r.environment ? (
           <TableButton

@@ -1,6 +1,6 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { IoIosCreate } from "react-icons/io";
 import { useAuth } from "@context/AuthProvider";
 import { addEvent } from "@hooks/supabase";
@@ -27,7 +27,7 @@ export default function CreateVisitorUnitPage({
   const [timeProfiles, setTimeProfiles] = useState({});
   const [accessProfiles, setAccessProfiles] = useState({});
   // API call handler to get time profiles
-  const handleTimeProfiles = async () => {
+  const handleTimeProfiles = useCallback(async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "staging") {
@@ -53,9 +53,9 @@ export default function CreateVisitorUnitPage({
       .catch(function (error) {
         console.error(error);
       });
-  };
+  }, [currentFacility]);
   // API call handler to get access profiles
-  const handleAccessProfiles = async () => {
+  const handleAccessProfiles = useCallback(async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "staging") {
@@ -81,7 +81,7 @@ export default function CreateVisitorUnitPage({
       .catch(function (error) {
         console.error(error);
       });
-  };
+  }, [currentFacility]);
   // API call handler to create the new visitor
   const handleCreateVisitor = async () => {
     const requiredFields = {
@@ -196,7 +196,7 @@ export default function CreateVisitorUnitPage({
   useEffect(() => {
     handleTimeProfiles();
     handleAccessProfiles();
-  }, []);
+  }, [handleTimeProfiles, handleAccessProfiles]);
 
   return (
     <ModalContainer

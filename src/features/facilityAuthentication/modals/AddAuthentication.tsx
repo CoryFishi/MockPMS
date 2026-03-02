@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FaCircleCheck } from "react-icons/fa6";
 import { MdOutlineError } from "react-icons/md";
 import toast from "react-hot-toast";
@@ -22,6 +22,19 @@ export default function AddAuthentication({
   const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const handleAuthRequest = useCallback((environment: string, creds: any) => {
+    setLoading(true);
+    handleNewLogin(environment, creds).then((data) => {
+      console.log("Authentication response:", data);
+      if (data.message) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+      setLoading(false);
+    });
+  }, [handleNewLogin]);
+
   useEffect(() => {
     var allFilled = false;
     if (api && apiSecret && client && clientSecret && environment) {
@@ -37,20 +50,8 @@ export default function AddAuthentication({
         clientSecret,
       });
     }
-  }, [api, apiSecret, client, clientSecret, environment]);
+  }, [api, apiSecret, client, clientSecret, environment, handleAuthRequest]);
 
-  const handleAuthRequest = (environment, creds) => {
-    setLoading(true);
-    handleNewLogin(environment, creds).then((data) => {
-      console.log("Authentication response:", data);
-      if (data.message) {
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
-      }
-      setLoading(false);
-    });
-  };
 
   const handleSubmit = async () => {
     if (isAuthenticated) {

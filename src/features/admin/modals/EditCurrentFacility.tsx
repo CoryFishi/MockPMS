@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import toast from "react-hot-toast";
 import { FaEdit } from "react-icons/fa";
 import qs from "qs";
@@ -122,7 +122,7 @@ export default function EditCurrentFacility({
             type="text"
             className="border border-slate-100 shadow-md rounded-sm w-full p-1 dark:border-zinc-700"
             value={id}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {setId(e.target.value); setIsAuthenticated(false);}}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {setId(e.target.value); setIsAuthenticated(false);}}
           />
           {/* API */}
           <label className="block my-1 font-bold">API:</label>
@@ -130,7 +130,7 @@ export default function EditCurrentFacility({
             type="text"
             className="border border-slate-100 shadow-md rounded-sm w-full p-1 dark:border-zinc-700"
             value={api}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {setApi(e.target.value); setIsAuthenticated(false);}}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {setApi(e.target.value); setIsAuthenticated(false);}}
           />
           {/* API Secret */}
           <label className="block my-1 font-bold">API Secret:</label>
@@ -138,7 +138,7 @@ export default function EditCurrentFacility({
             type="text"
             className="border border-slate-100 shadow-md rounded-sm w-full p-1 dark:border-zinc-700"
             value={apiSecret}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>{
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>{
               setApiSecret(e.target.value);
               setIsAuthenticated(false);
             }}
@@ -149,7 +149,7 @@ export default function EditCurrentFacility({
             type="text"
             className="border border-slate-100 shadow-md rounded-sm w-full p-1 dark:border-zinc-700"
             value={client}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>{
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>{
               setClient(e.target.value);
               setIsAuthenticated(false);
             }}
@@ -160,7 +160,7 @@ export default function EditCurrentFacility({
             type="text"
             className="border border-slate-100 shadow-md rounded-sm w-full p-1 dark:border-zinc-700"
             value={clientSecret}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>{
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>{
               setClientSecret(e.target.value);
               setIsAuthenticated(false);
             }}
@@ -170,7 +170,7 @@ export default function EditCurrentFacility({
           <select
             className="border border-slate-100 shadow-md rounded-sm dark:border-zinc-700 w-full p-2 hover:cursor-pointer"
             value={environment}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>{
+              onChange={(e: ChangeEvent<HTMLSelectElement>) =>{
                 setEnvironment(e.target.value);
                 setIsAuthenticated(false);
               }}

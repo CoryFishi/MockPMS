@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { FaPerson } from "react-icons/fa6";
 import { useAuth } from "@context/AuthProvider";
 import { supabaseAdmin } from "@app/supabaseClient";
@@ -11,22 +11,22 @@ import InputBox from "@components/UI/InputBox";
 
 export default function Users() {
   const { user } = useAuth();
-  const [users, setUsers] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [usersPulled, setUsersPulled] = useState(false);
-  const [dropdownIndex, setDropdownIndex] = useState(null);
+  const [users, setUsers] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
+  const [usersPulled, setUsersPulled] = useState<boolean>(false);
+  const [dropdownIndex, setDropdownIndex] = useState<number | null>(null);
   const [selfUser] = useState(user);
   const modalRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
-  const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortedColumn, setSortedColumn] = useState(null);
-  const [sortDirection, setSortDirection] = useState("asc");
+  const [isEditUserModalOpen, setIsEditUserModalOpen] = useState<boolean>(false);
+  const [selectedUser, setSelectedUser] = useState<any | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [sortedColumn, setSortedColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc" | null>("asc");
 
-  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
-    let newDirection;
+  const handleColumnSort = (columnKey: string, accessor: any = (a:any) => a[columnKey]) => {
+    let newDirection: "asc" | "desc" | null = "asc";
 
     if (sortedColumn !== columnKey) {
       newDirection = "asc";
@@ -56,15 +56,15 @@ export default function Users() {
     setFilteredUsers(sorted);
   };
 
-  const toggleDropdown = (index) => {
+  const toggleDropdown = (index: number) => {
     setDropdownIndex((prevIndex) => (prevIndex === index ? null : index));
   };
 
   // Close modal if clicking outside of it
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event: MouseEvent) => {
       const isClickInsideAny = Object.values(modalRefs.current).some((ref) =>
-        ref?.contains(event.target)
+        ref?.contains(event.target as Node)
       );
       if (!isClickInsideAny) {
         setDropdownIndex(null);
@@ -75,7 +75,7 @@ export default function Users() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  async function getUsers() {
+  const getUsers = useCallback(async () => {
     if (!user) return;
     const { data, error } = await supabaseAdmin.from("user_data").select("*");
 
@@ -85,9 +85,9 @@ export default function Users() {
       setUsersPulled(true);
       setUsers(data);
     }
-  }
+  }, [user]);
 
-  const deleteUser = async (userId) => {
+  const deleteUser = async (userId: string) => {
     try {
       // Delete the user from Supabase Auth
       const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(
@@ -125,7 +125,7 @@ export default function Users() {
 
   useEffect(() => {
     if (!usersPulled) getUsers();
-  }, [user]);
+  }, [user, getUsers, usersPulled]);
 
   useEffect(() => {
     const filteredUsers = users.sort((a, b) => {
@@ -160,49 +160,49 @@ export default function Users() {
         )
     );
     setFilteredUsers(filteredUsers);
-  }, [searchQuery]);
+  }, [searchQuery, users]);
 
   const columns = [
     {
       key: "user_email",
       label: "Email",
-      accessor: (e) => e.user_email || "",
+      accessor: (e: any) => e.user_email || "",
     },
     {
       key: "tokens",
       label: "Tokens",
-      accessor: (e) => e.tokens?.length || 0,
+      accessor: (e: any) => e.tokens?.length || 0,
     },
     {
       key: "favorite_tokens",
       label: "Favorite",
-      accessor: (e) => e.favorite_tokens?.length || 0,
+      accessor: (e: any) => e.favorite_tokens?.length || 0,
     },
     {
       key: "selected_tokens",
       label: "Selected",
-      accessor: (e) => e.selected_tokens?.length || 0,
+      accessor: (e: any) => e.selected_tokens?.length || 0,
     },
     {
       key: "current_facility",
       label: "Current Facility",
-      accessor: (e) => e.current_facility.name || "",
+      accessor: (e: any) => e.current_facility.name || "",
     },
     {
       key: "role",
       label: "Role",
-      accessor: (e) => e.role || "",
+      accessor: (e: any) => e.role || "",
     },
     {
       key: "created_at",
       label: "Created On",
-      accessor: (e) => e.created_at || "",
+      accessor: (e: any) => e.created_at || "",
     },
     {
       key: "actions",
       label: "Actions",
       sortable: false,
-      render: (user, index) => (
+      render: (user: any, index: number) => (
         <div className="flex justify-center relative">
           <button
             className="dark:bg-zinc-800 border rounded-lg dark:border-zinc-700 p-2 dark:hover:bg-zinc-900 w-full cursor-pointer"
@@ -268,7 +268,6 @@ export default function Users() {
           setIsEditUserModalOpen={setIsEditUserModalOpen}
           selectedUser={selectedUser}
           setUsers={setUsers}
-          users={users}
         />
       )}
       {/* Header */}

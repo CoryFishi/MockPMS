@@ -4,7 +4,7 @@ import { useAuth } from "@context/AuthProvider";
 import NotFound from "@components/shared/NotFound";
 import AdminDashboardLayout from "@pages/AdminDashboard/AdminDashboardLayout";
 
-export default function Admin({ darkMode, toggleDarkMode }) {
+export default function Admin({ darkMode, toggleDarkMode } : { darkMode: boolean; toggleDarkMode: () => void }) {
   const [dashboardMenu, setDashboardMenu] = useState(true);
   const { user, role } = useAuth();
 

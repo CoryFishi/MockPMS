@@ -1,7 +1,7 @@
 import PaginationFooter from "@components/shared/PaginationFooter";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   RiSignalWifi1Fill,
   RiSignalWifi2Fill,
@@ -26,16 +26,19 @@ import { GrStatusUnknown } from "react-icons/gr";
 export default function AllSmartMotionReport({
   selectedFacilities,
   searchQuery,
+} : {
+  selectedFacilities: any[];
+  searchQuery: string;
 }) {
-  const [filteredSmartMotion, setFilteredSmartMotion] = useState([]);
-  const [smartMotion, setSmartMotion] = useState([]);
-  const [hoveredRow, setHoveredRow] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [sortDirection, setSortDirection] = useState("asc");
-  const [sortedColumn, setSortedColumn] = useState(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [selectedMotionSensor, setSelectedMotionSensor] = useState(null);
+  const [filteredSmartMotion, setFilteredSmartMotion] = useState<any[]>([]);
+  const [smartMotion, setSmartMotion] = useState<any[]>([]);
+  const [hoveredRow, setHoveredRow] = useState<null | number>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(25);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [sortedColumn, setSortedColumn] = useState<null | string>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState<false | true>(false);
+  const [selectedMotionSensor, setSelectedMotionSensor] = useState<null | any>(null);
 
   const exportSmartMotion = () => {
     // Convert the data to CSV format
@@ -54,7 +57,7 @@ export default function AllSmartMotionReport({
     // Create rows
     const csvRows = [
       headers.join(","), // Add headers to rows
-      ...filteredSmartMotion.map((device) =>
+      ...filteredSmartMotion.map((device: any) =>
         [
           device.facilityName,
           device.name,
@@ -87,7 +90,7 @@ export default function AllSmartMotionReport({
     document.body.removeChild(link);
   };
 
-  const fetchSmartMotion = async (facility) => {
+  const fetchSmartMotion = async (facility: any) => {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -116,7 +119,7 @@ export default function AllSmartMotionReport({
     }
   };
 
-  const fetchDataForSelectedFacilities = async () => {
+  const fetchDataForSelectedFacilities = useCallback(async () => {
     setSmartMotion([]); // Clear existing data
     const fetchPromises = selectedFacilities.map(async (facility) => {
       const facilityName = facility.name;
@@ -141,17 +144,17 @@ export default function AllSmartMotionReport({
       if (a.facilityName.toLowerCase() > b.facilityName.toLowerCase()) return 1;
       return 0;
     });
-    setSmartMotion(sortedSmartMotion);
-  };
+    setSmartMotion(sortedSmartMotion as any);
+  }, [selectedFacilities]);
 
   useEffect(() => {
     fetchDataForSelectedFacilities();
-  }, [selectedFacilities]);
+  }, [selectedFacilities, fetchDataForSelectedFacilities]);
 
   useEffect(() => {
     setSortedColumn("Facility");
 
-    const filteredSmartMotion = smartMotion.filter((smartmotion) => {
+    const filteredSmartMotion = smartMotion.filter((smartmotion: any) => {
       return (
         (smartmotion.facilityName || "")
           .toLowerCase()
@@ -183,12 +186,12 @@ export default function AllSmartMotionReport({
           ))
       );
     });
-    setFilteredSmartMotion(filteredSmartMotion);
+    setFilteredSmartMotion(filteredSmartMotion as any);
     setCurrentPage(1);
   }, [smartMotion, searchQuery]);
 
-  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
-    let newDirection;
+  const handleColumnSort = (columnKey: string, accessor: any = (a: any) => a[columnKey]) => {
+    let newDirection: "asc" | "desc" | null = "asc";
 
     if (sortedColumn !== columnKey) {
       newDirection = "asc";
@@ -202,7 +205,7 @@ export default function AllSmartMotionReport({
     setSortDirection(newDirection);
 
     if (!newDirection) {
-      setFilteredSmartMotion([...smartMotion]);
+      setFilteredSmartMotion([...smartMotion] as any);
       return;
     }
 

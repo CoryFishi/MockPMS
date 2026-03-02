@@ -4,7 +4,7 @@ import SmartSpaceDashboardLayout from "@pages/SmartSpaceDashboard/SmartSpaceDash
 import { useAuth } from "@context/AuthProvider";
 import NotFound from "@components/shared/NotFound";
 
-export default function SmartSpaceDashboard({ darkMode, toggleDarkMode }) {
+export default function SmartSpaceDashboard({ darkMode, toggleDarkMode }: { darkMode: boolean; toggleDarkMode: () => void }) {
   const [dashboardMenu, setDashboardMenu] = useState(true);
   const { user, permissions } = useAuth();
 

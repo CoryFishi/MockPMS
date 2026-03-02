@@ -1,6 +1,6 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   AreaChart,
   Area,
@@ -11,13 +11,12 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-export default function OfflineEventsComparison({ selectedFacilities }) {
-  const [dayValue, setDayValue] = useState(7);
+export default function OfflineEventsComparison({ selectedFacilities } : { selectedFacilities: any[] }) {
+  const [dayValue, setDayValue] = useState<number>(7);
   const currentTime = Math.floor(Date.now() / 1000);
   const pastDayValue = currentTime - dayValue * 24 * 60 * 60;
-  const [smartlockEventsData, setSmartlockEventsData] = useState([]);
-
-  const fetchSmartLockEvents = async (facility) => {
+  const [smartlockEventsData, setSmartlockEventsData] = useState<any[]>([]);
+  const fetchSmartLockEvents = useCallback(async (facility: any) => {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -47,9 +46,12 @@ export default function OfflineEventsComparison({ selectedFacilities }) {
       toast.error(`${facility.name} does not have Events`);
       return null;
     }
-  };
+  }, [currentTime, pastDayValue]);
 
-  const fetchDataForSelectedFacilities = async () => {
+  
+
+  useEffect(() => {
+    const fetchDataForSelectedFacilities = async () => {
     const fetchPromises = selectedFacilities.map(async (facility) => {
       const smartlockData = await fetchSmartLockEvents(facility);
       return { [facility.name]: smartlockData };
@@ -58,11 +60,9 @@ export default function OfflineEventsComparison({ selectedFacilities }) {
     const allSmartlockData = await Promise.all(fetchPromises);
 
     setSmartlockEventsData(allSmartlockData);
-  };
-
-  useEffect(() => {
+    };
     fetchDataForSelectedFacilities();
-  }, [selectedFacilities, dayValue]);
+  }, [selectedFacilities, dayValue, fetchSmartLockEvents]);
 
   return (
     <div className="w-full px-2">

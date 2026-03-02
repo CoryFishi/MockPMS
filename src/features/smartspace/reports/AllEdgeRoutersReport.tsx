@@ -1,29 +1,31 @@
 import PaginationFooter from "@components/shared/PaginationFooter";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import DataTable from "@components/shared/DataTable";
 import DetailModal from "@components/shared/DetailModal";
-import { FiAlertTriangle } from "react-icons/fi";
 import { IoIosWarning } from "react-icons/io";
 import { RiErrorWarningFill } from "react-icons/ri";
 
 export default function AllEdgeRoutersReport({
   selectedFacilities,
   searchQuery,
+} : {
+  selectedFacilities: any[];
+  searchQuery: string;
 }) {
-  const [filteredEdgeRouters, setFilteredEdgeRouters] = useState([]);
-  const [edgeRouters, setEdgeRouters] = useState([]);
-  const [hoveredRow, setHoveredRow] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [sortDirection, setSortDirection] = useState("asc");
-  const [sortedColumn, setSortedColumn] = useState(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [selectedEdgeRouter, setSelectedEdgeRouter] = useState(null);
+  const [filteredEdgeRouters, setFilteredEdgeRouters] = useState<any[]>([]);
+  const [edgeRouters, setEdgeRouters] = useState<any[]>([]);
+  const [hoveredRow, setHoveredRow] = useState<null | number>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(25);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [sortedColumn, setSortedColumn] = useState<null | string>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
+  const [selectedEdgeRouter, setSelectedEdgeRouter] = useState<any>(null);
 
-  const fetchEdgeRouters = async (facility) => {
+  const fetchEdgeRouters = async (facility: any) => {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -52,7 +54,7 @@ export default function AllEdgeRoutersReport({
     }
   };
 
-  const fetchDataForSelectedFacilities = async () => {
+  const fetchDataForSelectedFacilities = useCallback(async () => {
     setEdgeRouters([]); // Clear existing data
     const fetchPromises = selectedFacilities.map(async (facility) => {
       const facilityName = facility.name;
@@ -69,11 +71,11 @@ export default function AllEdgeRoutersReport({
     // Flatten the array and update state with all Edge Routers
     const flattenedData = allEdgeRouterData.flat();
     setEdgeRouters(flattenedData);
-  };
+  }, [selectedFacilities]);
 
   useEffect(() => {
     fetchDataForSelectedFacilities();
-  }, [selectedFacilities]);
+  }, [selectedFacilities, fetchDataForSelectedFacilities]);
 
   useEffect(() => {
     setSortedColumn("Facility");
@@ -100,8 +102,8 @@ export default function AllEdgeRoutersReport({
     setCurrentPage(1);
   }, [edgeRouters, searchQuery]);
 
-  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
-    let newDirection;
+  const handleColumnSort = (columnKey: string, accessor: any = (a: any) => a[columnKey]) => {
+    let newDirection: "asc" | "desc" | null = "asc";
 
     if (sortedColumn !== columnKey) {
       newDirection = "asc";
@@ -134,8 +136,8 @@ export default function AllEdgeRoutersReport({
     {
       key: "facilityName",
       label: "Facility Name",
-      accessor: (r) => r.facilityName,
-      render: (r) => (
+      accessor: (r: any) => r.facilityName,
+      render: (r: any) => (
         <div className="w-full flex items-center justify-center">
           <div className="truncate max-w-[32ch]">{r.facilityName}</div>
         </div>
@@ -144,8 +146,8 @@ export default function AllEdgeRoutersReport({
     {
       key: "name",
       label: "Name",
-      accessor: (r) => r.name,
-      render: (r) => (
+      accessor: (r: any) => r.name,
+      render: (r: any) => (
         <div className="w-full flex items-center justify-center">
           <div className="truncate max-w-[32ch]">{r.name}</div>
         </div>
@@ -154,8 +156,8 @@ export default function AllEdgeRoutersReport({
     {
       key: "connectionStatus",
       label: "Connection Status",
-      accessor: (r) => r.connectionStatus,
-      render: (r) => (
+      accessor: (r: any) => r.connectionStatus,
+      render: (r: any) => (
         <div className="inline-flex items-center gap-2">
           {r.connectionStatus === "ok" ? (
             <FaCheckCircle className="text-green-500" />
@@ -173,13 +175,13 @@ export default function AllEdgeRoutersReport({
     {
       key: "eventStatusMessage",
       label: "Event Status",
-      accessor: (r) => r.eventStatusMessage,
+      accessor: (r: any) => r.eventStatusMessage,
     },
     {
       key: "isLockProvisioningEnabled",
       label: "Provisioning Enabled",
-      accessor: (r) => r.isLockProvisioningEnabled,
-      render: (r) => (
+      accessor: (r: any) => r.isLockProvisioningEnabled,
+      render: (r: any) => (
         <div>
           {r.isAccessPointProvisioningEnabled || r.isLockProvisioningEnabled
             ? "True"
@@ -190,17 +192,17 @@ export default function AllEdgeRoutersReport({
     {
       key: "isDeviceOffline",
       label: "Status",
-      accessor: (r) => r.isDeviceOffline,
-      render: (r) => <div>{!r.isDeviceOffline ? "Online" : "Offline"}</div>,
+      accessor: (r: any) => r.isDeviceOffline,
+      render: (r: any) => <div>{!r.isDeviceOffline ? "Online" : "Offline"}</div>,
     },
     {
       key: "lastCommunicationOn",
       label: "Last Communication On",
-      accessor: (r) => r.lastCommunicationOn,
+      accessor: (r: any) => r.lastCommunicationOn,
     },
   ];
 
-  const handleRowClick = (row) => {
+  const handleRowClick = (row: any) => {
     setSelectedEdgeRouter(row);
     setIsDetailModalOpen(true);
   };

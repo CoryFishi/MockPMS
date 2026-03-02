@@ -9,24 +9,24 @@ import toast from "react-hot-toast";
 import { BiCheckCircle, BiCircle } from "react-icons/bi";
 import { supabase } from "@app/supabaseClient";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { addEvent } from "@hooks/supabase";
 import { RiSettingsFill } from "react-icons/ri";
 
-export default function UserSettings({ darkMode, toggleDarkMode }) {
-  const [newPassword1, setNewPassword1] = useState("");
-  const [newPassword2, setNewPassword2] = useState("");
-  const [events, setEvents] = useState([]);
+export default function UserSettings({ darkMode, toggleDarkMode }: { darkMode: boolean; toggleDarkMode: () => void }) {
+  const [newPassword1, setNewPassword1] = useState<string>("");
+  const [newPassword2, setNewPassword2] = useState<string>("");
+  const [events, setEvents] = useState<any[]>([]);
   const { user, role } = useAuth();
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [filteredEvents, setFilteredEvents] = useState([]);
-  const [eventsPulled, setEventsPulled] = useState(false);
-  const [sortedColumn, setSortedColumn] = useState(null);
-  const [sortDirection, setSortDirection] = useState("desc");
-  const [enabled, setEnabled] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [filteredEvents, setFilteredEvents] = useState<any[]>([]);
+  const [eventsPulled, setEventsPulled] = useState<boolean>(false);
+  const [sortedColumn, setSortedColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [enabled, setEnabled] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (!user) return;
@@ -145,7 +145,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }) {
     },
   ];
 
-  const handleColumnSort = (columnKey: string, accessor: (a: any) => any = (a) => a[columnKey]) => {
+  const handleColumnSort = (columnKey: string, accessor: any = (a: any) => a[columnKey]) => {
     let newDirection: "asc" | "desc" | null = null;
 
     if (sortedColumn !== columnKey) {

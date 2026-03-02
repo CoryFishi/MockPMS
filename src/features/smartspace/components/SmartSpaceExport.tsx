@@ -1,4 +1,4 @@
-export default function SmartSpaceExport({ facilitiesInfo }) {
+export default function SmartSpaceExport({ facilitiesInfo } : { facilitiesInfo: any[] }) {
   // Export function
   const exportTable = () => {
     // Convert the data to CSV format

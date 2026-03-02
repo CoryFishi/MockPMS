@@ -788,10 +788,6 @@ function SmartSpaceMapping() {
     const baseInConePx = params.baseInCone * PX_PER_FT;
     const baseOutConePx = params.baseOutCone * PX_PER_FT;
     const crossPenaltyPx = params.crossPenalty * PX_PER_FT;
-    let wallPenalty = 0;
-    // Check for wall blocking - if any wall blocks the line of sight, communication is blocked
-    if (isBlockedByWalls(lock, ap, layout.walls)) {
-    }
 
     // determine endpoint-containing unit for lock to exclude it from crossing count
     const endpointIds = new Set();
@@ -926,8 +922,6 @@ function SmartSpaceMapping() {
       <Sidebar
         layout={layout}
         setLayout={setLayout}
-        handleParamChange={handleParamChange}
-        params={params}
         findNearbyLocks={findNearbyLocks}
         limitNearest={limitNearest}
         setLimitNearest={setLimitNearest}
@@ -936,7 +930,6 @@ function SmartSpaceMapping() {
         proximityText={proximityText}
         getAllLocks={getAllLocks}
         computeReachability={computeReachability}
-        handleCanvasChange={handleCanvasChange}
       />
       <div
         className="w-12 h-12 rounded-full bg-zinc-200 bottom-2 right-2 absolute border flex items-center justify-center text-3xl cursor-pointer hover:bg-zinc-300"
@@ -951,24 +944,17 @@ function SmartSpaceMapping() {
         <FacilityMap
           layout={layout}
           params={params}
-          findNearbyLocks={findNearbyLocks}
           onUpdate={handleUpdate}
           setUnitModalUnit={setUnitModalUnit}
           setIsUnitModalOpen={setIsUnitModalOpen}
           setLayout={setLayout}
           cosHalfAngle={cosHalfAngle}
           proximityPairs={proximityPairs}
-          setProximityPairs={setProximityPairs}
           proximityText={proximityText}
-          setProximityText={setProximityText}
-          canTalk={canTalk}
           getTriangleCorners={getTriangleCorners}
           hasTriangleSide={hasTriangleSide}
           getTriangleLockPos={getTriangleLockPos}
           getAllLocks={getAllLocks}
-          computeReachability={computeReachability}
-          setReachability={setReachability}
-          setRootLockIndex={setRootLockIndex}
           rootLockIndex={rootLockIndex}
           reachability={reachability}
           canLockTalkToAP={canLockTalkToAP}

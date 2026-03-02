@@ -1,14 +1,12 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { FaCheckCircle, FaExternalLinkAlt, FaWalking } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
 import SmartLockModal from "@features/smartspace/modals/SmartLockModal";
 import SmartMotionModal from "@features/smartspace/modals/SmartMotionModal";
 import AccessPointModal from "@features/smartspace/modals/AccessPointModal";
 import DetailModal from "@components/shared/DetailModal";
-import { BiLock } from "react-icons/bi";
-import { BsController, BsLockFill } from "react-icons/bs";
+import { BsLockFill } from "react-icons/bs";
 import { TiWiFi } from "react-icons/ti";
-import { GiControlTower } from "react-icons/gi";
 import { CgController } from "react-icons/cg";
 
 export default function SmartSpaceFacilityRow({
@@ -17,17 +15,27 @@ export default function SmartSpaceFacilityRow({
   expandedRows,
   toggledSections,
   explicitSort,
+} : {
+  facility: any;
+  setExpandedRows: React.Dispatch<React.SetStateAction<number[]>>;
+  expandedRows: any[];
+  toggledSections: {
+    openNet: boolean;
+    smartLock: boolean;
+    smartMotion: boolean;
+  };
+  explicitSort: boolean;
 }) {
-  const [isSmartlockModalOpen, setIsSmartlockModalOpen] = useState(false);
-  const [smartlockModalOption, setSmartlockModalOption] = useState(null);
-  const [isSmartMotionModalOpen, setIsSmartMotionModalOpen] = useState(false);
-  const [smartMotionModalOption, setSmartMotionModalOption] = useState(null);
-  const [isAccessPointModalOpen, setIsAccessPointModalOpen] = useState(false);
-  const [accessPointModalOption, setAccessPointModalOption] = useState(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [selectedEdgeRouter, setSelectedEdgeRouter] = useState(null);
+  const [isSmartlockModalOpen, setIsSmartlockModalOpen] = useState<boolean>(false);
+  const [smartlockModalOption, setSmartlockModalOption] = useState<any>(null);
+  const [isSmartMotionModalOpen, setIsSmartMotionModalOpen] = useState<boolean>(false);
+  const [smartMotionModalOption, setSmartMotionModalOption] = useState<any>(null);
+  const [isAccessPointModalOpen, setIsAccessPointModalOpen] = useState<boolean>(false);
+  const [accessPointModalOption, setAccessPointModalOption] = useState<any>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
+  const [selectedEdgeRouter, setSelectedEdgeRouter] = useState<any>(null);
 
-  const toggleRowExpansion = (facilityId) => {
+  const toggleRowExpansion = (facilityId: number) => {
     setExpandedRows((prev) =>
       prev.includes(facilityId)
         ? prev.filter((id) => id !== facilityId)
@@ -35,27 +43,27 @@ export default function SmartSpaceFacilityRow({
     );
   };
 
-  const openSmartLockModal = (option) => {
+  const openSmartLockModal = (option: any) => {
     if (!isSmartlockModalOpen) {
       setSmartlockModalOption(option);
       setIsSmartlockModalOpen(true);
     }
   };
-  const openSmartMotionModal = (option) => {
+  const openSmartMotionModal = (option: any) => {
     if (!isSmartMotionModalOpen) {
       setSmartMotionModalOption(option);
       setIsSmartMotionModalOpen(true);
     }
   };
 
-  const openAccessPointModal = (option) => {
+  const openAccessPointModal = (option: any) => {
     if (!isAccessPointModalOpen) {
       setAccessPointModalOption(option);
       setIsAccessPointModalOpen(true);
     }
   };
 
-  const openDetailModal = (edgeRouter) => {
+  const openDetailModal = (edgeRouter: any) => {
     setSelectedEdgeRouter(edgeRouter);
     setIsDetailModalOpen(true);
   };

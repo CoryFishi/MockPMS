@@ -1,32 +1,32 @@
 import PaginationFooter from "@components/shared/PaginationFooter";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import DataTable from "@components/shared/DataTable";
 import DetailModal from "@components/shared/DetailModal";
 import GeneralButton from "@components/UI/GeneralButton";
 import ModalContainer from "@components/UI/ModalContainer";
 import { MdEventNote } from "react-icons/md";
 
-export default function EventsReport({ selectedFacilities, searchQuery }) {
-  const [filteredSmartLockEvents, setFilteredSmartLockEvents] = useState([]);
-  const [smartlockEvents, setSmartlockEvents] = useState([]);
-  const [hoveredRow, setHoveredRow] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [sortDirection, setSortDirection] = useState("desc");
-  const [sortedColumn, setSortedColumn] = useState(null);
-  const [dayValue, setDayValue] = useState(0.5);
-  const currentTime = Math.floor(Date.now() / 1000);
-  const pastDayValue = currentTime - dayValue * 24 * 60 * 60;
+export default function EventsReport({ selectedFacilities, searchQuery } : { selectedFacilities: any[]; searchQuery: string }) {
+  const [filteredSmartLockEvents, setFilteredSmartLockEvents] = useState<any[]>([]);
+  const [smartlockEvents, setSmartlockEvents] = useState<any[]>([]);
+  const [hoveredRow, setHoveredRow] = useState<null | number>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(25);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [sortedColumn, setSortedColumn] = useState<null | string>(null);
+  const [dayValue, setDayValue] = useState<number>(0.5);
+  const currentTime = useMemo(() => Math.floor(Date.now() / 1000), []);
+  const pastDayValue = useMemo(() => currentTime - dayValue * 24 * 60 * 60, [currentTime, dayValue]);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [selectedEvents, setSelectedEvents] = useState([]);
-  const [eventTypes, setEventTypes] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState<null | any>(null);
+  const [selectedEvents, setSelectedEvents] = useState<any[]>([]);
+  const [eventTypes, setEventTypes] = useState<null | any>(null);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
-  const [eventModalSelectedEvents, setEventModalSelectedEvents] = useState([]);
+  const [eventModalSelectedEvents, setEventModalSelectedEvents] = useState<any[]>([]);
 
-  const fetchEventsForFacility = async (facility) => {
+  const fetchEventsForFacility = useCallback(async (facility: any) => {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -74,9 +74,9 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
       toast.error(`${facility.name} does not have Events`);
       return null;
     }
-  };
+  }, [currentTime, pastDayValue, selectedEvents]);
 
-  const fetchEventTypes = async () => {
+  const fetchEventTypes = useCallback(async () => {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
@@ -105,9 +105,9 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
       console.error(`Error fetching Event Types`, error);
       return null;
     }
-  };
+  }, [selectedFacilities]);
 
-  const fetchDataForSelectedFacilities = async () => {
+  const fetchDataForSelectedFacilities = useCallback(async () => {
     setSmartlockEvents([]); // Clear existing data
     const fetchPromises = selectedFacilities.map(async (facility) => {
       const smartlockData = await fetchEventsForFacility(facility);
@@ -120,18 +120,18 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
     // Flatten the array and update state with all smartlocks
     const flattenedData = allSmartlockData.flat();
     setSmartlockEvents(flattenedData);
-  };
+  }, [selectedFacilities, fetchEventsForFacility]);
 
   useEffect(() => {
     if (selectedEvents.length === 0) {
       return;
     }
     fetchDataForSelectedFacilities();
-  }, [selectedFacilities, dayValue, selectedEvents]);
+  }, [selectedFacilities, dayValue, selectedEvents, fetchDataForSelectedFacilities]);
 
   useEffect(() => {
     fetchEventTypes();
-  }, [selectedFacilities]);
+  }, [selectedFacilities, fetchEventTypes]);
 
   useEffect(() => {
     setSortedColumn("Created On");
@@ -141,7 +141,7 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
       return 0;
     });
     const filteredSmartLockEvents = sortedSmartLockEvents.filter(
-      (event) =>
+      (event : any) =>
         (event.facilityName || "")
           .toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
@@ -166,8 +166,8 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
     setCurrentPage(1);
   }, [smartlockEvents, searchQuery]);
 
-  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
-    let newDirection;
+  const handleColumnSort = (columnKey: string, accessor: any = (a:any) => a[columnKey]) => {
+    let newDirection: "asc" | "desc" | null = "asc";
 
     if (sortedColumn !== columnKey) {
       newDirection = "asc";
@@ -200,8 +200,8 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
     {
       key: "facilityName",
       label: "Facility Name",
-      accessor: (r) => r.facilityName,
-      render: (r) => (
+      accessor: (r: any) => r.facilityName,
+      render: (r: any) => (
         <div className="w-full flex items-center justify-center">
           <div className="truncate max-w-[32ch]">{r.facilityName}</div>
         </div>
@@ -210,8 +210,8 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
     {
       key: "deviceName",
       label: "Device Name",
-      accessor: (r) => r.deviceName,
-      render: (r) => (
+      accessor: (r: any) => r.deviceName,
+      render: (r: any) => (
         <div className="w-full flex items-center justify-center">
           <div className="truncate max-w-[32ch]">{r.deviceName}</div>
         </div>
@@ -220,26 +220,26 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
     {
       key: "eventCategory",
       label: "Event Category",
-      accessor: (r) => r.eventCategory,
+      accessor: (r: any) => r.eventCategory,
     },
     {
       key: "eventType",
       label: "Event Type",
-      accessor: (r) => r.eventType,
+      accessor: (r: any) => r.eventType,
     },
     {
       key: "eventDetails",
       label: "Event Details",
-      accessor: (r) => r.eventDetails,
+      accessor: (r: any) => r.eventDetails,
     },
     {
       key: "createdOn",
       label: "Created On",
-      accessor: (r) => r.createdOn,
+      accessor: (r: any) => r.createdOn,
     },
   ];
 
-  const handleRowClick = (row) => {
+  const handleRowClick = (row: any) => {
     setSelectedEvent(row);
     setIsDetailModalOpen(true);
   };
@@ -279,10 +279,10 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
               <div className="grid grid-cols-3 gap-2">
                 {eventTypes
                   .filter(
-                    (event) =>
+                    (event: any) =>
                       event.eventCategoryName === "Gateway Controller Event"
                   )
-                  .map((event, index) => (
+                  .map((event: any, index: number) => (
                     <div
                       key={index}
                       className={`p-2 flex items-center gap-2 cursor-pointer hover:bg-zinc-200 select-none ${
@@ -318,9 +318,9 @@ export default function EventsReport({ selectedFacilities, searchQuery }) {
               <div className="grid grid-cols-3 gap-2">
                 {eventTypes
                   .filter(
-                    (event) => event.eventCategoryName === "Edge Router Event"
+                    (event: any) => event.eventCategoryName === "Edge Router Event"
                   )
-                  .map((event, index) => (
+                  .map((event: any, index: number) => (
                     <div
                       key={index}
                       className={`p-2 flex items-center gap-2 cursor-pointer hover:bg-zinc-200 select-none ${

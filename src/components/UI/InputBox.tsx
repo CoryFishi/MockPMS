@@ -7,8 +7,14 @@ export default function InputBox({
   placeholder,
   type = "text",
   required = false,
+} : {
+  value: string;
+  onchange: any;
+  placeholder: string;
+  type?: string;
+  required?: boolean;
 }) {
-  const [isFocused, setIsFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState<boolean>(false);
   const shouldFloat = isFocused || value;
 
   return (

@@ -2,7 +2,7 @@ import Visitors from "@features/pms/pages/Visitors";
 import Units from "@features/pms/pages/Units";
 import AllFacilities from "@features/pms/pages/AllFacilities";
 import Favorites from "@features/pms/pages/Favorites";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
@@ -19,7 +19,7 @@ import Overview from "@features/pms/pages/Overview";
 export default function PMSDashboardLayout({
   dashboardMenu,
   setDashboardMenu,
-}) {
+} : { dashboardMenu: boolean; setDashboardMenu: any }) {
   const {
     user,
     currentFacility,
@@ -27,7 +27,6 @@ export default function PMSDashboardLayout({
     setTokens,
     setFavoriteTokens,
     setSelectedTokens,
-    role,
     permissions,
   } = useAuth();
   const [isNameGrabbed, setIsNameGrabbed] = useState(false);
@@ -43,7 +42,7 @@ export default function PMSDashboardLayout({
   const [currentFacilityName, setCurrentFacilityName] =
     useState("Select a Facility");
 
-  const handleCurrentFacilityUpdate = async (updatedInfo) => {
+  const handleCurrentFacilityUpdate = useCallback(async (updatedInfo: any) => {
     const { error } = await supabase.from("user_data").upsert(
       {
         user_id: user.id,
@@ -59,7 +58,7 @@ export default function PMSDashboardLayout({
       setCurrentFacilityName(updatedInfo.name);
       setIsNameGrabbed(true);
     }
-  };
+  }, [user, setCurrentFacility, setCurrentFacilityName, setIsNameGrabbed]);
 
   const handleCurrentFacilityDelete = async () => {
     const { error } = await supabase.from("user_data").upsert(
@@ -78,11 +77,6 @@ export default function PMSDashboardLayout({
     }
   };
 
-  const handleFacilityHandles = async () => {
-    await handleLogin();
-    await handleFacilityInfo();
-  };
-
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -96,7 +90,7 @@ export default function PMSDashboardLayout({
     }
   };
 
-  const handleLogin = async () => {
+  const handleLogin = useCallback(async () => {
     if (!currentFacility || Object.keys(currentFacility).length === 0) return;
 
     try {
@@ -113,9 +107,9 @@ export default function PMSDashboardLayout({
     } catch (err) {
       console.error("Login failed:", err);
     }
-  };
+  }, [currentFacility, handleCurrentFacilityUpdate]);
 
-  const handleFacilityInfo = async () => {
+  const handleFacilityInfo = useCallback(async () => {
     if (Object.keys(currentFacility).length === 0) return;
     var tokenStageKey = "";
     var tokenEnvKey = "";
@@ -148,9 +142,9 @@ export default function PMSDashboardLayout({
       .catch(function (error) {
         console.error("Error during login:", error);
       });
-  };
+  }, [currentFacility, handleCurrentFacilityUpdate]);
 
-  const toggleSection = (section) => {
+  const toggleSection = (section: keyof typeof openSections) => {
     setOpenSections((prev) => ({
       ...prev,
       [section]: !prev[section],
@@ -158,6 +152,10 @@ export default function PMSDashboardLayout({
   };
 
   useEffect(() => {
+    const handleFacilityHandles = async () => {
+      await handleLogin();
+      await handleFacilityInfo();
+    };
     if (!isNameGrabbed) {
       handleFacilityHandles();
     }
@@ -168,7 +166,7 @@ export default function PMSDashboardLayout({
     }, 3600 * 1000);
 
     return () => clearInterval(interval); // Cleanup on unmount
-  }, [currentFacility, isNameGrabbed, handleFacilityHandles]);
+  }, [currentFacility, isNameGrabbed, handleLogin, handleFacilityInfo]);
 
   return (
     <div className="flex flex-col w-full h-screen overflow-y-auto overflow-hidden">

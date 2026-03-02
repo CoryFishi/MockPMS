@@ -26,6 +26,11 @@ export default function SmartMotionModal({
   smartMotion,
   facilityName,
   setIsSmartMotionModalOpen,
+} : {
+  smartMotionModalOption: string;
+  smartMotion: any[];
+  facilityName: string;
+  setIsSmartMotionModalOpen: any;
 }) {
   const [filteredSmartMotion, setFilteredSmartMotion] = useState([]);
   const [option, setOption] = useState(smartMotionModalOption);

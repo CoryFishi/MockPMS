@@ -11,15 +11,15 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 import TableButton from "@components/UI/TableButton";
 import InputBox from "@components/UI/InputBox";
 
-export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
-  const [facilities, setFacilities] = useState([]);
-  const [sortDirection, setSortDirection] = useState("asc");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredFacilities, setFilteredFacilities] = useState([]);
-  const [sortedColumn, setSortedColumn] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [hasFavoriteTokensLoaded, setHasFavoriteTokensLoaded] = useState(false);
+export default function Favorites({ setOpenPage, setCurrentFacilityName } : { setOpenPage: any; setCurrentFacilityName: any; }) {
+  const [facilities, setFacilities] = useState<any[]>([]);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc" | null>("asc");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [filteredFacilities, setFilteredFacilities] = useState<any[]>([]);
+  const [sortedColumn, setSortedColumn] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(25);
+  const [hasFavoriteTokensLoaded, setHasFavoriteTokensLoaded] = useState<boolean>(false);
   const {
     user,
     favoriteTokens,
@@ -27,10 +27,10 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
     currentFacility,
     setCurrentFacility,
   } = useAuth();
-  const [noFacilities, setNoFacilities] = useState(false);
+  const [noFacilities, setNoFacilities] = useState<boolean>(false);
 
-  const handleSort = (columnKey, accessor = (a) => a[columnKey]) => {
-    let newDirection;
+  const handleSort = (columnKey: string, accessor: any = (a: any) => a[columnKey]) => {
+    let newDirection: "asc" | "desc" | null = "asc";
 
     if (sortedColumn !== columnKey) {
       newDirection = "asc";
@@ -59,7 +59,7 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
 
     setFilteredFacilities(sorted);
   };
-  const handleCurrentFacilityUpdate = async (updatedInfo) => {
+  const handleCurrentFacilityUpdate = async (updatedInfo: any) => {
     const { error } = await supabase.from("user_data").upsert(
       {
         user_id: user.id,
@@ -75,7 +75,7 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
       setCurrentFacility(updatedInfo);
     }
   };
-  const handleSelectLogin = async (facility) => {
+  const handleSelectLogin = async (facility: any) => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (facility.environment === "staging") {
@@ -117,7 +117,7 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
         throw error;
       });
   };
-  const handleSelect = async (facility) => {
+  const handleSelect = async (facility: any) => {
     await handleCurrentFacilityUpdate(facility);
     await toast.promise(handleSelectLogin(facility), {
       loading: "Selecting facility...",
@@ -127,11 +127,11 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
     localStorage.setItem("openPage", "units");
     setOpenPage("units");
   };
-  const addToFavorite = async (facility) => {
+  const addToFavorite = async (facility: any) => {
     const isFavorite = isFacilityFavorite(facility.id);
     handleFavoriteFacilitiesUpdate(facility, isFavorite);
   };
-  const handleFavoriteFacilitiesUpdate = async (newFacility, isFavorite) => {
+  const handleFavoriteFacilitiesUpdate = async (newFacility: any, isFavorite: boolean) => {
     // Fetch existing favorite tokens for the user
     const { data: currentData, error: fetchError } = await supabase
       .from("user_data")
@@ -186,8 +186,8 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
       }
     }
   };
-  const isFacilityFavorite = (facilityId) => {
-    return favoriteTokens.some((facility) => facility.id === facilityId);
+  const isFacilityFavorite = (facilityId: string) => {
+    return favoriteTokens.some((facility: any) => facility.id === facilityId);
   };
 
   useEffect(() => {
@@ -205,11 +205,10 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
     } catch {
       alert("It broke");
     }
-  }, [favoriteTokens]);
+  }, [favoriteTokens, facilities.length, hasFavoriteTokensLoaded]);
 
   useEffect(() => {
-    const filtered = facilities.filter(
-      (facility) =>
+    const filtered = facilities.filter((facility: any) =>
         (facility.id || "").toString().includes(searchQuery) ||
         (facility.propertyNumber || "")
           .toLowerCase()
@@ -235,8 +234,8 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
     {
       key: "isFavorite",
       label: "★",
-      accessor: (r) => (isFacilityFavorite(r.id) ? 1 : 0),
-      render: (r) => (
+      accessor: (r: any) => (isFacilityFavorite(r.id) ? 1 : 0),
+      render: (r: any) => (
         <div
           className="flex justify-center text-yellow-500 cursor-pointer"
           onClick={() => addToFavorite(r)}
@@ -252,19 +251,19 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
     {
       key: "environment",
       label: "Environment",
-      accessor: (r) => r.environment,
-      render: (r) => environmentLabel[r.environment] ?? "N/A",
+      accessor: (r: any) => r.environment,
+      render: (r: any) => environmentLabel[r.environment] ?? "N/A",
     },
     {
       key: "id",
       label: "Facility Id",
-      accessor: (r) => r.id,
+      accessor: (r: any) => r.id,
     },
     {
       key: "name",
       label: "Facility Name",
-      accessor: (r) => r.name,
-      render: (r) => (
+      accessor: (r: any) => r.name,
+      render: (r: any) => (
         <div className="flex gap-3 items-center justify-center">
           {r.name}
           <FaExternalLinkAlt
@@ -285,13 +284,13 @@ export default function Favorites({ setOpenPage, setCurrentFacilityName }) {
     {
       key: "propertyNumber",
       label: "Property Number",
-      accessor: (r) => r.propertyNumber,
+      accessor: (r: any) => r.propertyNumber,
     },
     {
       key: "actions",
       label: "Actions",
       sortable: false,
-      render: (r) =>
+      render: (r: any) =>
         currentFacility.id === r.id &&
         currentFacility.environment === r.environment ? (
           <TableButton

@@ -4,7 +4,7 @@ import DataTable from "@components/shared/DataTable";
 import { addEvent } from "@hooks/supabase";
 import { useAuth } from "@context/AuthProvider";
 import { MdEdit } from "react-icons/md";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import CreateVisitorUnitPage from "@features/pms/modals/CreateVisitorUnitPage";
@@ -39,7 +39,7 @@ export default function EditVisitor({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [continousDelete, setContinousDelete] = useState(false);
 
-  const handleTimeProfiles = async () => {
+  const handleTimeProfiles = useCallback(async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "staging") {
@@ -65,8 +65,8 @@ export default function EditVisitor({
       .catch(function (error) {
         console.error(error);
       });
-  };
-  const handleAccessProfiles = async () => {
+  }, [currentFacility]);
+  const handleAccessProfiles = useCallback(async () => {
     var tokenStageKey = "";
     var tokenEnvKey = "";
     if (currentFacility.environment === "staging") {
@@ -92,7 +92,7 @@ export default function EditVisitor({
       .catch(function (error) {
         console.error(error);
       });
-  };
+  }, [currentFacility]);
   const createTenant = () => {
     const handleRent = async () => {
       var tokenStageKey = "";
@@ -198,7 +198,7 @@ export default function EditVisitor({
   useEffect(() => {
     handleTimeProfiles();
     handleAccessProfiles();
-  }, []);
+  }, [handleTimeProfiles, handleAccessProfiles]);
 
   useEffect(() => {
     const filteredVisitors = allVisitors.filter(
