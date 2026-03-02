@@ -29,9 +29,9 @@ export default function CreateVisitorVisitor({
   const [selectedUnit, setSelectedUnit] = useState(null);
   const { currentFacility, user } = useAuth();
   const visitorTypes = [
-    { id: "Tenant", name: "Tenant" },
-    { id: "Guest", name: "Guest" },
-    { id: "nonTenant", name: "Non-Tenant Guest" },
+    { id: "Tenant", name: "PMS Tenant" },
+    { id: "Guest", name: "PMS Guest" },
+    { id: "nonTenant", name: "PMS Non-Tenant Guest" },
   ];
 
   const handleUnits = useCallback(async () => {

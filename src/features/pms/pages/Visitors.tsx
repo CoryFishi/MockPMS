@@ -308,12 +308,12 @@ export default function Visitors({ currentFacilityName }) {
       label: "Visitor Type",
       accessor: (v) =>
         v.isTenant
-          ? "Tenant"
+          ? "PMS Tenant"
           : v.isPortalVisitor
           ? "Non-Tenant"
           : !v.unitNumber
-          ? "Non-Tenant Guest"
-          : "Guest",
+          ? "PMS Non-Tenant Guest"
+          : "PMS Guest",
     },
     {
       key: "accessProfileName",
