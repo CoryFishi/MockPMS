@@ -1,19 +1,18 @@
-import Dashboard from "@pages/PMSDashboard/PMSDashboard";
-import AuthenticationSettings from "@pages/AuthenticationSettings/AuthenticationSettings";
-import SmartLockDashboard from "@pages/SmartSpaceDashboard/SmartSpaceDashboard";
-import Login from "@pages/Login/Login";
-import Register from "@pages/Register/Register";
-import Admin from "@pages/AdminDashboard/AdminDashboard";
-import UserSettings from "@pages/UserSettings/UserSettings";
-import ResetPassword from "@pages/ResetPassword/ResetPassword";
-import { Routes, Route } from "react-router-dom";
+import Dashboard from "@views/pms/PMSDashboard";
+import AuthenticationSettings from "@views/authentication-settings/AuthenticationSettings";
+import SmartLockDashboard from "@views/smartspace/SmartSpaceDashboard";
+import Login from "@views/auth/login/Login";
+import Register from "@views/auth/register/Register";
+import Admin from "@views/admin/AdminDashboard";
+import UserSettings from "@views/user-settings/UserSettings";
+import ResetPassword from "@views/auth/reset-password/ResetPassword";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useState, useEffect } from "react";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
 
-  // Check localStorage for dark mode preference on initial render
   useEffect(() => {
     const storedPreference = localStorage.getItem("darkMode");
     if (storedPreference === "true") {
@@ -22,7 +21,6 @@ function App() {
     }
   }, []);
 
-  // Toggle dark mode and save preference to localStorage
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
     if (!darkMode) {
@@ -42,65 +40,50 @@ function App() {
         toastOptions={{ duration: 2000 }}
       />
       <Routes>
+        {/* Redirect root to PMS */}
+        <Route path="/" element={<Navigate to="/pms/all-facilities" replace />} />
+
+        {/* PMS */}
         <Route
-          path="/"
-          element={
-            <Dashboard darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          }
+          path="/pms/*"
+          element={<Dashboard darkMode={darkMode} toggleDarkMode={toggleDarkMode} />}
         />
+
+        {/* SmartSpace */}
         <Route
-          path="/smartlock"
-          element={
-            <SmartLockDashboard
-              darkMode={darkMode}
-              toggleDarkMode={toggleDarkMode}
-            />
-          }
+          path="/smartspace/*"
+          element={<SmartLockDashboard darkMode={darkMode} toggleDarkMode={toggleDarkMode} />}
         />
+
+        {/* Admin */}
+        <Route
+          path="/admin/*"
+          element={<Admin darkMode={darkMode} toggleDarkMode={toggleDarkMode} />}
+        />
+
+        {/* Other pages */}
         <Route
           path="/authentication-settings"
-          element={
-            <AuthenticationSettings
-              darkMode={darkMode}
-              toggleDarkMode={toggleDarkMode}
-            />
-          }
+          element={<AuthenticationSettings darkMode={darkMode} toggleDarkMode={toggleDarkMode} />}
         />
         <Route
           path="/user-settings"
-          element={
-            <UserSettings darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          }
+          element={<UserSettings darkMode={darkMode} toggleDarkMode={toggleDarkMode} />}
         />
         <Route
           path="/login"
-          element={
-            <Login darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          }
+          element={<Login darkMode={darkMode} toggleDarkMode={toggleDarkMode} />}
         />
         <Route
           path="/register"
-          element={
-            <Register darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          }
+          element={<Register darkMode={darkMode} toggleDarkMode={toggleDarkMode} />}
         />
-        <Route
-          path="/admin"
-          element={
-            <Admin darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          }
-        />
-        <Route
-          path="/reset-password"
-          element={
-            <ResetPassword/>
-          }
-        />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
+        {/* Catch-all */}
         <Route
           path="/*"
-          element={
-            <Login darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          }
+          element={<Login darkMode={darkMode} toggleDarkMode={toggleDarkMode} />}
         />
       </Routes>
     </>

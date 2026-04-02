@@ -1,7 +1,10 @@
-import { useState, useEffect, createContext, useContext } from "react";
-import { supabase } from "@app/supabaseClient";
+import { useState, useEffect, useRef, useCallback, createContext, useContext } from "react";
+import { supabase } from "@lib/supabaseClient";
 import toast from "react-hot-toast";
 import { IoWarning } from "react-icons/io5";
+import { handleSingleLogin } from "@hooks/opentech";
+
+type BearerMap = Record<string, { access_token: string; expires_at: number }>;
 
 const AuthContext = createContext(null);
 
@@ -22,6 +25,85 @@ export const AuthProvider = ({ children }) => {
   const [role, setRole] = useState("");
   const [permissions, setPermissions] = useState({});
   const [noUser, setNoUser] = useState(true);
+  const [bearerTokens, setBearerTokens] = useState<BearerMap>({});
+
+  // Keep a ref so the background refresh interval can read latest values
+  // without being re-created every render
+  const bearerTokensRef = useRef<BearerMap>(bearerTokens);
+  const currentFacilityRef = useRef(currentFacility);
+  const tokensRef = useRef(tokens);
+
+  useEffect(() => { bearerTokensRef.current = bearerTokens; }, [bearerTokens]);
+  useEffect(() => { currentFacilityRef.current = currentFacility; }, [currentFacility]);
+  useEffect(() => { tokensRef.current = tokens; }, [tokens]);
+
+  // Returns cached access_token for a credential, or null if missing/expired.
+  // Stable reference (reads from ref) — safe to use in useCallback deps.
+  const getBearerToken = useCallback((credential: any): string | null => {
+    const key = `${credential.api}::${credential.environment}`;
+    const entry = bearerTokensRef.current[key];
+    if (!entry || Date.now() >= entry.expires_at) return null;
+    return entry.access_token;
+  }, []);
+
+  // Authenticate a list of credentials in parallel and merge results into bearerTokens
+  async function authenticateCredentials(creds: any[]) {
+    if (!creds.length) return;
+    const results = await Promise.allSettled(creds.map((c) => handleSingleLogin(c)));
+    setBearerTokens((prev) => {
+      const updated = { ...prev };
+      results.forEach((result, i) => {
+        if (result.status === "fulfilled" && 'token' in result.value) {
+          const cred = creds[i];
+          updated[`${cred.api}::${cred.environment}`] = {
+            access_token: result.value.token.access_token,
+            expires_at: Date.now() + result.value.token.expires_in * 1000,
+          };
+        }
+      });
+      return updated;
+    });
+  }
+
+  // Background refresh: every 5 minutes, re-auth tokens expiring within 10 minutes
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const allTokens = tokensRef.current;
+      if (!allTokens.length) return;
+
+      const stale = allTokens.filter((cred: any) => {
+        const key = `${cred.api}::${cred.environment}`;
+        const entry = bearerTokensRef.current[key];
+        return !entry || entry.expires_at - Date.now() < 10 * 60 * 1000;
+      });
+
+      if (!stale.length) return;
+
+      const results = await Promise.allSettled(stale.map((c: any) => handleSingleLogin(c)));
+      setBearerTokens((prev) => {
+        const updated = { ...prev };
+        results.forEach((r, i) => {
+          if (r.status === "fulfilled" && 'token' in r.value) {
+            const cred = stale[i];
+            const key = `${cred.api}::${cred.environment}`;
+            const freshToken = r.value.token;
+            updated[key] = {
+              access_token: freshToken.access_token,
+              expires_at: Date.now() + freshToken.expires_in * 1000,
+            };
+            // Patch currentFacility token in-place if this credential matches
+            const cf = currentFacilityRef.current as any;
+            if (cf?.api === cred.api && cf?.environment === cred.environment) {
+              setCurrentFacility((prev: any) => ({ ...prev, token: freshToken }));
+            }
+          }
+        });
+        return updated;
+      });
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (role) {
@@ -63,9 +145,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (user && !isPulled) {
-      // Call all gets
       setIsPulled(true);
-      // Get the current facility selection
       const getUserData = async () => {
         if (!user) throw new Error("User not signed in");
 
@@ -77,7 +157,6 @@ export const AuthProvider = ({ children }) => {
 
         if (error) {
           if (error.code === "PGRST116") {
-            // Insert a new row for the user
             const { error: insertError } = await supabase
               .from("user_data")
               .insert({
@@ -95,7 +174,6 @@ export const AuthProvider = ({ children }) => {
               return null;
             }
 
-            // Set default state after successful insertion
             setCurrentFacility({});
             setSelectedTokens([]);
             setFavoriteTokens([]);
@@ -151,6 +229,11 @@ export const AuthProvider = ({ children }) => {
           setFavoriteTokens(data?.favorite_tokens || []);
           setTokens(data?.tokens || []);
           setRole(data?.role || "");
+
+          // Silently authenticate all stored credentials in the background
+          if (data?.tokens?.length) {
+            authenticateCredentials(data.tokens);
+          }
         }
         if (
           data?.tokens < 1 &&
@@ -204,6 +287,19 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user, isPulled]);
 
+  // When tokens are updated externally (e.g. after adding a new credential),
+  // authenticate any credential that doesn't yet have a cached bearer token
+  useEffect(() => {
+    if (!tokens.length) return;
+    const missing = tokens.filter((cred: any) => {
+      const key = `${cred.api}::${cred.environment}`;
+      return !bearerTokensRef.current[key];
+    });
+    if (missing.length) {
+      authenticateCredentials(missing);
+    }
+  }, [tokens]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -223,6 +319,8 @@ export const AuthProvider = ({ children }) => {
         isLoading,
         permissions,
         noUser,
+        bearerTokens,
+        getBearerToken,
       }}
     >
       {children}
