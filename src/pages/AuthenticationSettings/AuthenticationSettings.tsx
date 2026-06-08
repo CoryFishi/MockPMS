@@ -231,7 +231,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode } : { 
   const exportFacilities = () => {
     const userResponse = confirm("Are you sure you want to export the tokens?");
     if (!userResponse) {
-      console.log("User denied export.");
+      console.error("User denied export.");
       return;
     }
     // Convert the data to CSV format

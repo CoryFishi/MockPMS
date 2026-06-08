@@ -25,7 +25,6 @@ export default function AddAuthentication({
   const handleAuthRequest = useCallback((environment: string, creds: any) => {
     setLoading(true);
     handleNewLogin(environment, creds).then((data) => {
-      console.log("Authentication response:", data);
       if (data.message) {
         setIsAuthenticated(true);
       } else {

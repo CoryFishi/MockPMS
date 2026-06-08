@@ -48,7 +48,7 @@ export default function CreateVisitorUnitModal({
         setTimeProfiles(response.data);
       })
       .catch(function (error) {
-        console.log(error);
+        console.error(error);;
       });
   };
   const handleAccessProfiles = async () => {
@@ -75,7 +75,7 @@ export default function CreateVisitorUnitModal({
         setAccessProfiles(response.data);
       })
       .catch(function (error) {
-        console.log(error);
+        console.error(error);;
       });
   };
   const handleCreateVisitor = (e) => {
@@ -132,7 +132,7 @@ export default function CreateVisitorUnitModal({
           });
         })
         .catch(function (error) {
-          console.log(error);
+          console.error(error);;
           throw error;
         }),
       {

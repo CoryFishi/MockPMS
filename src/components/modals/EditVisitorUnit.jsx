@@ -57,7 +57,7 @@ export default function EditVisitor({
         setTimeProfiles(response.data);
       })
       .catch(function (error) {
-        console.log(error);
+        console.error(error);;
       });
   };
   const handleAccessProfiles = async () => {
@@ -84,7 +84,7 @@ export default function EditVisitor({
         setAccessProfiles(response.data);
       })
       .catch(function (error) {
-        console.log(error);
+        console.error(error);;
       });
   };
   const createTenant = () => {
@@ -132,7 +132,6 @@ export default function EditVisitor({
         .then(function (response) {
           const visitor = response.data.visitor;
           setFilteredVisitors((prev) => [...prev, visitor]);
-          console.log(response.data);
           return response;
         })
         .catch(function (error) {
