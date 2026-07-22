@@ -3,14 +3,17 @@ import SmartLockModal from "@views/smartspace/dashboard/SmartLockModal";
 import { RiRouterFill } from "react-icons/ri";
 import SmartSpaceDetailModal from "@components/shared/DetailModal";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
+import { MdRefresh } from "react-icons/md";
 import SmartMotionModal from "@views/smartspace/dashboard/SmartMotionModal";
 
 export default function SmartSpaceFacilityCard({
   facility,
   toggledSections,
   explicitSort,
+  isRefreshing = false,
 } : {
   facility: any;
+  isRefreshing?: boolean;
   toggledSections: {
     smartLock: boolean;
     smartMotion: boolean;
@@ -109,6 +112,11 @@ export default function SmartSpaceFacilityCard({
           >
             {isCardShown ? <IoMdArrowDropdown /> : <IoMdArrowDropup />}{" "}
             {facility.name}
+            {isRefreshing && (
+              <span title="Refreshing data..." className="ml-2 inline-flex">
+                <MdRefresh className="animate-spin text-yellow-500 text-base" />
+              </span>
+            )}
           </h1>
           {isCardShown && (
             <>

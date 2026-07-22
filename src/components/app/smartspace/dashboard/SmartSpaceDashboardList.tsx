@@ -32,6 +32,7 @@ export default function SmartSpaceDashboardList({
   totalSmartMotion,
   pendingFacilities = [],
   erroredFacilities = [],
+  refreshingKeys = [],
 } : {
   filteredFacilities: any[];
   facilitiesWithBearers: any[];
@@ -70,6 +71,7 @@ export default function SmartSpaceDashboardList({
     refetch: () => void;
     isFetching: boolean;
   }[];
+  refreshingKeys?: string[];
 }) {
   const [sortKey, setSortKey] = useState<keyof typeof filteredFacilities[0] | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc" | null>("asc");
@@ -303,6 +305,9 @@ export default function SmartSpaceDashboardList({
             key={index}
             toggledSections={toggledSections}
             explicitSort={explicitSort}
+            isRefreshing={refreshingKeys.includes(
+              `${facility.environment}:${facility.id}`
+            )}
           />
         ))}
         {pendingFacilities.map((facility: any) => (

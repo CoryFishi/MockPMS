@@ -15,7 +15,7 @@ import { useFacilityStatusQueries, FACILITY_QUERY_KEY } from "@hooks/smartspace"
 export default function SmartSpaceDashboardView() {
   const { selectedTokens, getBearerToken } = useAuth();
   const queryClient = useQueryClient();
-  const { loaded, pending, errored, lastUpdatedAt } = useFacilityStatusQueries(
+  const { loaded, pending, errored, lastUpdatedAt, refreshingKeys } = useFacilityStatusQueries(
     selectedTokens,
     getBearerToken
   );
@@ -365,6 +365,7 @@ export default function SmartSpaceDashboardView() {
             totalSmartMotion={totalSmartMotion}
             pendingFacilities={pending}
             erroredFacilities={errored}
+            refreshingKeys={refreshingKeys}
           />
         </div>
       ) : (
@@ -608,6 +609,9 @@ export default function SmartSpaceDashboardView() {
                   facility={facility}
                   toggledSections={toggledSections}
                   explicitSort={explicitSort}
+                  isRefreshing={refreshingKeys.includes(
+                    `${facility.environment}:${facility.id}`
+                  )}
                 />
               </div>
             ))}

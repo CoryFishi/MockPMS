@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FaCheckCircle, FaExternalLinkAlt, FaWalking } from "react-icons/fa";
+import { MdRefresh } from "react-icons/md";
 import { IoIosWarning } from "react-icons/io";
 import SmartLockModal from "@views/smartspace/dashboard/SmartLockModal";
 import SmartMotionModal from "@views/smartspace/dashboard/SmartMotionModal";
@@ -15,6 +16,7 @@ export default function SmartSpaceFacilityRow({
   expandedRows,
   toggledSections,
   explicitSort,
+  isRefreshing = false,
 } : {
   facility: any;
   setExpandedRows: React.Dispatch<React.SetStateAction<number[]>>;
@@ -25,6 +27,7 @@ export default function SmartSpaceFacilityRow({
     smartMotion: boolean;
   };
   explicitSort: boolean;
+  isRefreshing?: boolean;
 }) {
   const [isSmartlockModalOpen, setIsSmartlockModalOpen] = useState<boolean>(false);
   const [smartlockModalOption, setSmartlockModalOption] = useState<any>(null);
@@ -120,6 +123,11 @@ export default function SmartSpaceFacilityRow({
                 {expandedRows.includes(facility.id) ? "−" : "+"}
               </button>
               <p className="truncate max-w-[20ch]">{facility.name}</p>
+              {isRefreshing && (
+                <span title="Refreshing data...">
+                  <MdRefresh className="animate-spin text-yellow-500 min-w-4" />
+                </span>
+              )}
               <FaExternalLinkAlt
                 className="hover:text-blue-300 text-blue-500"
                 onClick={(e) => {

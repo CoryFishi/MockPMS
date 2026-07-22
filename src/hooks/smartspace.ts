@@ -215,6 +215,10 @@ export function useFacilityStatusQueries(
         }))
         .filter((e) => e.isError),
       lastUpdatedAt: Math.max(0, ...results.map((r) => r.dataUpdatedAt || 0)),
+      // Facilities re-fetching in the background (already have data on screen)
+      refreshingKeys: facilities
+        .filter((_: any, i: number) => results[i].isFetching && !results[i].isPending)
+        .map((facility: any) => `${facility.environment}:${facility.id}`),
     }),
   });
 }
