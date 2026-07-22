@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { FaLock } from "react-icons/fa";
+import { MdRefresh } from "react-icons/md";
 import SmartSpaceFacilityCard from "@views/smartspace/dashboard/SmartSpaceFacilityCard";
 import FacilityPendingCard from "@views/smartspace/dashboard/FacilityPendingCard";
 import FacilityErrorCard from "@views/smartspace/dashboard/FacilityErrorCard";
@@ -220,7 +221,24 @@ export default function SmartSpaceDashboardView() {
           </span>
         </div>
       )}
-      <div className="mt-5 mb-2 flex items-center justify-end text-center mx-5">
+      {/* Last updated + refresh */}
+      <div className="mt-3 flex items-center justify-end gap-2 mx-5 text-xs text-zinc-500 dark:text-zinc-400">
+        {lastUpdatedAt > 0 && (
+          <span className="whitespace-nowrap">
+            Last updated {new Date(lastUpdatedAt).toLocaleTimeString()}
+          </span>
+        )}
+        <button
+          className="flex items-center gap-1 bg-zinc-500 text-white px-2 py-1 rounded-sm hover:bg-zinc-600 font-bold cursor-pointer hover:transition hover:duration-300 hover:ease-in-out"
+          onClick={() =>
+            queryClient.invalidateQueries({ queryKey: [FACILITY_QUERY_KEY] })
+          }
+          title="Refresh all facilities"
+        >
+          <MdRefresh className="text-sm" /> Refresh
+        </button>
+      </div>
+      <div className="mt-2 mb-2 flex items-center justify-end text-center mx-5">
         {/* Search Bar */}
 
         <InputBox
@@ -233,20 +251,6 @@ export default function SmartSpaceDashboardView() {
           }}
           value={searchQuery}
         />
-
-        {lastUpdatedAt > 0 && (
-          <span className="mr-3 text-xs text-zinc-500 dark:text-zinc-400 whitespace-nowrap">
-            Last updated {new Date(lastUpdatedAt).toLocaleTimeString()}
-          </span>
-        )}
-        <button
-          className="bg-zinc-500 text-white p-1 py-2 rounded-sm hover:bg-zinc-600 ml-3 w-28 font-bold cursor-pointer hover:transition hover:duration-300 hover:ease-in-out"
-          onClick={() =>
-            queryClient.invalidateQueries({ queryKey: [FACILITY_QUERY_KEY] })
-          }
-        >
-          Refresh All
-        </button>
 
         {/* Toggle view button */}
         <button
