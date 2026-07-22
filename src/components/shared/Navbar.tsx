@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { RiMenuFold3Fill, RiMenuFold4Fill } from "react-icons/ri";
 import { useAuth } from "@context/AuthProvider";
-import { supabase } from "@app/supabaseClient";
+import { supabase } from "@lib/supabaseClient";
 import { useState, useEffect, useRef } from "react";
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -43,10 +43,9 @@ export default function Navbar({
   };
 
   const showSideToggle =
-    location.pathname === "/" ||
-    location.pathname === "/smartlock" ||
-    location.pathname === "/admin" ||
-    location.pathname === "/sensor";
+    location.pathname.startsWith("/pms") ||
+    location.pathname.startsWith("/smartspace") ||
+    location.pathname.startsWith("/admin");
 
   // Close modal if clicking outside of it
   useEffect(() => {
@@ -85,9 +84,9 @@ export default function Navbar({
         <div className="flex space-x-4 items-center mr-5">
           {user && permissions.smartlockPlatform && (
             <Link
-              to="/smartlock"
+              to="/smartspace/all-facilities"
               className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium ${
-                location.pathname === "/smartlock"
+                location.pathname.startsWith("/smartspace")
                   ? "border-b-2 border-yellow-400"
                   : ""
               }`}
@@ -97,9 +96,11 @@ export default function Navbar({
           )}
           {user && permissions.pmsPlatform && (
             <Link
-              to="/"
+              to="/pms/all-facilities"
               className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium ${
-                location.pathname === "/" ? "border-b-2 border-yellow-400" : ""
+                location.pathname.startsWith("/pms")
+                  ? "border-b-2 border-yellow-400"
+                  : ""
               }`}
             >
               Property Management
@@ -107,9 +108,9 @@ export default function Navbar({
           )}
           {user && role === "admin" && (
             <Link
-              to="/admin"
+              to="/admin/users"
               className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium ${
-                location.pathname === "/admin"
+                location.pathname.startsWith("/admin")
                   ? "border-b-2 border-yellow-400"
                   : ""
               }`}

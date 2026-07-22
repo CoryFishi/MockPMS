@@ -27,12 +27,12 @@
     /* Path aliases */
     "paths": {
       "@components/*": ["./src/components/*"],
-      "@features/*": ["./src/features/*"],
+      "@views/*": ["./src/components/app/*"],
       "@context/*": ["./src/context/*"],
       "@assets/*": ["./src/assets/*"],
       "@app/*": ["./src/app/*"],
       "@hooks/*": ["./src/hooks/*"],
-      "@pages/*": ["./src/pages/*"]
+      "@lib/*": ["./src/lib/*"]
     }
   },
   "include": ["src"],
