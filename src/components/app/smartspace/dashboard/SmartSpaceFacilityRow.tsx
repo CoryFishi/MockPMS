@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FaCheckCircle, FaExternalLinkAlt, FaWalking } from "react-icons/fa";
+import { MdRefresh } from "react-icons/md";
 import { IoIosWarning } from "react-icons/io";
 import SmartLockModal from "@views/smartspace/dashboard/SmartLockModal";
 import SmartMotionModal from "@views/smartspace/dashboard/SmartMotionModal";
@@ -15,6 +16,7 @@ export default function SmartSpaceFacilityRow({
   expandedRows,
   toggledSections,
   explicitSort,
+  isRefreshing = false,
 } : {
   facility: any;
   setExpandedRows: React.Dispatch<React.SetStateAction<number[]>>;
@@ -25,6 +27,7 @@ export default function SmartSpaceFacilityRow({
     smartMotion: boolean;
   };
   explicitSort: boolean;
+  isRefreshing?: boolean;
 }) {
   const [isSmartlockModalOpen, setIsSmartlockModalOpen] = useState<boolean>(false);
   const [smartlockModalOption, setSmartlockModalOption] = useState<any>(null);
@@ -68,13 +71,15 @@ export default function SmartSpaceFacilityRow({
     setIsDetailModalOpen(true);
   };
 
-  // If no edge router data, do not render the row
-  // or if all toggled sections are false, do not render the row
+  const sectionFailed = (section: string) =>
+    Array.isArray(facility.failedSections) &&
+    facility.failedSections.includes(section);
+
+  // If all toggled sections are false, do not render the row
   if (
-    Object.keys(facility.edgeRouter).length === 0 ||
-    (toggledSections.openNet === false &&
-      toggledSections.smartLock === false &&
-      toggledSections.smartMotion === false)
+    toggledSections.openNet === false &&
+    toggledSections.smartLock === false &&
+    toggledSections.smartMotion === false
   ) {
     return null;
   }
@@ -118,6 +123,11 @@ export default function SmartSpaceFacilityRow({
                 {expandedRows.includes(facility.id) ? "−" : "+"}
               </button>
               <p className="truncate max-w-[20ch]">{facility.name}</p>
+              {isRefreshing && (
+                <span title="Refreshing data...">
+                  <MdRefresh className="animate-spin text-yellow-500 min-w-4" />
+                </span>
+              )}
               <FaExternalLinkAlt
                 className="hover:text-blue-300 text-blue-500"
                 onClick={(e) => {
@@ -140,36 +150,67 @@ export default function SmartSpaceFacilityRow({
         {/* OpenNet Section */}
         {toggledSections.openNet && (
           <>
-            <td className="px-4 py-2 border-l border-zinc-300 dark:border-zinc-700">
-              <div
-                className="inline-flex items-center gap-1 text-center justify-center w-full cursor-pointer hover:underline"
-                onClick={() => openDetailModal(facility.edgeRouter)}
+            {!sectionFailed("edgeRouter") ? (
+              <td className="px-4 py-2 border-l border-zinc-300 dark:border-zinc-700">
+                <div
+                  className="inline-flex items-center gap-1 text-center justify-center w-full cursor-pointer hover:underline"
+                  onClick={() => openDetailModal(facility.edgeRouter)}
+                >
+                  {facility.edgeRouterStatus === "error" ? (
+                    <IoIosWarning className="text-red-500 mr-2 min-w-5" />
+                  ) : facility.edgeRouterStatus === "warning" ? (
+                    <IoIosWarning className="text-yellow-500 mr-2 min-w-5" />
+                  ) : (
+                    <FaCheckCircle className="text-green-500 mr-2 min-w-5" />
+                  )}
+                  {facility.edgeRouterName}
+                </div>
+              </td>
+            ) : (
+              <td
+                className="px-4 py-2 text-center border-l border-zinc-300 dark:border-zinc-700 text-zinc-400"
+                title="Edge router data unavailable"
               >
-                {facility.edgeRouterStatus === "error" ? (
-                  <IoIosWarning className="text-red-500 mr-2 min-w-5" />
-                ) : facility.edgeRouterStatus === "warning" ? (
-                  <IoIosWarning className="text-yellow-500 mr-2 min-w-5" />
-                ) : (
-                  <FaCheckCircle className="text-green-500 mr-2 min-w-5" />
-                )}
-                {facility.edgeRouterName}
-              </div>
-            </td>
-            <td
-              className="px-4 py-2 text-center cursor-pointer hover:underline"
-              onClick={() => openAccessPointModal("online")}
-            >
-              {facility.onlineAccessPointsCount}
-            </td>
-            <td
-              className="px-4 py-2 text-center cursor-pointer hover:underline"
-              onClick={() => openAccessPointModal("offline")}
-            >
-              {facility.offlineAccessPointsCount}
-            </td>
+                —
+              </td>
+            )}
+            {!sectionFailed("accessPoints") ? (
+              <>
+                <td
+                  className="px-4 py-2 text-center cursor-pointer hover:underline"
+                  onClick={() => openAccessPointModal("online")}
+                >
+                  {facility.onlineAccessPointsCount}
+                </td>
+                <td
+                  className="px-4 py-2 text-center cursor-pointer hover:underline"
+                  onClick={() => openAccessPointModal("offline")}
+                >
+                  {facility.offlineAccessPointsCount}
+                </td>
+              </>
+            ) : (
+              <>
+                <td
+                  className="px-4 py-2 text-center text-zinc-400"
+                  title="Access point data unavailable"
+                >
+                  —
+                </td>
+                <td
+                  className="px-4 py-2 text-center text-zinc-400"
+                  title="Access point data unavailable"
+                >
+                  —
+                </td>
+              </>
+            )}
           </>
         )}
-        {toggledSections.smartLock && facility.smartLocks.length > 0 ? (
+        {toggledSections.smartLock &&
+        facility.smartLocks.length > 0 &&
+        !sectionFailed("smartlocks") &&
+        !sectionFailed("smartlockSummary") ? (
           <>
             <td
               className="px-4 py-2 text-center cursor-pointer hover:underline border-l border-zinc-300 dark:border-zinc-700"
@@ -216,11 +257,20 @@ export default function SmartSpaceFacilityRow({
           </>
         ) : toggledSections.smartLock ? (
           <td
-            className="border-l border-zinc-300 dark:border-zinc-700"
-            colSpan={toggledSections.smartLock ? 6 : 0}
-          ></td>
+            className="border-l border-zinc-300 dark:border-zinc-700 px-4 py-2 text-center text-zinc-400"
+            colSpan={6}
+            title={
+              sectionFailed("smartlocks") || sectionFailed("smartlockSummary")
+                ? "SmartLock data unavailable"
+                : undefined
+            }
+          >
+            {sectionFailed("smartlocks") || sectionFailed("smartlockSummary") ? "—" : ""}
+          </td>
         ) : null}
-        {toggledSections.smartMotion && facility.smartMotion.length > 0 ? (
+        {toggledSections.smartMotion &&
+        facility.smartMotion.length > 0 &&
+        !sectionFailed("smartMotion") ? (
           <>
             <td
               className="px-4 py-2 text-center cursor-pointer hover:underline border-l border-zinc-300 dark:border-zinc-700"
@@ -265,12 +315,15 @@ export default function SmartSpaceFacilityRow({
               {facility.smartMotionLowestBattery}%
             </td>
           </>
-        ) : (
+        ) : toggledSections.smartMotion ? (
           <td
-            colSpan={toggledSections.smartMotion ? 6 : 0}
-            className="border-l border-zinc-300 dark:border-zinc-700"
-          ></td>
-        )}
+            className="border-l border-zinc-300 dark:border-zinc-700 px-4 py-2 text-center text-zinc-400"
+            colSpan={6}
+            title={sectionFailed("smartMotion") ? "SmartMotion data unavailable" : undefined}
+          >
+            {sectionFailed("smartMotion") ? "—" : ""}
+          </td>
+        ) : null}
       </tr>
 
       {expandedRows.includes(facility.id) && (

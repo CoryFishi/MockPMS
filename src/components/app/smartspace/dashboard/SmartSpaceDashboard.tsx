@@ -1,18 +1,37 @@
-import axios from "axios";
-import toast from "react-hot-toast";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { FaLock } from "react-icons/fa";
+import { MdRefresh } from "react-icons/md";
 import SmartSpaceFacilityCard from "@views/smartspace/dashboard/SmartSpaceFacilityCard";
+import FacilityPendingCard from "@views/smartspace/dashboard/FacilityPendingCard";
+import FacilityErrorCard from "@views/smartspace/dashboard/FacilityErrorCard";
 import SmartSpaceExport from "@views/smartspace/dashboard/SmartSpaceExport";
 import { useAuth } from "@context/AuthProvider";
-import LoadingSpinner from "@components/shared/LoadingSpinner";
 import SmartSpaceDashboardList from "@views/smartspace/dashboard/SmartSpaceDashboardList";
 import InputBox from "@components/ui/InputBox";
 import SliderButton from "@components/ui/SliderButton";
+import { useFacilityStatusQueries, FACILITY_QUERY_KEY } from "@hooks/smartspace";
 
 export default function SmartSpaceDashboardView() {
-  const [facilitiesWithBearers, setFacilitiesWithBearers] = useState([]);
-  const [filteredFacilities, setFilteredFacilities] = useState([]);
+  const { selectedTokens, getBearerToken } = useAuth();
+  const queryClient = useQueryClient();
+  const { loaded, pending, errored, lastUpdatedAt, refreshingKeys } = useFacilityStatusQueries(
+    selectedTokens,
+    getBearerToken
+  );
+
+  // Sorted stable copy of loaded facilities (most smartlocks first), the
+  // source list for search and for the List's sort-reset.
+  const loadedFacilities = useMemo(
+    () =>
+      [...loaded].sort(
+        (a, b) => (b.smartLocks?.length || 0) - (a.smartLocks?.length || 0)
+      ),
+    [loaded]
+  );
+
+  const [filteredFacilities, setFilteredFacilities] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [listView, setListView] = useState(
     JSON.parse(localStorage.getItem("smartSpaceListView")) || true
   );
@@ -23,39 +42,13 @@ export default function SmartSpaceDashboardView() {
       smartMotion: true,
     }
   );
-  const [facilitiesInfo, setFacilitiesInfo] = useState<any[]>([]);
-  const [edgeRouterOfflineCount, setEdgeRouterOfflineCount] = useState<number>(0);
-  const [edgeRouterOnlineCount, setEdgeRouterOnlineCount] = useState<number>(0);
-  const [edgeRouterWarningCount, setEdgeRouterWarningCount] = useState<number>(0);
-  const [accessPointsOnlineCount, setAccessPointsOnlineCount] = useState<number>(0);
-  const [accessPointsOfflineCount, setAccessPointsOfflineCount] = useState<number>(0);
-  const [smartlockOkayCount, setSmartlockOkayCount] = useState<number>(0);
-  const [smartlockWarningCount, setSmartlockWarningCount] = useState<number>(0);
-  const [smartlockErrorCount, setSmartlockErrorCount] = useState<number>(0);
-  const [smartlockOfflineCount, setSmartlockOfflineCount] = useState<number>(0);
-  const [smartlockLowestSignal, setSmartlockLowestSignal] = useState<any>({});
-  const [smartlockLowestBattery, setSmartlockLowestBattery] = useState<any>({});
-  const [totalSmartlocks, setTotalSmartlocks] = useState<number>(0);
-  const [totalAccessPoints, setTotalAccessPoints] = useState<number>(0);
-  const [totalEdgeRouters, setTotalEdgeRouters] = useState<number>(0);
-  const [totalSmartMotion, setTotalSmartMotion] = useState<number>(0);
-  const [smartMotionOkayCount, setSmartMotionOkayCount] = useState<number>(0);
-  const [smartMotionWarningCount, setSmartMotionWarningCount] = useState<number>(0);
-  const [smartMotionErrorCount, setSmartMotionErrorCount] = useState<number>(0);
-  const [smartMotionOfflineCount, setSmartMotionOfflineCount] = useState<number>(0);
-  const [smartMotionLowestSignal, setSmartMotionLowestSignal] = useState<any>({});
-  const [smartMotionLowestBattery, setSmartMotionLowestBattery] = useState<any>({});
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const { selectedTokens, getBearerToken } = useAuth();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [explicitSort, setExplicitSort] = useState<boolean>(
     JSON.parse(localStorage.getItem("smartSpaceExplicit")) || false
   );
-  const [currentLoadingText, setCurrentLoadingText] = useState<string>("");
   // Search via search bar and button
   const search = useCallback((query: string) => {
     const trimmed = query.trim().toLowerCase();
-    const results = facilitiesWithBearers.filter((facility) => {
+    const results = loadedFacilities.filter((facility) => {
       const searchableFields = [
         facility.id?.toString(),
         facility.name,
@@ -71,486 +64,137 @@ export default function SmartSpaceDashboardView() {
       );
     });
     setFilteredFacilities(results);
-  }, [facilitiesWithBearers]);
-  // Function to get a bearer token for each facility
-  const fetchBearerToken = async (facility: any) => {
-    try {
-      var tokenStageKey = "";
-      var tokenEnvKey = "";
-      if (facility.environment === "staging") {
-        tokenStageKey = "cia-stg-1.aws.";
-      } else {
-        tokenEnvKey = facility.environment;
-      }
-      const data = {
-        grant_type: "password",
-        username: facility.api,
-        password: facility.apiSecret,
-        client_id: facility.client,
-        client_secret: facility.clientSecret,
-      };
-
-      const response = await axios.post(
-        `https://auth.${tokenStageKey}insomniaccia${tokenEnvKey}.com/auth/token`,
-        data,
-        {
-          headers: {
-            accept: "application/json",
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      );
-
-      return response.data.access_token;
-    } catch (error) {
-      console.error(`Error fetching token for ${facility.name}:`, error);
-      toast.error(`Failed to fetch token for ${facility.name}`);
-      return null;
-    }
-  };
+  }, [loadedFacilities]);
   // Toggle view - list or card
   const toggleListView = () => {
     setListView(!listView);
     localStorage.setItem("smartSpaceListView", !listView ? "true" : "false");
-  };
-  // Add totals together from each facility
-  useEffect(() => {
-    const updateAggregatedCounts = (filteredFacilities: any[]) => {
-      const facilitiesWithSmartLocks = filteredFacilities.filter(
-        (f: any) => Array.isArray(f.smartLocks) && f.smartLocks.length > 0
-      );
-      const facilitiesWithSmartMotions = filteredFacilities.filter(
-        (f: any) => Array.isArray(f.smartMotion) && f.smartMotion.length > 0
-      );
-
-      const totals = {
-        totalAccessPoints: 0,
-        totalEdgeRouters: 0,
-        totalSmartlocks: 0,
-        edgeRouterOfflineCount: 0,
-        edgeRouterOnlineCount: 0,
-        edgeRouterWarningCount: 0,
-        accessPointsOnlineCount: 0,
-        accessPointsOfflineCount: 0,
-        smartlockOkayCount: 0,
-        smartlockWarningCount: 0,
-        smartlockErrorCount: 0,
-        smartlockOfflineCount: 0,
-        smartlockLowestSignal: "100",
-        smartlockLowestBattery: "100",
-        smartlockLowestSignalFacility: "N/A",
-        smartlockLowestBatteryFacility: "N/A",
-        smartMotionOkayCount: 0,
-        smartMotionWarningCount: 0,
-        smartMotionErrorCount: 0,
-        smartMotionOfflineCount: 0,
-        smartMotionLowestSignal: "100",
-        smartMotionLowestBattery: "100",
-        smartMotionLowestSignalFacility: "N/A",
-        smartMotionLowestBatteryFacility: "N/A",
-        totalSmartMotion: 0,
-      };
-
-      // Count all edge routers and access points (all facilities)
-      for (const facility of facilitiesInfo) {
-        // If explicit sort is enabled, and smart motion is selected do not render the row when there are no smart motion devices
-        if (
-          facility.smartMotion.length < 1 &&
-          !toggledSections.smartLock &&
-          toggledSections.smartMotion &&
-          explicitSort
-        ) {
-          continue;
-        }
-
-        // If explicit sort is enabled, and smart lock is selected do not render the row when there are no smart lock devices
-        if (
-          facility.smartLocks.length < 1 &&
-          !toggledSections.smartMotion &&
-          toggledSections.smartLock &&
-          explicitSort
-        ) {
-          continue;
-        }
-
-        totals.totalEdgeRouters += facility.edgeRouterStatus ? 1 : 1;
-        totals.edgeRouterOfflineCount +=
-          facility.edgeRouterStatus === "error" ? 1 : 0;
-        totals.edgeRouterOnlineCount +=
-          facility.edgeRouterStatus === "ok" ? 1 : 0;
-        totals.edgeRouterWarningCount +=
-          facility.edgeRouterStatus === "warning" ? 1 : 0;
-
-        totals.accessPointsOnlineCount += facility.onlineAccessPointsCount;
-        totals.accessPointsOfflineCount += facility.offlineAccessPointsCount;
-        totals.totalAccessPoints +=
-          facility.onlineAccessPointsCount + facility.offlineAccessPointsCount;
-      }
-
-      // Count only smartlock stats from facilities with smartlocks
-      for (const facility of facilitiesWithSmartLocks) {
-        // If explicit sort is enabled, and smart motion is selected do not render the row when there are no smart motion devices
-        if (
-          facility.smartMotion.length < 1 &&
-          !toggledSections.smartLock &&
-          toggledSections.smartMotion &&
-          explicitSort
-        ) {
-          continue;
-        }
-
-        // If explicit sort is enabled, and smart lock is selected do not render the row when there are no smart lock devices
-        if (
-          facility.smartLocks.length < 1 &&
-          !toggledSections.smartMotion &&
-          toggledSections.smartLock &&
-          explicitSort
-        ) {
-          continue;
-        }
-
-        totals.totalSmartlocks +=
-          facility.okCount + facility.warningCount + facility.errorCount;
-
-        totals.smartlockOkayCount += facility.okCount || 0;
-        totals.smartlockWarningCount += facility.warningCount || 0;
-        totals.smartlockErrorCount += facility.errorCount || 0;
-        totals.smartlockOfflineCount += facility.offlineCount || 0;
-
-        const signal = parseInt(facility.lowestSignal);
-        const battery = parseInt(facility.lowestBattery);
-        if (signal < parseInt(totals.smartlockLowestSignal)) {
-          totals.smartlockLowestSignal = signal as any;
-          totals.smartlockLowestSignalFacility = facility.name;
-        }
-        if (battery < parseInt(totals.smartlockLowestBattery)) {
-          totals.smartlockLowestBattery = battery as any;
-          totals.smartlockLowestBatteryFacility = facility.name;
-        }
-      }
-
-      // Count only smartlock stats from facilities with smartmotions
-      for (const facility of facilitiesWithSmartMotions) {
-        // If explicit sort is enabled, and smart motion is selected do not render the row when there are no smart motion devices
-        if (
-          facility.smartMotion.length < 1 &&
-          !toggledSections.smartLock &&
-          toggledSections.smartMotion &&
-          explicitSort
-        ) {
-          continue;
-        }
-
-        // If explicit sort is enabled, and smart lock is selected do not render the row when there are no smart lock devices
-        if (
-          facility.smartLocks.length < 1 &&
-          !toggledSections.smartMotion &&
-          toggledSections.smartLock &&
-          explicitSort
-        ) {
-          continue;
-        }
-
-        totals.totalSmartMotion +=
-          facility.smartMotionOkayCount +
-          facility.smartMotionWarningCount +
-          facility.smartMotionErrorCount;
-
-        totals.smartMotionOkayCount += facility.smartMotionOkayCount || 0;
-        totals.smartMotionWarningCount += facility.smartMotionWarningCount || 0;
-        totals.smartMotionErrorCount += facility.smartMotionErrorCount || 0;
-        totals.smartMotionOfflineCount += facility.smartMotionOfflineCount || 0;
-
-        const signal = parseInt(facility.smartMotionLowestSignal);
-        const battery = parseInt(facility.smartMotionLowestBattery);
-        if (signal < parseInt(totals.smartMotionLowestSignal)) {
-          totals.smartMotionLowestSignal = signal as any;
-          totals.smartMotionLowestSignalFacility = facility.name;
-        }
-        if (battery < parseInt(totals.smartMotionLowestBattery)) {
-          totals.smartMotionLowestBattery = battery as any;
-          totals.smartMotionLowestBatteryFacility = facility.name;
-        }
-      }
-
-      setTotalAccessPoints(totals.totalAccessPoints);
-      setTotalEdgeRouters(totals.totalEdgeRouters);
-      setTotalSmartlocks(totals.totalSmartlocks);
-      setTotalSmartMotion(totals.totalSmartMotion);
-      setEdgeRouterOfflineCount(totals.edgeRouterOfflineCount);
-      setEdgeRouterWarningCount(totals.edgeRouterWarningCount);
-      setEdgeRouterOnlineCount(totals.edgeRouterOnlineCount);
-      setAccessPointsOnlineCount(totals.accessPointsOnlineCount);
-      setAccessPointsOfflineCount(totals.accessPointsOfflineCount);
-      setSmartlockOkayCount(totals.smartlockOkayCount);
-      setSmartlockWarningCount(totals.smartlockWarningCount);
-      setSmartlockErrorCount(totals.smartlockErrorCount);
-      setSmartlockOfflineCount(totals.smartlockOfflineCount);
-      setSmartlockLowestSignal({
-        lowestSignal: totals.smartlockLowestSignal,
-        facility: totals.smartlockLowestSignalFacility,
-      });
-      setSmartlockLowestBattery({
-        lowestBattery: totals.smartlockLowestBattery,
-        facility: totals.smartlockLowestBatteryFacility,
-      });
-      setSmartMotionOkayCount(totals.smartMotionOkayCount);
-      setSmartMotionWarningCount(totals.smartMotionWarningCount);
-      setSmartMotionErrorCount(totals.smartMotionErrorCount);
-      setSmartMotionOfflineCount(totals.smartMotionOfflineCount);
-      setSmartMotionLowestSignal({
-        lowestSignal: totals.smartMotionLowestSignal,
-        facility: totals.smartMotionLowestSignalFacility,
-      });
-      setSmartMotionLowestBattery({
-        lowestBattery: totals.smartMotionLowestBattery,
-        facility: totals.smartMotionLowestBatteryFacility,
-      });
-    };
-
-    updateAggregatedCounts(filteredFacilities);
-  }, [filteredFacilities, toggledSections, explicitSort, searchQuery, facilitiesInfo]);
-
-  // Get bearer tokens prior to creating rows/cards
-  useEffect(() => {
-    const fetchFacilitiesWithBearers = async () => {
-      try {
-        const fetchFacilityWithBearerAndStats = async (facility: any) => {
-          // Use cached bearer token when available — avoids a round-trip auth call
-          const bearer = getBearerToken(facility) ?? await fetchBearerToken(facility);
-          if (!bearer) return null;
-
-          const facilityWithBearer = { ...facility, bearer };
-          const stats = await fetchFacilityData(facilityWithBearer);
-          return stats;
-        };
-
-        const results = await Promise.all(
-          selectedTokens.map(async (facility: any) => {
-            return await fetchFacilityWithBearerAndStats(facility);
-          })
-        );
-
-        // Filter out any failed/null results
-        const validResults = results.filter(Boolean);
-
-        // Sort by smartLocks array length descending
-        validResults.sort(
-          (a, b) => (b.smartLocks?.length || 0) - (a.smartLocks?.length || 0)
-        );
-
-        setFacilitiesWithBearers(validResults);
-        setFilteredFacilities(validResults);
-        setFacilitiesInfo(validResults);
-      } catch (err) {
-        console.error("Failed to fetch facilities:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    // Initial fetch
-    fetchFacilitiesWithBearers();
-  }, [selectedTokens, getBearerToken]);
-
-  const fetchFacilityData = async (facility: any) => {
-    setCurrentLoadingText(`Loading ${facility.name}...`);
-    const { id, environment, bearer } = facility;
-    const tokenPrefix =
-      environment === "staging" ? "cia-stg-1.aws." : "";
-    const tokenSuffix = environment === "staging" ? "" : environment;
-
-    const headers = {
-      Authorization: `Bearer ${bearer}`,
-      accept: "application/json",
-      "api-version": "2.0",
-    };
-
-    const [edgeRouter, aps, summary, smartlocks] = await Promise.all([
-      axios
-        .get(
-          `https://accesscontrol.${tokenPrefix}insomniaccia${tokenSuffix}.com/facilities/${id}/edgerouterstatus`,
-          { headers }
-        )
-        .then((res) => res.data)
-        .catch(() => null),
-      axios
-        .get(
-          `https://accesscontrol.${tokenPrefix}insomniaccia${tokenSuffix}.com/facilities/${id}/edgerouterplatformdevicesstatus`,
-          { headers }
-        )
-        .then((res) => res.data)
-        .catch(() => []),
-      axios
-        .get(
-          `https://accesscontrol.${tokenPrefix}insomniaccia${tokenSuffix}.com/facilities/${id}/smartlockstatussummary`,
-          { headers }
-        )
-        .then((res) => res.data)
-        .catch(() => null),
-      axios
-        .get(
-          `https://accesscontrol.${tokenPrefix}insomniaccia${tokenSuffix}.com/facilities/${id}/smartlockstatus`,
-          { headers }
-        )
-        .then((res) => res.data)
-        .catch(() => []),
-    ]);
-
-    const fetchSmartMotion = async () => {
-      const res = await axios.get(
-        `https://accesscontrol.${tokenPrefix}insomniaccia${tokenSuffix}.com/facilities/${id}/smartmotionstatus`,
-        { headers }
-      );
-      return res.data;
-    };
-
-    const fetchFacilityDetail = async () => {
-      const res = await axios.get(
-        `https://accesscontrol.${tokenPrefix}insomniaccia${tokenSuffix}.com/facilities/${id}`,
-        { headers }
-      );
-      return res.data;
-    };
-
-    const fetchWeather = async (facilityDetail: any) => {
-      const weatherKey = import.meta.env.VITE_WEATHER_KEY;
-      const city = facilityDetail.city;
-      const res = await axios.get(
-        `https://api.weatherapi.com/v1/current.json?q=${city}&key=${weatherKey}`
-      );
-      return res.data;
-    };
-    const smartMotion = await fetchSmartMotion().catch(() => []);
-
-    const smartMotionOkayCount = smartMotion.filter(
-      (s) => s.overallStatus === "ok"
-    ).length;
-    const smartMotionWarningCount = smartMotion.filter(
-      (s) => s.overallStatus === "warning"
-    ).length;
-    const smartMotionErrorCount = smartMotion.filter(
-      (s) => s.overallStatus === "error"
-    ).length;
-    const smartMotionOfflineCount = smartMotion.filter(
-      (s) => s.isDeviceOffline
-    ).length;
-    const smartMotionLowestSignal = Math.min(
-      ...smartMotion
-        .filter((s) => !s.isDeviceOffline)
-        .map((s) => s.signalQuality || 255)
-    );
-    const smartMotionLowestBattery = Math.min(
-      ...smartMotion
-        .filter((s) => !s.isDeviceOffline)
-        .map((s) => s.batteryLevel)
-    );
-
-    const facilityDetail = await fetchFacilityDetail();
-    const weather = await fetchWeather(facilityDetail);
-
-    const lowestSignal = smartlocks
-      ? Math.min(
-          ...smartlocks
-            .filter((s: any) => !s.isDeviceOffline)
-            .map((s: any) => s.signalQuality || 255)
-        )
-      : 0;
-    const lowestBattery = smartlocks
-      ? Math.min(
-          ...smartlocks
-            .filter((s: any) => !s.isDeviceOffline)
-            .map((s: any) => s.batteryLevel || 100)
-        )
-      : 0;
-    const offlineCount = smartlocks
-      ? smartlocks.filter((s: any) => s.isDeviceOffline).length
-      : 0;
-    if (smartlocks.length > 0) {
-      return {
-        ...facility,
-        edgeRouterStatus: edgeRouter?.connectionStatus || "error",
-        onlineAccessPointsCount:
-          aps.filter((ap: any) => !ap.isDeviceOffline).length || 0,
-        offlineAccessPointsCount:
-          aps.filter((ap: any) => ap.isDeviceOffline).length || 0,
-        okCount: summary?.okCount || 0,
-        warningCount: summary?.warningCount || 0,
-        errorCount: summary?.errorCount || 0,
-        offlineCount,
-        lowestSignal: isFinite(lowestSignal)
-          ? Math.round((lowestSignal / 255) * 100)
-          : 0,
-        lowestBattery: isFinite(lowestBattery) ? lowestBattery : 0,
-        smartLocks: smartlocks || [],
-        edgeRouterName: edgeRouter?.name || "Edge Router",
-        edgeRouter: edgeRouter || {},
-        accessPoints: aps || [],
-        facilityDetail,
-        weather: weather || [],
-        smartMotion,
-        smartMotionOkayCount,
-        smartMotionWarningCount,
-        smartMotionErrorCount,
-        smartMotionOfflineCount,
-        smartMotionLowestSignal: isFinite(smartMotionLowestSignal)
-          ? Math.round((smartMotionLowestSignal / 255) * 100)
-          : 0,
-        smartMotionLowestBattery: isFinite(smartMotionLowestBattery)
-          ? smartMotionLowestBattery
-          : 0,
-      };
-    } else {
-      return {
-        ...facility,
-        edgeRouterStatus: edgeRouter?.connectionStatus || "error",
-        onlineAccessPointsCount:
-          aps.filter((ap: any) => !ap.isDeviceOffline).length || 0,
-        offlineAccessPointsCount:
-          aps.filter((ap: any) => ap.isDeviceOffline).length || 0,
-        okCount: -100,
-        warningCount: -100,
-        errorCount: -100,
-        offlineCount: -100,
-        lowestSignal: -100,
-        lowestBattery: -100,
-        smartLocks: [],
-        edgeRouterName: edgeRouter?.name || "Edge Router",
-        facilityDetail,
-        weather,
-        edgeRouter: edgeRouter || {},
-        accessPoints: aps || [],
-        smartMotion,
-        smartMotionOkayCount,
-        smartMotionWarningCount,
-        smartMotionErrorCount,
-        smartMotionOfflineCount,
-        smartMotionLowestSignal: isFinite(smartMotionLowestSignal)
-          ? Math.round((smartMotionLowestSignal / 255) * 100)
-          : 0,
-        smartMotionLowestBattery: isFinite(smartMotionLowestBattery)
-          ? smartMotionLowestBattery
-          : 0,
-      };
-    }
   };
 
   useEffect(() => {
     if (searchQuery.trim() !== "") {
       search(searchQuery);
     } else {
-      setFilteredFacilities(facilitiesWithBearers);
+      setFilteredFacilities(loadedFacilities);
     }
-  }, [searchQuery, facilitiesWithBearers, search]);
+  }, [searchQuery, loadedFacilities, search]);
+
+  const totals = useMemo(() => {
+    const t = {
+      totalAccessPoints: 0,
+      totalEdgeRouters: 0,
+      totalSmartlocks: 0,
+      totalSmartMotion: 0,
+      edgeRouterOfflineCount: 0,
+      edgeRouterOnlineCount: 0,
+      edgeRouterWarningCount: 0,
+      accessPointsOnlineCount: 0,
+      accessPointsOfflineCount: 0,
+      smartlockOkayCount: 0,
+      smartlockWarningCount: 0,
+      smartlockErrorCount: 0,
+      smartlockOfflineCount: 0,
+      smartlockLowestSignal: { lowestSignal: 100 as any, facility: "N/A" },
+      smartlockLowestBattery: { lowestBattery: 100 as any, facility: "N/A" },
+      smartMotionOkayCount: 0,
+      smartMotionWarningCount: 0,
+      smartMotionErrorCount: 0,
+      smartMotionOfflineCount: 0,
+      smartMotionLowestSignal: { lowestSignal: 100 as any, facility: "N/A" },
+      smartMotionLowestBattery: { lowestBattery: 100 as any, facility: "N/A" },
+    };
+
+    // Mirrors the row-hiding rules in SmartSpaceFacilityRow so totals match
+    // what is actually rendered.
+    const hiddenByExplicitSort = (facility: any) =>
+      (facility.smartMotion.length < 1 &&
+        !toggledSections.smartLock &&
+        toggledSections.smartMotion &&
+        explicitSort) ||
+      (facility.smartLocks.length < 1 &&
+        !toggledSections.smartMotion &&
+        toggledSections.smartLock &&
+        explicitSort);
+
+    for (const facility of filteredFacilities) {
+      if (hiddenByExplicitSort(facility)) continue;
+
+      t.totalEdgeRouters += 1;
+      t.edgeRouterOfflineCount += facility.edgeRouterStatus === "error" ? 1 : 0;
+      t.edgeRouterOnlineCount += facility.edgeRouterStatus === "ok" ? 1 : 0;
+      t.edgeRouterWarningCount += facility.edgeRouterStatus === "warning" ? 1 : 0;
+      t.accessPointsOnlineCount += facility.onlineAccessPointsCount;
+      t.accessPointsOfflineCount += facility.offlineAccessPointsCount;
+      t.totalAccessPoints +=
+        facility.onlineAccessPointsCount + facility.offlineAccessPointsCount;
+
+      if (Array.isArray(facility.smartLocks) && facility.smartLocks.length > 0) {
+        t.totalSmartlocks +=
+          facility.okCount + facility.warningCount + facility.errorCount;
+        t.smartlockOkayCount += facility.okCount || 0;
+        t.smartlockWarningCount += facility.warningCount || 0;
+        t.smartlockErrorCount += facility.errorCount || 0;
+        t.smartlockOfflineCount += facility.offlineCount || 0;
+
+        const signal = parseInt(facility.lowestSignal);
+        const battery = parseInt(facility.lowestBattery);
+        if (signal < parseInt(t.smartlockLowestSignal.lowestSignal)) {
+          t.smartlockLowestSignal = { lowestSignal: signal, facility: facility.name };
+        }
+        if (battery < parseInt(t.smartlockLowestBattery.lowestBattery)) {
+          t.smartlockLowestBattery = { lowestBattery: battery, facility: facility.name };
+        }
+      }
+
+      if (Array.isArray(facility.smartMotion) && facility.smartMotion.length > 0) {
+        t.totalSmartMotion +=
+          facility.smartMotionOkayCount +
+          facility.smartMotionWarningCount +
+          facility.smartMotionErrorCount;
+        t.smartMotionOkayCount += facility.smartMotionOkayCount || 0;
+        t.smartMotionWarningCount += facility.smartMotionWarningCount || 0;
+        t.smartMotionErrorCount += facility.smartMotionErrorCount || 0;
+        t.smartMotionOfflineCount += facility.smartMotionOfflineCount || 0;
+
+        const signal = parseInt(facility.smartMotionLowestSignal);
+        const battery = parseInt(facility.smartMotionLowestBattery);
+        if (signal < parseInt(t.smartMotionLowestSignal.lowestSignal)) {
+          t.smartMotionLowestSignal = { lowestSignal: signal, facility: facility.name };
+        }
+        if (battery < parseInt(t.smartMotionLowestBattery.lowestBattery)) {
+          t.smartMotionLowestBattery = { lowestBattery: battery, facility: facility.name };
+        }
+      }
+    }
+    return t;
+  }, [filteredFacilities, toggledSections, explicitSort]);
+
+  const {
+    totalAccessPoints,
+    totalEdgeRouters,
+    totalSmartlocks,
+    totalSmartMotion,
+    edgeRouterOfflineCount,
+    edgeRouterOnlineCount,
+    edgeRouterWarningCount,
+    accessPointsOnlineCount,
+    accessPointsOfflineCount,
+    smartlockOkayCount,
+    smartlockWarningCount,
+    smartlockErrorCount,
+    smartlockOfflineCount,
+    smartlockLowestSignal,
+    smartlockLowestBattery,
+    smartMotionOkayCount,
+    smartMotionWarningCount,
+    smartMotionErrorCount,
+    smartMotionOfflineCount,
+    smartMotionLowestSignal,
+    smartMotionLowestBattery,
+  } = totals;
 
   return (
-    <div
-      className={`relative ${
-        isLoading ? "overflow-hidden min-h-full" : "overflow-auto"
-      } h-full dark:text-white dark:bg-zinc-900 relative`}
-    >
-      {/* Loading Spinner */}
-      {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}
+    <div className="relative overflow-auto h-full dark:text-white dark:bg-zinc-900">
       {/* tab title */}
       <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
         <div className="ml-5 flex items-center text-sm">
@@ -558,7 +202,43 @@ export default function SmartSpaceDashboardView() {
           &ensp; SmartSpace Dashboard
         </div>
       </div>
-      <div className="mt-5 mb-2 flex items-center justify-end text-center mx-5">
+      {pending.length > 0 && (
+        <div className="mx-5 mt-3 flex items-center gap-3 text-sm text-zinc-500 dark:text-zinc-400">
+          <div className="h-2 flex-1 overflow-hidden rounded bg-zinc-200 dark:bg-zinc-800">
+            <div
+              className="h-full bg-yellow-500 transition-all duration-500"
+              style={{
+                width: `${
+                  ((selectedTokens.length - pending.length) /
+                    Math.max(selectedTokens.length, 1)) *
+                  100
+                }%`,
+              }}
+            />
+          </div>
+          <span className="whitespace-nowrap">
+            {selectedTokens.length - pending.length} of {selectedTokens.length} facilities loaded
+          </span>
+        </div>
+      )}
+      {/* Last updated + refresh */}
+      <div className="mt-3 flex items-center justify-end gap-2 mx-5 text-xs text-zinc-500 dark:text-zinc-400">
+        {lastUpdatedAt > 0 && (
+          <span className="whitespace-nowrap">
+            Last updated {new Date(lastUpdatedAt).toLocaleTimeString()}
+          </span>
+        )}
+        <button
+          className="flex items-center gap-1 bg-zinc-500 text-white px-2 py-1 rounded-sm hover:bg-zinc-600 font-bold cursor-pointer hover:transition hover:duration-300 hover:ease-in-out"
+          onClick={() =>
+            queryClient.invalidateQueries({ queryKey: [FACILITY_QUERY_KEY] })
+          }
+          title="Refresh all facilities"
+        >
+          <MdRefresh className="text-sm" /> Refresh
+        </button>
+      </div>
+      <div className="mt-2 mb-2 flex items-center justify-end text-center mx-5">
         {/* Search Bar */}
 
         <InputBox
@@ -672,7 +352,7 @@ export default function SmartSpaceDashboardView() {
             smartlockOfflineCount={smartlockOfflineCount}
             smartlockLowestSignal={smartlockLowestSignal}
             smartlockLowestBattery={smartlockLowestBattery}
-            facilitiesWithBearers={facilitiesWithBearers}
+            facilitiesWithBearers={loadedFacilities}
             setFilteredFacilities={setFilteredFacilities}
             toggledSections={toggledSections}
             explicitSort={explicitSort}
@@ -683,6 +363,9 @@ export default function SmartSpaceDashboardView() {
             smartMotionLowestSignal={smartMotionLowestSignal}
             smartMotionLowestBattery={smartMotionLowestBattery}
             totalSmartMotion={totalSmartMotion}
+            pendingFacilities={pending}
+            erroredFacilities={errored}
+            refreshingKeys={refreshingKeys}
           />
         </div>
       ) : (
@@ -926,6 +609,24 @@ export default function SmartSpaceDashboardView() {
                   facility={facility}
                   toggledSections={toggledSections}
                   explicitSort={explicitSort}
+                  isRefreshing={refreshingKeys.includes(
+                    `${facility.environment}:${facility.id}`
+                  )}
+                />
+              </div>
+            ))}
+            {pending.map((facility: any) => (
+              <div key={`pending-${facility.id}`} className="break-inside-avoid">
+                <FacilityPendingCard facility={facility} />
+              </div>
+            ))}
+            {errored.map((entry) => (
+              <div key={`error-${entry.facility.id}`} className="break-inside-avoid">
+                <FacilityErrorCard
+                  facility={entry.facility}
+                  error={entry.error}
+                  onRetry={() => entry.refetch()}
+                  isRetrying={entry.isFetching}
                 />
               </div>
             ))}
@@ -933,8 +634,17 @@ export default function SmartSpaceDashboardView() {
         </div>
       )}
       {/* Export Button */}
-      <div className="float-right px-5">
-        <SmartSpaceExport facilitiesInfo={facilitiesInfo} />
+      <div
+        className="float-right px-5"
+        title={
+          pending.length > 0
+            ? `Export available after all facilities load (${pending.length} remaining)`
+            : undefined
+        }
+      >
+        <div className={pending.length > 0 ? "pointer-events-none opacity-50" : ""}>
+          <SmartSpaceExport facilitiesInfo={loadedFacilities} />
+        </div>
       </div>
     </div>
   );
