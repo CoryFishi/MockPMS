@@ -12,11 +12,7 @@ import { useFacilityStatusQueries, FACILITY_QUERY_KEY } from "@hooks/smartspace"
 export default function SmartSpaceDashboardView() {
   const { selectedTokens, getBearerToken } = useAuth();
   const queryClient = useQueryClient();
-  // NOTE: `errored` from useFacilityStatusQueries is intentionally not
-  // destructured here — SmartSpaceDashboardList's props type doesn't yet
-  // accept pendingFacilities/erroredFacilities (Task 4 wires that up), and
-  // the card-view error block is added in Task 5. Re-add `errored` then.
-  const { loaded, pending, lastUpdatedAt } = useFacilityStatusQueries(
+  const { loaded, pending, errored, lastUpdatedAt } = useFacilityStatusQueries(
     selectedTokens,
     getBearerToken
   );
@@ -361,6 +357,8 @@ export default function SmartSpaceDashboardView() {
             smartMotionLowestSignal={smartMotionLowestSignal}
             smartMotionLowestBattery={smartMotionLowestBattery}
             totalSmartMotion={totalSmartMotion}
+            pendingFacilities={pending}
+            erroredFacilities={errored}
           />
         </div>
       ) : (

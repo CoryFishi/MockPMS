@@ -1,5 +1,7 @@
 import { useState } from "react";
 import SmartSpaceFacilityRow from "@views/smartspace/dashboard/SmartSpaceFacilityRow";
+import FacilityPendingRow from "@views/smartspace/dashboard/FacilityPendingRow";
+import FacilityErrorRow from "@views/smartspace/dashboard/FacilityErrorRow";
 
 export default function SmartSpaceDashboardList({
   filteredFacilities,
@@ -28,6 +30,8 @@ export default function SmartSpaceDashboardList({
   smartMotionLowestSignal,
   smartMotionLowestBattery,
   totalSmartMotion,
+  pendingFacilities = [],
+  erroredFacilities = [],
 } : {
   filteredFacilities: any[];
   facilitiesWithBearers: any[];
@@ -59,10 +63,23 @@ export default function SmartSpaceDashboardList({
   smartMotionLowestSignal: { facility: string; lowestSignal: number };
   smartMotionLowestBattery: { facility: string; lowestBattery: number };
   totalSmartMotion: number;
+  pendingFacilities?: any[];
+  erroredFacilities?: {
+    facility: any;
+    error: any;
+    refetch: () => void;
+    isFetching: boolean;
+  }[];
 }) {
   const [sortKey, setSortKey] = useState<keyof typeof filteredFacilities[0] | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc" | null>("asc");
   const [expandedRows, setExpandedRows] = useState<(keyof typeof filteredFacilities[0])[]>([]);
+
+  const totalColumns =
+    1 +
+    (toggledSections.openNet ? 3 : 0) +
+    (toggledSections.smartLock ? 6 : 0) +
+    (toggledSections.smartMotion ? 6 : 0);
 
   const handleSort = (key: keyof typeof filteredFacilities[0]) => {
     let nextDirection: "asc" | "desc" | null = "asc";
@@ -286,6 +303,23 @@ export default function SmartSpaceDashboardList({
             key={index}
             toggledSections={toggledSections}
             explicitSort={explicitSort}
+          />
+        ))}
+        {pendingFacilities.map((facility: any) => (
+          <FacilityPendingRow
+            key={`pending-${facility.id}`}
+            facility={facility}
+            colSpan={totalColumns}
+          />
+        ))}
+        {erroredFacilities.map((entry) => (
+          <FacilityErrorRow
+            key={`error-${entry.facility.id}`}
+            facility={entry.facility}
+            error={entry.error}
+            onRetry={() => entry.refetch()}
+            isRetrying={entry.isFetching}
+            colSpan={totalColumns}
           />
         ))}
         <tr className="bg-zinc-100 dark:bg-zinc-800 text-center">
