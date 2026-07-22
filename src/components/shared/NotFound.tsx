@@ -1,8 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useAuth } from "@context/AuthProvider";
 
 export default function NotFound() {
   const navigate = useNavigate();
+  const { isLoading } = useAuth();
   const [show404, setShow404] = useState(false);
 
   const handleRedirect = () => {
@@ -10,7 +12,7 @@ export default function NotFound() {
   };
 
   useEffect(() => {
-    // Show the 404 content after .5 second
+    // Brief grace period so single-frame auth transitions never flash the 404
     const timer = setTimeout(() => {
       setShow404(true);
     }, 500);
@@ -21,7 +23,7 @@ export default function NotFound() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
-      {show404 ? (
+      {show404 && !isLoading ? (
         // 404 content
         <>
           <h1 className="text-6xl font-bold mb-4">404</h1>
