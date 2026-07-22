@@ -108,11 +108,16 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (role) {
       const getUserPermissions = async () => {
-        let { data } = await supabase
-          .from("roles")
-          .select("*")
-          .eq("role_name", role);
-        setPermissions(data[0].permissions);
+        try {
+          let { data } = await supabase
+            .from("roles")
+            .select("*")
+            .eq("role_name", role);
+          setPermissions(data[0].permissions);
+        } finally {
+          // Auth is fully resolved once permissions are known (or failed)
+          setIsLoading(false);
+        }
       };
       getUserPermissions();
     }
@@ -146,6 +151,9 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (user && !isPulled) {
       setIsPulled(true);
+      // Re-enter loading while user data + permissions resolve (covers login
+      // transitions, where isLoading was already set false by the no-session path)
+      setIsLoading(true);
       const getUserData = async () => {
         if (!user) throw new Error("User not signed in");
 
@@ -171,6 +179,7 @@ export const AuthProvider = ({ children }) => {
 
             if (insertError) {
               console.error("Error inserting new user data:", insertError);
+              setIsLoading(false);
               return null;
             }
 
@@ -222,6 +231,7 @@ export const AuthProvider = ({ children }) => {
             return;
           }
           console.error("Error fetching user data:", error);
+          setIsLoading(false);
           return null;
         } else {
           setCurrentFacility(data?.current_facility || {});
@@ -229,6 +239,8 @@ export const AuthProvider = ({ children }) => {
           setFavoriteTokens(data?.favorite_tokens || []);
           setTokens(data?.tokens || []);
           setRole(data?.role || "");
+          // Empty role means the permissions effect never fires — resolve here
+          if (!data?.role) setIsLoading(false);
 
           // Silently authenticate all stored credentials in the background
           if (data?.tokens?.length) {
