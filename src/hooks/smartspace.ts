@@ -89,7 +89,7 @@ export async function fetchFacilityStatus(
     "weather",
     axios
       .get(
-        `https://api.weatherapi.com/v1/current.json?q=${facilityDetail.city}&key=${
+        `https://api.weatherapi.com/v1/current.json?q=${facilityDetail?.city}&key=${
           import.meta.env.VITE_WEATHER_KEY
         }`,
         { timeout: REQUEST_TIMEOUT_MS }
