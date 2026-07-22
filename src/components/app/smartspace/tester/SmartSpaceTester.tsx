@@ -83,7 +83,7 @@ export default function SmartSpaceTester() {
     try {
       var tokenStageKey = "";
       var tokenEnvKey = "";
-      if (facility.environment === "cia-stg-1.aws.") {
+      if (facility.environment === "staging") {
         tokenStageKey = "cia-stg-1.aws.";
       } else {
         tokenEnvKey = facility.environment;
@@ -120,8 +120,8 @@ export default function SmartSpaceTester() {
     if (!bearer) return;
     const { id, environment } = facility;
     const tokenPrefix =
-      environment === "cia-stg-1.aws." ? "cia-stg-1.aws." : "";
-    const tokenSuffix = environment === "cia-stg-1.aws." ? "" : environment;
+      environment === "staging" ? "cia-stg-1.aws." : "";
+    const tokenSuffix = environment === "staging" ? "" : environment;
     try {
       const response = await axios.get(
         `https://accesscontrol.${tokenPrefix}insomniaccia${tokenSuffix}.com/facilities/${id}/smartmotionstatus`,
@@ -160,8 +160,8 @@ export default function SmartSpaceTester() {
     if (!bearer) return;
     const { id, environment } = facility;
     const tokenPrefix =
-      environment === "cia-stg-1.aws." ? "cia-stg-1.aws." : "";
-    const tokenSuffix = environment === "cia-stg-1.aws." ? "" : environment;
+      environment === "staging" ? "cia-stg-1.aws." : "";
+    const tokenSuffix = environment === "staging" ? "" : environment;
     try {
       const response = await axios.get(
         `https://accesscontrol.${tokenPrefix}insomniaccia${tokenSuffix}.com/facilities/${id}/smartmotionstatus`,
@@ -207,8 +207,8 @@ export default function SmartSpaceTester() {
     if (!bearer) return new Set();
     const { environment } = facility;
     const tokenPrefix =
-      environment === "cia-stg-1.aws." ? "cia-stg-1.aws." : "";
-    const tokenSuffix = environment === "cia-stg-1.aws." ? "" : environment;
+      environment === "staging" ? "cia-stg-1.aws." : "";
+    const tokenSuffix = environment === "staging" ? "" : environment;
     try {
       const now = Math.floor(Date.now() / 1000);
       const twoMinutesAgo = now - 120;
