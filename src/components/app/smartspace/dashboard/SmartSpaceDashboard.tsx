@@ -421,10 +421,7 @@ export default function SmartSpaceDashboardView() {
       );
       return res.data;
     };
-    var smartMotion = [];
-    if (environment !== "") {
-      smartMotion = await fetchSmartMotion();
-    }
+    const smartMotion = await fetchSmartMotion().catch(() => []);
 
     const smartMotionOkayCount = smartMotion.filter(
       (s) => s.overallStatus === "ok"
