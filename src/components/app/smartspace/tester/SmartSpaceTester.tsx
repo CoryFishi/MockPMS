@@ -304,7 +304,6 @@ export default function SmartSpaceTester() {
       setSmartMotionData(data);
       smartMotionDataRef.current = data;
       const eventData = await fetchNewSmartMotionEventData(selectedFacility);
-      console.log("Event Data:", eventData);
       for (let item of data) {
         if (eventData.has(item.name)) {
           item.hasDetectedMotion = true;
@@ -319,7 +318,6 @@ export default function SmartSpaceTester() {
       setSmartMotionData(data);
       smartMotionDataRef.current = data;
       const eventData = await fetchNewSmartMotionEventData(selectedFacility);
-      console.log("Event Data:", eventData);
       for (let item of data) {
         if (eventData.has(item.name)) {
           item.hasDetectedMotion = true;

@@ -25,7 +25,6 @@
     "checkJs": false,
 
     /* Path aliases */
-    "baseUrl": ".",
     "paths": {
       "@components/*": ["./src/components/*"],
       "@views/*": ["./src/components/app/*"],

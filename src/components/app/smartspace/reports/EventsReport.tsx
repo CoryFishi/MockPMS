@@ -51,7 +51,6 @@ export default function EventsReport({ selectedFacilities, searchQuery } : { sel
           .filter((event) => event.eventCategoryName === "Edge Router Event")
           .map((event) => event.eventTypeEnum)
           .join("&etq=");
-      console.log("Selected Events:", gatewayPlatform, edgePlatform);
 
       const response = await axios.get(
         `https://accessevent.${tokenStageKey}insomniaccia${tokenEnvKey}.com/combinedevents/facilities/${
@@ -97,7 +96,6 @@ export default function EventsReport({ selectedFacilities, searchQuery } : { sel
         }
       );
       const eventTypes = response.data;
-      console.log("Fetched Event Types:", eventTypes);
       setEventTypes(eventTypes);
       setSelectedEvents(eventTypes);
       return eventTypes;
