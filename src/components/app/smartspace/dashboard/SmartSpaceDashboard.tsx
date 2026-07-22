@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { FaLock } from "react-icons/fa";
 import SmartSpaceFacilityCard from "@views/smartspace/dashboard/SmartSpaceFacilityCard";
+import FacilityPendingCard from "@views/smartspace/dashboard/FacilityPendingCard";
+import FacilityErrorCard from "@views/smartspace/dashboard/FacilityErrorCard";
 import SmartSpaceExport from "@views/smartspace/dashboard/SmartSpaceExport";
 import { useAuth } from "@context/AuthProvider";
 import SmartSpaceDashboardList from "@views/smartspace/dashboard/SmartSpaceDashboardList";
@@ -602,6 +604,21 @@ export default function SmartSpaceDashboardView() {
                   facility={facility}
                   toggledSections={toggledSections}
                   explicitSort={explicitSort}
+                />
+              </div>
+            ))}
+            {pending.map((facility: any) => (
+              <div key={`pending-${facility.id}`} className="break-inside-avoid">
+                <FacilityPendingCard facility={facility} />
+              </div>
+            ))}
+            {errored.map((entry) => (
+              <div key={`error-${entry.facility.id}`} className="break-inside-avoid">
+                <FacilityErrorCard
+                  facility={entry.facility}
+                  error={entry.error}
+                  onRetry={() => entry.refetch()}
+                  isRetrying={entry.isFetching}
                 />
               </div>
             ))}
