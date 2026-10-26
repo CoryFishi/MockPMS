@@ -34,6 +34,10 @@ from the customer's site plan; installers receive the exports.
 
 ## Source facts (installation manuals)
 
+The planning ranges used by the checks are deliberately smaller than these
+(2026-10-26): ER/AP 250 ft LOS / 75 ft without, SmartLock 100 × 25 ft,
+SmartMotion 50 ft. See `model/rules.ts`.
+
 | Device | Range | Neighbour rule | Other |
 |---|---|---|---|
 | Edge Router / Access Point (OpenNet, same hardware) | 656 ft (200 m) line of sight; 328 ft (100 m) without | path to ≥2 OpenNet devices (ER or AP) | ~100 smart devices per AP; ≥2 smart devices with LOS per AP; PoE+ 30 W each |
@@ -163,10 +167,10 @@ live in one `rules.ts` and are shown read-only in the Rules tab.
 
 1. **Line of sight** — a pair is LOS unless the segment between them crosses any
    `wall` polyline segment.
-2. **OpenNet ↔ OpenNet wireless link** (ER/AP pairs): distance ≤ 656 ft with LOS,
-   ≤ 328 ft without.
-3. **Sensor reach** — SmartMotion: circle radius 100 ft. SmartLock: ellipse
-   centred on the lock, semi-axis 200 ft along `facingDeg`, 55 ft perpendicular.
+2. **OpenNet ↔ OpenNet wireless link** (ER/AP pairs): distance ≤ 250 ft with LOS,
+   ≤ 75 ft without.
+3. **Sensor reach** — SmartMotion: circle radius 50 ft. SmartLock: ellipse
+   centred on the lock, semi-axis 100 ft along `facingDeg`, 25 ft perpendicular.
    If the segment crosses a wall, the reach is multiplied by `WALL_FACTOR = 0.5`
    (once, however many walls).
 4. **Sensor ↔ sensor link** — each lies within the other's (wall-reduced) reach.
