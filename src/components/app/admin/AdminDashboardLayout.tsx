@@ -1,12 +1,13 @@
 import Users from "@views/admin/users/Users";
 import UserEvents from "@views/admin/user-events/UserEvents";
 import Roles from "@views/admin/roles/Roles";
-import { Link, useNavigate, useLocation, Routes, Route, Navigate } from "react-router-dom";
+import { useNavigate, useLocation, Routes, Route, Navigate } from "react-router-dom";
 import { useState } from "react";
 import { BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import { useAuth } from "@context/AuthProvider";
 import { supabase } from "@lib/supabaseClient";
+import SidebarFooter from "@components/shared/SidebarFooter";
 
 export default function AdminDashboardLayout({ dashboardMenu } : { dashboardMenu: boolean }) {
   const { setTokens, setCurrentFacility, setFavoriteTokens, setSelectedTokens } = useAuth();
@@ -49,16 +50,18 @@ export default function AdminDashboardLayout({ dashboardMenu } : { dashboardMenu
 
             {/* User Administration Section */}
             <div className={`pl-2 pr-2 pb-8 mt-8 ${isAdminSection ? "bg-zinc-900 dark:bg-zinc-900 border-l-yellow-500 border-l-2" : ""}`}>
-              <div
-                className="flex justify-between items-center cursor-pointer mt-8"
+              <button
+                type="button"
+                className="flex w-full justify-between items-center cursor-pointer mt-8 text-left"
                 onClick={() => toggleSection("userAdmin")}
+                aria-expanded={!openSections.userAdmin}
               >
                 <div className="flex items-center space-x-2">
                   <BsBuildingFill className={`${isAdminSection ? "text-yellow-500" : ""}`} />
                   <span className="pl-2">User Administration</span>
                 </div>
                 {openSections.userAdmin ? <MdExpandLess className="shrink-0 text-2xl" /> : <MdExpandMore className="shrink-0 text-2xl" />}
-              </div>
+              </button>
 
               {!openSections.userAdmin && (
                 <div className="mx-4 mt-4 space-y-2">
@@ -79,18 +82,12 @@ export default function AdminDashboardLayout({ dashboardMenu } : { dashboardMenu
               )}
             </div>
 
-            <div className="absolute bottom-0 w-full hidden md:flex justify-between text-sm cursor-pointer text-center">
-              <Link to="/user-settings" className="hover:dark:bg-zinc-900 w-full p-2">Settings</Link>
-              <div className="hover:dark:bg-zinc-900 w-full p-2">
-                <a href="https://opentechalliancesupport.zendesk.com/hc/en-us/categories/115001966887-OpenTech-IoE" target="_blank" rel="noopener noreferrer">Help</a>
-              </div>
-              <div className="hover:dark:bg-zinc-900 w-full p-2" onClick={handleLogout}>Logout</div>
-            </div>
+            <SidebarFooter onLogout={handleLogout} />
           </div>
         )}
 
         {/* Page Content */}
-        <div className="w-full flex flex-col bg-background-50 dark:bg-zinc-900 h-full">
+        <div className="w-full flex flex-col dark:bg-zinc-900 h-full">
           <Routes>
             <Route index        element={<Navigate to="users" replace />} />
             <Route path="users"        element={<Users />} />

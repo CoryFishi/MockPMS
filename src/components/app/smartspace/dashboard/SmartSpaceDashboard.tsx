@@ -11,6 +11,7 @@ import SmartSpaceDashboardList from "@views/smartspace/dashboard/SmartSpaceDashb
 import InputBox from "@components/ui/InputBox";
 import SliderButton from "@components/ui/SliderButton";
 import { useFacilityStatusQueries, FACILITY_QUERY_KEY } from "@hooks/smartspace";
+import PageHeader from "@components/shared/PageHeader";
 
 export default function SmartSpaceDashboardView() {
   const { selectedTokens, getBearerToken } = useAuth();
@@ -196,12 +197,7 @@ export default function SmartSpaceDashboardView() {
   return (
     <div className="relative overflow-auto h-full dark:text-white dark:bg-zinc-900">
       {/* tab title */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
-        <div className="ml-5 flex items-center text-sm">
-          <FaLock className="text-lg" />
-          &ensp; SmartSpace Dashboard
-        </div>
-      </div>
+      <PageHeader icon={FaLock} title="SmartSpace Dashboard" />
       {pending.length > 0 && (
         <div className="mx-5 mt-3 flex items-center gap-3 text-sm text-zinc-500 dark:text-zinc-400">
           <div className="h-2 flex-1 overflow-hidden rounded bg-zinc-200 dark:bg-zinc-800">

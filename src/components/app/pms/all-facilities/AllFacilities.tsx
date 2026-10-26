@@ -17,6 +17,7 @@ import TableButton from "@components/ui/TableButton";
 import InputBox from "@components/ui/InputBox";
 import { buildApiUrl, buildAuthUrl, authHeaders, getEnvironmentName } from "@hooks/opentech";
 import { useNavigate } from "react-router-dom";
+import PageHeader from "@components/shared/PageHeader";
 
 export default function AllFacilities({ setCurrentFacilityName }) {
   const {
@@ -560,12 +561,7 @@ export default function AllFacilities({ setCurrentFacilityName }) {
       {/* Loading Spinner */}
       {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* Page Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
-        <div className="ml-5 flex items-center text-sm">
-          <FaWarehouse className="text-lg" />
-          &ensp; All Facilities
-        </div>
-      </div>
+      <PageHeader icon={FaWarehouse} title="All Facilities" />
       <div className="w-full px-5 flex flex-col rounded-lg h-fit">
         {/* Search Bar */}
         <div className="mt-5 mb-2 flex items-center justify-end text-center">

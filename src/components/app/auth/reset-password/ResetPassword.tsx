@@ -68,10 +68,11 @@ export default function ResetPassword() {
         </h2>
         {error && (
           <div className="fixed inset-0 bg-black/30 flex items-center justify-center dark:text-white z-30">
-            <div className="bg-white p-4 rounded-sm shadow-lg max-w-sm w-full dark:bg-darkSecondary">
+            <div className="bg-white p-4 rounded-sm shadow-lg max-w-sm w-full dark:bg-zinc-800">
               <h1 className="font-bold text-center text-3xl">Oh no!</h1>
               <p className="text-center text-red-500 mt-3">{error}</p>
               <button
+                type="button"
                 className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-sm w-full hover:cursor-pointer hover:bg-blue-600 hover:scale-105 transition duration-150"
                 onClick={() => setError(null)}
               >
@@ -83,17 +84,21 @@ export default function ResetPassword() {
         <input
           type="password"
           placeholder="New Password"
+          aria-label="New Password"
+          autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="bg-white w-full px-4 py-2 border border-zinc-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+          className="bg-white dark:bg-zinc-900 dark:text-white w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500"
           required
         />
         <input
           type="password"
           placeholder="Confirm New Password"
+          aria-label="Confirm New Password"
+          autoComplete="new-password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="bg-white w-full px-4 py-2 border border-zinc-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+          className="bg-white dark:bg-zinc-900 dark:text-white w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500"
           required
         />
         <button

@@ -12,6 +12,7 @@ import OfflineEventsComparison from "@views/smartspace/reports/OfflineEventsComp
 import InputBox from "@components/ui/InputBox";
 import AllSmartMotionReport from "@views/smartspace/reports/AllSmartMotionReport";
 import { handleSingleLogin } from "@hooks/opentech";
+import PageHeader from "@components/shared/PageHeader";
 
 export default function SmartSpaceReports() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -138,16 +139,8 @@ export default function SmartSpaceReports() {
       {/* Loading Spinner */}
       {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* tab title */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
-        <div className="ml-5 flex items-center text-sm">
-          <FaLock className="text-lg" />
-          &ensp; SmartLock Reports
-        </div>
-      </div>
-      <p className="text-sm dark:text-white text-left pt-1 pl-1">
-        {pageLoadDateTime}
-      </p>
-      <div className="mt-3 mb-2 flex items-center justify-end text-center mx-5">
+      <PageHeader icon={FaLock} title="SmartLock Reports" meta={pageLoadDateTime} />
+      <div className="mt-5 mb-2 flex items-center justify-end text-center mx-5">
         {/* Search Bar */}
         <InputBox
           placeholder="Search reports..."

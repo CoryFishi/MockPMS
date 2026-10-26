@@ -12,6 +12,7 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 import TableButton from "@components/ui/TableButton";
 import InputBox from "@components/ui/InputBox";
 import { buildAuthUrl } from "@hooks/opentech";
+import PageHeader from "@components/shared/PageHeader";
 
 export default function Favorites({ setCurrentFacilityName } : { setCurrentFacilityName: any; }) {
   const [facilities, setFacilities] = useState<any[]>([]);
@@ -317,12 +318,7 @@ export default function Favorites({ setCurrentFacilityName } : { setCurrentFacil
 
   return (
     <div className="relative overflow-auto h-full dark:text-white dark:bg-zinc-900">
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
-        <div className="ml-5 flex items-center text-sm">
-          <GoStarFill className="text-lg" />
-          &ensp; Favorites
-        </div>
-      </div>
+      <PageHeader icon={GoStarFill} title="Favorites" />
       <div className="w-full h-fit p-5 flex flex-col rounded-lg pb-10">
         <div className=" mb-2 flex items-center justify-end text-center">
           <InputBox

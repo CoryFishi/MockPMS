@@ -5,7 +5,7 @@ import Favorites from "@views/pms/favorites/Favorites";
 import Overview from "@views/pms/overview/Overview";
 import Scripts from "@views/pms/scripts/Scripts";
 import { useState, useEffect, useCallback } from "react";
-import { Link, useNavigate, useLocation, Routes, Route, Navigate } from "react-router-dom";
+import { useNavigate, useLocation, Routes, Route, Navigate } from "react-router-dom";
 import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import axios from "axios";
@@ -14,6 +14,7 @@ import { supabase } from "@lib/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import { handleSingleLogin, buildApiUrl, authHeaders } from "@hooks/opentech";
 import { RiAdminFill } from "react-icons/ri";
+import SidebarFooter from "@components/shared/SidebarFooter";
 
 export default function PMSDashboardLayout({
   dashboardMenu,
@@ -44,6 +45,11 @@ export default function PMSDashboardLayout({
   const isFacilitySection = path.includes("/pms/visitors") || path.includes("/pms/units") || path.includes("/pms/overview");
   const isFacilitiesSection = path.includes("/pms/all-facilities") || path.includes("/pms/favorites");
   const isAdminSection = path.includes("/pms/scripts");
+
+  const controlCenterUrl =
+    currentFacility?.environment === "staging"
+      ? `https://portal.${currentFacility.environment}insomniaccia.com/facility/${currentFacility.id}/dashboard`
+      : `https://portal.insomniaccia${currentFacility?.environment ?? ""}.com/facility/${currentFacility?.id}/dashboard`;
 
   const handleCurrentFacilityUpdate = useCallback(async (updatedInfo: any) => {
     const { error } = await supabase.from("user_data").upsert(
@@ -175,16 +181,18 @@ export default function PMSDashboardLayout({
             {/* Current Facility Section */}
             {currentFacility && currentFacility.id > 0 && (
               <div className={`pl-2 pr-2 pb-8 mt-8 ${isFacilitySection ? "bg-zinc-900 dark:bg-zinc-900 border-l-yellow-500 border-l-2" : "dark:bg-zinc-950"}`}>
-                <div
-                  className="flex justify-between items-center cursor-pointer mt-8"
+                <button
+                  type="button"
+                  className="flex w-full justify-between items-center cursor-pointer mt-8 text-left"
                   onClick={() => toggleSection("currentFacility")}
+                  aria-expanded={!openSections.currentFacility}
                 >
                   <div className="flex items-center space-x-2">
                     <BsBuildingFill className={`${isFacilitySection ? "text-yellow-500" : ""}`} />
                     <span className="pl-1 truncate max-w-[18ch]">{currentFacilityName}</span>
                   </div>
                   {openSections.currentFacility ? <MdExpandLess className="shrink-0 text-2xl" /> : <MdExpandMore className="shrink-0 text-2xl" />}
-                </div>
+                </button>
 
                 {!openSections.currentFacility && (
                   <div className="mx-4 mt-4 space-y-2">
@@ -200,24 +208,16 @@ export default function PMSDashboardLayout({
                     >
                       Units
                     </button>
-                    {currentFacility && currentFacility.id > 0
-                      ? (() => {
-                          const baseUrl =
-                            currentFacility.environment === "staging"
-                              ? `https://portal.${currentFacility.environment}insomniaccia.com/facility/${currentFacility.id}/dashboard`
-                              : `https://portal.insomniaccia${currentFacility.environment}.com/facility/${currentFacility.id}/dashboard`;
-                          return (
-                            <button
-                              onClick={(e) => { e.preventDefault(); window.open(baseUrl, "_blank"); }}
-                              title={baseUrl}
-                              className="px-2 flex items-center gap-2 hover:bg-zinc-800 dark:hover:bg-zinc-800"
-                            >
-                              <FaExternalLinkAlt />
-                              Control Center
-                            </button>
-                          );
-                        })()
-                      : null}
+                    <a
+                      href={controlCenterUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={controlCenterUrl}
+                      className="px-2 flex w-full items-center gap-2 cursor-pointer hover:bg-zinc-800 dark:hover:bg-zinc-800"
+                    >
+                      Control Center
+                      <FaExternalLinkAlt className="text-xs" />
+                    </a>
                     <button
                       onClick={() => {
                         navigate("/pms/all-facilities");
@@ -235,16 +235,18 @@ export default function PMSDashboardLayout({
 
             {/* Facilities Section */}
             <div className={`border-t border-b pl-2 pr-2 border-zinc-500 pb-8 ${isFacilitiesSection ? "bg-zinc-900 dark:bg-zinc-900 border-l-yellow-500 border-l-2" : "dark:bg-zinc-950"}`}>
-              <div
-                className="flex justify-between items-center cursor-pointer mt-8"
+              <button
+                type="button"
+                className="flex w-full justify-between items-center cursor-pointer mt-8 text-left"
                 onClick={() => toggleSection("facilities")}
+                aria-expanded={!openSections.facilities}
               >
                 <div className="flex items-center space-x-2">
                   <BsFillBuildingsFill className={`${isFacilitiesSection ? "text-yellow-500" : ""}`} />
                   <span className="pl-1 truncate max-w-[18ch]">Other Options</span>
                 </div>
                 {openSections.facilities ? <MdExpandLess className="shrink-0 text-2xl" /> : <MdExpandMore className="shrink-0 text-2xl" />}
-              </div>
+              </button>
 
               {!openSections.facilities && (
                 <div className="mx-4 mt-4 space-y-2">
@@ -267,16 +269,18 @@ export default function PMSDashboardLayout({
             {/* Admin Section */}
             {permissions.pmsPlatformAdmin && currentFacility.id > 0 && (
               <div className={`border-t border-b pl-2 pr-2 border-zinc-500 pb-8 ${isAdminSection ? "bg-zinc-900 dark:bg-zinc-900 border-l-yellow-500 border-l-2" : "dark:bg-zinc-950"}`}>
-                <div
-                  className="flex justify-between items-center cursor-pointer mt-8"
+                <button
+                  type="button"
+                  className="flex w-full justify-between items-center cursor-pointer mt-8 text-left"
                   onClick={() => toggleSection("admin")}
+                  aria-expanded={!openSections.admin}
                 >
                   <div className="flex items-center space-x-2">
                     <RiAdminFill className={`${isAdminSection ? "text-yellow-500" : ""}`} />
                     <span className="pl-1 truncate max-w-[18ch]">Admin Functions</span>
                   </div>
                   {openSections.admin ? <MdExpandLess className="shrink-0 text-2xl" /> : <MdExpandMore className="shrink-0 text-2xl" />}
-                </div>
+                </button>
 
                 {!openSections.admin && (
                   <div className="mx-4 mt-4 space-y-2">
@@ -291,13 +295,7 @@ export default function PMSDashboardLayout({
               </div>
             )}
 
-            <div className="absolute bottom-0 w-full hidden md:flex justify-between text-sm cursor-pointer text-center">
-              <Link to="/user-settings" className="hover:dark:bg-zinc-900 w-full p-2">Settings</Link>
-              <div className="hover:dark:bg-zinc-900 w-full p-2">
-                <a href="https://opentechalliancesupport.zendesk.com/hc/en-us/categories/115001966887-OpenTech-IoE" target="_blank" rel="noopener noreferrer">Help</a>
-              </div>
-              <div className="hover:dark:bg-zinc-900 w-full p-2" onClick={handleLogout}>Logout</div>
-            </div>
+            <SidebarFooter onLogout={handleLogout} />
           </div>
         )}
 

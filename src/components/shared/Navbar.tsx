@@ -66,12 +66,15 @@ export default function Navbar({
   }, [isDropdownOpen]);
 
   return (
-    <nav className="bg-white dark:bg-zinc-900 p-2 w-fullselect-none relative">
+    <nav className="bg-white dark:bg-zinc-900 p-2 w-full select-none relative">
       <div className="flex items-center justify-between text-black dark:text-white relative">
         <div className="flex">
           {showSideToggle && (
             <button
               onClick={toggleSideMenu}
+              type="button"
+              aria-label={dashboardMenu ? "Hide sidebar" : "Show sidebar"}
+              title={dashboardMenu ? "Hide sidebar" : "Show sidebar"}
               className="flex items-center shrink-0 p-2"
             >
               {(dashboardMenu === true && (
@@ -86,7 +89,7 @@ export default function Navbar({
           {user && permissions.smartlockPlatform && (
             <Link
               to="/smartspace/all-facilities"
-              className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium ${
+              className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 font-medium ${
                 location.pathname.startsWith("/smartspace")
                   ? "border-b-2 border-yellow-400"
                   : ""
@@ -98,7 +101,7 @@ export default function Navbar({
           {user && permissions.pmsPlatform && (
             <Link
               to="/pms/all-facilities"
-              className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium ${
+              className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 font-medium ${
                 location.pathname.startsWith("/pms")
                   ? "border-b-2 border-yellow-400"
                   : ""
@@ -110,7 +113,7 @@ export default function Navbar({
           {user && role === "admin" && (
             <Link
               to="/admin/users"
-              className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium ${
+              className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 font-medium ${
                 location.pathname.startsWith("/admin")
                   ? "border-b-2 border-yellow-400"
                   : ""
@@ -121,40 +124,45 @@ export default function Navbar({
           )}
           {user ? (
             <div className="relative" ref={userRef}>
-              <h2
+              <button
+                type="button"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="cursor-pointer bg-zinc-100 dark:bg-zinc-800 rounded-md p-2 px-4 flex items-center text-center"
+                aria-haspopup="menu"
+                aria-expanded={isDropdownOpen}
+                className="cursor-pointer bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-md p-2 px-4 flex items-center gap-1 text-center"
               >
-                {user.email}{" "}
+                {user.email}
                 {isDropdownOpen ? <MdExpandLess /> : <MdExpandMore />}
-              </h2>
+              </button>
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-1 w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg z-50 flex flex-col">
                   <button
-                    className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium text-center hover:cursor-pointer rounded-t"
+                    className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 font-medium text-center hover:cursor-pointer rounded-t"
                     onClick={() =>{
                       toggleDarkMode();
-                      setIsDropdownOpen(!isDropdownOpen);
+                      setIsDropdownOpen(false);
                     }}
                   >
                     {darkMode ? "Light Mode" : "Dark Mode"}
                   </button>
                   <Link
                     to="/user-settings"
-                    className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium text-center"
+                    onClick={() => setIsDropdownOpen(false)}
+                    className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 font-medium text-center"
                   >
                     User Settings
                   </Link>
                   {permissions.authenticationPlatform && (
                     <Link
                       to="/authentication-settings"
-                      className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium text-center"
+                      onClick={() => setIsDropdownOpen(false)}
+                      className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 font-medium text-center"
                     >
                       Authentication
                     </Link>
                   )}
                   <button
-                    className="hover:bg-zinc-100 hover:cursor-pointer dark:hover:bg-zinc-700 px-3 py-2 text-md font-medium rounded-b"
+                    className="hover:bg-zinc-100 hover:cursor-pointer dark:hover:bg-zinc-700 px-3 py-2 font-medium rounded-b"
                     onClick={() => handleLogout()}
                   >
                     Logout
@@ -167,7 +175,7 @@ export default function Navbar({
               {" "}
               <Link
                 to="/login"
-                className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 rounded-md text-md font-medium ${
+                className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 rounded-md font-medium ${
                   location.pathname === "/" ? "underline" : ""
                 }`}
               >
@@ -175,7 +183,7 @@ export default function Navbar({
               </Link>
               <Link
                 to="/register"
-                className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 rounded-md text-md font-medium ${
+                className={`hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 rounded-md font-medium ${
                   location.pathname === "/" ? "underline" : ""
                 }`}
               >

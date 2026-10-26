@@ -10,6 +10,7 @@ import { addEvent } from "@hooks/supabase";
 import DataTable from "@components/shared/DataTable";
 import InputBox from "@components/ui/InputBox";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
+import PageHeader from "@components/shared/PageHeader";
 
 export default function Users() {
   const { user } = useAuth();
@@ -224,7 +225,7 @@ export default function Users() {
               className="absolute top-full mt-1 right-0 w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg z-20 flex flex-col"
             >
               <button
-                className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md hover:cursor-pointer rounded-t"
+                className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 hover:cursor-pointer rounded-t"
                 onClick={() => {
                   setSelectedUser(user);
                   setIsEditUserModalOpen(true);
@@ -234,7 +235,7 @@ export default function Users() {
                 Edit
               </button>
               <button
-                className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md hover:cursor-pointer"
+                className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 hover:cursor-pointer"
                 onClick={() => {
                   setSelectedUser(user);
                   setIsCopyUserDataModalOpen(true);
@@ -244,7 +245,7 @@ export default function Users() {
                 Copy Data
               </button>
               <button
-                className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md hover:cursor-pointer rounded-b"
+                className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 hover:cursor-pointer rounded-b"
                 onClick={() => {
                   setDropdownIndex(null);
                   if (selfUser.id !== user.user_id) {
@@ -296,12 +297,7 @@ export default function Users() {
         />
       )}
       {/* Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
-        <div className="ml-5 flex items-center text-sm">
-          <FaPerson className="text-lg" />
-          &ensp; Users
-        </div>
-      </div>
+      <PageHeader icon={FaPerson} title="Users" />
       {/* Body */}
       <div className="w-full px-5 flex flex-col rounded-lg h-fit">
         {/* Search Bar */}

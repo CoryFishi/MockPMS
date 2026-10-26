@@ -27,6 +27,8 @@ export default function InputBox({
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         placeholder=""
+        aria-label={placeholder}
+        aria-required={required}
         className="w-full px-3 py-3 pr-8 border border-zinc-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 dark:bg-zinc-900 dark:border-zinc-700"
       />
       {/* Floating label */}
@@ -46,6 +48,7 @@ export default function InputBox({
       {value && (
         <button
           type="button"
+          aria-label="Clear"
           className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 cursor-pointer"
           onClick={() => onchange({ target: { value: "" } })}
         >

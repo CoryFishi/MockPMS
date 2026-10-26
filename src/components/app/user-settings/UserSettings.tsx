@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect, useCallback } from "react";
 import { addEvent } from "@hooks/supabase";
 import { RiSettingsFill } from "react-icons/ri";
+import PageHeader from "@components/shared/PageHeader";
 
 export default function UserSettings({ darkMode, toggleDarkMode }: { darkMode: boolean; toggleDarkMode: () => void }) {
   const [newPassword1, setNewPassword1] = useState<string>("");
@@ -183,12 +184,7 @@ export default function UserSettings({ darkMode, toggleDarkMode }: { darkMode: b
           {/* Navbar */}
           <Navbar setDashboardMenu={null} dashboardMenu={null} darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           {/* Body */}
-          <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
-            <div className="ml-5 flex items-center text-sm">
-              <RiSettingsFill className="text-lg" />
-              &ensp; User Settings
-            </div>
-          </div>
+          <PageHeader icon={RiSettingsFill} title="User Settings" />
           <div className="flex-1 overflow-y-auto px-5 flex flex-col">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-2 rounded-sm max-w-7xl mx-auto">
               {/* Account Information */}

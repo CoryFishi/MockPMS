@@ -60,7 +60,7 @@ export default function RegisterComp() {
     <div className="flex items-center justify-center min-h-screen bg-zinc-100 dark:bg-zinc-900">
       {error && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center dark:text-white z-30">
-          <div className="bg-white p-4 rounded-sm shadow-lg max-w-sm w-full dark:bg-darkSecondary">
+          <div className="bg-white p-4 rounded-sm shadow-lg max-w-sm w-full dark:bg-zinc-800">
             <h1 className="font-bold text-center text-3xl">Oh no!</h1>
             <p className="text-center text-red-500 mt-3">{error}</p>
             <button
@@ -75,7 +75,7 @@ export default function RegisterComp() {
 
       {message && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center dark:text-white z-30">
-          <div className="bg-white p-4 rounded-sm shadow-lg max-w-sm w-full dark:bg-darkSecondary">
+          <div className="bg-white p-4 rounded-sm shadow-lg max-w-sm w-full dark:bg-zinc-800">
             <h1 className="font-bold text-center text-3xl">Success!</h1>
             <p className="text-center text-blue-500 mt-3">{message}</p>
             <button
@@ -97,23 +97,29 @@ export default function RegisterComp() {
         <input
           type="email"
           placeholder="Email"
+          aria-label="Email"
+          autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="bg-white w-full px-4 py-2 border border-zinc-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+          className="bg-white dark:bg-zinc-900 dark:text-white w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500"
         />
         <input
           type="password"
           placeholder="Password"
+          aria-label="Password"
+          autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="bg-white w-full px-4 py-2 border border-zinc-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+          className="bg-white dark:bg-zinc-900 dark:text-white w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500"
         />
         <input
           type="password"
           placeholder="Confirm Password"
+          aria-label="Confirm Password"
+          autoComplete="new-password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="bg-white w-full px-4 py-2 border border-zinc-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+          className="bg-white dark:bg-zinc-900 dark:text-white w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500"
         />
         <button
           type="submit"
@@ -124,20 +130,22 @@ export default function RegisterComp() {
 
         <p className="text-center dark:text-white">
           Already have an account? Sign In{" "}
-          <span
-            className="text-blue-400 hover:cursor-pointer"
+          <button
+            type="button"
+            className="text-blue-400 hover:underline hover:cursor-pointer"
             onClick={() => navigate("/login")}
           >
             Here
-          </span>
+          </button>
         </p>
         <p className="text-sm text-center dark:text-white">
-          <span
-            className="text-blue-400 hover:cursor-pointer"
+          <button
+            type="button"
+            className="text-blue-400 hover:underline hover:cursor-pointer"
             onClick={() => handleForgotPassword()}
           >
             Forgot your password?
-          </span>
+          </button>
         </p>
       </form>
     </div>

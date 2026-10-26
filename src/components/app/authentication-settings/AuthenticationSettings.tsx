@@ -13,6 +13,7 @@ import React, { useRef, useState, useEffect, useCallback } from "react";
 import { addEvent } from "@hooks/supabase";
 import { handleSingleLogin } from "@hooks/opentech";
 import GeneralButton from "@components/ui/GeneralButton";
+import PageHeader from "@components/shared/PageHeader";
 
 export default function AuthenticationSettings({ darkMode, toggleDarkMode } : { darkMode: boolean; toggleDarkMode: () => void }) {
   const [settingsSavedFacilities, setSettingsSavedFacilities] = useState<any[]>([]);
@@ -544,12 +545,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode } : { 
           {/* Navbar */}
           <Navbar setDashboardMenu={null} dashboardMenu={null} darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
           {/* Body */}
-          <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
-            <div className="ml-5 flex items-center text-sm">
-              <MdToken className="text-lg" />
-              &ensp; Authentication Settings
-            </div>
-          </div>
+          <PageHeader icon={MdToken} title="Authentication Settings" />
           <div className="w-full h-full px-5 flex flex-col rounded-lg overflow-y-auto">
             <div className="flex justify-between mt-2">
               <div></div>

@@ -9,6 +9,7 @@ import { supabaseAdmin } from "@lib/supabaseClient";
 import toast from "react-hot-toast";
 import InputBox from "@components/ui/InputBox";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
+import PageHeader from "@components/shared/PageHeader";
 
 export default function Roles() {
   const { user } = useAuth();
@@ -193,7 +194,7 @@ export default function Roles() {
               className="absolute top-full mt-1 right-0 w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg z-20 flex flex-col"
             >
               <button
-                className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md hover:cursor-pointer rounded-b"
+                className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 hover:cursor-pointer rounded-b"
                 onClick={() => {
                   setSelectedRole(role);
                   setIsEditRoleModalOpen(true);
@@ -205,7 +206,7 @@ export default function Roles() {
               {users.filter((user) => user.role === role.role_name).length <
               1 ? (
                 <button
-                  className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md hover:cursor-pointer rounded-b"
+                  className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 hover:cursor-pointer rounded-b"
                   onClick={() =>
                     toast.promise(deleteRole(role.id), {
                       loading: `Deleting role...`,
@@ -243,12 +244,7 @@ export default function Roles() {
         />
       )}
       {/* Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
-        <div className="ml-5 flex items-center text-sm">
-          <FaPerson className="text-lg" />
-          &ensp; Roles
-        </div>
-      </div>
+      <PageHeader icon={FaPerson} title="Roles" />
       <div className="w-full px-5 flex flex-col rounded-lg h-fit">
         {/* Search Bar */}
         <div className="mb-2 mt-5 flex items-center justify-end text-center">

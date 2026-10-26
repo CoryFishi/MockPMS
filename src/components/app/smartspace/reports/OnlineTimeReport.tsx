@@ -361,7 +361,7 @@ export default function OnlineTimeReport({ selectedFacilities, searchQuery } : {
         <p className="text-left text-sm ml-2">
           Events shown from the last
           <select
-            className="border rounded-sm mx-2 dark:bg-darkSecondary dark:border-border"
+            className="border rounded-sm mx-2 dark:bg-zinc-900 dark:border-zinc-700"
             id="dayValue"
             value={dayValue}
             onChange={(e) => {

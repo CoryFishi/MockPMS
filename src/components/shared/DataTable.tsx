@@ -8,7 +8,7 @@ export default function DataTable({
   sortDirection,
   sortedColumn,
   onSort,
-  hoveredRow = null,
+  hoveredRow: _hoveredRow = null, // row hover styling is CSS-only; kept for caller compatibility
   setHoveredRow = null,
   onRowClick = null,
 }) {
@@ -66,6 +66,13 @@ export default function DataTable({
                 onClick={() => {
                   if (sortable && onSort) onSort(key, accessor);
                 }}
+                aria-sort={
+                  sortedColumn === key && sortable && sortDirection
+                    ? sortDirection === "asc"
+                      ? "ascending"
+                      : "descending"
+                    : undefined
+                }
               >
                 {label}
                 {sortedColumn === key && sortable && (
@@ -89,7 +96,7 @@ export default function DataTable({
                 setHoveredRow ? () => setHoveredRow(null) : undefined
               }
               className={`hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
-                hoveredRow !== null ? "cursor-pointer" : ""
+                onRowClick ? "cursor-pointer" : ""
               }`}
             >
               {columns.map(({ key, accessor, render }) => (
@@ -102,7 +109,7 @@ export default function DataTable({
                       typeof accessor === "function"
                         ? accessor(item)
                         : item[key];
-                    if (!value) return;
+                    if (value === null || value === undefined || value === "") return;
                     const rect = e.currentTarget.getBoundingClientRect();
 
                     setContextMenu({
@@ -133,7 +140,7 @@ export default function DataTable({
         >
           <button
             onClick={() => {
-              navigator.clipboard.writeText(contextMenu.content.cell);
+              navigator.clipboard.writeText(String(contextMenu.content.cell));
               setContextMenu({ ...contextMenu, visible: false });
             }}
             className="block w-full text-left px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-900 cursor-pointer"
