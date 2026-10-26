@@ -47,6 +47,7 @@ src/
 │   ├── opentech.ts           # OpenTech URL/header/login helpers + Facility type
 │   ├── facilityRefs.ts       # store/hydrate favorite, selected and current facilities (see Supabase)
 │   ├── facilityResource.ts   # useFacilityResource — cached per-facility lists (units, visitors, ...)
+│   ├── sitePlans.ts          # site_plans queries/mutations + background image Storage helpers
 │   ├── statuslist.ts         # useFacilityStatusLists — facilities across all saved credentials
 │   ├── smartspace.ts         # React Query facility-status fetching for the SmartSpace dashboard
 │   ├── tableSort.ts          # useTableSort — DataTable sort state that survives data changes
@@ -55,7 +56,7 @@ src/
 supabase/migrations/          # SQL migrations (RLS policies, admin functions) — applied manually in the Supabase SQL editor
 ```
 
-Notable pages: `pms/DeleteModal.tsx` is shared by `units/` and `visitors/`. `admin/users/CopyUserData.tsx` merges/replaces tokens, favorites, and selected facilities between users. `smartspace/mapping/` is a react-konva floor-plan editor (`applyChange.ts` holds its state transitions; `facility1.json` is sample data).
+Notable pages: `pms/DeleteModal.tsx` is shared by `units/` and `visitors/`. `admin/users/CopyUserData.tsx` merges/replaces tokens, favorites, and selected facilities between users. `smartspace/mapping/` is the pre-install **site planner** (react-konva): `SitePlans.tsx` lists plans, `SitePlanEditor.tsx` edits one at `/smartspace/mapping/:planId`. Its `model/` folder is pure TypeScript — `types.ts` (the stored layout), `rules.ts` (manual-derived ranges and limits), `analyze.ts` (coverage checks), `ops.ts` (layout edits), `exports.ts` (BOM, lock install CSV). Plans are standalone — not linked to OpenTech facilities, units or devices. Spec: `docs/superpowers/specs/2026-10-26-site-plan-mapping-design.md`.
 
 ---
 
@@ -203,6 +204,8 @@ There is no service-role client in the frontend. Admin powers come from the data
 - **`guard_user_data_role` trigger** — only admins can change `user_data.role` (non-admins may insert with `role` `'user'` or null).
 - **`supabase.rpc("admin_delete_user", { target_user_id })`** — deletes a user's `user_data` row and auth account; admin-only, can't delete yourself.
 
+- **`public.has_permission(key)`** — true when the caller's role grants `key` in `roles.permissions`, or they're an admin. Use it in RLS for permission-gated tables.
+
 New admin capability = new policy or `SECURITY DEFINER` function in a new migration, never a privileged key in the frontend. After DDL changes, run `supabase/verify_admin_rls.sql`.
 
 Log user actions with `import { addEvent } from "@hooks/supabase"` → `addEvent(name, description, completed)`.
@@ -213,6 +216,7 @@ Log user actions with `import { addEvent } from "@hooks/supabase"` → `addEvent
   - **Facility references** — `favorite_tokens`, `selected_tokens` and `current_facility` store `{id, name, environment, propertyNumber, api}`; the secrets live only in `tokens` (matched on `api` + `environment`). AuthProvider's `setFavoriteTokens`/`setSelectedTokens`/`setCurrentFacility` re-attach them (`hydrateFacility`), so state always holds complete facilities. **Every write must go through `toFacilityRef(s)(value, tokens)`** from `@hooks/facilityRefs` — it drops the bearer token, and keeps inline secrets only when the owning user has no matching credential (deleted credentials, data copied by an admin). The `smartlock-overview` Edge Function hydrates the same way.
 - **`user_events`** — `id`, `user_id`, `event_name` (e.g. `"Token Added"`), `event_description`, `completed` (bool), `created_at`
 - **`roles`** — `id`, `role_name`, `role_description`, `permissions` (jsonb)
+- **`site_plans`** — `id`, `name`, `customer`, `address`, `notes`, `layout` (jsonb, see `mapping/model/types.ts`), `summary` (jsonb device counts for the list page), `created_by(_email)`, `created_at`, `updated_by(_email)`, `updated_at`. The `site_plans_stamp` trigger sets the `created_*`/`updated_*` columns — never send them. RLS: `has_permission('smartlockPlatform')` reads/creates/edits; only the creator or an admin deletes. Saves are conditional on the loaded `updated_at` (conflict → overwrite/reload). Background images live in the private `site-plan-backgrounds` Storage bucket at `{planId}/{uuid}.png|jpg` (signed URLs). Migration `20261026220000_site_plans.sql`; verify with `supabase/verify_site_plans.sql`.
 
 ### Permissions object
 

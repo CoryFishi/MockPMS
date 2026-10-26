@@ -1,7 +1,7 @@
 # Site Plan Mapping — Design
 
 **Date:** 2026-10-26
-**Status:** Approved (grilling session, Q1–Q23)
+**Status:** Implemented (pending migration + in-app verification)
 **Scope:** Rebuild SmartSpace → Mapping as a pre-install site planner for OpenNet,
 SmartLock S and SmartMotion.
 
