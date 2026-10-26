@@ -10,7 +10,7 @@
 //   POST {}                                → email each subscriber their report
 //   POST { "testRecipient": "you@x.com" }  → build every report, send all to you@x.com
 //
-// Secrets: RESEND_KEY (required), REPORT_FROM (optional sender address).
+// Secrets: RESEND_API_KEY (required), REPORT_FROM (optional sender address).
 // SUPABASE_URL and SUPABASE_SECRET_KEYS are injected by the platform.
 
 interface Facility {
@@ -233,8 +233,8 @@ ${failedList}
 }
 
 async function sendEmail(to: string, subject: string, html: string) {
-  const resendKey = Deno.env.get("RESEND_KEY");
-  if (!resendKey) throw new Error("RESEND_KEY secret is not set");
+  const resendKey = Deno.env.get("RESEND_API_KEY");
+  if (!resendKey) throw new Error("RESEND_API_KEY secret is not set");
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
