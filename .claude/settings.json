@@ -14,5 +14,8 @@
       "Read(./.env)",
       "Read(./.env.*)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "supabase-mockpms"
+  ]
 }
