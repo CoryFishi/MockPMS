@@ -8,9 +8,13 @@
 --   * guard_user_data_role trigger — only admins can change a role (blocks self-promotion)
 --   * public.admin_delete_user()   — replaces auth.admin.deleteUser()
 --
--- Safe to re-run: functions use CREATE OR REPLACE and every policy is dropped
--- by name before being created. Policies are permissive (OR'd), so any
--- pre-existing policies keep working alongside these.
+-- It also removes the dashboard-made setup it replaces: the old policies on
+-- user_data/roles/user_events (some let users rewrite their own role's
+-- permissions or log events as anyone) and the user_roles mirror table that
+-- the old is_admin() read, along with its sync triggers.
+--
+-- Safe to re-run: functions use CREATE OR REPLACE and every policy, trigger,
+-- function and table is dropped with IF EXISTS before being (re)created.
 
 begin;
 
@@ -33,6 +37,28 @@ $$;
 
 revoke all on function public.is_admin() from public, anon;
 grant execute on function public.is_admin() to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Legacy cleanup: pre-existing policies (all permissive, so left in place they
+-- would be OR'd with the ones below and undo them) and the user_roles mirror.
+-- ---------------------------------------------------------------------------
+drop policy if exists "Allow admins to manipulate this table" on public.user_data;
+drop policy if exists "Enable users to manipulate their own data only" on public.user_data;
+drop policy if exists "Enable users to view their own data only" on public.user_data;
+
+drop policy if exists "Admin access" on public.roles;
+drop policy if exists "roles can see their own role" on public.roles;
+
+drop policy if exists "Enable access for admin users" on public.user_events;
+drop policy if exists "Enable insert for authenticated users only" on public.user_events;
+drop policy if exists "Enable users to view their own data only" on public.user_events;
+
+drop trigger if exists sync_user_roles on public.user_data;
+drop trigger if exists trg_sync_user_roles on public.user_data;
+drop function if exists public.sync_user_roles();
+drop function if exists public.update_user_roles();
+-- No CASCADE: its own policies go with it; anything else depending on it should fail loudly.
+drop table if exists public.user_roles;
 
 -- ---------------------------------------------------------------------------
 -- Role guard: non-admins may create their row with role 'user' (or no role)

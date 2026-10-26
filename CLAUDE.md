@@ -216,7 +216,7 @@ Log user actions with `import { addEvent } from "@hooks/supabase"` → `addEvent
 
 ### Tables
 
-- **`user_data`** — `user_id` (uuid PK), `user_email`, `role`, `tokens` (jsonb credentials), `favorite_tokens` (jsonb), `selected_tokens` (jsonb), `current_facility` (jsonb, or `{}`), `last_update_at`
+- **`user_data`** — `user_id` (uuid PK), `user_email`, `role`, `tokens` (jsonb[] credentials), `favorite_tokens` (jsonb[]), `selected_tokens` (jsonb[]), `current_facility` (jsonb, or `{}`), `last_update_at`
 - **`user_events`** — `id`, `user_id`, `event_name` (e.g. `"Token Added"`), `event_description`, `completed` (bool), `created_at`
 - **`roles`** — `id`, `role_name`, `role_description`, `permissions` (jsonb)
 
