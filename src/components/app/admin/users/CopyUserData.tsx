@@ -4,6 +4,7 @@ import { FaCopy } from "react-icons/fa";
 import { supabase } from "@lib/supabaseClient";
 import { addEvent } from "@hooks/supabase";
 import { useAuth } from "@context/AuthProvider";
+import { hydrateFacilities, restoreFacilities, toFacilityRefs } from "@hooks/facilityRefs";
 import ModalContainer from "@components/ui/ModalContainer";
 import ModalButton from "@components/ui/ModalButton";
 import SelectOption from "@components/ui/SelectOption";
@@ -71,7 +72,8 @@ export default function CopyUserData({
     if (!targetUserId) throw new Error("No target user selected.");
     if (selectedFields.length === 0) throw new Error("Nothing to copy.");
 
-    const columns = selectedFields.map((f) => f.key).join(",");
+    // Always read everything: facility lists are stored relative to each user's credentials
+    const columns = "tokens,favorite_tokens,selected_tokens,current_facility";
     const description = `${user.email} copied ${selectedFields
       .map((f) => f.label)
       .join(", ")} from ${sourceUser.user_email} to ${
@@ -86,8 +88,8 @@ export default function CopyUserData({
         .in("user_id", [sourceUser.user_id, targetUserId]);
       if (fetchError) throw fetchError;
 
-      const source = rows.find((r: any) => r.user_id === sourceUser.user_id);
-      const target = rows.find((r: any) => r.user_id === targetUserId);
+      const source: any = rows.find((r: any) => r.user_id === sourceUser.user_id);
+      const target: any = rows.find((r: any) => r.user_id === targetUserId);
       if (!source || !target) throw new Error("User data not found.");
 
       const update: Record<string, any> = {
@@ -98,6 +100,23 @@ export default function CopyUserData({
           mode === "replace"
             ? source[key] || []
             : mergeLists(key, target[key] || [], source[key] || []);
+      }
+      // Re-store facility lists against the target's resulting credentials:
+      // secrets come from the source's credentials, and stay inline only for
+      // facilities whose credential the target doesn't have
+      const targetTokens = update.tokens ?? target.tokens ?? [];
+      const credentials = [...(target.tokens || []), ...(source.tokens || [])];
+      const copiedLists = {
+        favorite_tokens: update.favorite_tokens,
+        selected_tokens: update.selected_tokens,
+      };
+      if (update.tokens) {
+        // The target's credentials changed: re-store all its facilities
+        Object.assign(update, restoreFacilities(target, credentials, targetTokens));
+      }
+      for (const key of ["favorite_tokens", "selected_tokens"] as const) {
+        if (!copiedLists[key]) continue;
+        update[key] = toFacilityRefs(hydrateFacilities(copiedLists[key], credentials), targetTokens);
       }
 
       const { error } = await supabase

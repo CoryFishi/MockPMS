@@ -12,7 +12,7 @@ import axios from "axios";
 import { useAuth } from "@context/AuthProvider";
 import { supabase } from "@lib/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
-import { handleSingleLogin, buildApiUrl, authHeaders } from "@hooks/opentech";
+import { buildApiUrl, authHeaders } from "@hooks/opentech";
 import { RiAdminFill } from "react-icons/ri";
 import SidebarFooter from "@components/shared/SidebarFooter";
 
@@ -28,7 +28,7 @@ export default function PMSDashboardLayout({
     setFavoriteTokens,
     setSelectedTokens,
     permissions,
-    getBearerToken,
+    ensureBearerToken,
   } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -50,24 +50,6 @@ export default function PMSDashboardLayout({
     currentFacility?.environment === "staging"
       ? `https://portal.${currentFacility.environment}insomniaccia.com/facility/${currentFacility.id}/dashboard`
       : `https://portal.insomniaccia${currentFacility?.environment ?? ""}.com/facility/${currentFacility?.id}/dashboard`;
-
-  const handleCurrentFacilityUpdate = useCallback(async (updatedInfo: any) => {
-    const { error } = await supabase.from("user_data").upsert(
-      {
-        user_id: user.id,
-        current_facility: updatedInfo,
-      },
-      { onConflict: "user_id" }
-    );
-
-    if (error) {
-      console.error("Error saving credentials:", error.message);
-    } else {
-      setCurrentFacility(updatedInfo);
-      setCurrentFacilityName(updatedInfo.name);
-      setIsNameGrabbed(true);
-    }
-  }, [user, setCurrentFacility]);
 
   const handleCurrentFacilityDelete = async () => {
     const { error } = await supabase.from("user_data").upsert(
@@ -102,53 +84,39 @@ export default function PMSDashboardLayout({
   const handleLogin = useCallback(async () => {
     if (!currentFacility || Object.keys(currentFacility).length === 0) return;
 
-    // Use cached bearer token from AuthProvider when available
-    const cached = getBearerToken(currentFacility);
-    if (cached) {
-      const updatedFacility = { ...currentFacility, token: { access_token: cached } };
-      handleCurrentFacilityUpdate(updatedFacility);
+    const bearer = await ensureBearerToken(currentFacility);
+    if (!bearer) {
+      console.error("Login failed for current facility");
       return;
     }
-
-    try {
-      const fetchToken = await handleSingleLogin(currentFacility);
-      if ('token' in fetchToken) {
-        const updatedFacility = {
-          ...currentFacility,
-          token: fetchToken.token,
-        };
-        handleCurrentFacilityUpdate(updatedFacility);
-      } else {
-        console.error("Login failed:", fetchToken.error);
-      }
-    } catch (err) {
-      console.error("Login failed:", err);
-    }
-  }, [currentFacility, handleCurrentFacilityUpdate, getBearerToken]);
+    // The token is kept in memory only (current_facility stores a reference)
+    setCurrentFacility((prev: any) => ({ ...prev, token: { access_token: bearer } }));
+    setCurrentFacilityName(currentFacility.name);
+    setIsNameGrabbed(true);
+  }, [currentFacility, setCurrentFacility, ensureBearerToken]);
 
   const handleFacilityInfo = useCallback(async () => {
     if (Object.keys(currentFacility).length === 0) return;
+    // currentFacility.token isn't stored, so this render's copy may lack it
+    const bearer = await ensureBearerToken(currentFacility);
+    if (!bearer) return;
     const config = {
       method: "get",
       url: buildApiUrl(currentFacility, `/facilities/${currentFacility.id}`),
-      headers: authHeaders(currentFacility),
+      headers: authHeaders({ token: { access_token: bearer } }),
+      timeout: 15000,
     };
 
     axios(config)
       .then(function (response) {
-        const facilityInfo = response.data;
-        let facility = currentFacility;
-        const updatedFacility = {
-          ...facility,
-          facilityInfo,
-        };
-        handleCurrentFacilityUpdate(updatedFacility);
+        // Merge into the latest state so the token set by handleLogin survives
+        setCurrentFacility((prev: any) => ({ ...prev, facilityInfo: response.data }));
         setCurrentFacilityName(response.data.name);
       })
       .catch(function (error) {
         console.error("Error during login:", error);
       });
-  }, [currentFacility, handleCurrentFacilityUpdate]);
+  }, [currentFacility, setCurrentFacility, ensureBearerToken]);
 
   const toggleSection = (section: keyof typeof openSections) => {
     setOpenSections((prev) => ({

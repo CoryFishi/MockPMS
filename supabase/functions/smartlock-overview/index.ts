@@ -25,7 +25,25 @@ interface Facility {
 
 interface Subscriber {
   user_email: string;
-  selected_tokens: Facility[] | null;
+  tokens: Facility[] | null;
+  // References ({id, name, environment, api}); secrets come from `tokens`.
+  // Entries without a matching credential still carry inline secrets.
+  selected_tokens: Partial<Facility>[] | null;
+}
+
+// Attach the matching saved credential's secrets to a selected facility
+function hydrate(ref: Partial<Facility>, credentials: Facility[]): Facility {
+  const credential = credentials.find(
+    (c) => c.api === ref.api && (c.environment ?? "") === (ref.environment ?? "")
+  );
+  return {
+    ...ref,
+    ...(credential && {
+      apiSecret: credential.apiSecret,
+      client: credential.client,
+      clientSecret: credential.clientSecret,
+    }),
+  } as Facility;
 }
 
 interface FacilityReport {
@@ -276,7 +294,7 @@ Deno.serve(async (req) => {
   // Secret keys go on the apikey header only — never as a Bearer token.
   const res = await fetch(
     `${Deno.env.get("SUPABASE_URL")}/rest/v1/user_data` +
-      "?select=user_email,selected_tokens&automated_reports->>smartlockOverview=eq.true",
+      "?select=user_email,tokens,selected_tokens&automated_reports->>smartlockOverview=eq.true",
     { headers: { apikey: keys[0] } }
   );
   if (!res.ok) {
@@ -286,7 +304,7 @@ Deno.serve(async (req) => {
 
   const results = [];
   for (const sub of subscribers) {
-    const facilities = sub.selected_tokens ?? [];
+    const facilities = (sub.selected_tokens ?? []).map((f) => hydrate(f, sub.tokens ?? []));
     const to = testRecipient || sub.user_email;
     try {
       if (!facilities.length) {

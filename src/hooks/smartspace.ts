@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useQueries } from "@tanstack/react-query";
-import { handleSingleLogin, buildApiUrl, authHeaders } from "@hooks/opentech";
+import { buildApiUrl, authHeaders } from "@hooks/opentech";
 
 export const FACILITY_QUERY_KEY = "smartspace-facility";
 
@@ -29,17 +29,11 @@ async function withFacilitySlot<T>(task: () => Promise<T>): Promise<T> {
 
 export async function fetchFacilityStatus(
   facility: any,
-  getBearerToken: (credential: any) => string | null
+  ensureBearerToken: (credential: any) => Promise<string | null>
 ) {
   // Bearer token is critical — no token, no data.
-  let bearer = getBearerToken(facility);
-  if (!bearer) {
-    const login: any = await handleSingleLogin(facility);
-    if (!login?.token?.access_token) {
-      throw new Error("Authentication failed");
-    }
-    bearer = login.token.access_token;
-  }
+  const bearer = await ensureBearerToken(facility);
+  if (!bearer) throw new Error("Authentication failed");
 
   const headers = authHeaders({ ...facility, token: { access_token: bearer } });
   const get = (path: string) =>
@@ -178,13 +172,13 @@ export async function fetchFacilityStatus(
 
 export function useFacilityStatusQueries(
   selectedTokens: any[],
-  getBearerToken: (credential: any) => string | null
+  ensureBearerToken: (credential: any) => Promise<string | null>
 ) {
   const facilities = selectedTokens ?? [];
   return useQueries({
     queries: facilities.map((facility: any) => ({
       queryKey: [FACILITY_QUERY_KEY, facility.environment, facility.id],
-      queryFn: () => withFacilitySlot(() => fetchFacilityStatus(facility, getBearerToken)),
+      queryFn: () => withFacilitySlot(() => fetchFacilityStatus(facility, ensureBearerToken)),
       staleTime: FIVE_MINUTES_MS,
       refetchInterval: FIVE_MINUTES_MS,
     })),

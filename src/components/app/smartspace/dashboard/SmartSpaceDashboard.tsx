@@ -14,11 +14,11 @@ import { useFacilityStatusQueries, FACILITY_QUERY_KEY } from "@hooks/smartspace"
 import PageHeader from "@components/shared/PageHeader";
 
 export default function SmartSpaceDashboardView() {
-  const { selectedTokens, getBearerToken } = useAuth();
+  const { selectedTokens, ensureBearerToken } = useAuth();
   const queryClient = useQueryClient();
   const { loaded, pending, errored, lastUpdatedAt, refreshingKeys } = useFacilityStatusQueries(
     selectedTokens,
-    getBearerToken
+    ensureBearerToken
   );
 
   // Sorted stable copy of loaded facilities (most smartlocks first), the

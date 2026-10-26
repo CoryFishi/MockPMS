@@ -1,3 +1,4 @@
+import { restoreFacilities } from "@hooks/facilityRefs";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { supabase } from "@lib/supabaseClient";
@@ -42,7 +43,16 @@ export default function EditUser({
     try {
       const { data, error } = await supabase
         .from("user_data")
-        .update(newUserData)
+        .update({
+          ...newUserData,
+          // Secrets from the credentials before and after this edit, so
+          // facilities whose credential was removed keep them inline
+          ...restoreFacilities(
+            newUserData,
+            [...(newUserData.tokens || []), ...(selectedUser.tokens || [])],
+            newUserData.tokens || []
+          ),
+        })
         .eq("user_id", newUserData.user_id);
 
       if (error) {

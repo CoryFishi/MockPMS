@@ -7,11 +7,11 @@ import DetailModal from "@components/shared/DetailModal";
 import { RiTestTubeFill, RiCheckboxCircleFill, RiCloseCircleFill } from "react-icons/ri";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { handleSingleLogin, buildApiUrl, authHeaders } from "@hooks/opentech";
+import { buildApiUrl, authHeaders } from "@hooks/opentech";
 import PageHeader from "@components/shared/PageHeader";
 
 export default function SmartSpaceTester() {
-  const { selectedTokens, getBearerToken } = useAuth();
+  const { selectedTokens, ensureBearerToken } = useAuth();
   const [selectedFacility, setSelectedFacility] = useState<any>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [smartMotionData, setSmartMotionData] = useState<any[]>([]);
@@ -95,16 +95,10 @@ export default function SmartSpaceTester() {
     );
   };
   const fetchBearerToken = useCallback(async (facility) => {
-    const cached = getBearerToken(facility);
-    if (cached) return cached;
-    const login: any = await handleSingleLogin(facility);
-    const token = login?.token?.access_token;
-    if (!token) {
-      toast.error(`Failed to fetch token for ${facility.name}`);
-      return null;
-    }
+    const token = await ensureBearerToken(facility);
+    if (!token) toast.error(`Failed to fetch token for ${facility.name}`);
     return token;
-  }, [getBearerToken]);
+  }, [ensureBearerToken]);
 
   const fetchInitialSmartMotionData = useCallback(async (facility: any) => {
     const bearer = await fetchBearerToken(facility);

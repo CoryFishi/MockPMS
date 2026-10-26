@@ -1,14 +1,17 @@
-import Dashboard from "@views/pms/PMSDashboard";
-import AuthenticationSettings from "@views/authentication-settings/AuthenticationSettings";
-import SmartLockDashboard from "@views/smartspace/SmartSpaceDashboard";
 import Login from "@views/auth/login/Login";
-import Register from "@views/auth/register/Register";
-import Admin from "@views/admin/AdminDashboard";
-import UserSettings from "@views/user-settings/UserSettings";
-import ResetPassword from "@views/auth/reset-password/ResetPassword";
+import LoadingSpinner from "@components/shared/LoadingSpinner";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
+
+// Each platform is its own chunk, so the first load only downloads what's shown
+const Dashboard = lazy(() => import("@views/pms/PMSDashboard"));
+const SmartLockDashboard = lazy(() => import("@views/smartspace/SmartSpaceDashboard"));
+const Admin = lazy(() => import("@views/admin/AdminDashboard"));
+const AuthenticationSettings = lazy(() => import("@views/authentication-settings/AuthenticationSettings"));
+const UserSettings = lazy(() => import("@views/user-settings/UserSettings"));
+const Register = lazy(() => import("@views/auth/register/Register"));
+const ResetPassword = lazy(() => import("@views/auth/reset-password/ResetPassword"));
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -39,6 +42,13 @@ function App() {
         reverseOrder={true}
         toastOptions={{ duration: 2000 }}
       />
+      <Suspense
+        fallback={
+          <div className="relative h-screen overflow-hidden dark:bg-zinc-900">
+            <LoadingSpinner loadingText="" />
+          </div>
+        }
+      >
       <Routes>
         {/* Redirect root to PMS */}
         <Route path="/" element={<Navigate to="/pms/all-facilities" replace />} />
@@ -86,6 +96,7 @@ function App() {
           element={<Login darkMode={darkMode} toggleDarkMode={toggleDarkMode} />}
         />
       </Routes>
+      </Suspense>
     </>
   );
 }

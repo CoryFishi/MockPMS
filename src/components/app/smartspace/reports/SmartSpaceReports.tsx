@@ -11,7 +11,6 @@ import { FaLock } from "react-icons/fa";
 import OfflineEventsComparison from "@views/smartspace/reports/OfflineEventsComparison";
 import InputBox from "@components/ui/InputBox";
 import AllSmartMotionReport from "@views/smartspace/reports/AllSmartMotionReport";
-import { handleSingleLogin } from "@hooks/opentech";
 import PageHeader from "@components/shared/PageHeader";
 
 export default function SmartSpaceReports() {
@@ -21,7 +20,7 @@ export default function SmartSpaceReports() {
   const [facilitiesWithBearers, setFacilitiesWithBearers] = useState([]);
   const [openPage, setOpenPage] = useState<keyof typeof reportOptions>("AllSmartLocksReport");
   const [reportSearch, setReportSearch] = useState(false);
-  const { selectedTokens, getBearerToken } = useAuth();
+  const { selectedTokens, ensureBearerToken } = useAuth();
   const modalRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentLoadingText, setCurrentLoadingText] = useState("");
@@ -72,16 +71,10 @@ export default function SmartSpaceReports() {
 
   // Function to get a bearer token for each facility
   const fetchBearerToken = useCallback(async (facility) => {
-    const cached = getBearerToken(facility);
-    if (cached) return cached;
-    const login: any = await handleSingleLogin(facility);
-    const token = login?.token?.access_token;
-    if (!token) {
-      toast.error(`Failed to fetch token for ${facility.name}`);
-      return null;
-    }
+    const token = await ensureBearerToken(facility);
+    if (!token) toast.error(`Failed to fetch token for ${facility.name}`);
     return token;
-  }, [getBearerToken]);
+  }, [ensureBearerToken]);
 
   // Facility dropdown toggle
   const toggleDropdown = () => setIsOpen(!isOpen);
@@ -104,9 +97,6 @@ export default function SmartSpaceReports() {
       try {
         const updatedFacilities = await Promise.all(
           selectedTokens.map(async (facility) => {
-            // Use cached bearer token when available — avoids a round-trip auth call
-            const cached = getBearerToken(facility);
-            if (cached) return { ...facility, bearer: cached };
             setCurrentLoadingText(`Fetching token for ${facility.name}...`);
             const bearer = await fetchBearerToken(facility);
             return { ...facility, bearer };
@@ -122,7 +112,7 @@ export default function SmartSpaceReports() {
 
     // Initial fetch
     fetchFacilitiesWithBearers();
-  }, [selectedTokens, getBearerToken, fetchBearerToken]);
+  }, [selectedTokens, fetchBearerToken]);
 
   // Set all facilities as selected by default
   useEffect(() => {

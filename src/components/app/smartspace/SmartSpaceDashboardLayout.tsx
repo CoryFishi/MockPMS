@@ -1,16 +1,19 @@
 import SmartSpaceAllFacilitiesPage from "@views/smartspace/all-facilities/SmartSpaceAllFacilities";
 import SmartSpaceSelectedPage from "@views/smartspace/selected/SmartSpaceSelected";
 import SmartSpaceDashboardView from "@views/smartspace/dashboard/SmartSpaceDashboard";
-import SmartSpaceReports from "@views/smartspace/reports/SmartSpaceReports";
-import SmartSpaceMapping from "@views/smartspace/mapping/SmartSpaceMapping";
-import SmartSpaceTester from "@views/smartspace/tester/SmartSpaceTester";
 import { useNavigate, useLocation, Routes, Route, Navigate } from "react-router-dom";
 import SidebarFooter from "@components/shared/SidebarFooter";
-import { useState } from "react";
+import LoadingSpinner from "@components/shared/LoadingSpinner";
+import { useState, lazy, Suspense } from "react";
 import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import { useAuth } from "@context/AuthProvider";
 import { supabase } from "@lib/supabaseClient";
+
+// Heavy pages (recharts, react-konva) load on first visit
+const SmartSpaceReports = lazy(() => import("@views/smartspace/reports/SmartSpaceReports"));
+const SmartSpaceMapping = lazy(() => import("@views/smartspace/mapping/SmartSpaceMapping"));
+const SmartSpaceTester = lazy(() => import("@views/smartspace/tester/SmartSpaceTester"));
 
 export default function SmartSpaceDashboardLayout({ dashboardMenu }: { dashboardMenu: boolean }) {
   const { setTokens, setCurrentFacility, setFavoriteTokens, setSelectedTokens } = useAuth();
@@ -126,7 +129,8 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }: { dashboard
         )}
 
         {/* Page Content */}
-        <div className="w-full flex flex-col h-full">
+        <div className="relative w-full flex flex-col h-full">
+          <Suspense fallback={<LoadingSpinner loadingText="" />}>
           <Routes>
             <Route index element={<Navigate to="all-facilities" replace />} />
             <Route path="all-facilities" element={<SmartSpaceAllFacilitiesPage />} />
@@ -137,6 +141,7 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }: { dashboard
             <Route path="tester"         element={<SmartSpaceTester />} />
             <Route path="*"              element={<Navigate to="all-facilities" replace />} />
           </Routes>
+          </Suspense>
         </div>
       </div>
     </div>

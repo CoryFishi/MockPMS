@@ -1,10 +1,8 @@
 import DataTable from "@components/shared/DataTable";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
 import PaginationFooter from "@components/shared/PaginationFooter";
-import axios from "axios";
 import toast from "react-hot-toast";
-import React, { useCallback, useEffect, useState } from "react";
-import qs from "qs";
+import React, { useMemo, useState } from "react";
 import { useAuth } from "@context/AuthProvider";
 import { supabase } from "@lib/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
@@ -17,157 +15,24 @@ import {
   RiCheckboxBlankCircleLine,
 } from "react-icons/ri";
 import InputBox from "@components/ui/InputBox";
-import { getEnvironmentName, buildAuthUrl, buildApiUrl, authHeaders } from "@hooks/opentech";
+import { useFacilityStatusLists, filterFacilities } from "@hooks/statuslist";
+import { useTableSort } from "@hooks/tableSort";
+import { toFacilityRefs } from "@hooks/facilityRefs";
 import PageHeader from "@components/shared/PageHeader";
 
 export default function SmartSpaceAllFacilitiesPage() {
-  const [facilities, setFacilities] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredFacilities, setFilteredFacilities] = useState([]);
-  const [sortedColumn, setSortedColumn] = useState(null);
-  const [sortDirection, setSortDirection] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [noFacilities, setNoFacilities] = useState(false);
-  const { user, tokens, selectedTokens, setSelectedTokens, getBearerToken } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentLoadingText, setCurrentLoadingText] = useState("");
-
-  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
-    let newDirection;
-
-    if (sortedColumn !== columnKey) {
-      newDirection = "asc";
-    } else if (sortDirection === "asc") {
-      newDirection = "desc";
-    } else if (sortDirection === "desc") {
-      newDirection = null;
-    }
-
-    setSortedColumn(newDirection ? columnKey : null);
-    setSortDirection(newDirection);
-
-    if (!newDirection) {
-      setFilteredFacilities([...facilities]);
-      return;
-    }
-
-    const sorted = [...filteredFacilities].sort((a, b) => {
-      const aVal = accessor(a) ?? "";
-      const bVal = accessor(b) ?? "";
-
-      if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
-      if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
-      return 0;
-    });
-
-    setFilteredFacilities(sorted);
-  };
-
-  const handleLogin = async (facility) => {
-    const data = qs.stringify({
-      grant_type: "password",
-      username: facility.api,
-      password: facility.apiSecret,
-      client_id: facility.client,
-      client_secret: facility.clientSecret,
-    });
-
-    const config = {
-      method: "post",
-      url: buildAuthUrl(facility),
-      headers: {
-        accept: "application/json",
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      data: data,
-    };
-
-    return axios(config)
-      .then(function (response) {
-        return response.data;
-      })
-      .catch(function (error) {
-        console.error("Error during login:", error);
-        throw error;
-      });
-  };
-  const handleFacilities = useCallback(async (saved: any[]) => {
-    setFacilities([]);
-    setFilteredFacilities([]);
-    setIsLoading(true);
-    const total = saved.length;
-    let loadedCount = 0;
-    setCurrentLoadingText(`0/${total} loaded`);
-
-    const handleAccount = async (facility: any) => {
-      try {
-        // Use cached bearer token when available to avoid redundant auth calls
-        const cachedToken = getBearerToken(facility);
-        const bearer = cachedToken
-          ? { access_token: cachedToken }
-          : await handleLogin(facility);
-
-        const res = await axios.get(
-          buildApiUrl(facility, "/facilities/statuslist"),
-          {
-            headers: authHeaders({
-              ...facility,
-              token: { access_token: bearer?.access_token },
-            }),
-          }
-        );
-
-        const enriched = res.data.map((item: any) => ({
-          ...item,
-          environment: facility.environment,
-          api: facility.api,
-          apiSecret: facility.apiSecret,
-          client: facility.client,
-          clientSecret: facility.clientSecret,
-        }));
-
-        return enriched;
-      } catch (err) {
-        console.error(`Error loading ${facility.client}:`, err);
-        toast.error(`Failed to load facilities for account ${facility.name || facility.client} in ${getEnvironmentName(facility)}.`);
-        return [];
-      }
-    };
-
-    try {
-      const chunks = await Promise.all(
-        saved.map(async (facility) => {
-          const result = await handleAccount(facility);
-          loadedCount++;
-          setCurrentLoadingText(`${loadedCount}/${total} loaded`);
-          return result;
-        })
-      );
-
-      const flattened = chunks.flat();
-
-      if (flattened.length === 0) {
-        setNoFacilities(true);
-      } else {
-        const sorted = flattened.sort((a, b) => {
-          if (a.environment < b.environment) return -1;
-          if (a.environment > b.environment) return 1;
-          if (a.id < b.id) return -1;
-          if (a.id > b.id) return 1;
-          return 0;
-        });
-
-        setFacilities(sorted);
-        setFilteredFacilities(sorted);
-      }
-    } catch (err) {
-      toast.error(`Facilities Failed to Load!: ${err.message}`);
-    } finally {
-      setCurrentLoadingText("");
-      setIsLoading(false);
-    }
-  }, [setFacilities, getBearerToken]);
+  const { user, tokens, selectedTokens, setSelectedTokens } = useAuth();
+  const { facilities, settledCount, total, allSettled, noFacilities, isLoading } =
+    useFacilityStatusLists();
+  const searchedFacilities = useMemo(
+    () => filterFacilities(facilities, searchQuery),
+    [facilities, searchQuery]
+  );
+  const { sortedRows: filteredFacilities, sortedColumn, sortDirection, onSort } =
+    useTableSort(searchedFacilities);
 
   const handleSelectedFacilitiesUpdate = async (newFacility: any, isSelected: boolean) => {
     const { data: currentData, error: fetchError } = await supabase
@@ -211,7 +76,7 @@ export default function SmartSpaceAllFacilitiesPage() {
     const { error: upsertError } = await supabase.from("user_data").upsert(
       {
         user_id: user.id,
-        selected_tokens: updatedTokens,
+        selected_tokens: toFacilityRefs(updatedTokens, tokens),
         last_update_at: new Date().toISOString(),
       },
       { onConflict: "user_id" }
@@ -278,47 +143,6 @@ export default function SmartSpaceAllFacilitiesPage() {
       (facility) => facility.id === facilityId
     );
   };
-
-  useEffect(() => {
-    if (!tokens) return;
-    handleFacilities(tokens);
-  }, [tokens, handleFacilities]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-    const loweredQuery = searchQuery.toLowerCase();
-
-    const searchableFields = [
-      "facilityId",
-      "facilityPropertyNumber",
-      "facilityName",
-      "accountName",
-      "environment",
-      "gatewayStatus",
-      "alarmStatus",
-      "deviceStatus",
-      "edgeRouterPlatformDeviceStatus",
-      "pmsInterfaceStatus",
-      "gatewayStatusMessage",
-      "alarmStatusMessage",
-      "deviceStatusMessage",
-      "edgeRouterPlatformDeviceStatusMessage",
-      "pmsInterfaceStatusMessage",
-    ];
-
-    const filtered = facilities.filter((facility) => {
-      return (
-        searchableFields.some((field) => {
-          const value = facility[field];
-          return value?.toString().toLowerCase().includes(loweredQuery);
-        }) ||
-        (facility.edgeRouterPlatformDeviceStatus != null &&
-          "smartlock".includes(loweredQuery))
-      );
-    });
-
-    setFilteredFacilities(filtered);
-  }, [facilities, searchQuery]);
 
   const environmentLabel = {
     "-dev": "Development",
@@ -419,9 +243,13 @@ export default function SmartSpaceAllFacilitiesPage() {
       } h-full dark:text-white dark:bg-zinc-900 relative`}
     >
       {/* Loading Spinner */}
-      {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}
+      {isLoading && <LoadingSpinner loadingText={total ? `${settledCount}/${total} loaded` : ""} />}
       {/* Header */}
-      <PageHeader icon={FaWarehouse} title="All Facilities" />
+      <PageHeader
+        icon={FaWarehouse}
+        title="All Facilities"
+        meta={!allSettled && total ? `Loading ${settledCount}/${total}...` : undefined}
+      />
       {/* Body */}
       <div className="w-full px-5 flex flex-col rounded-lg h-full">
         {/* Search Bar */}
@@ -429,7 +257,10 @@ export default function SmartSpaceAllFacilitiesPage() {
           <InputBox
             placeholder="Search facilities..."
             value={searchQuery}
-            onchange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+            onchange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1);
+            }}
           />
         </div>
         {/* Table */}
@@ -441,7 +272,7 @@ export default function SmartSpaceAllFacilitiesPage() {
             rowsPerPage={rowsPerPage}
             sortDirection={sortDirection}
             sortedColumn={sortedColumn}
-            onSort={handleColumnSort}
+            onSort={onSort}
           />
           {/* If no facilities display no facilities text */}
           {noFacilities && (

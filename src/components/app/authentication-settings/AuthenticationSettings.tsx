@@ -1,3 +1,4 @@
+import { restoreFacilities } from "@hooks/facilityRefs";
 import Navbar from "@components/shared/Navbar";
 import NotFound from "@components/shared/NotFound";
 import DataTable from "@components/shared/DataTable";
@@ -25,7 +26,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode } : { 
   const [isRenameModalOpen, setIsRenameModalOpen] = useState<boolean>(false);
   const [selectedToken, setSelectedToken] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { user, tokens, setTokens, permissions } = useAuth();
+  const { user, tokens, setTokens, permissions, ensureBearerToken } = useAuth();
 
   const handleRename = (token: any) => {
     setSelectedToken(token);
@@ -151,7 +152,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode } : { 
 
     const { data: currentData, error: fetchError } = await supabase
       .from("user_data")
-      .select("tokens")
+      .select("tokens, favorite_tokens, selected_tokens, current_facility")
       .eq("user_id", user.id)
       .single();
 
@@ -169,6 +170,8 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode } : { 
       {
         user_id: user.id,
         tokens: updatedTokens,
+        // Facilities that used the removed credential keep their secrets inline
+        ...restoreFacilities(currentData, currentData?.tokens || [], updatedTokens),
         last_update_at: new Date().toISOString(),
       },
       { onConflict: "user_id" }
@@ -193,15 +196,11 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode } : { 
     }
   };
 
+  // A valid cached bearer token counts as authenticated; otherwise this logs in
+  // (shared with any login already in flight for the same credential)
   const handleReauthentication = useCallback(async (facility: any, index: number) => {
-    const result: { token?: string; error?: string } = await handleSingleLogin({
-      api: facility.api,
-      apiSecret: facility.apiSecret,
-      client: facility.client,
-      clientSecret: facility.clientSecret,
-      environment: facility.environment,
-    });
-    if (result.error) {
+    const bearer = await ensureBearerToken(facility);
+    if (!bearer) {
       setSettingsSavedFacilities((prevFacilities) =>
         prevFacilities.map((f, i) =>
           i === index ? { ...f, isAuthenticated: false } : f
@@ -214,7 +213,7 @@ export default function AuthenticationSettings({ darkMode, toggleDarkMode } : { 
         )
       );
     }
-  }, []);
+  }, [ensureBearerToken]);
 
   const handleNewAuthenitcation = async (env: string, creds: any) => {
     if (env === "prod") env = "";

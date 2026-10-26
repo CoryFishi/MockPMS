@@ -7,35 +7,57 @@ import { useAuth } from "@context/AuthProvider";
 import { FaPerson } from "react-icons/fa6";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useCallback, useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import DeleteModal from "@views/pms/DeleteModal";
 import InputBox from "@components/ui/InputBox";
 import GeneralButton from "@components/ui/GeneralButton";
 import TableButton from "@components/ui/TableButton";
 import { addEvent } from "@hooks/supabase";
 import { buildApiUrl, authHeaders } from "@hooks/opentech";
+import { useFacilityResource, sortByUnitNumber } from "@hooks/facilityResource";
+import { useTableSort } from "@hooks/tableSort";
 import PageHeader from "@components/shared/PageHeader";
 
 export default function Visitors({ currentFacilityName }) {
-  const [visitors, setVisitors] = useState<any[]>([]);
   const [isCreateVisitorModalOpen, setIsCreateVisitorModalOpen] =
     useState<boolean>(false);
   const [selectedVisitor, setSelectedVisitor] = useState<any>(null);
   const [isEditVisitorModalOpen, setIsEditVisitorModalOpen] = useState<boolean>(false);
-  const [filteredVisitors, setFilteredVisitors] = useState<any[]>(visitors);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc" | null>("asc");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [sortedColumn, setSortedColumn] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(25);
-  const [visitorsPulled, setVisitorsPulled] = useState<boolean>(false);
   const { currentFacility, permissions } = useAuth();
-  const [smartLocks, setSmartLocks] = useState<any[]>([]);
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
   const [currentLoadingText] = useState<string>("Loading Visitors...");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [continousDelete, setContinousDelete] = useState<boolean>(false);
   const { user } = useAuth();
+  const {
+    data: visitors,
+    setData: setVisitors,
+    isPending: visitorsPending,
+  } = useFacilityResource(currentFacility, "/visitors", { transform: sortByUnitNumber });
+  const visitorsPulled = !visitorsPending;
+  // Errors when the facility has no SmartLocks, so don't retry
+  const { data: smartLocks } = useFacilityResource(currentFacility, "/smartlockstatus", { retry: false });
+
+  const searchedVisitors = useMemo(() => {
+    const query = searchQuery.toLowerCase();
+    return visitors.filter(
+      (visitor) =>
+        (visitor.id?.toString() || "").includes(searchQuery) ||
+        (visitor.accessProfileName?.toLowerCase() || "").includes(query) ||
+        (visitor.timeGroupName?.toLowerCase() || "").includes(query) ||
+        (visitor.name?.toLowerCase() || "").includes(query) ||
+        (visitor.unitNumber?.toLowerCase() || "").includes(query) ||
+        (visitor.mobilePhoneNumber?.toLowerCase() || "").includes(query) ||
+        (visitor.email?.toLowerCase() || "").includes(query) ||
+        (visitor.code?.toLowerCase() || "").includes(query)
+    );
+  }, [visitors, searchQuery]);
+  const { sortedRows: filteredVisitors, sortedColumn, sortDirection, onSort } =
+    useTableSort(searchedVisitors);
+
   const tenantCount = filteredVisitors.filter(
     (visitor) => visitor.isTenant === true
   ).length;
@@ -46,82 +68,6 @@ export default function Visitors({ currentFacilityName }) {
     (visitor) => visitor.isTenant === false && visitor.isPortalVisitor === false
   ).length;
 
-  const handleColumnSort = (columnKey: string, accessor = (a: any) => a[columnKey]) => {
-    let newDirection: "asc" | "desc" | null = "asc";
-
-    if (sortedColumn !== columnKey) {
-      newDirection = "asc";
-    } else if (sortDirection === "asc") {
-      newDirection = "desc";
-    } else if (sortDirection === "desc") {
-      newDirection = null;
-    }
-
-    setSortedColumn(newDirection ? columnKey : null);
-    setSortDirection(newDirection);
-
-    if (!newDirection) {
-      setFilteredVisitors([...visitors]);
-      return;
-    }
-
-    const sorted = [...filteredVisitors].sort((a, b) => {
-      const aVal = accessor(a) ?? "";
-      const bVal = accessor(b) ?? "";
-
-      if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
-      if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
-      return 0;
-    });
-
-    setFilteredVisitors(sorted);
-  };
-  const handleVisitors = useCallback(async () => {
-    const config = {
-      method: "get",
-      url: buildApiUrl(currentFacility, `/facilities/${currentFacility.id}/visitors`),
-      headers: authHeaders(currentFacility),
-    };
-
-    return axios(config)
-      .then(function (response) {
-        const sortedVisitors = response.data.sort((a, b) => {
-          if (a.unitNumber < b.unitNumber) return -1;
-          if (a.unitNumber > b.unitNumber) return 1;
-          return 0;
-        });
-        setSortedColumn("Unit Number");
-        setVisitors(sortedVisitors);
-        return response;
-      })
-      .catch(function (error) {
-        throw error;
-      });
-  }, [currentFacility]);
-  const handleSmartLocks = useCallback(async () => {
-    try {
-      const response = await axios.get(
-        buildApiUrl(currentFacility, `/facilities/${currentFacility.id}/smartlockstatus`),
-        {
-          headers: authHeaders(currentFacility),
-        }
-      );
-      const smartLocks = response.data;
-      if (smartLocks.length > 0) {
-        setSmartLocks(smartLocks);
-        return smartLocks;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      console.error(
-        `Error fetching SmartLocks for: ${currentFacility.name}`,
-        error
-      );
-      console.error(`${currentFacility.name} does not have SmartLocks`);
-      return null;
-    }
-  }, [currentFacility]);
   const moveOutVisitor = async (visitor: any) => {
     const handleDelete = async () => {
       const config = {
@@ -211,57 +157,6 @@ export default function Visitors({ currentFacilityName }) {
       deleteVisitor(v);
     }
   };
-
-  // Run handleUnits once when the component loads
-  useEffect(() => {
-    const fetchVisitors = async () => {
-      if (!currentFacility.token) return;
-      if (visitorsPulled) return;
-      await handleVisitors();
-      await handleSmartLocks();
-      setVisitorsPulled(true);
-    };
-
-    fetchVisitors();
-  }, [currentFacility, visitorsPulled, handleSmartLocks, handleVisitors]);
-
-  // Refresh data every 5 minutes
-  useEffect(() => {
-    if (!currentFacility.token) return;
-    const interval = setInterval(async () => {
-      await handleVisitors();
-      await handleSmartLocks();
-    }, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, [currentFacility, handleVisitors, handleSmartLocks]);
-
-  useEffect(() => {
-    // Filter facilities based on the search query
-    const filteredVisitors = visitors.filter(
-      (visitor) =>
-        (visitor.id?.toString() || "").includes(searchQuery) ||
-        (visitor.accessProfileName?.toLowerCase() || "").includes(
-          searchQuery.toLowerCase()
-        ) ||
-        (visitor.timeGroupName?.toLowerCase() || "").includes(
-          searchQuery.toLowerCase()
-        ) ||
-        (visitor.name?.toLowerCase() || "").includes(
-          searchQuery.toLowerCase()
-        ) ||
-        (visitor.unitNumber?.toLowerCase() || "").includes(
-          searchQuery.toLowerCase()
-        ) ||
-        (visitor.mobilePhoneNumber?.toLowerCase() || "").includes(
-          searchQuery.toLowerCase()
-        ) ||
-        (visitor.email?.toLowerCase() || "").includes(
-          searchQuery.toLowerCase()
-        ) ||
-        (visitor.code?.toLowerCase() || "").includes(searchQuery.toLowerCase())
-    );
-    setFilteredVisitors(filteredVisitors);
-  }, [visitors, searchQuery]);
 
   const columns = [
     { key: "id", label: "Visitor Id", accessor: (v) => v.id || "" },
@@ -469,7 +364,7 @@ export default function Visitors({ currentFacilityName }) {
           rowsPerPage={rowsPerPage}
           sortDirection={sortDirection}
           sortedColumn={sortedColumn}
-          onSort={handleColumnSort}
+          onSort={onSort}
         />
         {/* Pagination Footer */}
         <div className="px-2 py-5 mx-1">

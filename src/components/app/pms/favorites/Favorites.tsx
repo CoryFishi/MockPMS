@@ -1,17 +1,15 @@
 import PaginationFooter from "@components/shared/PaginationFooter";
 import DataTable from "@components/shared/DataTable";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoStar, GoStarFill } from "react-icons/go";
-import qs from "qs";
 import { useAuth } from "@context/AuthProvider";
 import { supabase } from "@lib/supabaseClient";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import TableButton from "@components/ui/TableButton";
 import InputBox from "@components/ui/InputBox";
-import { buildAuthUrl } from "@hooks/opentech";
+import { toFacilityRef, toFacilityRefs } from "@hooks/facilityRefs";
 import PageHeader from "@components/shared/PageHeader";
 
 export default function Favorites({ setCurrentFacilityName } : { setCurrentFacilityName: any; }) {
@@ -25,11 +23,12 @@ export default function Favorites({ setCurrentFacilityName } : { setCurrentFacil
   const [hasFavoriteTokensLoaded, setHasFavoriteTokensLoaded] = useState<boolean>(false);
   const {
     user,
+    tokens,
     favoriteTokens,
     setFavoriteTokens,
     currentFacility,
     setCurrentFacility,
-    getBearerToken,
+    ensureBearerToken,
   } = useAuth();
   const navigate = useNavigate();
   const [noFacilities, setNoFacilities] = useState<boolean>(false);
@@ -68,7 +67,7 @@ export default function Favorites({ setCurrentFacilityName } : { setCurrentFacil
     const { error } = await supabase.from("user_data").upsert(
       {
         user_id: user.id,
-        current_facility: updatedInfo,
+        current_facility: toFacilityRef(updatedInfo, tokens),
         last_update_at: new Date().toISOString(),
       },
       { onConflict: "user_id" }
@@ -81,51 +80,15 @@ export default function Favorites({ setCurrentFacilityName } : { setCurrentFacil
     }
   };
   const handleSelectLogin = async (facility: any) => {
-    // Use cached bearer token if available — avoids a round-trip auth call
-    const cached = getBearerToken(facility);
-    if (cached) {
-      const updatedFacility = {
-        ...facility,
-        token: { access_token: cached },
-      };
-      handleCurrentFacilityUpdate(updatedFacility);
-      setCurrentFacilityName(facility.name);
-      return { data: updatedFacility };
-    }
-
-    const data = qs.stringify({
-      grant_type: "password",
-      username: facility.api,
-      password: facility.apiSecret,
-      client_id: facility.client,
-      client_secret: facility.clientSecret,
-    });
-    const config = {
-      method: "post",
-      url: buildAuthUrl(facility),
-      headers: {
-        accept: "application/json",
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      data: data,
+    const bearer = await ensureBearerToken(facility);
+    if (!bearer) throw new Error("Authentication failed");
+    const updatedFacility = {
+      ...facility,
+      token: { access_token: bearer },
     };
-
-    return axios(config)
-      .then(function (response) {
-        const tokenData = response.data;
-        const updatedFacility = {
-          ...facility,
-          token: tokenData,
-        };
-        handleCurrentFacilityUpdate(updatedFacility);
-
-        setCurrentFacilityName(facility.name);
-        return response;
-      })
-      .catch(function (error) {
-        console.error("Error during login:", error);
-        throw error;
-      });
+    handleCurrentFacilityUpdate(updatedFacility);
+    setCurrentFacilityName(facility.name);
+    return { data: updatedFacility };
   };
   const handleSelect = async (facility: any) => {
     await handleCurrentFacilityUpdate(facility);
@@ -164,7 +127,7 @@ export default function Favorites({ setCurrentFacilityName } : { setCurrentFacil
       const { error } = await supabase.from("user_data").upsert(
         {
           user_id: user.id,
-          favorite_tokens: updatedTokens,
+          favorite_tokens: toFacilityRefs(updatedTokens, tokens),
         },
         { onConflict: "user_id" }
       );
@@ -183,7 +146,7 @@ export default function Favorites({ setCurrentFacilityName } : { setCurrentFacil
       const { error } = await supabase.from("user_data").upsert(
         {
           user_id: user.id,
-          favorite_tokens: updatedTokens,
+          favorite_tokens: toFacilityRefs(updatedTokens, tokens),
         },
         { onConflict: "user_id" }
       );

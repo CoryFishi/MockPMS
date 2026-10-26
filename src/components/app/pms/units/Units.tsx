@@ -10,9 +10,11 @@ import InputBox from "@components/ui/InputBox";
 import { useAuth } from "@context/AuthProvider";
 import { addEvent } from "@hooks/supabase";
 import { buildApiUrl, authHeaders } from "@hooks/opentech";
+import { useFacilityResource, sortByUnitNumber } from "@hooks/facilityResource";
+import { useTableSort } from "@hooks/tableSort";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useCallback, useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { RiDoorLockFill } from "react-icons/ri";
 import DeleteModal from "@views/pms/DeleteModal";
 import CreateVisitorUnitPage from "@views/pms/units/CreateVisitorUnitPage";
@@ -20,7 +22,6 @@ import DelinquencyModal from "@views/pms/units/DelinquencyModal";
 import PageHeader from "@components/shared/PageHeader";
 
 export default function Units({ currentFacilityName } : { currentFacilityName: string }) {
-  const [units, setUnits] = useState<any[]>([]);
   const [isUnitModalOpen, setIsUnitModalOpen] = useState<boolean>(false);
   const [isCreateVisitorModalOpen, setIsCreateVisitorModalOpen] =
     useState<boolean>(false);
@@ -28,19 +29,12 @@ export default function Units({ currentFacilityName } : { currentFacilityName: s
     localStorage.getItem("visitorAutofill") === "true" || false
   );
   const [selectedUnit, setSelectedUnit] = useState<string>("");
-  const [timeProfiles, setTimeProfiles] = useState<Record<string, any>>({});
-  const [accessProfiles, setAccessProfiles] = useState<Record<string, any>>({});
   const [isEditVisitorModalOpen, setIsEditVisitorModalOpen] = useState<boolean>(false);
-  const [filteredUnits, setFilteredUnits] = useState<any[]>(units);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [sortedColumn, setSortedColumn] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(25);
-  const [unitsPulled, setUnitsPulled] = useState<boolean>(false);
   const [visitors, setVisitors] = useState<any[]>([]);
   const { currentFacility, user, permissions } = useAuth();
-  const [smartLocks, setSmartLocks] = useState<any[]>([]);
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
   const [hoveredLock, setHoveredLock] = useState<number | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
@@ -49,6 +43,29 @@ export default function Units({ currentFacilityName } : { currentFacilityName: s
   const [continousDelete, setContinousDelete] = useState<boolean>(false);
   const [isMoveOutModalOpen, setIsMoveOutModalOpen] = useState<boolean>(false);
   const [currentLoadingText] = useState<string>("Loading Units...");
+  const {
+    data: units,
+    setData: setUnits,
+    isPending: unitsPending,
+  } = useFacilityResource(currentFacility, "/units", { transform: sortByUnitNumber });
+  const unitsPulled = !unitsPending;
+  const { data: timeProfiles } = useFacilityResource(currentFacility, "/timegroups");
+  const { data: accessProfiles } = useFacilityResource(currentFacility, "/accessprofiles");
+  // Errors when the facility has no SmartLocks, so don't retry
+  const { data: smartLocks } = useFacilityResource(currentFacility, "/smartlockstatus", { retry: false });
+
+  const searchedUnits = useMemo(() => {
+    const query = searchQuery.toLowerCase();
+    return units.filter(
+      (unit) =>
+        unit.unitNumber.toLowerCase().includes(query) ||
+        unit.id.toString().includes(searchQuery) ||
+        unit.status.toLowerCase().includes(query)
+    );
+  }, [units, searchQuery]);
+  const { sortedRows: filteredUnits, sortedColumn, sortDirection, onSort } =
+    useTableSort(searchedUnits);
+
   const rentedCount = filteredUnits.filter(
     (unit) => unit.status === "Rented"
   ).length;
@@ -59,82 +76,6 @@ export default function Units({ currentFacilityName } : { currentFacilityName: s
     (unit) => unit.status === "Vacant"
   ).length;
 
-  const handleTimeProfiles = useCallback(async () => {
-    const config = {
-      method: "get",
-      url: buildApiUrl(currentFacility, `/facilities/${currentFacility.id}/timegroups`),
-      headers: authHeaders(currentFacility),
-    };
-
-    axios(config)
-      .then(function (response) {
-        setTimeProfiles(response.data);
-      })
-      .catch(function (error) {
-        console.error(error);
-      });
-  }, [currentFacility]);
-  const handleAccessProfiles = useCallback(async () => {
-    const config = {
-      method: "get",
-      url: buildApiUrl(currentFacility, `/facilities/${currentFacility.id}/accessprofiles`),
-      headers: authHeaders(currentFacility),
-    };
-
-    axios(config)
-      .then(function (response) {
-        setAccessProfiles(response.data);
-      })
-      .catch(function (error) {
-        console.error(error);
-      });
-  }, [currentFacility]);
-  const handleUnits = useCallback(async () => {
-    const config = {
-      method: "get",
-      url: buildApiUrl(currentFacility, `/facilities/${currentFacility.id}/units`),
-      headers: authHeaders(currentFacility),
-    };
-
-    return axios(config)
-      .then(function (response) {
-        const sortedUnits = response.data.sort((a, b) => {
-          if (a.unitNumber < b.unitNumber) return -1;
-          if (a.unitNumber > b.unitNumber) return 1;
-          return 0;
-        });
-        setSortedColumn("Unit Number");
-        setUnits(sortedUnits);
-        return response;
-      })
-      .catch(function (error) {
-        throw error;
-      });
-  }, [currentFacility]);
-  const handleSmartLocks = useCallback(async () => {
-    try {
-      const response = await axios.get(
-        buildApiUrl(currentFacility, `/facilities/${currentFacility.id}/smartlockstatus`),
-        {
-          headers: authHeaders(currentFacility),
-        }
-      );
-      const smartLocks = response.data;
-      if (smartLocks.length > 0) {
-        setSmartLocks(smartLocks);
-        return smartLocks;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      console.error(
-        `Error fetching SmartLocks for: ${currentFacility.name}`,
-        error
-      );
-      console.error(`${currentFacility.name} does not have SmartLocks`);
-      return null;
-    }
-  }, [currentFacility]);
   const moveIn = async (unit) => {
     const handleRent = async () => {
       const data = {
@@ -389,80 +330,6 @@ export default function Units({ currentFacilityName } : { currentFacilityName: s
   const handleVisitorAutofill = (isFill) => {
     setVisitorAutofill(!isFill);
     localStorage.setItem("visitorAutofill", `${!isFill}`);
-  };
-
-  // Run handleUnits once when the component loads
-  useEffect(() => {
-    const fetchData = async () => {
-      // Return if no token is found
-      if (!currentFacility.token) return;
-      // Return if units have already been pulled
-      if (unitsPulled) return;
-      await Promise.all([
-        handleUnits(),
-        handleAccessProfiles(),
-        handleTimeProfiles(),
-        handleSmartLocks(),
-      ]);
-      setUnitsPulled(true);
-    };
-
-    fetchData();
-  }, [currentFacility, unitsPulled, handleAccessProfiles, handleTimeProfiles, handleUnits, handleSmartLocks]);
-
-  // Refresh data every 5 minutes
-  useEffect(() => {
-    if (!currentFacility.token) return;
-    const interval = setInterval(async () => {
-      await Promise.all([
-        handleUnits(),
-        handleAccessProfiles(),
-        handleTimeProfiles(),
-        handleSmartLocks(),
-      ]);
-    }, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, [currentFacility, handleUnits, handleAccessProfiles, handleTimeProfiles, handleSmartLocks]);
-
-  useEffect(() => {
-    const filteredUnits = units.filter(
-      (unit) =>
-        unit.unitNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        unit.id.toString().includes(searchQuery) ||
-        unit.status.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredUnits(filteredUnits);
-  }, [units, searchQuery]);
-
-  const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
-    let newDirection;
-
-    if (sortedColumn !== columnKey) {
-      newDirection = "asc";
-    } else if (sortDirection === "asc") {
-      newDirection = "desc";
-    } else if (sortDirection === "desc") {
-      newDirection = null;
-    }
-
-    setSortedColumn(newDirection ? columnKey : null);
-    setSortDirection(newDirection);
-
-    if (!newDirection) {
-      setFilteredUnits([...units]);
-      return;
-    }
-
-    const sorted = [...filteredUnits].sort((a, b) => {
-      const aVal = accessor(a) ?? "";
-      const bVal = accessor(b) ?? "";
-
-      if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
-      if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
-      return 0;
-    });
-
-    setFilteredUnits(sorted);
   };
 
   const columns = [
@@ -789,7 +656,7 @@ export default function Units({ currentFacilityName } : { currentFacilityName: s
           rowsPerPage={rowsPerPage}
           sortedColumn={sortedColumn}
           sortDirection={sortDirection}
-          onSort={handleColumnSort}
+          onSort={onSort}
         />
         {/* Pagination Footer */}
         <div className="px-2 py-5 mx-1">

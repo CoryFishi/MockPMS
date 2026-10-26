@@ -45,7 +45,11 @@ src/
 ├── context/AuthProvider.tsx  # Global auth, user data, bearer token cache (useAuth)
 ├── hooks/
 │   ├── opentech.ts           # OpenTech URL/header/login helpers + Facility type
+│   ├── facilityRefs.ts       # store/hydrate favorite, selected and current facilities (see Supabase)
+│   ├── facilityResource.ts   # useFacilityResource — cached per-facility lists (units, visitors, ...)
+│   ├── statuslist.ts         # useFacilityStatusLists — facilities across all saved credentials
 │   ├── smartspace.ts         # React Query facility-status fetching for the SmartSpace dashboard
+│   ├── tableSort.ts          # useTableSort — DataTable sort state that survives data changes
 │   └── supabase.ts           # addEvent() user-event logging
 └── lib/supabaseClient.ts     # the single Supabase client (anon key)
 supabase/migrations/          # SQL migrations (RLS policies, admin functions) — applied manually in the Supabase SQL editor
@@ -100,6 +104,7 @@ Import: `import { useAuth } from "@context/AuthProvider"`
 | `noUser` | `boolean` | No authenticated user |
 | `bearerTokens` | `BearerMap` | Cached bearer tokens — see Bearer Token System |
 | `getBearerToken` | fn | `(credential) => string \| null` |
+| `ensureBearerToken` | fn | `(credential) => Promise<string \| null>` — cache, else shared in-flight login |
 
 ---
 
@@ -115,21 +120,21 @@ type BearerMap = Record<string, { access_token: string; expires_at: number }>
 
 `getBearerToken(credential)` returns the cached `access_token`, or `null` if missing/expired. It reads from a ref, so it is stable and safe in `useCallback`/`useEffect` deps.
 
-AuthProvider automatically:
-1. **On user data load** — authenticates all stored credentials in parallel (`Promise.allSettled`)
-2. **When `tokens` changes** — authenticates any credential not already cached
-3. **Every 5 minutes** — refreshes tokens expiring within 10 minutes; patches `currentFacility.token` if it matches
+`ensureBearerToken(credential)` returns the cached token, or joins a login already in flight for that credential, or logs in; it resolves `null` on failure and is stable. Prefer it in new code — concurrent callers share one auth request instead of each logging in.
 
-Standard usage — cache first, then fall back to `handleSingleLogin` (as `hooks/smartspace.ts` and the SmartSpace Tester/Reports pages do):
+The cache is persisted to `localStorage.bearerTokens` (expired entries dropped on load, cleared on `SIGNED_OUT`), so a reload doesn't re-authenticate every credential.
+
+AuthProvider automatically:
+1. **On load and when `tokens` changes** — calls `ensureBearerToken` for every credential (no-op for cached ones)
+2. **Every 5 minutes** — refreshes tokens expiring within 10 minutes; patches `currentFacility.token` if it matches
+
+Standard usage — every page and hook uses it; don't call `handleSingleLogin` directly except to test a credential:
 
 ```typescript
-const { getBearerToken } = useAuth();
+const { ensureBearerToken } = useAuth();
 
-let bearer = getBearerToken(facility);
-if (!bearer) {
-  const login: any = await handleSingleLogin(facility); // { token } on success, { error } on failure
-  bearer = login?.token?.access_token ?? null;
-}
+const bearer = await ensureBearerToken(facility);
+if (!bearer) throw new Error("Authentication failed");
 ```
 
 ---
@@ -175,25 +180,13 @@ All under `/facilities/{id}` on `accesscontrol` unless noted. To find how an end
 
 Two styles coexist:
 
-- **React Query** — `main.tsx` provides a `QueryClient` (defaults: `staleTime` 5m, `gcTime` 30m, `retry: 1`, `refetchOnWindowFocus: false`). The SmartSpace dashboard uses `useFacilityStatusQueries(selectedTokens, getBearerToken)` from `@hooks/smartspace`: one query per facility, at most 6 concurrent fetches, 15s timeout, 5-minute `refetchInterval`, returning `{ loaded, pending, errored, lastUpdatedAt, refreshingKeys }`. Refresh by `queryClient.invalidateQueries({ queryKey: [FACILITY_QUERY_KEY] })`. Prefer this style for new multi-facility fetching.
-- **Local state + pulled flag** — most PMS pages (e.g. `Units.tsx`, `Visitors.tsx`): a per-page flag (`unitsPulled`, `visitorsPulled`) guards a one-time fetch, set *after* the fetch completes, plus a 5-minute `setInterval` refresh:
-
-```typescript
-useEffect(() => {
-  const fetchData = async () => {
-    if (!currentFacility.token || unitsPulled) return;
-    await handleUnits();
-    setUnitsPulled(true);
-  };
-  fetchData();
-}, [currentFacility, unitsPulled, handleUnits]);
-
-useEffect(() => {
-  if (!currentFacility.token) return;
-  const interval = setInterval(() => handleUnits(), 5 * 60 * 1000);
-  return () => clearInterval(interval);
-}, [currentFacility, handleUnits]);
-```
+- **React Query** (use this) — `main.tsx` provides a `QueryClient` (defaults: `staleTime` 5m, `gcTime` 30m, `retry: 1`, `refetchOnWindowFocus: false`).
+  - **Current-facility lists** — `useFacilityResource(currentFacility, "/units", { transform?, retry? })` from `@hooks/facilityResource` returns `{ data, setData, isPending, isError, refetch }`, cached per facility and refreshed every 5 minutes. `setData` behaves like a `useState` setter but writes into the cache — use it for optimistic edits (Units/Visitors pass it to their modals as `setUnits`/`setVisitors`).
+  - **All saved credentials** — `useFacilityStatusLists()` from `@hooks/statuslist` (both All Facilities pages): one `/facilities/statuslist` query per credential, rows stream in, failures reported in one toast. Pair with `filterFacilities(facilities, query)`.
+  - **SmartSpace dashboard** — `useFacilityStatusQueries(selectedTokens, ensureBearerToken)` from `@hooks/smartspace`: one query per facility, at most 6 concurrent fetches, 15s timeout, 5-minute `refetchInterval`, returning `{ loaded, pending, errored, lastUpdatedAt, refreshingKeys }`. Refresh by `queryClient.invalidateQueries({ queryKey: [FACILITY_QUERY_KEY] })`.
+  - Give every OpenTech request a `timeout` (15s is used throughout) — a hung host otherwise blocks until the browser gives up.
+- **Sorting** — derive the table rows with `useTableSort(rows)` (`@hooks/tableSort`) → `{ sortedRows, sortedColumn, sortDirection, onSort }` rather than sorting a copy into state, so the sort survives refreshes and search changes. Keep the search filter in a `useMemo` and call `setCurrentPage(1)` in the search input's handler.
+- **Local state + pulled flag** — older pages still fetch in a `useEffect` guarded by a "pulled" flag with a `setInterval` refresh. Don't copy it for new code.
 
 ---
 
@@ -217,6 +210,7 @@ Log user actions with `import { addEvent } from "@hooks/supabase"` → `addEvent
 ### Tables
 
 - **`user_data`** — `user_id` (uuid PK), `user_email`, `role`, `tokens` (jsonb[] credentials), `favorite_tokens` (jsonb[]), `selected_tokens` (jsonb[]), `current_facility` (jsonb, or `{}`), `last_update_at`
+  - **Facility references** — `favorite_tokens`, `selected_tokens` and `current_facility` store `{id, name, environment, propertyNumber, api}`; the secrets live only in `tokens` (matched on `api` + `environment`). AuthProvider's `setFavoriteTokens`/`setSelectedTokens`/`setCurrentFacility` re-attach them (`hydrateFacility`), so state always holds complete facilities. **Every write must go through `toFacilityRef(s)(value, tokens)`** from `@hooks/facilityRefs` — it drops the bearer token, and keeps inline secrets only when the owning user has no matching credential (deleted credentials, data copied by an admin). The `smartlock-overview` Edge Function hydrates the same way.
 - **`user_events`** — `id`, `user_id`, `event_name` (e.g. `"Token Added"`), `event_description`, `completed` (bool), `created_at`
 - **`roles`** — `id`, `role_name`, `role_description`, `permissions` (jsonb)
 
@@ -318,7 +312,7 @@ Top-level routes are in `src/app/App.tsx`; each platform layout (`PMSDashboardLa
 ## UI State
 
 - **Dark mode** — `document.documentElement.classList` toggles `dark`; persisted in `localStorage.darkMode` (`"true"`/`"false"`); passed as `darkMode`/`toggleDarkMode` props from `App.tsx` through the layouts. Style with Tailwind `dark:` variants.
-- **Other localStorage keys** — `smartSpaceListView`, `smartSpaceToggledSections`, `smartSpaceExplicit`, `visitorAutofill`.
+- **Other localStorage keys** — `bearerTokens`, `smartSpaceListView`, `smartSpaceToggledSections`, `smartSpaceExplicit`, `visitorAutofill`.
 - **Toasts** — `react-hot-toast`, `<Toaster position="bottom-right" reverseOrder />` in `App.tsx`, default duration 2000ms. `toast.promise` takes a **Promise**: pass `fn()`, not `fn` (passing the reference silently does nothing).
 
 ```typescript

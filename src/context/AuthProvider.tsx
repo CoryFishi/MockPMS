@@ -3,8 +3,27 @@ import { supabase } from "@lib/supabaseClient";
 import toast from "react-hot-toast";
 import { IoWarning } from "react-icons/io5";
 import { handleSingleLogin } from "@hooks/opentech";
+import { hydrateFacility, hydrateFacilities } from "@hooks/facilityRefs";
 
 type BearerMap = Record<string, { access_token: string; expires_at: number }>;
+
+// Bearer cache survives reloads so a fresh page load doesn't re-authenticate
+// every saved credential. Cleared on sign-out.
+const BEARER_STORAGE_KEY = "bearerTokens";
+
+const bearerKey = (credential: any) => `${credential.api}::${credential.environment}`;
+
+function loadStoredBearers(): BearerMap {
+  try {
+    const stored: BearerMap = JSON.parse(localStorage.getItem(BEARER_STORAGE_KEY) || "{}");
+    const now = Date.now();
+    return Object.fromEntries(
+      Object.entries(stored).filter(([, entry]) => entry?.expires_at > now)
+    );
+  } catch {
+    return {};
+  }
+}
 
 const AuthContext = createContext(null);
 
@@ -17,15 +36,15 @@ export function useAuth() {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [tokens, setTokens] = useState([]);
-  const [selectedTokens, setSelectedTokens] = useState([]);
-  const [favoriteTokens, setFavoriteTokens] = useState([]);
-  const [currentFacility, setCurrentFacility] = useState({});
+  const [selectedTokens, setSelectedTokensState] = useState([]);
+  const [favoriteTokens, setFavoriteTokensState] = useState([]);
+  const [currentFacility, setCurrentFacilityState] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [isPulled, setIsPulled] = useState(false);
   const [role, setRole] = useState("");
   const [permissions, setPermissions] = useState({});
   const [noUser, setNoUser] = useState(true);
-  const [bearerTokens, setBearerTokens] = useState<BearerMap>({});
+  const [bearerTokens, setBearerTokens] = useState<BearerMap>(loadStoredBearers);
 
   // Keep a ref so the background refresh interval can read latest values
   // without being re-created every render
@@ -33,37 +52,77 @@ export const AuthProvider = ({ children }) => {
   const currentFacilityRef = useRef(currentFacility);
   const tokensRef = useRef(tokens);
 
-  useEffect(() => { bearerTokensRef.current = bearerTokens; }, [bearerTokens]);
+  // In-flight logins keyed by credential, so concurrent callers share one request
+  const pendingLoginsRef = useRef<Map<string, Promise<string | null>>>(new Map());
+
+  useEffect(() => {
+    bearerTokensRef.current = bearerTokens;
+    localStorage.setItem(BEARER_STORAGE_KEY, JSON.stringify(bearerTokens));
+  }, [bearerTokens]);
   useEffect(() => { currentFacilityRef.current = currentFacility; }, [currentFacility]);
   useEffect(() => { tokensRef.current = tokens; }, [tokens]);
+
+  // Stored favorite/selected/current facilities are references without secrets
+  // (see @hooks/facilityRefs); these setters re-attach the secrets from the
+  // saved credentials so consumers always get complete facilities.
+  const setFavoriteTokens = useCallback((update: any) => {
+    setFavoriteTokensState((prev) =>
+      hydrateFacilities(typeof update === "function" ? update(prev) : update, tokensRef.current)
+    );
+  }, []);
+  const setSelectedTokens = useCallback((update: any) => {
+    setSelectedTokensState((prev) =>
+      hydrateFacilities(typeof update === "function" ? update(prev) : update, tokensRef.current)
+    );
+  }, []);
+  const setCurrentFacility = useCallback((update: any) => {
+    setCurrentFacilityState((prev) =>
+      hydrateFacility(typeof update === "function" ? update(prev) : update, tokensRef.current)
+    );
+  }, []);
+
+  // Credentials added, removed or edited: refresh the attached secrets
+  useEffect(() => {
+    setFavoriteTokensState((prev) => hydrateFacilities(prev, tokens));
+    setSelectedTokensState((prev) => hydrateFacilities(prev, tokens));
+    setCurrentFacilityState((prev) => hydrateFacility(prev, tokens));
+  }, [tokens]);
 
   // Returns cached access_token for a credential, or null if missing/expired.
   // Stable reference (reads from ref) — safe to use in useCallback deps.
   const getBearerToken = useCallback((credential: any): string | null => {
-    const key = `${credential.api}::${credential.environment}`;
-    const entry = bearerTokensRef.current[key];
+    const entry = bearerTokensRef.current[bearerKey(credential)];
     if (!entry || Date.now() >= entry.expires_at) return null;
     return entry.access_token;
   }, []);
 
-  // Authenticate a list of credentials in parallel and merge results into bearerTokens
-  async function authenticateCredentials(creds: any[]) {
-    if (!creds.length) return;
-    const results = await Promise.allSettled(creds.map((c) => handleSingleLogin(c)));
-    setBearerTokens((prev) => {
-      const updated = { ...prev };
-      results.forEach((result, i) => {
-        if (result.status === "fulfilled" && 'token' in result.value) {
-          const cred = creds[i];
-          updated[`${cred.api}::${cred.environment}`] = {
-            access_token: result.value.token.access_token,
-            expires_at: Date.now() + result.value.token.expires_in * 1000,
-          };
-        }
-      });
-      return updated;
-    });
-  }
+  // Returns a bearer token for a credential: from cache, from a login already in
+  // flight, or by logging in. Resolves null on failure (never throws). Stable.
+  const ensureBearerToken = useCallback((credential: any): Promise<string | null> => {
+    const cached = getBearerToken(credential);
+    if (cached) return Promise.resolve(cached);
+
+    const key = bearerKey(credential);
+    const pending = pendingLoginsRef.current.get(key);
+    if (pending) return pending;
+
+    const login = handleSingleLogin(credential)
+      .then((result) => {
+        if (!("token" in result)) return null;
+        const entry = {
+          access_token: result.token.access_token,
+          expires_at: Date.now() + result.token.expires_in * 1000,
+        };
+        // Update the ref now so callers that resolve before the next render hit the cache
+        bearerTokensRef.current = { ...bearerTokensRef.current, [key]: entry };
+        setBearerTokens((prev) => ({ ...prev, [key]: entry }));
+        return entry.access_token;
+      })
+      .finally(() => pendingLoginsRef.current.delete(key));
+
+    pendingLoginsRef.current.set(key, login);
+    return login;
+  }, [getBearerToken]);
 
   // Background refresh: every 5 minutes, re-auth tokens expiring within 10 minutes
   useEffect(() => {
@@ -72,8 +131,7 @@ export const AuthProvider = ({ children }) => {
       if (!allTokens.length) return;
 
       const stale = allTokens.filter((cred: any) => {
-        const key = `${cred.api}::${cred.environment}`;
-        const entry = bearerTokensRef.current[key];
+        const entry = bearerTokensRef.current[bearerKey(cred)];
         return !entry || entry.expires_at - Date.now() < 10 * 60 * 1000;
       });
 
@@ -85,7 +143,7 @@ export const AuthProvider = ({ children }) => {
         results.forEach((r, i) => {
           if (r.status === "fulfilled" && 'token' in r.value) {
             const cred = stale[i];
-            const key = `${cred.api}::${cred.environment}`;
+            const key = bearerKey(cred);
             const freshToken = r.value.token;
             updated[key] = {
               access_token: freshToken.access_token,
@@ -103,7 +161,7 @@ export const AuthProvider = ({ children }) => {
     }, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [setCurrentFacility]);
 
   useEffect(() => {
     if (role) {
@@ -140,6 +198,10 @@ export const AuthProvider = ({ children }) => {
     const { data: listener } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setUser(session?.user ?? null);
+        if (event === "SIGNED_OUT") {
+          localStorage.removeItem(BEARER_STORAGE_KEY);
+          setBearerTokens({});
+        }
       }
     );
 
@@ -234,18 +296,15 @@ export const AuthProvider = ({ children }) => {
           setIsLoading(false);
           return null;
         } else {
-          setCurrentFacility(data?.current_facility || {});
-          setSelectedTokens(data?.selected_tokens || []);
-          setFavoriteTokens(data?.favorite_tokens || []);
-          setTokens(data?.tokens || []);
+          const credentials = data?.tokens || [];
+          setCurrentFacilityState(hydrateFacility(data?.current_facility || {}, credentials));
+          setSelectedTokensState(hydrateFacilities(data?.selected_tokens, credentials));
+          setFavoriteTokensState(hydrateFacilities(data?.favorite_tokens, credentials));
+          setTokens(credentials);
           setRole(data?.role || "");
           // Empty role means the permissions effect never fires — resolve here
           if (!data?.role) setIsLoading(false);
-
-          // Silently authenticate all stored credentials in the background
-          if (data?.tokens?.length) {
-            authenticateCredentials(data.tokens);
-          }
+          // Stored credentials are authenticated by the `tokens` effect below
         }
         if (
           data?.tokens < 1 &&
@@ -297,20 +356,14 @@ export const AuthProvider = ({ children }) => {
       };
       getUserData();
     }
-  }, [user, isPulled]);
+  }, [user, isPulled, setCurrentFacility, setFavoriteTokens, setSelectedTokens]);
 
-  // When tokens are updated externally (e.g. after adding a new credential),
-  // authenticate any credential that doesn't yet have a cached bearer token
+  // On load and whenever tokens change (e.g. after adding a credential),
+  // authenticate any credential without a valid cached bearer token.
+  // ensureBearerToken dedupes against logins pages have already started.
   useEffect(() => {
-    if (!tokens.length) return;
-    const missing = tokens.filter((cred: any) => {
-      const key = `${cred.api}::${cred.environment}`;
-      return !bearerTokensRef.current[key];
-    });
-    if (missing.length) {
-      authenticateCredentials(missing);
-    }
-  }, [tokens]);
+    tokens.forEach((cred: any) => { ensureBearerToken(cred); });
+  }, [tokens, ensureBearerToken]);
 
   return (
     <AuthContext.Provider
@@ -333,6 +386,7 @@ export const AuthProvider = ({ children }) => {
         noUser,
         bearerTokens,
         getBearerToken,
+        ensureBearerToken,
       }}
     >
       {children}

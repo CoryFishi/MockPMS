@@ -10,6 +10,7 @@ import {
   RiCheckboxBlankCircleLine,
 } from "react-icons/ri";
 import InputBox from "@components/ui/InputBox";
+import { toFacilityRefs } from "@hooks/facilityRefs";
 import PageHeader from "@components/shared/PageHeader";
 
 export default function SmartSpaceSelectedPage() {
@@ -22,7 +23,7 @@ export default function SmartSpaceSelectedPage() {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [selectedTokensLoaded, setSelectedTokensLoaded] = useState(false);
   const [noFacilities, setNoFacilities] = useState(false);
-  const { user, selectedTokens, setSelectedTokens } = useAuth();
+  const { user, tokens, selectedTokens, setSelectedTokens } = useAuth();
   const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
     let newDirection;
 
@@ -77,7 +78,7 @@ export default function SmartSpaceSelectedPage() {
       const { error } = await supabase.from("user_data").upsert(
         {
           user_id: user.id,
-          selected_tokens: updatedTokens,
+          selected_tokens: toFacilityRefs(updatedTokens, tokens),
           last_update_at: new Date().toISOString(),
         },
         { onConflict: "user_id" }
@@ -98,7 +99,7 @@ export default function SmartSpaceSelectedPage() {
       const { error } = await supabase.from("user_data").upsert(
         {
           user_id: user.id,
-          selected_tokens: updatedTokens,
+          selected_tokens: toFacilityRefs(updatedTokens, tokens),
           last_update_at: new Date().toISOString(),
         },
         { onConflict: "user_id" }

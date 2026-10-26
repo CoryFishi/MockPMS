@@ -4,29 +4,32 @@ import toast from "react-hot-toast";
 import { FaEdit } from "react-icons/fa";
 import qs from "qs";
 import { buildAuthUrl, buildApiUrl, authHeaders } from "@hooks/opentech";
+import { hydrateFacility } from "@hooks/facilityRefs";
 
 export default function EditCurrentFacility({
   setIsEditCurrentFacilityModalOpen,
   newUserData,
   setNewUserData,
 }) {
-  const [id, setId] = useState(newUserData.current_facility.id || "");
-  const [api, setApi] = useState(newUserData.current_facility.api || "");
+  // Stored as a reference: take the secrets from the user's saved credentials
+  const current = hydrateFacility(newUserData.current_facility || {}, newUserData.tokens || []);
+  const [id, setId] = useState(current.id || "");
+  const [api, setApi] = useState(current.api || "");
   const [apiSecret, setApiSecret] = useState(
-    newUserData.current_facility.apiSecret || ""
+    current.apiSecret || ""
   );
   const [client, setClient] = useState(
-    newUserData.current_facility.client || ""
+    current.client || ""
   );
   const [clientSecret, setClientSecret] = useState(
-    newUserData.current_facility.clientSecret || ""
+    current.clientSecret || ""
   );
   const [environment, setEnvironment] = useState(
-    newUserData.current_facility.environment || ""
+    current.environment || ""
   );
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [facilityName, setFacilityName] = useState(
-    newUserData.current_facility.name || ""
+    current.name || ""
   );
 
   const handleLogin = async () => {

@@ -65,6 +65,8 @@ async function login(facility: Facility) {
       "Content-Type": "application/x-www-form-urlencoded",
     },
     data,
+    // An unresponsive auth host would otherwise hang until the browser gives up
+    timeout: 15000,
   };
 
   const response = await axios(config);
