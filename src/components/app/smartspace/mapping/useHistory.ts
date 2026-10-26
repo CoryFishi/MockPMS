@@ -14,6 +14,8 @@ interface HistoryState<T> {
 
 export interface History<T> {
   present: T;
+  /** The last committed value — `present` minus any uncommitted (live drag) edit. */
+  committed: T;
   /**
    * Replace the present value. `commit: false` updates it without an undo step
    * (live drags); the next committed set — or `commit()` — records one step
@@ -85,6 +87,7 @@ export function useHistory<T>(initial: T): History<T> {
 
   return {
     present: state.present,
+    committed: state.pending ?? state.present,
     set,
     commit,
     undo,

@@ -99,44 +99,48 @@ export async function createPlan(details: SitePlanDetails): Promise<string> {
   return data.id as string;
 }
 
-export async function updatePlanDetails(id: string, details: SitePlanDetails): Promise<SitePlanRow> {
-  const { data, error } = await supabase.from("site_plans").update(details).eq("id", id).select("*").maybeSingle();
-  if (error) throw error;
-  if (!data) throw new Error("The plan was not found or you can't edit it.");
-  return toRow(data);
-}
-
 export type SaveResult =
-  | { ok: true; row: SitePlanRow }
-  | { ok: false; reason: "conflict"; current: SitePlanListRow }
-  | { ok: false; reason: "deleted" };
+  | { status: "saved"; row: SitePlanRow }
+  | { status: "conflict"; current: SitePlanListRow }
+  | { status: "deleted" };
 
-interface SaveInput {
-  id: string;
-  /** updated_at of the version being edited; null skips the conflict check. */
-  loadedUpdatedAt: string | null;
-  layout: PlanLayout;
-  summary: PlanSummary;
-}
-
-/** Saves the layout unless someone else saved since `loadedUpdatedAt`. */
-export async function savePlan({ id, loadedUpdatedAt, layout, summary }: SaveInput): Promise<SaveResult> {
-  let query = supabase.from("site_plans").update({ layout, summary }).eq("id", id);
+/**
+ * Updates the plan unless someone else saved since `loadedUpdatedAt` (null
+ * skips the check, i.e. overwrite).
+ */
+async function conditionalUpdate(
+  id: string,
+  patch: Record<string, unknown>,
+  loadedUpdatedAt: string | null,
+): Promise<SaveResult> {
+  let query = supabase.from("site_plans").update(patch).eq("id", id);
   if (loadedUpdatedAt) query = query.eq("updated_at", loadedUpdatedAt);
   const { data, error } = await query.select("*").maybeSingle();
   if (error) throw error;
-  if (data) {
-    addEvent("Site Plan Saved", data.name, true);
-    return { ok: true, row: toRow(data) };
-  }
+  if (data) return { status: "saved", row: toRow(data) };
   const { data: current, error: readError } = await supabase
     .from("site_plans")
     .select(LIST_COLUMNS)
     .eq("id", id)
     .maybeSingle();
   if (readError) throw readError;
-  if (!current) return { ok: false, reason: "deleted" };
-  return { ok: false, reason: "conflict", current: current as SitePlanListRow };
+  if (!current) return { status: "deleted" };
+  return { status: "conflict", current: current as SitePlanListRow };
+}
+
+export async function savePlan(
+  id: string,
+  layout: PlanLayout,
+  summary: PlanSummary,
+  loadedUpdatedAt: string | null,
+): Promise<SaveResult> {
+  const result = await conditionalUpdate(id, { layout, summary }, loadedUpdatedAt);
+  if (result.status === "saved") addEvent("Site Plan Saved", result.row.name, true);
+  return result;
+}
+
+export function updatePlanDetails(id: string, details: SitePlanDetails, loadedUpdatedAt: string | null) {
+  return conditionalUpdate(id, { ...details }, loadedUpdatedAt);
 }
 
 async function removeFolder(planId: string) {
