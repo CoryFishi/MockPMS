@@ -8,10 +8,10 @@ import DetailModal from "@components/shared/DetailModal";
 import { RiErrorWarningFill } from "react-icons/ri";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { buildAuthUrl, buildApiUrl, authHeaders } from "@hooks/opentech";
+import { handleSingleLogin, buildApiUrl, authHeaders } from "@hooks/opentech";
 
 export default function SmartSpaceTester() {
-  const { selectedTokens } = useAuth();
+  const { selectedTokens, getBearerToken } = useAuth();
   const [selectedFacility, setSelectedFacility] = useState<any>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [smartMotionData, setSmartMotionData] = useState<any[]>([]);
@@ -80,34 +80,17 @@ export default function SmartSpaceTester() {
       })
     );
   };
-  const fetchBearerToken = async (facility: { environment: string; api: string; apiSecret: string; client: string; clientSecret: string; name: string }) => {
-    try {
-      const data = {
-        grant_type: "password",
-        username: facility.api,
-        password: facility.apiSecret,
-        client_id: facility.client,
-        client_secret: facility.clientSecret,
-      };
-
-      const response = await axios.post(
-        buildAuthUrl(facility),
-        data,
-        {
-          headers: {
-            accept: "application/json",
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      );
-
-      return response.data.access_token;
-    } catch (error) {
-      console.error(`Error fetching token for ${facility.name}:`, error);
+  const fetchBearerToken = useCallback(async (facility) => {
+    const cached = getBearerToken(facility);
+    if (cached) return cached;
+    const login: any = await handleSingleLogin(facility);
+    const token = login?.token?.access_token;
+    if (!token) {
       toast.error(`Failed to fetch token for ${facility.name}`);
       return null;
     }
-  };
+    return token;
+  }, [getBearerToken]);
 
   const fetchInitialSmartMotionData = useCallback(async (facility: any) => {
     const bearer = await fetchBearerToken(facility);
@@ -140,7 +123,7 @@ export default function SmartSpaceTester() {
       toast.error(`Failed to fetch SmartMotion data for ${facility.name}`);
       return [];
     }
-  }, []);
+  }, [fetchBearerToken]);
 
   const fetchNewSmartMotionData = useCallback(async (facility: any) => {
     const bearer = await fetchBearerToken(facility);
@@ -180,7 +163,7 @@ export default function SmartSpaceTester() {
       toast.error(`Failed to fetch SmartMotion data for ${facility.name}`);
       return [];
     }
-  }, []);
+  }, [fetchBearerToken]);
 
   const fetchNewSmartMotionEventData = useCallback(async (facility: any) => {
     const bearer = await fetchBearerToken(facility);
@@ -218,7 +201,7 @@ export default function SmartSpaceTester() {
       );
       return new Set();
     }
-  }, []);
+  }, [fetchBearerToken]);
 
   const columns = [
     {

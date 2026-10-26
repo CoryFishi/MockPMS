@@ -1,6 +1,6 @@
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
-import { supabase } from "@lib/supabaseClient";
+import { supabaseAdmin } from "@lib/supabaseClient";
 import {
   FaTrash,
   FaEye,
@@ -34,13 +34,13 @@ export default function EditUser({
   const { user } = useAuth();
 
   const getRoles = async () => {
-    let { data } = await supabase.from("roles").select("role_name");
+    let { data } = await supabaseAdmin.from("roles").select("role_name");
     setRoles(data);
   };
 
   const updateUserData = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from("user_data")
         .update(newUserData)
         .eq("user_id", newUserData.user_id);

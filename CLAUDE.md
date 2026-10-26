@@ -120,7 +120,7 @@ AuthProvider automatically:
 2. **When `tokens` changes** — authenticates any credential not already cached
 3. **Every 5 minutes** — refreshes tokens expiring within 10 minutes; patches `currentFacility.token` if it matches
 
-Standard usage — cache first, then fall back to `handleSingleLogin` (as `hooks/smartspace.ts` does):
+Standard usage — cache first, then fall back to `handleSingleLogin` (as `hooks/smartspace.ts` and the SmartSpace Tester/Reports pages do):
 
 ```typescript
 const { getBearerToken } = useAuth();
@@ -131,8 +131,6 @@ if (!bearer) {
   bearer = login?.token?.access_token ?? null;
 }
 ```
-
-> `SmartSpaceTester.tsx` and `SmartSpaceReports.tsx` each define a local `fetchBearerToken` that sends a JSON body instead of `qs.stringify` (and the Tester skips the cache). Don't copy them; use the pattern above.
 
 ---
 
@@ -301,7 +299,7 @@ Standard modal shell. Use `ModalButton` for buttons inside `responseContent`.
 Top-level routes are in `src/app/App.tsx`; each platform layout (`PMSDashboardLayout`, `SmartSpaceDashboardLayout`, `AdminDashboardLayout`) owns a nested `<Routes>` for its sub-pages. Read those files for the current route list.
 
 - `/` redirects to `/pms/all-facilities`; the catch-all `/*` renders Login. Each layout redirects its index and unknown sub-paths to its first page.
-- **Permission gating happens in the `*Dashboard.tsx` wrappers** (`pmsPlatform`, `smartlockPlatform`, `role === "admin"`), which render `NotFound` on failure; leaf pages check finer-grained permissions (e.g. `pmsPlatformUnitCreate`) inline. Exception: `/pms/scripts` is hidden from the sidebar unless `pmsPlatformAdmin`, but the route itself is not gated.
+- **Permission gating happens in the `*Dashboard.tsx` wrappers** (`pmsPlatform`, `smartlockPlatform`, `role === "admin"`), which render `NotFound` on failure; leaf pages check finer-grained permissions (e.g. `pmsPlatformUnitCreate`) inline. `/pms/scripts` additionally requires `pmsPlatformAdmin` at both the sidebar link and the route.
 - Nested routes use **relative** paths (`path="units"`) under the parent wildcard (`/pms/*`).
 - Navigate with `useNavigate` + absolute paths (`navigate("/pms/units")`), never `Link to="units"` from within a layout.
 - Navbar highlights the active platform with `pathname.startsWith("/pms" | "/smartspace" | "/admin")`; layouts highlight sub-sections with `pathname.includes("/pms/units")` etc.
@@ -324,6 +322,6 @@ toast.promise(save(), { loading: "Saving...", success: <b>Saved!</b>, error: <b>
 
 1. **`currentFacility.token`** is only populated after a facility is selected. Guard API calls with `if (!currentFacility.token) return;`.
 2. **`isPulled`** (AuthProvider) is set after the first Supabase fetch and prevents re-fetching. Only reset it to force a full reload.
-3. **Admin pages and RLS** — reading or writing *another* user's `user_data` needs `supabaseAdmin`; the RLS-bound `supabase` client silently affects only the current user's rows. Some admin code still uses `supabase` (e.g. `EditUser.tsx`, `Roles.tsx`, `CreateRole.tsx`, `EditRole.tsx`); check which client you need rather than copying.
+3. **Admin pages use `supabaseAdmin`** for `user_data` and `roles` reads/writes. The RLS-bound `supabase` client doesn't error on another user's row — the update just matches zero rows and reports success.
 4. **OAuth bodies use `qs.stringify()`** with `application/x-www-form-urlencoded`, not `JSON.stringify`.
 5. **Windows case-only renames** (e.g. `UI` → `ui`) need a two-step rename through a temp name; the filesystem is case-insensitive.

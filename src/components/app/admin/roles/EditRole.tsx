@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { IoIosCreate } from "react-icons/io";
-import { supabase } from "@lib/supabaseClient";
+import { supabaseAdmin } from "@lib/supabaseClient";
 
 export default function EditRole({
   setIsEditRoleModalOpen,
@@ -28,7 +28,7 @@ export default function EditRole({
         return Promise.reject(new Error("Missing a role description!"));
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from("roles")
         .update({
           role_name: roleName,

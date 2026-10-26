@@ -5,14 +5,13 @@ import EventsReport from "@views/smartspace/reports/EventsReport";
 import OnlineTimeReport from "@views/smartspace/reports/OnlineTimeReport";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
 import { useAuth } from "@context/AuthProvider";
-import axios from "axios";
 import toast from "react-hot-toast";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FaLock } from "react-icons/fa";
 import OfflineEventsComparison from "@views/smartspace/reports/OfflineEventsComparison";
 import InputBox from "@components/ui/InputBox";
 import AllSmartMotionReport from "@views/smartspace/reports/AllSmartMotionReport";
-import { buildAuthUrl } from "@hooks/opentech";
+import { handleSingleLogin } from "@hooks/opentech";
 
 export default function SmartSpaceReports() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -71,34 +70,17 @@ export default function SmartSpaceReports() {
   };
 
   // Function to get a bearer token for each facility
-  const fetchBearerToken = async (facility) => {
-    try {
-      const data = {
-        grant_type: "password",
-        username: facility.api,
-        password: facility.apiSecret,
-        client_id: facility.client,
-        client_secret: facility.clientSecret,
-      };
-
-      const response = await axios.post(
-        buildAuthUrl(facility),
-        data,
-        {
-          headers: {
-            accept: "application/json",
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      );
-
-      return response.data.access_token;
-    } catch (error) {
-      console.error(`Error fetching token for ${facility.name}:`, error);
+  const fetchBearerToken = useCallback(async (facility) => {
+    const cached = getBearerToken(facility);
+    if (cached) return cached;
+    const login: any = await handleSingleLogin(facility);
+    const token = login?.token?.access_token;
+    if (!token) {
       toast.error(`Failed to fetch token for ${facility.name}`);
       return null;
     }
-  };
+    return token;
+  }, [getBearerToken]);
 
   // Facility dropdown toggle
   const toggleDropdown = () => setIsOpen(!isOpen);
@@ -139,7 +121,7 @@ export default function SmartSpaceReports() {
 
     // Initial fetch
     fetchFacilitiesWithBearers();
-  }, [selectedTokens, getBearerToken]);
+  }, [selectedTokens, getBearerToken, fetchBearerToken]);
 
   // Set all facilities as selected by default
   useEffect(() => {

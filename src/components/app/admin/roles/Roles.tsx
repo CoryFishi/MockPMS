@@ -5,7 +5,7 @@ import DataTable from "@components/shared/DataTable";
 import React, { useRef, useState, useEffect } from "react";
 import { FaPerson } from "react-icons/fa6";
 import { useAuth } from "@context/AuthProvider";
-import { supabaseAdmin, supabase } from "@lib/supabaseClient";
+import { supabaseAdmin } from "@lib/supabaseClient";
 import toast from "react-hot-toast";
 import InputBox from "@components/ui/InputBox";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
@@ -81,7 +81,7 @@ export default function Roles() {
   const deleteRole = async (roleId: number) => {
     try {
       // Delete the role
-      const { error } = await supabase.from("roles").delete().eq("id", roleId);
+      const { error } = await supabaseAdmin.from("roles").delete().eq("id", roleId);
       if (error) {
         console.error("Error deleting the role:", error);
         throw new Error("Failed to delete role.");

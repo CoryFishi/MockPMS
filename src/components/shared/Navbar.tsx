@@ -4,7 +4,7 @@ import { useAuth } from "@context/AuthProvider";
 import { supabase } from "@lib/supabaseClient";
 import { useState, useEffect, useRef } from "react";
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Navbar({
   setDashboardMenu,
@@ -27,6 +27,7 @@ export default function Navbar({
   } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const userRef = useRef(null);
 
   const handleLogout = async () => {

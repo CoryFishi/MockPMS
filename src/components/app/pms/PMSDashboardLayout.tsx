@@ -310,7 +310,10 @@ export default function PMSDashboardLayout({
             <Route path="units" element={<Units currentFacilityName={currentFacilityName} />} />
             <Route path="visitors" element={<Visitors currentFacilityName={currentFacilityName} />} />
             <Route path="overview" element={<Overview currentFacilityName={currentFacilityName} />} />
-            <Route path="scripts" element={<Scripts />} />
+            <Route
+              path="scripts"
+              element={permissions.pmsPlatformAdmin ? <Scripts /> : <Navigate to="all-facilities" replace />}
+            />
             <Route path="*" element={<Navigate to="all-facilities" replace />} />
           </Routes>
         </div>

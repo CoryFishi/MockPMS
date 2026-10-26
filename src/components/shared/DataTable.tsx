@@ -41,7 +41,7 @@ export default function DataTable({
 
     return () => {
       document.removeEventListener("click", handleDismiss);
-      document.addEventListener("auxclick", handleDismiss);
+      document.removeEventListener("auxclick", handleDismiss);
       window.removeEventListener("scroll", handleScroll, true);
     };
   }, []);
