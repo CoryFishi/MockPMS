@@ -14,7 +14,7 @@ export interface Facility {
 
 export type OpenTechService = "accesscontrol" | "accessevent";
 
-function getEnvKeys(f: Facility): { tokenStageKey: string; tokenEnvKey: string } {
+function getEnvKeys(f: Pick<Facility, "environment">): { tokenStageKey: string; tokenEnvKey: string } {
   const tokenStageKey = f.environment === "staging" ? "cia-stg-1.aws." : "";
   const tokenEnvKey = f.environment === "staging" ? "" : f.environment;
   return { tokenStageKey, tokenEnvKey };
@@ -26,7 +26,7 @@ export function buildAuthUrl(f: Facility): string {
 }
 
 export function buildApiUrl(
-  f: Facility,
+  f: Pick<Facility, "environment">,
   path: string,
   service: OpenTechService = "accesscontrol",
 ): string {
@@ -36,7 +36,7 @@ export function buildApiUrl(
 }
 
 export function authHeaders(
-  f: Facility,
+  f: Pick<Facility, "token">,
   contentType: string = "application/json",
   apiVersion: string = "2.0",
 ) {

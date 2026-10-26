@@ -21,7 +21,7 @@ export default [
         sourceType: "module",
       },
     },
-    settings: { react: { version: "18.3" } },
+    settings: { react: { version: "detect" } },
     plugins: {
       react,
       "react-hooks": reactHooks,
@@ -40,45 +40,13 @@ export default [
         "warn",
         { allowConstantExport: true },
       ],
-      "import/no-restricted-paths": [
-        "error",
-        {
-          zones: [
-            {
-              target: "./src/features/auth",
-              from: "./src/features",
-              except: ["./auth"],
-            },
-            {
-              target: "./src/features/admin",
-              from: "./src/features",
-              except: ["./admin"],
-            },
-            {
-              target: "./src/features/facilityAuthentication",
-              from: "./src/features",
-              except: ["./facilityAuthentication"],
-            },
-            {
-              target: "./src/features/pms",
-              from: "./src/features",
-              except: ["./pms"],
-            },
-            {
-              target: "./src/features/smartlock",
-              from: "./src/features",
-              except: ["./smartlock"],
-            },
-            {
-              target: "./src/features",
-              from: "./src/app",
-            },
-            {
-              target: ["./src/components", "./src/hooks", "./src/utils"],
-              from: ["./src/features", "./src/app"],
-            },
-          ],
-        },
+      // TypeScript handles undefined identifiers; the core rules misfire on TS
+      // syntax (e.g. parameter names inside function type signatures).
+      "no-undef": "off",
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrors: "none" },
       ],
     },
   },

@@ -2,8 +2,6 @@
 
 This project is a web-based dashboard for managing property facilities and smart locks. It is built with **React** using **Vite** and **Tailwind CSS** and relies on **Supabase** for authentication and data storage.
 
-#### Authentication Branch is current, main is behind 100+ commits
-
 ## Features
 
 - Property management dashboard with facility, unit and visitor management
@@ -23,7 +21,7 @@ This project is a web-based dashboard for managing property facilities and smart
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/youruser/MockPMS.git
+   git clone https://github.com/CoryFishi/MockPMS.git
    cd MockPMS
    ```
 2. Install dependencies
@@ -55,17 +53,29 @@ npm run build
 ```
 The bundled output will be in the `dist` folder.
 
+### Checks
+
+```bash
+npm run typecheck   # tsc --noEmit
+npm run lint        # eslint
+npm run check       # both
+```
+
 ## Project Structure
 
 ```
 src/
-├─ app/               # App entry, global styles and Supabase client
-├─ components/        # Reusable UI components
-├─ context/           # React context providers
-├─ features/          # Application features (admin, auth, pms, smartlock)
-├─ hooks/             # Custom hooks
-├─ pages/             # Route level pages
+├─ app/               # Root router (App.tsx) and global styles
+├─ components/
+│  ├─ app/            # Pages, grouped by platform (admin, auth, pms, smartspace, ...)
+│  ├─ shared/         # Reusable page building blocks (DataTable, Navbar, ...)
+│  └─ ui/             # Atomic UI elements (buttons, inputs, modal shell)
+├─ context/           # AuthProvider (auth + bearer token cache)
+├─ hooks/             # OpenTech API helpers, SmartSpace queries, Supabase event logging
+└─ lib/               # Supabase clients
 ```
+
+See [CLAUDE.md](CLAUDE.md) for the detailed developer/agent guide.
 
 ## License
 

@@ -10,104 +10,69 @@ MockPMS is an internal tooling app used by OpenTech Alliance's **onboarding/supp
 
 It is a React + TypeScript frontend that drives the OpenTech API directly. Supabase handles auth and user data storage only — all property/facility data comes from the OpenTech API.
 
-**Stack:** React 19 · TypeScript · Vite · Tailwind CSS 4 · Supabase · Axios · React Router 7 · react-hot-toast
+**Stack:** React 19 · TypeScript · Vite · Tailwind CSS 4 · Supabase · Axios · TanStack React Query · React Router 7 · react-hot-toast · recharts (reports) · react-konva (mapping canvas) · react-icons
 
 ---
 
-## Folder Structure
+## Verifying Changes
+
+```bash
+npm run check      # typecheck + lint — run after every change; must stay at 0 errors
+npm run build      # vite build — does NOT typecheck, so it is not a substitute for check
+npm run dev        # http://localhost:5173 (needs a .env with the Supabase keys)
+```
+
+- The baseline is green: `tsc` reports 0 errors and `eslint` 0 errors (only two pre-existing `react-refresh/only-export-components` warnings). Any new error is yours.
+- There is no test suite. Behavior changes are verified by running the app, which needs real Supabase + OpenTech credentials — if you cannot, say so rather than claiming the change works.
+- `tsconfig` has `strict: false` and much of the code is loosely typed (`any`). Type new code properly; don't widen existing types to silence errors.
+- Unused vars are flagged by `@typescript-eslint/no-unused-vars`; prefix intentionally unused args with `_`.
+- `.env` holds the Supabase **service role key** — never print it, commit it, or paste it into output.
+- Design specs and implementation plans live in `docs/superpowers/{specs,plans}/`, named `YYYY-MM-DD-<topic>.md`.
+
+---
+
+## Code Map
 
 ```
 src/
-├── app/
-│   ├── App.tsx                        # Root router
-│   └── index.css
+├── main.tsx                  # QueryClientProvider → AuthProvider → BrowserRouter → App
+├── app/App.tsx               # Top-level routes, Toaster, dark mode state
 ├── components/
-│   ├── app/                           # Page-level components (@views alias)
-│   │   ├── admin/
-│   │   │   ├── AdminDashboard.tsx
-│   │   │   ├── AdminDashboardLayout.tsx
-│   │   │   ├── roles/                 # Roles.tsx, CreateRole.tsx, EditRole.tsx
-│   │   │   ├── user-events/           # UserEvents.tsx
-│   │   │   └── users/                 # Users.tsx, EditUser.tsx, AddToken.tsx, ...
-│   │   ├── auth/
-│   │   │   ├── login/
-│   │   │   ├── register/
-│   │   │   └── reset-password/
-│   │   ├── authentication-settings/   # AuthenticationSettings.tsx, AddAuthentication.tsx, ...
-│   │   ├── pms/
-│   │   │   ├── PMSDashboard.tsx
-│   │   │   ├── PMSDashboardLayout.tsx
-│   │   │   ├── DeleteModal.tsx        # Shared delete modal used by units/ and visitors/
-│   │   │   ├── all-facilities/
-│   │   │   ├── favorites/
-│   │   │   ├── overview/
-│   │   │   ├── scripts/
-│   │   │   ├── units/                 # Units.tsx + all unit modals
-│   │   │   └── visitors/              # Visitors.tsx + all visitor modals
-│   │   ├── smartspace/
-│   │   │   ├── SmartSpaceDashboard.tsx
-│   │   │   ├── SmartSpaceDashboardLayout.tsx
-│   │   │   ├── all-facilities/
-│   │   │   ├── dashboard/             # Cards, rows, modals
-│   │   │   ├── mapping/               # Canvas-based floor plan editor
-│   │   │   ├── reports/               # 7 report types
-│   │   │   ├── selected/
-│   │   │   └── tester/
-│   │   └── user-settings/
-│   ├── shared/                        # @components/shared — reusable page building blocks
-│   │   ├── LoadingSpinner.tsx
-│   │   ├── Navbar.tsx
-│   │   ├── DataTable.tsx
-│   │   ├── PaginationFooter.tsx
-│   │   ├── DetailModal.tsx
-│   │   └── NotFound.tsx
-│   └── ui/                            # @components/ui — atomic UI elements
-│       ├── GeneralButton.tsx
-│       ├── ModalButton.tsx
-│       ├── TableButton.tsx
-│       ├── SliderButton.tsx
-│       ├── InputBox.tsx
-│       ├── SelectOption.tsx
-│       └── ModalContainer.tsx
-├── context/
-│   └── AuthProvider.tsx               # Global auth + bearer token state
+│   ├── app/                  # @views — pages, one folder per platform (admin, auth, pms, smartspace,
+│   │                         #   authentication-settings, user-settings); modals live beside their page
+│   ├── shared/               # @components/shared — DataTable, PaginationFooter, DetailModal, Navbar, ...
+│   └── ui/                   # @components/ui — buttons, inputs, ModalContainer
+├── context/AuthProvider.tsx  # Global auth, user data, bearer token cache (useAuth)
 ├── hooks/
-│   ├── opentech.ts                    # OpenTech auth helpers
-│   └── supabase.ts                    # Event logging helper
-├── lib/
-│   └── supabaseClient.ts              # Supabase client init (public + admin)
-└── assets/
+│   ├── opentech.ts           # OpenTech URL/header/login helpers + Facility type
+│   ├── smartspace.ts         # React Query facility-status fetching for the SmartSpace dashboard
+│   └── supabase.ts           # addEvent() user-event logging
+└── lib/supabaseClient.ts     # supabase + supabaseAdmin clients
 ```
+
+Notable pages: `pms/DeleteModal.tsx` is shared by `units/` and `visitors/`. `admin/users/CopyUserData.tsx` merges/replaces tokens, favorites, and selected facilities between users. `smartspace/mapping/` is a react-konva floor-plan editor (`applyChange.ts` holds its state transitions; `facility1.json` is sample data).
 
 ---
 
 ## Path Aliases
 
-Defined identically in `vite.config.ts` and `tsconfig.json`. **Always use aliases — never relative paths.**
+**Always import via aliases — never relative paths.** Defined in both `tsconfig.json` (`paths`) and `vite.config.ts` (`resolve.alias`); change both together.
 
-| Alias | Resolves to |
-|---|---|
-| `@components` | `src/components` |
-| `@views` | `src/components/app` |
-| `@context` | `src/context` |
-| `@hooks` | `src/hooks` |
-| `@lib` | `src/lib` |
-| `@app` | `src/app` |
-| `@assets` | `src/assets` |
+`@components` → `src/components` · `@views` → `src/components/app` · `@context` · `@hooks` · `@lib` · `@app` · `@assets` → `src/<name>`
 
 ---
 
 ## Environment Variables
 
+Typed in `src/vite-env.d.ts`; read via `import.meta.env.VITE_*`.
+
 ```env
 VITE_SUPABASE_URL=         # Supabase project URL
 VITE_SUPABASE_KEY=         # Public anon key (row-level security applies)
 VITE_SUPABASE_SERVICE_KEY= # Service role key (bypasses RLS — admin operations only)
-VITE_RESEND_KEY=           # Email service key (configured, not yet wired to UI)
-VITE_WEATHER_KEY=          # Weather API key (configured, not yet wired to UI)
+VITE_WEATHER_KEY=          # weatherapi.com key — used by hooks/smartspace.ts for facility weather
+VITE_RESEND_KEY=           # Listed in README but not read anywhere in src/
 ```
-
-Access via `import.meta.env.VITE_*`.
 
 ---
 
@@ -120,7 +85,7 @@ Import: `import { useAuth } from "@context/AuthProvider"`
 | `user` | `any \| null` | Supabase auth user |
 | `setUser` | fn | |
 | `role` | `string` | e.g. `"user"`, `"admin"` |
-| `permissions` | `object` | From `roles` table — see Permissions section |
+| `permissions` | `object` | From `roles` table — see Permissions below |
 | `tokens` | `array` | Stored credentials `[{name, api, apiSecret, client, clientSecret, environment}]` |
 | `setTokens` | fn | Update stored credentials (triggers auto-auth for new ones) |
 | `favoriteTokens` | `array` | Favorited facilities |
@@ -140,9 +105,7 @@ Import: `import { useAuth } from "@context/AuthProvider"`
 
 ## Bearer Token System
 
-All OpenTech API calls require a bearer token obtained from the auth endpoint. AuthProvider manages a central cache so no component needs to re-authenticate on its own.
-
-### BearerMap
+All OpenTech API calls require a bearer token. AuthProvider keeps a central cache so no component needs to re-authenticate on its own.
 
 ```typescript
 type BearerMap = Record<string, { access_token: string; expires_at: number }>
@@ -150,172 +113,125 @@ type BearerMap = Record<string, { access_token: string; expires_at: number }>
 // expires_at: absolute ms timestamp (Date.now() + expires_in * 1000)
 ```
 
-### getBearerToken(credential)
+`getBearerToken(credential)` returns the cached `access_token`, or `null` if missing/expired. It reads from a ref, so it is stable and safe in `useCallback`/`useEffect` deps.
 
-Returns the cached `access_token` or `null` if missing/expired. Reads from a ref — stable callback, safe to use in `useCallback` deps.
+AuthProvider automatically:
+1. **On user data load** — authenticates all stored credentials in parallel (`Promise.allSettled`)
+2. **When `tokens` changes** — authenticates any credential not already cached
+3. **Every 5 minutes** — refreshes tokens expiring within 10 minutes; patches `currentFacility.token` if it matches
 
-### Standard usage pattern (all API-calling pages)
+Standard usage — cache first, then fall back to `handleSingleLogin` (as `hooks/smartspace.ts` does):
 
 ```typescript
 const { getBearerToken } = useAuth();
 
-// Inside data-fetching function:
-const cached = getBearerToken(facility);
-const bearer = cached ?? await fetchBearerToken(facility); // fallback to fresh auth
+let bearer = getBearerToken(facility);
+if (!bearer) {
+  const login: any = await handleSingleLogin(facility); // { token } on success, { error } on failure
+  bearer = login?.token?.access_token ?? null;
+}
 ```
 
-### What AuthProvider does automatically
-
-1. **On user data load** — authenticates all stored credentials in parallel via `Promise.allSettled`
-2. **When `tokens` changes** — authenticates any credential not already in the cache
-3. **Every 5 minutes** — refreshes any token expiring within 10 minutes; patches `currentFacility.token` if the refreshed credential matches
+> `SmartSpaceTester.tsx` and `SmartSpaceReports.tsx` each define a local `fetchBearerToken` that sends a JSON body instead of `qs.stringify` (and the Tester skips the cache). Don't copy them; use the pattern above.
 
 ---
 
 ## OpenTech API
 
-### URL Construction
+### Helpers (`@hooks/opentech`) — use these for every API call
 
-```typescript
-const tokenStageKey = facility.environment === "staging" ? "cia-stg-1.aws." : "";
-const tokenEnvKey   = facility.environment === "staging" ? "" : facility.environment;
+| Helper | Purpose |
+|---|---|
+| `buildAuthUrl(facility)` | Auth token URL (`https://auth.…/auth/token`) |
+| `buildApiUrl(facility, path, service?)` | API URL. Only needs `environment`. `service` defaults to `"accesscontrol"`; pass `"accessevent"` for `/combinedevents/…`. `path` keeps its leading `/`. |
+| `authHeaders(facility, contentType?, apiVersion?)` | Bearer headers. Only needs `token`. `contentType` defaults to `"application/json"` (pass `"application/json-patch+json"` for write endpoints that require it); `apiVersion` defaults to `"2.0"` (pass `"3.0"` for the `accessevent` calls). |
+| `handleSingleLogin(facility)` | Authenticate; returns `{ message, token }` or `{ error }` (never throws) |
+| `handleMultiLogin(facility)` | Same, but rethrows on failure (for `Promise.allSettled`/`toast.promise`) |
+| `getEnvironmentName(facility)` | Human-readable environment string |
 
-// Auth endpoint
-`https://auth.${tokenStageKey}insomniaccia${tokenEnvKey}.com/auth/token`
+`Facility` is the exported credential/facility type. Auth POSTs use `application/x-www-form-urlencoded` with a `qs.stringify()` body — keep them out of `authHeaders`. Portal (`portal.…`) deep-links are not API calls and don't use these helpers.
 
-// API endpoint
-`https://accesscontrol.${tokenStageKey}insomniaccia${tokenEnvKey}.com/facilities/${id}/...`
-```
+### Environments
 
-### Environment values
-
-| `environment` field | Human label | Auth URL example |
+| `environment` | Label | Auth host |
 |---|---|---|
 | `""` | Production | `auth.insomniaccia.com` |
 | `"staging"` | Staging | `auth.cia-stg-1.aws.insomniaccia.com` |
 | `"-dev"` | Development | `auth.insomniaccia-dev.com` |
 | `"-qa"` | QA | `auth.insomniaccia-qa.com` |
 
-### Required headers for all API calls
+### Endpoints
 
-```typescript
-{
-  Authorization: "Bearer " + facility.token.access_token,
-  accept: "application/json",
-  "api-version": "2.0",
-  "Content-Type": "application/json",
-}
-```
+All under `/facilities/{id}` on `accesscontrol` unless noted. To find how an endpoint is called today, grep `src/` for its path.
 
-### Auth payload (via `qs.stringify`)
-
-```typescript
-{
-  grant_type: "password",
-  username: facility.api,
-  password: facility.apiSecret,
-  client_id: facility.client,
-  client_secret: facility.clientSecret,
-}
-```
-
-### Key endpoints
-
-| Method | Path | Description |
-|---|---|---|
-| `GET` | `/facilities/statuslist` | All facilities for account |
-| `GET` | `/facilities/{id}/units` | All units |
-| `POST` | `/facilities/{id}/units` | Create unit |
-| `POST` | `/facilities/{id}/units/{unitId}/vacate` | Remove all visitors from unit |
-| `POST` | `/facilities/{id}/units/{unitId}/enable` | Re-enable disabled unit |
-| `POST` | `/facilities/{id}/units/{unitId}/disable` | Disable unit |
-| `GET` | `/facilities/{id}/visitors` | All visitors |
-| `POST` | `/facilities/{id}/visitors` | Create visitor |
-| `POST` | `/facilities/{id}/visitors/{visitorId}/update` | Update visitor |
-| `POST` | `/facilities/{id}/visitors/{visitorId}/remove` | Remove visitor |
-| `POST` | `/facilities/{id}/visitors/{visitorId}/enable` | Enable visitor |
-| `POST` | `/facilities/{id}/visitors/{visitorId}/disable` | Disable visitor |
-| `GET` | `/facilities/{id}/smartlockstatus` | SmartLock device status |
-| `GET` | `/facilities/{id}/edgerouterplatformdevicesstatus` | Edge router + AP status |
-| `GET` | `/facilities/{id}/accessprofiles` | Access profiles |
-| `GET` | `/facilities/{id}/timegroups` | Time groups |
-| `GET` | `/facilities/{id}/actiongroups/manual` | Manual action groups |
-
-Helpers in `@hooks/opentech` (use these instead of hand-building URLs/headers):
-
-| Helper | Purpose |
-|---|---|
-| `buildAuthUrl(facility)` | Auth token URL (`https://auth.…/auth/token`) |
-| `buildApiUrl(facility, path, service?)` | API URL. `service` defaults to `"accesscontrol"`; pass `"accessevent"` for `/combinedevents/…` endpoints. `path` keeps its leading `/` and any interpolations. |
-| `authHeaders(facility, contentType?, apiVersion?)` | Bearer header object. `contentType` defaults to `"application/json"` (pass `"application/json-patch+json"` for the write endpoints that require it); `apiVersion` defaults to `"2.0"` (pass `"3.0"` for the `accessevent`/combined-events calls that require it). |
-| `getEnvironmentName(facility)` | Human-readable environment string |
-
-`Facility` is the exported type for the credential/facility shape. Auth POSTs keep their own `application/x-www-form-urlencoded` headers — do not route them through `authHeaders`. Portal (`portal.…`) deep-links are not API calls and are not built with these helpers.
+- **Facility:** `GET /facilities/statuslist` (all facilities for account), `GET /facilities/{id}`, `/status`, `/devices`, `/lockdown`, `/emergency`
+- **Units:** `GET|POST /units`, `/units/{unitId}/vacate`, `/enable` (with `?suppressCommands=true`), `/disable`, `/units/{unitId}/visitors`, `/units/{unitId}/delete/vacant`
+- **Visitors:** `GET|POST /visitors`, `/visitors/{visitorId}/update`, `/remove`
+- **Devices:** `/smartlockstatus`, `/smartlockstatussummary`, `/smartmotionstatus`, `/edgerouterstatus`, `/edgerouterplatformdevicesstatus`
+- **Config:** `/accessprofiles`, `/timegroups`, `/actiongroups/manual`, `/actiongroups/{id}/open|hold|close`
+- **Events (`accessevent`, api-version 3.0):** `/combinedevents/facilities/{id}`, `/combinedevents/types`
 
 ---
 
-## Supabase Schema
+## Data Fetching
 
-### `user_data`
+Two styles coexist:
 
-| Column | Type | Notes |
-|---|---|---|
-| `user_id` | uuid PK | Supabase auth user ID |
-| `user_email` | text | |
-| `role` | text | e.g. `"user"`, `"admin"` |
-| `tokens` | jsonb | `[{name, api, apiSecret, client, clientSecret, environment}]` |
-| `favorite_tokens` | jsonb | `[{id, name, api, ...}]` |
-| `selected_tokens` | jsonb | `[{id, name, api, ...}]` |
-| `current_facility` | jsonb | Single facility object or `{}` |
-| `last_update_at` | timestamptz | |
-
-### `user_events`
-
-| Column | Type | Notes |
-|---|---|---|
-| `id` | int PK | |
-| `user_id` | uuid | |
-| `event_name` | text | e.g. `"User Deleted"`, `"Token Added"` |
-| `event_description` | text | |
-| `completed` | boolean | Success/failure |
-| `created_at` | timestamptz | |
-
-### `roles`
-
-| Column | Type | Notes |
-|---|---|---|
-| `id` | int PK | |
-| `role_name` | text | |
-| `role_description` | text | |
-| `permissions` | jsonb | See permissions object below |
-
-### Permissions object
+- **React Query** — `main.tsx` provides a `QueryClient` (defaults: `staleTime` 5m, `gcTime` 30m, `retry: 1`, `refetchOnWindowFocus: false`). The SmartSpace dashboard uses `useFacilityStatusQueries(selectedTokens, getBearerToken)` from `@hooks/smartspace`: one query per facility, at most 6 concurrent fetches, 15s timeout, 5-minute `refetchInterval`, returning `{ loaded, pending, errored, lastUpdatedAt, refreshingKeys }`. Refresh by `queryClient.invalidateQueries({ queryKey: [FACILITY_QUERY_KEY] })`. Prefer this style for new multi-facility fetching.
+- **Local state + pulled flag** — most PMS pages (e.g. `Units.tsx`, `Visitors.tsx`): a per-page flag (`unitsPulled`, `visitorsPulled`) guards a one-time fetch, set *after* the fetch completes, plus a 5-minute `setInterval` refresh:
 
 ```typescript
-{
-  pmsPlatform: boolean,
-  pmsPlatformAdmin: boolean,
-  smartlockPlatform: boolean,
-  authenticationPlatform: boolean,
-  // granular auth platform permissions:
-  authCreate: boolean,
-  authRead: boolean,
-  authUpdate: boolean,
-  authDelete: boolean,
-  authExport: boolean,
-  authImport: boolean,
-}
+useEffect(() => {
+  const fetchData = async () => {
+    if (!currentFacility.token || unitsPulled) return;
+    await handleUnits();
+    setUnitsPulled(true);
+  };
+  fetchData();
+}, [currentFacility, unitsPulled, handleUnits]);
+
+useEffect(() => {
+  if (!currentFacility.token) return;
+  const interval = setInterval(() => handleUnits(), 5 * 60 * 1000);
+  return () => clearInterval(interval);
+}, [currentFacility, handleUnits]);
 ```
 
-### Supabase clients
+---
+
+## Supabase
 
 ```typescript
 import { supabase, supabaseAdmin } from "@lib/supabaseClient";
-// supabase      — public client, row-level security applies
-// supabaseAdmin — service role client, bypasses RLS (admin pages only)
+// supabase      — public client, row-level security applies (current user's own rows)
+// supabaseAdmin — service role client, bypasses RLS (needed to read/write other users' rows)
 ```
 
-Log events with: `import { addEvent } from "@hooks/supabase"` → `addEvent(name, description, completed)`
+Log user actions with `import { addEvent } from "@hooks/supabase"` → `addEvent(name, description, completed)`.
+
+### Tables
+
+- **`user_data`** — `user_id` (uuid PK), `user_email`, `role`, `tokens` (jsonb credentials), `favorite_tokens` (jsonb), `selected_tokens` (jsonb), `current_facility` (jsonb, or `{}`), `last_update_at`
+- **`user_events`** — `id`, `user_id`, `event_name` (e.g. `"Token Added"`), `event_description`, `completed` (bool), `created_at`
+- **`roles`** — `id`, `role_name`, `role_description`, `permissions` (jsonb)
+
+### Permissions object
+
+Source of truth for the key list: `admin/roles/CreateRole.tsx`. Adding a permission means updating `CreateRole.tsx` and `EditRole.tsx`.
+
+```typescript
+{
+  pmsPlatform, pmsPlatformAdmin,
+  pmsPlatformUnitCreate, pmsPlatformUnitEdit, pmsPlatformUnitDelete,
+  pmsPlatformVisitorCreate, pmsPlatformVisitorEdit, pmsPlatformVisitorDelete,
+  smartlockPlatform,
+  authenticationPlatform,
+  authenticationPlatformCreate, authenticationPlatformDelete,
+  authenticationPlatformImport, authenticationPlatformExport,
+  authenticationPlatformEnvironmentProduction, authenticationPlatformEnvironmentDevelopment,
+  authenticationPlatformEnvironmentStaging, authenticationPlatformEnvironmentQA,
+}  // all boolean
+```
 
 ---
 
@@ -323,9 +239,8 @@ Log events with: `import { addEvent } from "@hooks/supabase"` → `addEvent(name
 
 ### `<LoadingSpinner loadingText="..." />`
 
-Full-page overlay spinner. Requires the parent container to be `relative` and `overflow-hidden`.
+Full-page overlay spinner. The parent must be `relative` and `overflow-hidden`:
 
-Standard page wrapper pattern:
 ```tsx
 <div className={`relative ${isLoading ? "overflow-hidden min-h-full" : "overflow-auto"} h-full dark:text-white dark:bg-zinc-900`}>
   {isLoading && <LoadingSpinner loadingText="Loading..." />}
@@ -335,52 +250,38 @@ Standard page wrapper pattern:
 
 ### `<DataTable columns={} data={} ... />`
 
-| Prop | Type | Notes |
-|---|---|---|
-| `columns` | `Column[]` | See column shape below |
-| `data` | `any[]` | Full dataset (paginated internally) |
-| `currentPage` | `number` | |
-| `rowsPerPage` | `number` | |
-| `sortDirection` | `"asc" \| "desc" \| null` | |
-| `sortedColumn` | `string \| null` | |
-| `onSort` | fn | `(columnKey, accessor?) => void` |
-| `hoveredRow` | `any` | Optional |
-| `setHoveredRow` | fn | Optional |
-| `onRowClick` | fn | Optional |
+Props: `columns`, `data` (full dataset, paginated internally), `currentPage`, `rowsPerPage`, `sortDirection` (`"asc" | "desc" | null`), `sortedColumn`, `onSort(columnKey, accessor?)`, and optional `hoveredRow`, `setHoveredRow`, `onRowClick`. Right-clicking a cell opens a built-in Copy Cell / Copy Row menu.
 
-Column shape:
 ```typescript
 {
   key: string,
   label: string,
-  accessor: (row) => any,       // for sorting
-  render?: (row) => ReactNode,  // optional custom cell
-  sortable?: boolean,           // default true
+  accessor?: (row) => any,             // sort/display value; defaults to row[key]
+  render?: (row, index) => ReactNode,  // custom cell
+  sortable?: boolean,                  // default true
 }
 ```
 
-### `<PaginationFooter rowsPerPage={} setRowsPerPage={} currentPage={} setCurrentPage={} items={} />`
+Sorting is owned by the page: copy `handleColumnSort` from an existing list page (e.g. `Units.tsx`).
 
-Always reset `setCurrentPage(1)` whenever `searchQuery` or filter changes.
+### `<PaginationFooter rowsPerPage setRowsPerPage currentPage setCurrentPage items />`
+
+Call `setCurrentPage(1)` whenever the search query or a filter changes, or filtered results can land on an empty page.
 
 ### `<ModalContainer title icon mainContent responseContent onClose />`
 
 Standard modal shell. Use `ModalButton` for buttons inside `responseContent`.
 
-### UI components
+### UI components (note the lowercase `onchange`/`onclick` props)
 
 ```tsx
 <InputBox value={} onchange={} placeholder="" type="text" />
 <SelectOption value={} onChange={} options={[{id, name}]} placeholder="" />
-<TableButton onclick={} text="" className="" />   // table row action button
-<ModalButton onclick={} text="" className="" />   // modal action button
+<TableButton onclick={} text="" className="" />   // table row action
+<ModalButton onclick={} text="" className="" />   // modal action
 <GeneralButton onclick={} text="" className="" /> // general use
 <SliderButton onclick={} value={bool} />          // toggle switch
 ```
-
----
-
-## Standard Page Patterns
 
 ### Header bar (all list pages)
 
@@ -393,163 +294,36 @@ Standard modal shell. Use `ModalButton` for buttons inside `responseContent`.
 </div>
 ```
 
-### Data fetch on mount with pulled flag
-
-```typescript
-const [dataPulled, setDataPulled] = useState(false);
-
-useEffect(() => {
-  if (!dataPulled) {
-    fetchData();
-    setDataPulled(true);
-  }
-}, [dataPulled, fetchData]);
-```
-
-### Background refresh (5-minute interval)
-
-```typescript
-useEffect(() => {
-  if (!currentFacility.token) return;
-  const interval = setInterval(async () => {
-    await fetchData();
-  }, 5 * 60 * 1000);
-  return () => clearInterval(interval);
-}, [currentFacility, fetchData]);
-```
-
-### Sort handler boilerplate
-
-```typescript
-const handleColumnSort = (columnKey, accessor = (a) => a[columnKey]) => {
-  let newDirection: "asc" | "desc" | null;
-  if (sortedColumn !== columnKey) newDirection = "asc";
-  else if (sortDirection === "asc") newDirection = "desc";
-  else newDirection = null;
-
-  setSortedColumn(newDirection ? columnKey : null);
-  setSortDirection(newDirection);
-
-  if (!newDirection) { setFilteredData([...data]); return; }
-  setFilteredData([...filteredData].sort((a, b) => {
-    const aVal = accessor(a) ?? "";
-    const bVal = accessor(b) ?? "";
-    if (aVal < bVal) return newDirection === "asc" ? -1 : 1;
-    if (aVal > bVal) return newDirection === "asc" ? 1 : -1;
-    return 0;
-  }));
-};
-```
-
 ---
 
 ## Routing
 
-Defined in `src/app/App.tsx`. All routes are protected by auth + permission checks inside the page components (not in the router).
+Top-level routes are in `src/app/App.tsx`; each platform layout (`PMSDashboardLayout`, `SmartSpaceDashboardLayout`, `AdminDashboardLayout`) owns a nested `<Routes>` for its sub-pages. Read those files for the current route list.
 
-### Top-level routes
-
-| Path | Component | Permission |
-|---|---|---|
-| `/` | → redirect to `/pms/all-facilities` | — |
-| `/pms/*` | PMSDashboard → PMSDashboardLayout | `pmsPlatform` |
-| `/smartspace/*` | SmartSpaceDashboard → SmartSpaceDashboardLayout | `smartlockPlatform` |
-| `/admin/*` | AdminDashboard → AdminDashboardLayout | `role === "admin"` |
-| `/user-settings` | UserSettings | any authenticated |
-| `/authentication-settings` | AuthenticationSettings | `authenticationPlatform` |
-| `/login` | Login | public |
-| `/register` | Register | public |
-| `/reset-password` | ResetPassword | public |
-
-### PMS sub-routes (`/pms/*`)
-
-| Path | Component |
-|---|---|
-| `/pms/all-facilities` | AllFacilities |
-| `/pms/favorites` | Favorites |
-| `/pms/units` | Units |
-| `/pms/visitors` | Visitors |
-| `/pms/overview` | Overview |
-| `/pms/scripts` | Scripts (admin only — `pmsPlatformAdmin`) |
-
-### SmartSpace sub-routes (`/smartspace/*`)
-
-| Path | Component |
-|---|---|
-| `/smartspace/all-facilities` | SmartSpaceAllFacilities |
-| `/smartspace/selected` | SmartSpaceSelected |
-| `/smartspace/dashboard` | SmartSpaceDashboardView |
-| `/smartspace/reports` | SmartSpaceReports |
-| `/smartspace/mapping` | SmartSpaceMapping |
-| `/smartspace/tester` | SmartSpaceTester |
-
-### Admin sub-routes (`/admin/*`)
-
-| Path | Component |
-|---|---|
-| `/admin/users` | Users |
-| `/admin/user-events` | UserEvents |
-| `/admin/roles` | Roles |
-
-### Navigation rules
-
-- **Always use `useNavigate` + absolute paths** (e.g. `navigate("/pms/units")`) — never `Link to="units"` from within a layout.
-- **Navbar links** use `startsWith` to highlight the active platform section:
-  - Property Management → `/pms/all-facilities`, active when `pathname.startsWith("/pms")`
-  - SmartSpace → `/smartspace/all-facilities`, active when `pathname.startsWith("/smartspace")`
-  - Admin → `/admin/users`, active when `pathname.startsWith("/admin")`
-- **Layout active-section highlighting** uses `path.includes("/pms/units")` etc. from `useLocation().pathname`.
-- **Nested `<Routes>`** inside each layout use **relative** paths (e.g. `path="units"`, not `path="/pms/units"`), under the parent `path="/pms/*"` wildcard in App.tsx.
+- `/` redirects to `/pms/all-facilities`; the catch-all `/*` renders Login. Each layout redirects its index and unknown sub-paths to its first page.
+- **Permission gating happens in the `*Dashboard.tsx` wrappers** (`pmsPlatform`, `smartlockPlatform`, `role === "admin"`), which render `NotFound` on failure; leaf pages check finer-grained permissions (e.g. `pmsPlatformUnitCreate`) inline. Exception: `/pms/scripts` is hidden from the sidebar unless `pmsPlatformAdmin`, but the route itself is not gated.
+- Nested routes use **relative** paths (`path="units"`) under the parent wildcard (`/pms/*`).
+- Navigate with `useNavigate` + absolute paths (`navigate("/pms/units")`), never `Link to="units"` from within a layout.
+- Navbar highlights the active platform with `pathname.startsWith("/pms" | "/smartspace" | "/admin")`; layouts highlight sub-sections with `pathname.includes("/pms/units")` etc.
 
 ---
 
-## Dark Mode
+## UI State
 
-- Toggled via `document.documentElement.classList.add/remove('dark')`
-- Persisted in `localStorage` as key `"darkMode"` (`"true"` / `"false"`)
-- Passed as `darkMode` and `toggleDarkMode` props from `App.tsx` down through layout components
-- All dark variants use Tailwind `dark:` prefix (e.g., `dark:bg-zinc-900`, `dark:text-white`)
-
----
-
-## Toasts
-
-Using `react-hot-toast`. Configured in App.tsx: `position="bottom-right"`, default duration 2000ms.
+- **Dark mode** — `document.documentElement.classList` toggles `dark`; persisted in `localStorage.darkMode` (`"true"`/`"false"`); passed as `darkMode`/`toggleDarkMode` props from `App.tsx` through the layouts. Style with Tailwind `dark:` variants.
+- **Other localStorage keys** — `smartSpaceListView`, `smartSpaceToggledSections`, `smartSpaceExplicit`, `visitorAutofill`.
+- **Toasts** — `react-hot-toast`, `<Toaster position="bottom-right" reverseOrder />` in `App.tsx`, default duration 2000ms. `toast.promise` takes a **Promise**: pass `fn()`, not `fn` (passing the reference silently does nothing).
 
 ```typescript
-import toast from "react-hot-toast";
-
-toast.success("Done");
-toast.error("Failed");
-toast.promise(asyncFn(), {        // asyncFn() — must call it, not pass reference
-  loading: "Saving...",
-  success: <b>Saved!</b>,
-  error: <b>Failed.</b>,
-});
+toast.promise(save(), { loading: "Saving...", success: <b>Saved!</b>, error: <b>Failed.</b> });
 ```
-
-> **Critical:** `toast.promise` requires a `Promise`, not a function reference. Always call `fn()` — not `fn`.
 
 ---
 
 ## Common Gotchas
 
-1. **`toast.promise(fn, ...)` vs `toast.promise(fn(), ...)`** — always pass the invoked promise, not the function reference. Passing the function silently fails.
-
-2. **Windows case-sensitive renames** — renaming a folder with only a case change (e.g., `UI` → `ui`) requires a two-step rename via a temp name due to Windows case-insensitive filesystem.
-
-3. **`useCallback` and `getBearerToken`** — `getBearerToken` is wrapped in `useCallback` with empty deps because it reads from a ref. It's stable and safe to include in other `useCallback` dependency arrays.
-
-4. **`isPulled` flag** — AuthProvider sets this to `true` after the first Supabase fetch. It prevents re-fetching on re-renders. Never reset it unless you intend a full data reload.
-
-5. **`supabaseAdmin` for admin pages** — always use `supabaseAdmin` (service role) in admin pages that need to read/write other users' data. Regular `supabase` client is RLS-restricted to the current user.
-
-6. **API URL/header construction is centralized** — the old copy-pasted `tokenStageKey`/`tokenEnvKey` pattern is now abstracted into `buildAuthUrl`/`buildApiUrl`/`authHeaders` in `@hooks/opentech` (see the OpenTech API section). Use those helpers for any new API call instead of hand-building URLs or header objects.
-
-7. **Pagination reset on filter** — always call `setCurrentPage(1)` when `searchQuery` changes, otherwise filtered results may show an empty page.
-
-8. **`currentFacility` token** — only populated after facility selection. Always guard with `if (!currentFacility.token) return;` before making API calls.
-
-9. **Both `tsconfig.json` and `vite.config.ts`** must be updated together whenever path aliases change.
-
-10. **`qs` for OAuth payloads** — the auth endpoint requires `application/x-www-form-urlencoded`. Use `qs.stringify()` to encode the body, not `JSON.stringify`.
+1. **`currentFacility.token`** is only populated after a facility is selected. Guard API calls with `if (!currentFacility.token) return;`.
+2. **`isPulled`** (AuthProvider) is set after the first Supabase fetch and prevents re-fetching. Only reset it to force a full reload.
+3. **Admin pages and RLS** — reading or writing *another* user's `user_data` needs `supabaseAdmin`; the RLS-bound `supabase` client silently affects only the current user's rows. Some admin code still uses `supabase` (e.g. `EditUser.tsx`, `Roles.tsx`, `CreateRole.tsx`, `EditRole.tsx`); check which client you need rather than copying.
+4. **OAuth bodies use `qs.stringify()`** with `application/x-www-form-urlencoded`, not `JSON.stringify`.
+5. **Windows case-only renames** (e.g. `UI` → `ui`) need a two-step rename through a temp name; the filesystem is case-insensitive.

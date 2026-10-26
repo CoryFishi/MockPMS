@@ -13,7 +13,9 @@ dist-ssr
 *.local
 .env
 
-.claude
+# Claude Code: share .claude/settings.json and skills; keep personal overrides local
+.claude/settings.local.json
+.claude/worktrees/
 
 # Editor directories and files
 .vscode/*

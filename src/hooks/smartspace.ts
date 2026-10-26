@@ -29,7 +29,6 @@ async function withFacilitySlot<T>(task: () => Promise<T>): Promise<T> {
 
 export async function fetchFacilityStatus(
   facility: any,
-  // eslint-disable-next-line no-unused-vars
   getBearerToken: (credential: any) => string | null
 ) {
   // Bearer token is critical — no token, no data.
@@ -179,7 +178,6 @@ export async function fetchFacilityStatus(
 
 export function useFacilityStatusQueries(
   selectedTokens: any[],
-  // eslint-disable-next-line no-unused-vars
   getBearerToken: (credential: any) => string | null
 ) {
   const facilities = selectedTokens ?? [];
