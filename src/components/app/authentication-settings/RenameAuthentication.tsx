@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
+import ModalCloseButton from "@components/ui/ModalCloseButton";
 
 export default function RenameAuthentication({
   isOpen,
@@ -31,16 +32,11 @@ export default function RenameAuthentication({
               Rename {token.name || "Authentication"}
             </h2>
           </div>
-          <button
-            onClick={() => onClose()}
-            className="bg-zinc-100 h-full px-5 cursor-pointer rounded-tr text-zinc-600 dark:text-white dark:bg-zinc-800 dark:hover:hover:bg-red-500 hover:bg-red-500 transition duration-300 ease-in-out"
-          >
-            x
-          </button>
+          <ModalCloseButton onclick={() => onClose()} />
         </div>
         <div className="px-5 py-3 flex flex-col gap-2">
           <input
-            className="border border-zinc-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-darkSecondary dark:border-zinc-700"
+            className="border border-zinc-300 rounded-sm px-3 py-2 w-full mb-2 dark:bg-zinc-900 dark:border-zinc-700"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder="New name"

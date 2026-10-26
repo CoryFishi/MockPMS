@@ -7,6 +7,7 @@ import FillVacantModal, { FillVacantConfig } from "@views/pms/units/FillVacantMo
 import GeneralButton from "@components/ui/GeneralButton";
 import { addEvent } from "@hooks/supabase";
 import { buildApiUrl, authHeaders } from "@hooks/opentech";
+import PageHeader from "@components/shared/PageHeader";
 
 export default function Scripts() {
   const { currentFacility, user } = useAuth();
@@ -78,7 +79,7 @@ export default function Scripts() {
             ...prevLogs,
             `${new Date().toLocaleString()}: Unit ${r.unitNumber} (${
               r.id
-            }) imported sucessfully`,
+            }) imported successfully`,
           ]);
         })
         .catch(function (error) {
@@ -136,7 +137,7 @@ export default function Scripts() {
             ...prevLogs,
             `${new Date().toLocaleString()}: Tenant ${r.id} (Unit ${
               r.unitNumber
-            }) imported sucessfully`,
+            }) imported successfully`,
           ]);
           return response;
         })
@@ -202,7 +203,7 @@ export default function Scripts() {
             ...prevLogs,
             `${new Date().toLocaleString()}: Unit ${r.unitNumber} (${
               r.id
-            }) imported sucessfully`,
+            }) imported successfully`,
           ]);
           handleRent(r);
         })
@@ -393,12 +394,7 @@ export default function Scripts() {
           setIsModalOpen={setIsCleanupModalOpen}
         />
       )}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
-        <div className="ml-5 flex items-center text-sm">
-          <FaScroll className="text-lg" />
-          &ensp; Scripts
-        </div>
-      </div>
+      <PageHeader icon={FaScroll} title="Scripts" />
       <div className="w-full h-fit p-5 flex flex-col pb-10 gap-4">
         <div className="bg-zinc-100 dark:bg-zinc-800 rounded-lg px-4 py-3 text-sm border dark:border-zinc-700">
           Active facility:{" "}

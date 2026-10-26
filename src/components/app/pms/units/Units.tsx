@@ -17,6 +17,7 @@ import { RiDoorLockFill } from "react-icons/ri";
 import DeleteModal from "@views/pms/DeleteModal";
 import CreateVisitorUnitPage from "@views/pms/units/CreateVisitorUnitPage";
 import DelinquencyModal from "@views/pms/units/DelinquencyModal";
+import PageHeader from "@components/shared/PageHeader";
 
 export default function Units({ currentFacilityName } : { currentFacilityName: string }) {
   const [units, setUnits] = useState<any[]>([]);
@@ -728,12 +729,7 @@ export default function Units({ currentFacilityName } : { currentFacilityName: s
       {/* Loading Spinner */}
       {!unitsPulled && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* Page Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
-        <div className="ml-5 flex items-center text-sm">
-          <RiDoorLockFill className="text-lg" />
-          &ensp; Units | {currentFacilityName}
-        </div>
-      </div>
+      <PageHeader icon={RiDoorLockFill} title="Units" subtitle={currentFacilityName} />
       <div className="w-full px-5 flex flex-col rounded-lg h-fit">
         {/* Totals Header */}
         <div className="mt-5 min-h-12 flex justify-center gap-32">

@@ -6,6 +6,7 @@ import { useAuth } from "@context/AuthProvider";
 import { supabase } from "@lib/supabaseClient";
 import InputBox from "@components/ui/InputBox";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
+import PageHeader from "@components/shared/PageHeader";
 
 export default function UserEvents() {
   const { user } = useAuth();
@@ -129,14 +130,7 @@ export default function UserEvents() {
     <div className={`relative ${isLoading ? "overflow-hidden min-h-full" : "overflow-auto"} dark:text-white dark:bg-zinc-900 h-full`}>
       {isLoading && <LoadingSpinner loadingText="Loading events..." />}
       {/* Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
-        <div className="ml-5 flex items-center text-sm">
-          <FaPerson className="text-lg" />
-          &ensp; User Events
-        </div>
-      </div>
-      {/* Display date/time of when events were pulled */}
-      <p className="text-sm dark:text-white text-left">{pullDate || ""}</p>
+      <PageHeader icon={FaPerson} title="User Events" meta={pullDate} />
       {/* Body */}
       <div className="w-full px-5 flex flex-col rounded-lg h-fit">
         {/* Search Bar */}

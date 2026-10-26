@@ -4,7 +4,8 @@ import SmartSpaceDashboardView from "@views/smartspace/dashboard/SmartSpaceDashb
 import SmartSpaceReports from "@views/smartspace/reports/SmartSpaceReports";
 import SmartSpaceMapping from "@views/smartspace/mapping/SmartSpaceMapping";
 import SmartSpaceTester from "@views/smartspace/tester/SmartSpaceTester";
-import { Link, useNavigate, useLocation, Routes, Route, Navigate } from "react-router-dom";
+import { useNavigate, useLocation, Routes, Route, Navigate } from "react-router-dom";
+import SidebarFooter from "@components/shared/SidebarFooter";
 import { useState } from "react";
 import { BsFillBuildingsFill, BsBuildingFill } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
@@ -54,16 +55,18 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }: { dashboard
 
             {/* Dashboard Section */}
             <div className={`pl-2 pr-2 pb-8 mt-8 ${isDashboardSection ? "bg-zinc-900 dark:bg-zinc-900 border-l-yellow-500 border-l-2" : ""}`}>
-              <div
-                className="flex justify-between items-center cursor-pointer mt-8"
+              <button
+                type="button"
+                className="flex w-full justify-between items-center cursor-pointer mt-8 text-left"
                 onClick={() => toggleSection("currentFacility")}
+                aria-expanded={!openSections.currentFacility}
               >
                 <div className="flex items-center space-x-2">
                   <BsBuildingFill className={`${isDashboardSection ? "text-yellow-500" : ""}`} />
                   <span className="pl-1 truncate max-w-[18ch]">Dashboard</span>
                 </div>
                 {openSections.currentFacility ? <MdExpandLess className="shrink-0 text-2xl" /> : <MdExpandMore className="shrink-0 text-2xl" />}
-              </div>
+              </button>
 
               {!openSections.currentFacility && (
                 <div className="mx-4 mt-4 space-y-2">
@@ -87,16 +90,18 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }: { dashboard
 
             {/* Facilities Section */}
             <div className={`border-t border-b pl-2 pr-2 border-zinc-500 pb-8 ${isFacilitiesSection ? "bg-zinc-900 dark:bg-zinc-900 border-l-yellow-500 border-l-2" : ""}`}>
-              <div
-                className="flex justify-between items-center cursor-pointer mt-8"
+              <button
+                type="button"
+                className="flex w-full justify-between items-center cursor-pointer mt-8 text-left"
                 onClick={() => toggleSection("facilities")}
+                aria-expanded={!openSections.facilities}
               >
                 <div className="flex items-center space-x-2">
                   <BsFillBuildingsFill className={`${isFacilitiesSection ? "text-yellow-500" : ""}`} />
                   <span className="pl-1 truncate max-w-[18ch]">Other Options</span>
                 </div>
                 {openSections.facilities ? <MdExpandLess className="shrink-0 text-2xl" /> : <MdExpandMore className="shrink-0 text-2xl" />}
-              </div>
+              </button>
 
               {!openSections.facilities && (
                 <div className="mx-4 mt-4 space-y-2">
@@ -116,13 +121,7 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }: { dashboard
               )}
             </div>
 
-            <div className="absolute bottom-0 w-full hidden md:flex justify-between text-sm hover:cursor-pointer text-center">
-              <Link to="/user-settings" className="hover:dark:bg-zinc-900 w-full p-2">Settings</Link>
-              <div className="hover:dark:bg-zinc-900 w-full p-2">
-                <a href="https://opentechalliancesupport.zendesk.com/hc/en-us/categories/115001966887-OpenTech-IoE" target="_blank" rel="noopener noreferrer">Help</a>
-              </div>
-              <div className="hover:dark:bg-zinc-900 w-full p-2" onClick={handleLogout}>Logout</div>
-            </div>
+            <SidebarFooter onLogout={handleLogout} />
           </div>
         )}
 

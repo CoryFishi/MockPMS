@@ -12,7 +12,9 @@ export default function PaginationFooter({
   setCurrentPage,
   items,
 }) {
-  const pageCount = Math.ceil(items.length / rowsPerPage);
+  const pageCount = Math.max(1, Math.ceil(items.length / rowsPerPage));
+  const firstItem = items.length === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
+  const lastItem = Math.min(currentPage * rowsPerPage, items.length);
 
   return (
     <div className="flex justify-between items-center select-none">
@@ -21,6 +23,7 @@ export default function PaginationFooter({
           <select
             className="border rounded-sm ml-2 dark:bg-zinc-800 dark:border-zinc-700 hover:cursor-pointer"
             id="rowsPerPage"
+            aria-label="Rows per page"
             value={rowsPerPage}
             onChange={(e) => {
               setRowsPerPage(Number(e.target.value));
@@ -36,17 +39,15 @@ export default function PaginationFooter({
           </select>
         </div>
         <p className="text-sm">
-          {currentPage === 1 ? 1 : (currentPage - 1) * rowsPerPage + 1} -{" "}
-          {currentPage * rowsPerPage > items.length
-            ? items.length
-            : currentPage * rowsPerPage}{" "}
-          of {items.length}
+          {firstItem} - {lastItem} of {items.length}
         </p>
       </div>
       <div className="gap-2 flex">
         <button
           disabled={currentPage === 1}
           onClick={() => setCurrentPage(1)}
+          aria-label="First page"
+          title="First page"
           className="hover:cursor-pointer disabled:cursor-not-allowed p-1 disabled:text-zinc-500"
         >
           <BiChevronsLeft />
@@ -54,6 +55,8 @@ export default function PaginationFooter({
         <button
           disabled={currentPage === 1}
           onClick={() => setCurrentPage((prev) => prev - 1)}
+          aria-label="Previous page"
+          title="Previous page"
           className="hover:cursor-pointer disabled:cursor-not-allowed p-1 disabled:text-zinc-500"
         >
           <BiChevronLeft />
@@ -62,15 +65,19 @@ export default function PaginationFooter({
           {currentPage} of {pageCount}
         </p>
         <button
-          disabled={currentPage === pageCount}
+          disabled={currentPage >= pageCount}
           onClick={() => setCurrentPage((prev) => prev + 1)}
+          aria-label="Next page"
+          title="Next page"
           className="hover:cursor-pointer disabled:cursor-not-allowed p-1 disabled:text-zinc-500"
         >
           <BiChevronRight />
         </button>
         <button
-          disabled={currentPage === pageCount}
+          disabled={currentPage >= pageCount}
           onClick={() => setCurrentPage(pageCount)}
+          aria-label="Last page"
+          title="Last page"
           className="hover:cursor-pointer disabled:cursor-not-allowed p-1 disabled:text-zinc-500"
         >
           <BiChevronsRight />

@@ -1,14 +1,14 @@
-import { RiTestTubeFill } from "react-icons/ri";
 import { useAuth } from "@context/AuthProvider";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import InputBox from "@components/ui/InputBox";
 import PaginationFooter from "@components/shared/PaginationFooter";
 import DataTable from "@components/shared/DataTable";
 import DetailModal from "@components/shared/DetailModal";
-import { RiErrorWarningFill } from "react-icons/ri";
+import { RiTestTubeFill, RiCheckboxCircleFill, RiCloseCircleFill } from "react-icons/ri";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { handleSingleLogin, buildApiUrl, authHeaders } from "@hooks/opentech";
+import PageHeader from "@components/shared/PageHeader";
 
 export default function SmartSpaceTester() {
   const { selectedTokens, getBearerToken } = useAuth();
@@ -33,6 +33,20 @@ export default function SmartSpaceTester() {
     setIsOpen(!isOpen);
   };
   const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const visibleSmartMotion = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return filteredSmartMotion;
+    return filteredSmartMotion.filter((r) =>
+      [r.name, r.currentSensorState, r.lastUpdateTimestampDisplay].some((v) =>
+        String(v ?? "").toLowerCase().includes(query)
+      )
+    );
+  }, [filteredSmartMotion, searchQuery]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   // Close modal if clicking outside of it
   useEffect(() => {
@@ -228,8 +242,8 @@ export default function SmartSpaceTester() {
       accessor: (r: any) => (r.hasDetectedMotion ? "Yes" : "No"),
       render: (r: any) => {
         const Icon = r.hasDetectedMotion
-          ? RiErrorWarningFill
-          : RiErrorWarningFill;
+          ? RiCheckboxCircleFill
+          : RiCloseCircleFill;
 
         const color = r.hasDetectedMotion ? "text-green-500" : "text-red-500";
 
@@ -307,15 +321,10 @@ export default function SmartSpaceTester() {
         />
       )}
       {/* Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
-        <div className="ml-5 flex items-center text-sm">
-          <RiTestTubeFill className="text-lg" />
-          &ensp; SmartMotion Tester
-        </div>
-      </div>
-      <div className="w-full gap-2 flex p-2 items-center">
+      <PageHeader icon={RiTestTubeFill} title="SmartMotion Tester" />
+      <div className="w-full gap-2 flex px-5 pt-5 pb-2 items-center">
         <InputBox
-          placeholder="Search reports..."
+          placeholder="Search sensors..."
           value={searchQuery}
           onchange={(e) => setSearchQuery(e.target.value)}
         />
@@ -392,7 +401,7 @@ export default function SmartSpaceTester() {
           <div className="h-[73vh] overflow-y-auto text-center">
             <DataTable
               columns={columns}
-              data={filteredSmartMotion}
+              data={visibleSmartMotion}
               currentPage={currentPage}
               rowsPerPage={rowsPerPage}
               sortDirection={sortDirection}
@@ -409,7 +418,7 @@ export default function SmartSpaceTester() {
               setRowsPerPage={setRowsPerPage}
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
-              items={filteredSmartMotion}
+              items={visibleSmartMotion}
             />
           </div>
         </>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { supabase } from "@lib/supabaseClient";
 import { useAuth } from "@context/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function LoginComp() {
   const { setUser, setIsPulled } = useAuth();
@@ -23,7 +24,7 @@ export default function LoginComp() {
     if (error) {
       setError(error.message);
     } else {
-      alert("Password reset email sent. Please check your inbox." + email);
+      toast.success(`Password reset email sent to ${email}. Please check your inbox.`, { duration: 5000 });
     }
   };
 
@@ -68,16 +69,20 @@ export default function LoginComp() {
         <input
           type="email"
           placeholder="Email"
+          aria-label="Email"
+          autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="bg-white w-full px-4 py-2 border border-zinc-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+          className="bg-white dark:bg-zinc-900 dark:text-white w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500"
         />
         <input
           type="password"
           placeholder="Password"
+          aria-label="Password"
+          autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="bg-white w-full px-4 py-2 border border-zinc-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+          className="bg-white dark:bg-zinc-900 dark:text-white w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500"
         />
         <button
           type="submit"
@@ -87,20 +92,22 @@ export default function LoginComp() {
         </button>
         <p className="text-center dark:text-white">
           Don&apos;t have an account? Register{" "}
-          <span
-            className="text-blue-400 hover:cursor-pointer"
+          <button
+            type="button"
+            className="text-blue-400 hover:underline hover:cursor-pointer"
             onClick={() => navigate("/register")}
           >
             Here
-          </span>
+          </button>
         </p>
         <p className="text-sm text-center dark:text-white">
-          <span
-            className="text-blue-400 hover:cursor-pointer"
+          <button
+            type="button"
+            className="text-blue-400 hover:underline hover:cursor-pointer"
             onClick={() => handleForgotPassword()}
           >
             Forgot your password?
-          </span>
+          </button>
         </p>
       </form>
     </div>

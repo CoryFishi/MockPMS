@@ -14,6 +14,7 @@ import GeneralButton from "@components/ui/GeneralButton";
 import TableButton from "@components/ui/TableButton";
 import { addEvent } from "@hooks/supabase";
 import { buildApiUrl, authHeaders } from "@hooks/opentech";
+import PageHeader from "@components/shared/PageHeader";
 
 export default function Visitors({ currentFacilityName }) {
   const [visitors, setVisitors] = useState<any[]>([]);
@@ -416,13 +417,7 @@ export default function Visitors({ currentFacilityName }) {
       {/* Loading Spinner */}
       {!visitorsPulled && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* Page Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
-        <div className="ml-5 flex items-center text-sm">
-          <FaPerson className="text-lg" />
-          &ensp; Visitors | {currentFacilityName}
-        </div>
-      </div>
-      {/* Load Time Label */}
+      <PageHeader icon={FaPerson} title="Visitors" subtitle={currentFacilityName} />
       <div className="w-full px-5 flex flex-col rounded-lg h-fit">
         {/* Totals Header */}
         <div className="mt-5 min-h-12 flex justify-center gap-32">

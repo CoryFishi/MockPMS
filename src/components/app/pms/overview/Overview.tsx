@@ -8,6 +8,7 @@ import { MdArrowDropDown } from "react-icons/md";
 import { BiInfoCircle } from "react-icons/bi";
 import { IoInformationCircle } from "react-icons/io5";
 import { buildApiUrl, authHeaders } from "@hooks/opentech";
+import PageHeader from "@components/shared/PageHeader";
 
 export default function Overview({ currentFacilityName } : { currentFacilityName: string }) {
   const { currentFacility } = useAuth();
@@ -186,12 +187,7 @@ export default function Overview({ currentFacilityName } : { currentFacilityName
       className={`relative overflow-auto h-full dark:text-white dark:bg-zinc-900`}
     >
       {/* Page Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
-        <div className="ml-5 flex items-center text-sm">
-          <RiDoorLockFill className="text-lg" />
-          &ensp; Overview | {currentFacilityName}
-        </div>
-      </div>
+      <PageHeader icon={RiDoorLockFill} title="Overview" subtitle={currentFacilityName} />
       <div className="w-full px-5 flex flex-col rounded-lg h-fit gap-2">
         {/* Action Groups */}
         <h2 className="flex items-center">

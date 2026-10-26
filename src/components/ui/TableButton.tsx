@@ -12,7 +12,6 @@ export default function TableButton({
       className={`cursor-pointer text-white px-2 py-1 rounded font-bold ${className}`}
       onClick={() => onclick()}
       type="button"
-      aria-label="table button"
     >
       {text || "No Text"}
     </button>

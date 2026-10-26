@@ -268,7 +268,7 @@ Call `setCurrentPage(1)` whenever the search query or a filter changes, or filte
 
 ### `<ModalContainer title icon mainContent responseContent onClose />`
 
-Standard modal shell. Use `ModalButton` for buttons inside `responseContent`.
+Standard modal shell. Use `ModalButton` for buttons inside `responseContent`. Modals that build their own header should use `<ModalCloseButton onclick />` (`@components/ui/ModalCloseButton`) rather than a hand-rolled "x".
 
 ### UI components (note the lowercase `onchange`/`onclick` props)
 
@@ -281,16 +281,18 @@ Standard modal shell. Use `ModalButton` for buttons inside `responseContent`.
 <SliderButton onclick={} value={bool} />          // toggle switch
 ```
 
-### Header bar (all list pages)
+### `<SidebarFooter onLogout />`
+
+The three `*DashboardLayout.tsx` sidebars end with `<SidebarFooter onLogout={handleLogout} />` (Settings / Help / Logout).
+
+### `<PageHeader icon title subtitle? meta? />` (top of every page)
 
 ```tsx
-<div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
-  <div className="ml-5 flex items-center text-sm">
-    <IconComponent className="text-lg" />
-    &ensp; Page Title
-  </div>
-</div>
+import PageHeader from "@components/shared/PageHeader";
+<PageHeader icon={RiDoorLockFill} title="Units" subtitle={currentFacilityName} meta={pullDate} />
 ```
+
+`subtitle` renders after a `|` separator; `meta` is right-aligned (e.g. a "last pulled" timestamp). Don't hand-roll the header bar.
 
 ---
 

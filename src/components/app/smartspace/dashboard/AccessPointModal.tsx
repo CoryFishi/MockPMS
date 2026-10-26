@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { FaWarehouse, FaCheckCircle } from "react-icons/fa";
 import { RiErrorWarningFill } from "react-icons/ri";
 import { IoIosWarning } from "react-icons/io";
+import ModalCloseButton from "@components/ui/ModalCloseButton";
 
 export default function AccessPointModal({
   accessPointModalOption,
@@ -157,12 +158,7 @@ export default function AccessPointModal({
               {facilityName}&apos;s Access Points
             </h2>
           </div>
-          <button
-            onClick={() => setIsAccessPointModalOpen(false)}
-            className="bg-zinc-100 h-full px-5 cursor-pointer rounded-tr text-zinc-600 dark:text-white dark:bg-zinc-800 dark:hover:hover:bg-red-500 hover:bg-red-500 transition duration-300 ease-in-out"
-          >
-            x
-          </button>
+          <ModalCloseButton onclick={() => setIsAccessPointModalOpen(false)} />
         </div>
         <div className="pt-5 px-5">
           {option && (

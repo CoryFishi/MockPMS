@@ -18,6 +18,7 @@ import {
 } from "react-icons/ri";
 import InputBox from "@components/ui/InputBox";
 import { getEnvironmentName, buildAuthUrl, buildApiUrl, authHeaders } from "@hooks/opentech";
+import PageHeader from "@components/shared/PageHeader";
 
 export default function SmartSpaceAllFacilitiesPage() {
   const [facilities, setFacilities] = useState([]);
@@ -420,12 +421,7 @@ export default function SmartSpaceAllFacilitiesPage() {
       {/* Loading Spinner */}
       {isLoading && <LoadingSpinner loadingText={currentLoadingText} />}
       {/* Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
-        <div className="ml-5 flex items-center text-sm">
-          <FaWarehouse className="text-lg" />
-          &ensp; All Facilities
-        </div>
-      </div>
+      <PageHeader icon={FaWarehouse} title="All Facilities" />
       {/* Body */}
       <div className="w-full px-5 flex flex-col rounded-lg h-full">
         {/* Search Bar */}

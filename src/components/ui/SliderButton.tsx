@@ -13,7 +13,8 @@ export default function SliderButton({ onclick, value, offValue, onValue } : {
       }`}
       onClick={() => onclick()}
       type="button"
-      aria-label="slider button"
+      role="switch"
+      aria-checked={value}
     >
       <div
         className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-500 ease-out text-xs flex items-center justify-center ${

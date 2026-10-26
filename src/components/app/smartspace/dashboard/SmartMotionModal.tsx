@@ -20,6 +20,7 @@ import {
 import { BsBuildingFill, BsDoorClosedFill } from "react-icons/bs";
 import { IoIosWarning } from "react-icons/io";
 import { GrStatusUnknown } from "react-icons/gr";
+import ModalCloseButton from "@components/ui/ModalCloseButton";
 
 export default function SmartMotionModal({
   smartMotionModalOption,
@@ -292,12 +293,7 @@ export default function SmartMotionModal({
               {facilityName}&apos;s SmartMotion Sensors
             </h2>
           </div>
-          <button
-            onClick={() => setIsSmartMotionModalOpen(false)}
-            className="bg-zinc-100 h-full px-5 cursor-pointer rounded-tr text-zinc-600 dark:text-white dark:bg-zinc-800 dark:hover:hover:bg-red-500 hover:bg-red-500 transition duration-300 ease-in-out"
-          >
-            x
-          </button>
+          <ModalCloseButton onclick={() => setIsSmartMotionModalOpen(false)} />
         </div>
         <div className="pt-5 px-5">
           {option && (

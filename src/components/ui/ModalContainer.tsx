@@ -1,4 +1,5 @@
 import React from "react";
+import ModalCloseButton from "@components/ui/ModalCloseButton";
 
 export default function ModalContainer({
   title,
@@ -17,7 +18,12 @@ export default function ModalContainer({
     // Modal Background
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
       {/* Modal Container */}
-      <div className="bg-white dark:bg-zinc-900 dark:text-white rounded shadow-lg">
+      <div
+        className="bg-white dark:bg-zinc-900 dark:text-white rounded shadow-lg"
+        role="dialog"
+        aria-modal="true"
+        aria-label={title || "Modal"}
+      >
         {/* Header Container */}
         <div className="pl-5 border-b-2 border-b-yellow-500 flex justify-between items-center h-10">
           <div className="flex items-center">
@@ -27,13 +33,7 @@ export default function ModalContainer({
           {responseContent ? (
             ""
           ) : (
-            <button
-              onClick={onClose}
-              className="bg-zinc-100 h-full px-5 cursor-pointer rounded-tr text-zinc-600 dark:text-white dark:bg-zinc-800 dark:hover:hover:bg-red-500 hover:bg-red-500 transition duration-300 ease-in-out"
-              title="Close"
-            >
-              x
-            </button>
+            <ModalCloseButton onclick={onClose} />
           )}
         </div>
         {/* Content Container */}

@@ -19,6 +19,7 @@ import {
 } from "react-icons/ri";
 import { BsShieldLockFill } from "react-icons/bs";
 import { IoIosWarning } from "react-icons/io";
+import ModalCloseButton from "@components/ui/ModalCloseButton";
 
 export default function SmartLockModal({
   smartlockModalOption,
@@ -295,12 +296,7 @@ export default function SmartLockModal({
               {facilityName}&apos;s SmartLocks
             </h2>
           </div>
-          <button
-            onClick={() => setIsSmartlockModalOpen(false)}
-            className="bg-zinc-100 h-full px-5 cursor-pointer rounded-tr text-zinc-600 dark:text-white dark:bg-zinc-800 dark:hover:hover:bg-red-500 hover:bg-red-500 transition duration-300 ease-in-out"
-          >
-            x
-          </button>
+          <ModalCloseButton onclick={() => setIsSmartlockModalOpen(false)} />
         </div>
         <div className="pt-5 px-5">
           {option && (

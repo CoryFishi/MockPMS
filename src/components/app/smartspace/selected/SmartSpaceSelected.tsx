@@ -10,6 +10,7 @@ import {
   RiCheckboxBlankCircleLine,
 } from "react-icons/ri";
 import InputBox from "@components/ui/InputBox";
+import PageHeader from "@components/shared/PageHeader";
 
 export default function SmartSpaceSelectedPage() {
   const [facilities, setFacilities] = useState([]);
@@ -234,15 +235,10 @@ export default function SmartSpaceSelectedPage() {
   return (
     <div className="relative overflow-auto h-full dark:text-white dark:bg-zinc-900">
       {/* Header */}
-      <div className="flex h-12 bg-zinc-200 items-center dark:border-zinc-700 dark:bg-zinc-950">
-        <div className="ml-5 flex items-center text-sm">
-          <RiCheckboxCircleFill className="text-lg" />
-          &ensp; Selected Facilities
-        </div>
-      </div>
+      <PageHeader icon={RiCheckboxCircleFill} title="Selected Facilities" />
       {/* Body */}
       <div className="w-full px-5 flex flex-col rounded-lg h-full">
-        {/* Seach Bar */}
+        {/* Search Bar */}
         <div className="mt-5 mb-2 flex items-center justify-end text-center">
           <InputBox
             placeholder="Search facilities..."
