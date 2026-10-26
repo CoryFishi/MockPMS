@@ -26,7 +26,7 @@ npm run dev        # http://localhost:5173 (needs a .env with the Supabase keys)
 - There is no test suite. Behavior changes are verified by running the app, which needs real Supabase + OpenTech credentials — if you cannot, say so rather than claiming the change works.
 - `tsconfig` has `strict: false` and much of the code is loosely typed (`any`). Type new code properly; don't widen existing types to silence errors.
 - Unused vars are flagged by `@typescript-eslint/no-unused-vars`; prefix intentionally unused args with `_`.
-- `.env` holds the Supabase **service role key** — never print it, commit it, or paste it into output.
+- `.env` holds Supabase keys — never print it, commit it, or paste it into output. Everything `VITE_*` is bundled into the public JS, so a secret must never get a `VITE_` variable.
 - Design specs and implementation plans live in `docs/superpowers/{specs,plans}/`, named `YYYY-MM-DD-<topic>.md`.
 
 ---
@@ -47,7 +47,8 @@ src/
 │   ├── opentech.ts           # OpenTech URL/header/login helpers + Facility type
 │   ├── smartspace.ts         # React Query facility-status fetching for the SmartSpace dashboard
 │   └── supabase.ts           # addEvent() user-event logging
-└── lib/supabaseClient.ts     # supabase + supabaseAdmin clients
+└── lib/supabaseClient.ts     # the single Supabase client (anon key)
+supabase/migrations/          # SQL migrations (RLS policies, admin functions) — applied manually in the Supabase SQL editor
 ```
 
 Notable pages: `pms/DeleteModal.tsx` is shared by `units/` and `visitors/`. `admin/users/CopyUserData.tsx` merges/replaces tokens, favorites, and selected facilities between users. `smartspace/mapping/` is a react-konva floor-plan editor (`applyChange.ts` holds its state transitions; `facility1.json` is sample data).
@@ -69,7 +70,6 @@ Typed in `src/vite-env.d.ts`; read via `import.meta.env.VITE_*`.
 ```env
 VITE_SUPABASE_URL=         # Supabase project URL
 VITE_SUPABASE_KEY=         # Public anon key (row-level security applies)
-VITE_SUPABASE_SERVICE_KEY= # Service role key (bypasses RLS — admin operations only)
 VITE_WEATHER_KEY=          # weatherapi.com key — used by hooks/smartspace.ts for facility weather
 VITE_RESEND_KEY=           # Listed in README but not read anywhere in src/
 ```
@@ -200,10 +200,17 @@ useEffect(() => {
 ## Supabase
 
 ```typescript
-import { supabase, supabaseAdmin } from "@lib/supabaseClient";
-// supabase      — public client, row-level security applies (current user's own rows)
-// supabaseAdmin — service role client, bypasses RLS (needed to read/write other users' rows)
+import { supabase } from "@lib/supabaseClient"; // anon key; RLS applies to every call
 ```
+
+There is no service-role client in the frontend. Admin powers come from the database (`supabase/migrations/20261026000000_admin_rls.sql`):
+
+- `public.is_admin()` — true when the caller's `user_data.role = 'admin'`; used by the RLS policies.
+- **RLS** — everyone reads/writes their own `user_data` row and logs/reads their own `user_events`; all signed-in users read `roles`; admins read/update/delete all `user_data`, write `roles`, and read all `user_events`.
+- **`guard_user_data_role` trigger** — only admins can change `user_data.role` (non-admins may insert with `role` `'user'` or null).
+- **`supabase.rpc("admin_delete_user", { target_user_id })`** — deletes a user's `user_data` row and auth account; admin-only, can't delete yourself.
+
+New admin capability = new policy or `SECURITY DEFINER` function in a new migration, never a privileged key in the frontend. After DDL changes, run `supabase/verify_admin_rls.sql`.
 
 Log user actions with `import { addEvent } from "@hooks/supabase"` → `addEvent(name, description, completed)`.
 
@@ -324,6 +331,6 @@ toast.promise(save(), { loading: "Saving...", success: <b>Saved!</b>, error: <b>
 
 1. **`currentFacility.token`** is only populated after a facility is selected. Guard API calls with `if (!currentFacility.token) return;`.
 2. **`isPulled`** (AuthProvider) is set after the first Supabase fetch and prevents re-fetching. Only reset it to force a full reload.
-3. **Admin pages use `supabaseAdmin`** for `user_data` and `roles` reads/writes. The RLS-bound `supabase` client doesn't error on another user's row — the update just matches zero rows and reports success.
+3. **RLS fails silently** — an update/delete blocked by a policy doesn't error; it matches zero rows and returns success. When an admin write "succeeds" but nothing changes, check the policies (and that the caller's `role` really is `admin`).
 4. **OAuth bodies use `qs.stringify()`** with `application/x-www-form-urlencoded`, not `JSON.stringify`.
 5. **Windows case-only renames** (e.g. `UI` → `ui`) need a two-step rename through a temp name; the filesystem is case-insensitive.

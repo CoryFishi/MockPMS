@@ -1,7 +1,7 @@
 import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
 import toast from "react-hot-toast";
 import { FaCopy } from "react-icons/fa";
-import { supabaseAdmin } from "@lib/supabaseClient";
+import { supabase } from "@lib/supabaseClient";
 import { addEvent } from "@hooks/supabase";
 import { useAuth } from "@context/AuthProvider";
 import ModalContainer from "@components/ui/ModalContainer";
@@ -80,7 +80,7 @@ export default function CopyUserData({
 
     try {
       // Read both rows fresh so we don't overwrite changes made since the table loaded
-      const { data: rows, error: fetchError } = await supabaseAdmin
+      const { data: rows, error: fetchError } = await supabase
         .from("user_data")
         .select(`user_id,${columns}`)
         .in("user_id", [sourceUser.user_id, targetUserId]);
@@ -100,7 +100,7 @@ export default function CopyUserData({
             : mergeLists(key, target[key] || [], source[key] || []);
       }
 
-      const { error } = await supabaseAdmin
+      const { error } = await supabase
         .from("user_data")
         .update(update)
         .eq("user_id", targetUserId);

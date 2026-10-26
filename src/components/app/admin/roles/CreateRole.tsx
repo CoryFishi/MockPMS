@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { IoIosCreate } from "react-icons/io";
-import { supabaseAdmin } from "@lib/supabaseClient";
+import { supabase } from "@lib/supabaseClient";
 
 export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
   // Store the unit number to be created
@@ -42,7 +42,7 @@ export default function CreateRole({ setIsCreateRoleModalOpen, setRoles }) {
         return Promise.reject(new Error("Missing a role description!"));
       }
 
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await supabase
         .from("roles")
         .insert([
           {

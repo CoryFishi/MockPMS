@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { FaPerson } from "react-icons/fa6";
 import { useAuth } from "@context/AuthProvider";
-import { supabaseAdmin } from "@lib/supabaseClient";
+import { supabase } from "@lib/supabaseClient";
 import toast from "react-hot-toast";
 import EditUser from "@views/admin/users/EditUser";
 import CopyUserData from "@views/admin/users/CopyUserData";
@@ -82,7 +82,7 @@ export default function Users() {
 
   const getUsers = useCallback(async () => {
     if (!user) return;
-    const { data, error } = await supabaseAdmin.from("user_data").select("*");
+    const { data, error } = await supabase.from("user_data").select("*");
 
     if (error) {
       console.error("Error fetching events:", error);
@@ -95,26 +95,15 @@ export default function Users() {
 
   const deleteUser = async (userId: string) => {
     try {
-      // Delete the user from Supabase Auth
-      const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(
-        userId
-      );
-      if (authError) {
+      // Deletes the user_data row and the auth user; the database checks the
+      // caller is an admin (see supabase/migrations/*_admin_rls.sql)
+      const { error } = await supabase.rpc("admin_delete_user", {
+        target_user_id: userId,
+      });
+      if (error) {
         addEvent("User Deleted", `${user.email} deleted user ${userId}`, false);
-        console.error("Error deleting user:", authError);
-        throw new Error("Failed to delete user from Auth.");
-      }
-
-      // Delete the user's row from the user_data table
-      const { error: dataError } = await supabaseAdmin
-        .from("user_data")
-        .delete()
-        .eq("user_id", userId);
-
-      if (dataError) {
-        addEvent("User Deleted", `${user.email} deleted user ${userId}`, false);
-        console.error("Error deleting user data:", dataError);
-        throw new Error("Failed to delete user data.");
+        console.error("Error deleting user:", error);
+        throw new Error("Failed to delete user.");
       }
 
       // Success

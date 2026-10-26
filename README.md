@@ -32,10 +32,11 @@ This project is a web-based dashboard for managing property facilities and smart
    ```
    VITE_SUPABASE_URL=your_supabase_url
    VITE_SUPABASE_KEY=your_supabase_anon_key
-   VITE_SUPABASE_SERVICE_KEY=your_supabase_service_key
    VITE_WEATHER_KEY=your_openweathermap_key
    VITE_RESEND_KEY=your_resend_key #This may be deprecated
    ```
+
+4. Apply the SQL in `supabase/migrations/` to your Supabase project (SQL editor), in filename order. Admin access is enforced by these RLS policies — the app never uses a service role key.
 
 ### Running the App
 

@@ -5,7 +5,7 @@ import DataTable from "@components/shared/DataTable";
 import React, { useRef, useState, useEffect } from "react";
 import { FaPerson } from "react-icons/fa6";
 import { useAuth } from "@context/AuthProvider";
-import { supabaseAdmin } from "@lib/supabaseClient";
+import { supabase } from "@lib/supabaseClient";
 import toast from "react-hot-toast";
 import InputBox from "@components/ui/InputBox";
 import LoadingSpinner from "@components/shared/LoadingSpinner";
@@ -82,7 +82,7 @@ export default function Roles() {
   const deleteRole = async (roleId: number) => {
     try {
       // Delete the role
-      const { error } = await supabaseAdmin.from("roles").delete().eq("id", roleId);
+      const { error } = await supabase.from("roles").delete().eq("id", roleId);
       if (error) {
         console.error("Error deleting the role:", error);
         throw new Error("Failed to delete role.");
@@ -100,7 +100,7 @@ export default function Roles() {
     if (!rolesPulled) {
       const getRoles = async () => {
         if (!user) return;
-        const { data, error } = await supabaseAdmin.from("roles").select("*");
+        const { data, error } = await supabase.from("roles").select("*");
         if (error) {
           console.error("Error fetching roles:", error);
         } else {
@@ -110,7 +110,7 @@ export default function Roles() {
       };
       const getUsers = async () => {
         if (!user) return;
-        const { data, error } = await supabaseAdmin.from("user_data").select("*");
+        const { data, error } = await supabase.from("user_data").select("*");
         if (error) {
           console.error("Error fetching users:", error);
         } else {
