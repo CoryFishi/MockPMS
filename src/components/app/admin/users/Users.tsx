@@ -4,6 +4,7 @@ import { useAuth } from "@context/AuthProvider";
 import { supabaseAdmin } from "@lib/supabaseClient";
 import toast from "react-hot-toast";
 import EditUser from "@views/admin/users/EditUser";
+import CopyUserData from "@views/admin/users/CopyUserData";
 import PaginationFooter from "@components/shared/PaginationFooter";
 import { addEvent } from "@hooks/supabase";
 import DataTable from "@components/shared/DataTable";
@@ -21,6 +22,7 @@ export default function Users() {
   const [selfUser] = useState(user);
   const modalRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
   const [isEditUserModalOpen, setIsEditUserModalOpen] = useState<boolean>(false);
+  const [isCopyUserDataModalOpen, setIsCopyUserDataModalOpen] = useState<boolean>(false);
   const [selectedUser, setSelectedUser] = useState<any | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortedColumn, setSortedColumn] = useState<string | null>(null);
@@ -232,6 +234,16 @@ export default function Users() {
                 Edit
               </button>
               <button
+                className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md hover:cursor-pointer"
+                onClick={() => {
+                  setSelectedUser(user);
+                  setIsCopyUserDataModalOpen(true);
+                  setDropdownIndex(null);
+                }}
+              >
+                Copy Data
+              </button>
+              <button
                 className="hover:bg-zinc-100 dark:hover:bg-zinc-700 px-3 py-2 text-md hover:cursor-pointer rounded-b"
                 onClick={() => {
                   setDropdownIndex(null);
@@ -271,6 +283,15 @@ export default function Users() {
         <EditUser
           setIsEditUserModalOpen={setIsEditUserModalOpen}
           selectedUser={selectedUser}
+          setUsers={setUsers}
+        />
+      )}
+      {/* Copy User Data Modal */}
+      {isCopyUserDataModalOpen && (
+        <CopyUserData
+          setIsCopyUserDataModalOpen={setIsCopyUserDataModalOpen}
+          sourceUser={selectedUser}
+          users={users}
           setUsers={setUsers}
         />
       )}
