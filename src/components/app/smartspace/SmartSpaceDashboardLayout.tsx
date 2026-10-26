@@ -12,7 +12,8 @@ import { supabase } from "@lib/supabaseClient";
 
 // Heavy pages (recharts, react-konva) load on first visit
 const SmartSpaceReports = lazy(() => import("@views/smartspace/reports/SmartSpaceReports"));
-const SmartSpaceMapping = lazy(() => import("@views/smartspace/mapping/SmartSpaceMapping"));
+const SitePlans = lazy(() => import("@views/smartspace/mapping/SitePlans"));
+const SitePlanEditor = lazy(() => import("@views/smartspace/mapping/SitePlanEditor"));
 const SmartSpaceTester = lazy(() => import("@views/smartspace/tester/SmartSpaceTester"));
 
 export default function SmartSpaceDashboardLayout({ dashboardMenu }: { dashboardMenu: boolean }) {
@@ -137,7 +138,8 @@ export default function SmartSpaceDashboardLayout({ dashboardMenu }: { dashboard
             <Route path="selected"       element={<SmartSpaceSelectedPage />} />
             <Route path="dashboard"      element={<SmartSpaceDashboardView />} />
             <Route path="reports"        element={<SmartSpaceReports />} />
-            <Route path="mapping"        element={<SmartSpaceMapping />} />
+            <Route path="mapping"        element={<SitePlans />} />
+            <Route path="mapping/:planId" element={<SitePlanEditor />} />
             <Route path="tester"         element={<SmartSpaceTester />} />
             <Route path="*"              element={<Navigate to="all-facilities" replace />} />
           </Routes>
